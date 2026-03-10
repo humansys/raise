@@ -1,0 +1,86 @@
+{
+  "scan_summary": {
+    "files_scanned": 1,
+    "total_symbols": 3,
+    "public_symbols": 3,
+    "internal_symbols": 0,
+    "errors": []
+  },
+  "confidence_distribution": {
+    "high": 0,
+    "medium": 1,
+    "low": 1
+  },
+  "categories": {
+    "model": 1,
+    "other": 1
+  },
+  "components": [
+    {
+      "id": "comp-service.handler-MyClass",
+      "name": "MyClass",
+      "kind": "class",
+      "file": "src/service/handler.py",
+      "line": 10,
+      "signature": "class MyClass(BaseModel)",
+      "module": "service.handler",
+      "confidence": {
+        "score": 55,
+        "tier": "medium",
+        "signals": {
+          "has_docstring": true,
+          "docstring_length": 38,
+          "has_type_annotations": false,
+          "path_matches_convention": false,
+          "known_base_class": "BaseModel",
+          "name_follows_convention": true,
+          "parent_validated": false,
+          "has_semantic_suffix": false
+        }
+      },
+      "auto_category": "model",
+      "auto_purpose": "A class that handles service requests.",
+      "depends_on": [],
+      "internal": false,
+      "methods": [
+        "process"
+      ],
+      "docstring": "A class that handles service requests."
+    },
+    {
+      "id": "comp-service.handler-helper",
+      "name": "helper",
+      "kind": "function",
+      "file": "src/service/handler.py",
+      "line": 30,
+      "signature": "def helper(x: int) -> str",
+      "module": "service.handler",
+      "confidence": {
+        "score": 15,
+        "tier": "low",
+        "signals": {
+          "has_docstring": false,
+          "docstring_length": 0,
+          "has_type_annotations": true,
+          "path_matches_convention": false,
+          "known_base_class": null,
+          "name_follows_convention": true,
+          "parent_validated": false,
+          "has_semantic_suffix": false
+        }
+      },
+      "auto_category": "other",
+      "auto_purpose": "",
+      "depends_on": [],
+      "internal": false,
+      "methods": [],
+      "docstring": null
+    }
+  ],
+  "module_groups": {
+    "src/service/handler.py": [
+      "comp-service.handler-MyClass",
+      "comp-service.handler-helper"
+    ]
+  }
+}

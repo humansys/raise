@@ -1,0 +1,5894 @@
+generated_at: '2026-02-09T16:30:29.684335+00:00'
+source_command: raise discover scan src/raise_cli --language python --output json | raise discover analyze
+symbol_count: 345
+scan_summary:
+  files_scanned: 94
+  total_symbols: 648
+  public_symbols: 418
+  internal_symbols: 230
+  errors: []
+confidence_distribution:
+  high: 214
+  medium: 131
+  low: 0
+categories:
+  exception: 11
+  service: 95
+  model: 64
+  other: 31
+  utility: 44
+  parser: 27
+  builder: 18
+  config: 2
+  formatter: 19
+  schema: 1
+  command: 33
+components:
+- id: comp-exceptions-RaiseError
+  name: RaiseError
+  kind: class
+  file: exceptions.py
+  line: 25
+  signature: class RaiseError(Exception)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 55
+  methods:
+  - to_dict
+  purpose: Base exception class for all raise-cli errors, providing consistent exit codes, error codes, hints, and structured
+    details for scripting and user guidance.
+  category: exception
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-ConfigurationError
+  name: ConfigurationError
+  kind: class
+  file: exceptions.py
+  line: 80
+  signature: class ConfigurationError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception for configuration-related errors such as malformed config files, missing configuration, or invalid values.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-KataNotFoundError
+  name: KataNotFoundError
+  kind: class
+  file: exceptions.py
+  line: 95
+  signature: class KataNotFoundError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception raised when a requested kata ID does not exist in .raise/katas/.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-GateNotFoundError
+  name: GateNotFoundError
+  kind: class
+  file: exceptions.py
+  line: 107
+  signature: class GateNotFoundError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception raised when a requested gate ID does not exist in .raise/gates/.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-ArtifactNotFoundError
+  name: ArtifactNotFoundError
+  kind: class
+  file: exceptions.py
+  line: 119
+  signature: class ArtifactNotFoundError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception raised when a referenced artifact path does not exist.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-DependencyError
+  name: DependencyError
+  kind: class
+  file: exceptions.py
+  line: 131
+  signature: class DependencyError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception raised when a required external tool (git, ast-grep, ripgrep) is not installed or accessible.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-StateError
+  name: StateError
+  kind: class
+  file: exceptions.py
+  line: 146
+  signature: class StateError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception raised when state file is corrupted, cannot be parsed, or has schema validation failures.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-ValidationError
+  name: ValidationError
+  kind: class
+  file: exceptions.py
+  line: 161
+  signature: class ValidationError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception raised when schema validation fails, artifact content validation fails, or input format is invalid.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-exceptions-GateFailedError
+  name: GateFailedError
+  kind: class
+  file: exceptions.py
+  line: 176
+  signature: class GateFailedError(RaiseError)
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Exception raised when gate validation criteria fail, representing business logic failure rather than system error.
+  category: exception
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-writer-EmitResult
+  name: EmitResult
+  kind: class
+  file: telemetry/writer.py
+  line: 30
+  signature: class EmitResult
+  module: telemetry.writer
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Dataclass representing the result of emitting a telemetry signal, indicating success status, file path, and any
+    error message.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-schemas-SkillEvent
+  name: SkillEvent
+  kind: class
+  file: telemetry/schemas.py
+  line: 24
+  signature: class SkillEvent(BaseModel)
+  module: telemetry.schemas
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A skill invocation event.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-schemas-SessionEvent
+  name: SessionEvent
+  kind: class
+  file: telemetry/schemas.py
+  line: 59
+  signature: class SessionEvent(BaseModel)
+  module: telemetry.schemas
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A session lifecycle event.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-schemas-CalibrationEvent
+  name: CalibrationEvent
+  kind: class
+  file: telemetry/schemas.py
+  line: 97
+  signature: class CalibrationEvent(BaseModel)
+  module: telemetry.schemas
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A calibration data point for velocity tracking.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-schemas-ErrorEvent
+  name: ErrorEvent
+  kind: class
+  file: telemetry/schemas.py
+  line: 136
+  signature: class ErrorEvent(BaseModel)
+  module: telemetry.schemas
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A tool error event.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-schemas-CommandUsage
+  name: CommandUsage
+  kind: class
+  file: telemetry/schemas.py
+  line: 170
+  signature: class CommandUsage(BaseModel)
+  module: telemetry.schemas
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A CLI command usage event.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-schemas-WorkLifecycle
+  name: WorkLifecycle
+  kind: class
+  file: telemetry/schemas.py
+  line: 198
+  signature: class WorkLifecycle(BaseModel)
+  module: telemetry.schemas
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A unified work lifecycle event for Lean flow analysis.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-close-CloseInput
+  name: CloseInput
+  kind: class
+  file: session/close.py
+  line: 49
+  signature: class CloseInput
+  module: session.close
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Pydantic model for structured session close input, capturing summary, outcomes, patterns, corrections, and session
+    state for atomic write operations.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-close-CloseResult
+  name: CloseResult
+  kind: class
+  file: session/close.py
+  line: 69
+  signature: class CloseResult
+  module: session.close
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Dataclass representing the result of session close operation, including session ID, counts of added items, and
+    status messages.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-tools-ToolResult
+  name: ToolResult
+  kind: class
+  file: core/tools.py
+  line: 28
+  signature: class ToolResult
+  module: core.tools
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - success
+  purpose: Dataclass representing the result from running an external tool, capturing returncode, stdout, and stderr.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-tools-GitStatus
+  name: GitStatus
+  kind: class
+  file: core/tools.py
+  line: 48
+  signature: class GitStatus
+  module: core.tools
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Dataclass representing parsed git status output with staged, modified, untracked files, and current branch name.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-tools-SearchMatch
+  name: SearchMatch
+  kind: class
+  file: core/tools.py
+  line: 65
+  signature: class SearchMatch
+  module: core.tools
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Dataclass representing a search match from ripgrep or ast-grep, containing file path, line number, and matched
+    text.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-writer-SessionIndexValidation
+  name: SessionIndexValidation
+  kind: class
+  file: memory/writer.py
+  line: 24
+  signature: class SessionIndexValidation
+  module: memory.writer
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - summary
+  purpose: Dataclass for validating session index quality, detecting missing IDs, non-standard formats, duplicates, and sequence
+    gaps.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-writer-PatternInput
+  name: PatternInput
+  kind: class
+  file: memory/writer.py
+  line: 188
+  signature: class PatternInput(BaseModel)
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Input for creating a new pattern entry.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-CalibrationInput
+  name: CalibrationInput
+  kind: class
+  file: memory/writer.py
+  line: 212
+  signature: class CalibrationInput(BaseModel)
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Input for creating a new calibration entry.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-SessionInput
+  name: SessionInput
+  kind: class
+  file: memory/writer.py
+  line: 236
+  signature: class SessionInput(BaseModel)
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Input for creating a new session entry.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-WriteResult
+  name: WriteResult
+  kind: class
+  file: memory/writer.py
+  line: 254
+  signature: class WriteResult(BaseModel)
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Result of a write operation.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-migration-MigrationResult
+  name: MigrationResult
+  kind: class
+  file: memory/migration.py
+  line: 16
+  signature: class MigrationResult
+  module: memory.migration
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - summary
+  purpose: Dataclass representing the result of migrating session, telemetry, and calibration data from project to personal
+    directory.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-MemoryScope
+  name: MemoryScope
+  kind: class
+  file: memory/models.py
+  line: 16
+  signature: class MemoryScope(str, Enum)
+  module: memory.models
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining memory data scope tiers (GLOBAL, PROJECT, PERSONAL) determining storage location and visibility precedence.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-MemoryConceptType
+  name: MemoryConceptType
+  kind: class
+  file: memory/models.py
+  line: 36
+  signature: class MemoryConceptType(str, Enum)
+  module: memory.models
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining types of memory concepts (PATTERN, CALIBRATION, SESSION) extracted from JSONL files.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-PatternSubType
+  name: PatternSubType
+  kind: class
+  file: memory/models.py
+  line: 50
+  signature: class PatternSubType(str, Enum)
+  module: memory.models
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining pattern sub-types (CODEBASE, PROCESS, ARCHITECTURE, TECHNICAL) for categorizing learned patterns.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-MemoryRelationshipType
+  name: MemoryRelationshipType
+  kind: class
+  file: memory/models.py
+  line: 66
+  signature: class MemoryRelationshipType(str, Enum)
+  module: memory.models
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining relationship types between memory concepts (LEARNED_FROM, RELATED_TO, VALIDATES, APPLIES_TO).
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-MemoryConcept
+  name: MemoryConcept
+  kind: class
+  file: memory/models.py
+  line: 82
+  signature: class MemoryConcept(BaseModel)
+  module: memory.models
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - token_estimate
+  purpose: A memory concept extracted from JSONL files.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-models-MemoryRelationship
+  name: MemoryRelationship
+  kind: class
+  file: memory/models.py
+  line: 128
+  signature: class MemoryRelationship(BaseModel)
+  module: memory.models
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A relationship between two memory concepts.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-models-MemoryLoadResult
+  name: MemoryLoadResult
+  kind: class
+  file: memory/models.py
+  line: 156
+  signature: class MemoryLoadResult(BaseModel)
+  module: memory.models
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Result of loading memory from JSONL files.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory_md-MemoryMdGenerator
+  name: MemoryMdGenerator
+  kind: class
+  file: onboarding/memory_md.py
+  line: 34
+  signature: class MemoryMdGenerator
+  module: onboarding.memory_md
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - generate
+  purpose: Generates MEMORY.md content from methodology.yaml and patterns.jsonl for AI editor system prompts.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-bootstrap-BootstrapResult
+  name: BootstrapResult
+  kind: class
+  file: onboarding/bootstrap.py
+  line: 31
+  signature: class BootstrapResult(BaseModel)
+  module: onboarding.bootstrap
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Result of base Rai bootstrap operation.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-Confidence
+  name: Confidence
+  kind: class
+  file: onboarding/conventions.py
+  line: 21
+  signature: class Confidence(str, Enum)
+  module: onboarding.conventions
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining confidence levels (HIGH, MEDIUM, LOW) for detected conventions based on consistency ratio and sample
+    size.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-conventions-IndentationConvention
+  name: IndentationConvention
+  kind: class
+  file: onboarding/conventions.py
+  line: 35
+  signature: class IndentationConvention(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detected indentation convention.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-QuoteConvention
+  name: QuoteConvention
+  kind: class
+  file: onboarding/conventions.py
+  line: 53
+  signature: class QuoteConvention(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detected string quote style convention.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-LineLengthConvention
+  name: LineLengthConvention
+  kind: class
+  file: onboarding/conventions.py
+  line: 69
+  signature: class LineLengthConvention(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detected line length convention.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-StyleConventions
+  name: StyleConventions
+  kind: class
+  file: onboarding/conventions.py
+  line: 83
+  signature: class StyleConventions(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Code style conventions detected in the project.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-NamingConvention
+  name: NamingConvention
+  kind: class
+  file: onboarding/conventions.py
+  line: 94
+  signature: class NamingConvention(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detected naming pattern for a symbol type.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-NamingConventions
+  name: NamingConventions
+  kind: class
+  file: onboarding/conventions.py
+  line: 112
+  signature: class NamingConventions(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Naming conventions by symbol type.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-StructureConventions
+  name: StructureConventions
+  kind: class
+  file: onboarding/conventions.py
+  line: 124
+  signature: class StructureConventions(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Project structure conventions.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-ConventionResult
+  name: ConventionResult
+  kind: class
+  file: onboarding/conventions.py
+  line: 140
+  signature: class ConventionResult(BaseModel)
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Complete result of convention detection.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-manifest-ProjectInfo
+  name: ProjectInfo
+  kind: class
+  file: onboarding/manifest.py
+  line: 22
+  signature: class ProjectInfo(BaseModel)
+  module: onboarding.manifest
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Information about the project detected during init.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-manifest-ProjectManifest
+  name: ProjectManifest
+  kind: class
+  file: onboarding/manifest.py
+  line: 38
+  signature: class ProjectManifest(BaseModel)
+  module: onboarding.manifest
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Project manifest stored in .
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-detection-ProjectType
+  name: ProjectType
+  kind: class
+  file: onboarding/detection.py
+  line: 79
+  signature: class ProjectType(str, Enum)
+  module: onboarding.detection
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining project types (GREENFIELD, BROWNFIELD) based on existence of code files.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-detection-DetectionResult
+  name: DetectionResult
+  kind: class
+  file: onboarding/detection.py
+  line: 92
+  signature: class DetectionResult
+  module: onboarding.detection
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Dataclass representing project type detection result with project type and code file count.
+  category: model
+  depends_on:
+  - ProjectType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-skills-SkillScaffoldResult
+  name: SkillScaffoldResult
+  kind: class
+  file: onboarding/skills.py
+  line: 30
+  signature: class SkillScaffoldResult(BaseModel)
+  module: onboarding.skills
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Result of skill scaffolding operation.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-governance-GuardrailLevel
+  name: GuardrailLevel
+  kind: class
+  file: onboarding/governance.py
+  line: 27
+  signature: class GuardrailLevel(str, Enum)
+  module: onboarding.governance
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining guardrail enforcement levels (MUST, SHOULD, COULD) mapping to MoSCoW prioritization.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-governance-GeneratedGuardrail
+  name: GeneratedGuardrail
+  kind: class
+  file: onboarding/governance.py
+  line: 41
+  signature: class GeneratedGuardrail(BaseModel)
+  module: onboarding.governance
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A guardrail generated from detected conventions.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-governance-GuardrailGenerator
+  name: GuardrailGenerator
+  kind: class
+  file: onboarding/governance.py
+  line: 59
+  signature: class GuardrailGenerator
+  module: onboarding.governance
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - confidence_to_level
+  - generate
+  - to_markdown
+  purpose: Generates guardrails from detected conventions by mapping confidence levels to enforcement levels.
+  category: builder
+  depends_on:
+  - Confidence
+  - ConventionResult
+  - GuardrailLevel
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-governance-GovernanceScaffoldResult
+  name: GovernanceScaffoldResult
+  kind: class
+  file: onboarding/governance.py
+  line: 386
+  signature: class GovernanceScaffoldResult(BaseModel)
+  module: onboarding.governance
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Result of governance scaffolding.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-claudemd-ClaudeMdGenerator
+  name: ClaudeMdGenerator
+  kind: class
+  file: onboarding/claudemd.py
+  line: 15
+  signature: class ClaudeMdGenerator
+  module: onboarding.claudemd
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - generate
+  purpose: Generates project-specific CLAUDE.md content with detected conventions, structure, and governance references.
+  category: builder
+  depends_on:
+  - ConventionResult
+  - DetectionResult
+  - ProjectType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-profile-ExperienceLevel
+  name: ExperienceLevel
+  kind: class
+  file: onboarding/profile.py
+  line: 20
+  signature: class ExperienceLevel(str, Enum)
+  module: onboarding.profile
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining developer experience level with RaiSE using Shu-Ha-Ri model.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-profile-CommunicationStyle
+  name: CommunicationStyle
+  kind: class
+  file: onboarding/profile.py
+  line: 36
+  signature: class CommunicationStyle(str, Enum)
+  module: onboarding.profile
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining communication style preferences (EXPLANATORY, BALANCED, DIRECT).
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-profile-CommunicationPreferences
+  name: CommunicationPreferences
+  kind: class
+  file: onboarding/profile.py
+  line: 52
+  signature: class CommunicationPreferences(BaseModel)
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Communication preferences for a developer.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-CurrentSession
+  name: CurrentSession
+  kind: class
+  file: onboarding/profile.py
+  line: 72
+  signature: class CurrentSession(BaseModel)
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - is_stale
+  purpose: Active session state for detecting orphaned sessions.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-Correction
+  name: Correction
+  kind: class
+  file: onboarding/profile.py
+  line: 100
+  signature: class Correction(BaseModel)
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A coaching correction episode.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-Deadline
+  name: Deadline
+  kind: class
+  file: onboarding/profile.py
+  line: 117
+  signature: class Deadline(BaseModel)
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: An operational deadline Rai tracks.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-RelationshipState
+  name: RelationshipState
+  kind: class
+  file: onboarding/profile.py
+  line: 134
+  signature: class RelationshipState(BaseModel)
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: State of the Rai-developer relationship.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-CoachingContext
+  name: CoachingContext
+  kind: class
+  file: onboarding/profile.py
+  line: 148
+  signature: class CoachingContext(BaseModel)
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Rai's coaching observations about a developer.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-DeveloperProfile
+  name: DeveloperProfile
+  kind: class
+  file: onboarding/profile.py
+  line: 176
+  signature: class DeveloperProfile(BaseModel)
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Personal profile for a developer using RaiSE.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session_state-CurrentWork
+  name: CurrentWork
+  kind: class
+  file: schemas/session_state.py
+  line: 14
+  signature: class CurrentWork(BaseModel)
+  module: schemas.session_state
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - coerce_none_to_empty
+  purpose: What Rai is currently working on.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session_state-LastSession
+  name: LastSession
+  kind: class
+  file: schemas/session_state.py
+  line: 39
+  signature: class LastSession(BaseModel)
+  module: schemas.session_state
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Summary of the most recent session.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session_state-PendingItems
+  name: PendingItems
+  kind: class
+  file: schemas/session_state.py
+  line: 57
+  signature: class PendingItems(BaseModel)
+  module: schemas.session_state
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Open items carried between sessions.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session_state-EpicProgress
+  name: EpicProgress
+  kind: class
+  file: schemas/session_state.py
+  line: 71
+  signature: class EpicProgress(BaseModel)
+  module: schemas.session_state
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Progress tracking for the current epic.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session_state-SessionState
+  name: SessionState
+  kind: class
+  file: schemas/session_state.py
+  line: 89
+  signature: class SessionState(BaseModel)
+  module: schemas.session_state
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Project-level working state.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-ConfidenceSignals
+  name: ConfidenceSignals
+  kind: class
+  file: discovery/analyzer.py
+  line: 71
+  signature: class ConfidenceSignals(BaseModel)
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Deterministic signals used to compute confidence score.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-ConfidenceResult
+  name: ConfidenceResult
+  kind: class
+  file: discovery/analyzer.py
+  line: 87
+  signature: class ConfidenceResult(BaseModel)
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Confidence assessment for a component.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-AnalyzedComponent
+  name: AnalyzedComponent
+  kind: class
+  file: discovery/analyzer.py
+  line: 101
+  signature: class AnalyzedComponent(BaseModel)
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A component enriched with deterministic analysis.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-AnalysisResult
+  name: AnalysisResult
+  kind: class
+  file: discovery/analyzer.py
+  line: 137
+  signature: class AnalysisResult(BaseModel)
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Complete analysis output — deterministic, no AI needed.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-Symbol
+  name: Symbol
+  kind: class
+  file: discovery/scanner.py
+  line: 44
+  signature: class Symbol(BaseModel)
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A code symbol extracted from source.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-ScanResult
+  name: ScanResult
+  kind: class
+  file: discovery/scanner.py
+  line: 77
+  signature: class ScanResult(BaseModel)
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Result of scanning a directory or file.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-drift-DriftWarning
+  name: DriftWarning
+  kind: class
+  file: discovery/drift.py
+  line: 31
+  signature: class DriftWarning(BaseModel)
+  module: discovery.drift
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A warning about architectural drift.
+  category: exception
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-drift-BaselineComponentMetadata
+  name: BaselineComponentMetadata
+  kind: class
+  file: discovery/drift.py
+  line: 55
+  signature: class BaselineComponentMetadata(BaseModel)
+  module: discovery.drift
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Metadata for a baseline component.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-drift-BaselineComponent
+  name: BaselineComponent
+  kind: class
+  file: discovery/drift.py
+  line: 64
+  signature: class BaselineComponent(BaseModel)
+  module: discovery.drift
+  confidence_tier: high
+  confidence_score: 75
+  purpose: A component from the validated baseline.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-models-ConceptType
+  name: ConceptType
+  kind: class
+  file: governance/models.py
+  line: 15
+  signature: class ConceptType(str, Enum)
+  module: governance.models
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining types of governance concepts extracted from markdown.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-Concept
+  name: Concept
+  kind: class
+  file: governance/models.py
+  line: 47
+  signature: class Concept(BaseModel)
+  module: governance.models
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - validate_line_range
+  purpose: A semantic concept extracted from governance markdown.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-models-ExtractionResult
+  name: ExtractionResult
+  kind: class
+  file: governance/models.py
+  line: 106
+  signature: class ExtractionResult(BaseModel)
+  module: governance.models
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Result of a concept extraction operation.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-extractor-GovernanceExtractor
+  name: GovernanceExtractor
+  kind: class
+  file: governance/extractor.py
+  line: 24
+  signature: class GovernanceExtractor
+  module: governance.extractor
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - extract_from_file
+  - extract_all
+  - extract_with_result
+  purpose: Orchestrates multiple parsers to extract concepts from governance files.
+  category: service
+  depends_on:
+  - Concept
+  - ConceptType
+  - ExtractionResult
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-query-QueryStrategy
+  name: QueryStrategy
+  kind: class
+  file: context/query.py
+  line: 22
+  signature: class QueryStrategy(str, Enum)
+  module: context.query
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining query strategies (KEYWORD_SEARCH, CONCEPT_LOOKUP) for retrieving context from unified graph.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-query-Query
+  name: Query
+  kind: class
+  file: context/query.py
+  line: 34
+  signature: class Query(BaseModel)
+  module: context.query
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Query parameters for unified context retrieval.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-query-ArchitecturalContext
+  name: ArchitecturalContext
+  kind: class
+  file: context/query.py
+  line: 80
+  signature: class ArchitecturalContext(BaseModel)
+  module: context.query
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Full architectural context for a module.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-query-QueryMetadata
+  name: QueryMetadata
+  kind: class
+  file: context/query.py
+  line: 108
+  signature: class QueryMetadata(BaseModel)
+  module: context.query
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Metadata about unified query result.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-query-QueryResult
+  name: QueryResult
+  kind: class
+  file: context/query.py
+  line: 141
+  signature: class QueryResult(BaseModel)
+  module: context.query
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - to_json
+  - from_json
+  purpose: Result of unified context query.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-query-QueryEngine
+  name: QueryEngine
+  kind: class
+  file: context/query.py
+  line: 225
+  signature: class QueryEngine
+  module: context.query
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - from_file
+  - query
+  - find_domain_for
+  - find_layer_for
+  - find_constraints_for
+  - get_architectural_context
+  purpose: Query engine for unified context graph providing keyword search and concept lookup with BFS traversal.
+  category: service
+  depends_on:
+  - Graph
+  - ConceptNode
+  - EdgeType
+  - NodeType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-graph-Graph
+  name: Graph
+  kind: class
+  file: context/graph.py
+  line: 21
+  signature: class Graph
+  module: context.graph
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - add_concept
+  - add_relationship
+  - get_concept
+  - get_concepts_by_type
+  - get_neighbors
+  - iter_concepts
+  - iter_relationships
+  - node_count
+  - edge_count
+  - save
+  - load
+  purpose: NetworkX-based unified context graph wrapping MultiDiGraph for typed operations on cross-domain concepts and relationships.
+  category: model
+  depends_on:
+  - ConceptEdge
+  - ConceptNode
+  - EdgeType
+  - NodeType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-builder-GraphBuilder
+  name: GraphBuilder
+  kind: class
+  file: context/builder.py
+  line: 28
+  signature: class GraphBuilder
+  module: context.builder
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - build
+  - load_governance
+  - load_memory
+  - load_work
+  - load_skills
+  - load_components
+  - load_architecture
+  - load_identity
+  - load_code_structure
+  - infer_relationships
+  purpose: Builds unified context graph from all sources including governance, memory JSONL files, work tracking, skills,
+    components, architecture, and identity.
+  category: builder
+  depends_on:
+  - Graph
+  - ConceptNode
+  - GovernanceExtractor
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-ConceptNode
+  name: ConceptNode
+  kind: class
+  file: context/models.py
+  line: 54
+  signature: class ConceptNode(BaseModel)
+  module: context.models
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - token_estimate
+  purpose: A node in the unified context graph.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-models-ConceptEdge
+  name: ConceptEdge
+  kind: class
+  file: context/models.py
+  line: 102
+  signature: class ConceptEdge(BaseModel)
+  module: context.models
+  confidence_tier: high
+  confidence_score: 75
+  purpose: An edge in the unified context graph.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-settings-TomlConfigSource
+  name: TomlConfigSource
+  kind: class
+  file: config/settings.py
+  line: 32
+  signature: class TomlConfigSource(PydanticBaseSettingsSource)
+  module: config.settings
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - get_field_value
+  purpose: Custom settings source for TOML configuration files.
+  category: config
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-settings-RaiseSettings
+  name: RaiseSettings
+  kind: class
+  file: config/settings.py
+  line: 77
+  signature: class RaiseSettings(BaseSettings)
+  module: config.settings
+  confidence_tier: high
+  confidence_score: 75
+  methods:
+  - settings_customise_sources
+  purpose: Configuration settings for raise-cli with proper cascade precedence.
+  category: config
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-console-OutputConsole
+  name: OutputConsole
+  kind: class
+  file: output/console.py
+  line: 30
+  signature: class OutputConsole
+  module: output.console
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - print_message
+  - print_success
+  - print_warning
+  - print_data
+  - print_list
+  purpose: Output abstraction that respects --format flag, providing consistent output formatting across human, JSON, and
+    table formats.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-main-OutputFormat
+  name: OutputFormat
+  kind: class
+  file: cli/main.py
+  line: 55
+  signature: class OutputFormat(str, Enum)
+  module: cli.main
+  confidence_tier: medium
+  confidence_score: 65
+  purpose: Enum defining output format options (human, json, table) for CLI commands.
+  category: schema
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-schema-SkillMetadata
+  name: SkillMetadata
+  kind: class
+  file: skills/schema.py
+  line: 16
+  signature: class SkillMetadata(BaseModel)
+  module: skills.schema
+  confidence_tier: medium
+  confidence_score: 55
+  methods:
+  - from_raw
+  purpose: Metadata for a RaiSE skill from YAML frontmatter including lifecycle, version, frequency, and prerequisites.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-schema-SkillHookCommand
+  name: SkillHookCommand
+  kind: class
+  file: skills/schema.py
+  line: 65
+  signature: class SkillHookCommand(BaseModel)
+  module: skills.schema
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Represents a single hook command in a skill with type and command fields.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-schema-SkillHook
+  name: SkillHook
+  kind: class
+  file: skills/schema.py
+  line: 72
+  signature: class SkillHook(BaseModel)
+  module: skills.schema
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Hook configuration with nested commands list.
+  category: model
+  depends_on:
+  - SkillHookCommand
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-schema-SkillFrontmatter
+  name: SkillFrontmatter
+  kind: class
+  file: skills/schema.py
+  line: 80
+  signature: class SkillFrontmatter(BaseModel)
+  module: skills.schema
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: YAML frontmatter for a SKILL.md file with name, description, metadata, and hooks.
+  category: model
+  depends_on:
+  - SkillMetadata
+  - SkillHook
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-schema-Skill
+  name: Skill
+  kind: class
+  file: skills/schema.py
+  line: 98
+  signature: class Skill(BaseModel)
+  module: skills.schema
+  confidence_tier: medium
+  confidence_score: 55
+  methods:
+  - name
+  - version
+  - lifecycle
+  - description
+  purpose: Complete RaiSE skill with frontmatter and markdown body from parsed SKILL.md.
+  category: model
+  depends_on:
+  - SkillFrontmatter
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-scaffold-ScaffoldResult
+  name: ScaffoldResult
+  kind: class
+  file: skills/scaffold.py
+  line: 28
+  signature: class ScaffoldResult(BaseModel)
+  module: skills.scaffold
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Result of scaffolding a skill, indicating success status and path or error.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-validator-ValidationSeverity
+  name: ValidationSeverity
+  kind: class
+  file: skills/validator.py
+  line: 22
+  signature: class ValidationSeverity(Enum)
+  module: skills.validator
+  confidence_tier: medium
+  confidence_score: 45
+  purpose: Enum for validation issue severity levels (ERROR, WARNING).
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-validator-ValidationResult
+  name: ValidationResult
+  kind: class
+  file: skills/validator.py
+  line: 29
+  signature: class ValidationResult(BaseModel)
+  module: skills.validator
+  confidence_tier: medium
+  confidence_score: 55
+  methods:
+  - is_valid
+  - error_count
+  - warning_count
+  purpose: Result of validating a skill file with errors and warnings.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-parser-ParseError
+  name: ParseError
+  kind: class
+  file: skills/parser.py
+  line: 24
+  signature: class ParseError(Exception)
+  module: skills.parser
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Exception raised when parsing a skill file fails.
+  category: exception
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-name_checker-NameCheckResult
+  name: NameCheckResult
+  kind: class
+  file: skills/name_checker.py
+  line: 45
+  signature: class NameCheckResult(BaseModel)
+  module: skills.name_checker
+  confidence_tier: medium
+  confidence_score: 55
+  methods:
+  - is_valid
+  purpose: Result of checking a skill name against ontology patterns and conflicts.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-locator-SkillLocator
+  name: SkillLocator
+  kind: class
+  file: skills/locator.py
+  line: 29
+  signature: class SkillLocator
+  module: skills.locator
+  confidence_tier: medium
+  confidence_score: 45
+  methods:
+  - find_skill_dirs
+  - load_skill
+  - load_all_skills
+  - group_by_lifecycle
+  purpose: Locates and loads skills from skill directory with lifecycle organization.
+  category: service
+  depends_on:
+  - parse_skill
+  - Skill
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-python-PythonAnalyzer
+  name: PythonAnalyzer
+  kind: class
+  file: context/analyzers/python.py
+  line: 17
+  signature: class PythonAnalyzer
+  module: context.analyzers.python
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - detect
+  - analyze_modules
+  purpose: Analyzes Python modules using ast to extract imports, exports, and component counts.
+  category: parser
+  depends_on:
+  - ModuleInfo
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-ModuleInfo
+  name: ModuleInfo
+  kind: class
+  file: context/analyzers/models.py
+  line: 11
+  signature: class ModuleInfo(BaseModel)
+  module: context.analyzers.models
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Language-agnostic module analysis result.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-protocol-CodeAnalyzer
+  name: CodeAnalyzer
+  kind: class
+  file: context/analyzers/protocol.py
+  line: 15
+  signature: class CodeAnalyzer(Protocol)
+  module: context.analyzers.protocol
+  confidence_tier: medium
+  confidence_score: 65
+  methods:
+  - detect
+  - analyze_modules
+  purpose: Protocol defining contract for language-specific code analyzers.
+  category: schema
+  depends_on:
+  - ModuleInfo
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-__main__-main
+  name: main
+  kind: function
+  file: __main__.py
+  line: 11
+  signature: def main() -> None
+  module: __main__
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Entry point for python -m raise_cli with error handling.
+  category: command
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-exceptions-exceptions
+  name: exceptions
+  kind: module
+  file: exceptions.py
+  line: 1
+  signature: module exceptions
+  module: exceptions
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Provides centralized exception hierarchy for raise-cli with consistent exit codes, error codes, and user guidance
+    for scripting and troubleshooting.
+  category: exception
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-writer-writer
+  name: writer
+  kind: module
+  file: telemetry/writer.py
+  line: 1
+  signature: module writer
+  module: telemetry.writer
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides emit() function to append telemetry signals to personal JSONL file with thread-safe file locking, for
+    per-developer usage tracking.
+  category: service
+  depends_on:
+  - Signal
+  - get_personal_dir
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-writer-emit
+  name: emit
+  kind: function
+  file: telemetry/writer.py
+  line: 68
+  signature: 'def emit(signal: Signal, *, base_path: Path | None=None) -> EmitResult'
+  module: telemetry.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Emit a telemetry signal to the signals.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-emit_skill_event
+  name: emit_skill_event
+  kind: function
+  file: telemetry/writer.py
+  line: 126
+  signature: 'def emit_skill_event(skill: str, event: SkillEventType, duration_sec: int | None=None, *, base_path: Path |
+    None=None) -> EmitResult'
+  module: telemetry.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Convenience function to emit a skill event.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-emit_command_usage
+  name: emit_command_usage
+  kind: function
+  file: telemetry/writer.py
+  line: 155
+  signature: 'def emit_command_usage(command: str, subcommand: str | None=None, *, base_path: Path | None=None) -> EmitResult'
+  module: telemetry.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Convenience function to emit a command usage event.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-emit_error_event
+  name: emit_error_event
+  kind: function
+  file: telemetry/writer.py
+  line: 181
+  signature: 'def emit_error_event(tool: str, error_type: str, context: str, recoverable: bool, *, base_path: Path | None=None)
+    -> EmitResult'
+  module: telemetry.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Convenience function to emit an error event.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-schemas-schemas
+  name: schemas
+  kind: module
+  file: telemetry/schemas.py
+  line: 1
+  signature: module schemas
+  module: telemetry.schemas
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Defines Pydantic signal schemas for local telemetry following OpenTelemetry conventions.
+  category: schema
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-state-state
+  name: state
+  kind: module
+  file: session/state.py
+  line: 1
+  signature: module state
+  module: session.state
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Session state persistence for .raise/rai/session-state.yaml.
+  category: service
+  depends_on:
+  - SessionState
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-state-get_session_state_path
+  name: get_session_state_path
+  kind: function
+  file: session/state.py
+  line: 23
+  signature: 'def get_session_state_path(project_path: Path) -> Path'
+  module: session.state
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Returns the absolute path to session-state.yaml.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-state-load_session_state
+  name: load_session_state
+  kind: function
+  file: session/state.py
+  line: 35
+  signature: 'def load_session_state(project_path: Path) -> SessionState | None'
+  module: session.state
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Loads session state from YAML, returning SessionState or None.
+  category: service
+  depends_on:
+  - SessionState
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-state-save_session_state
+  name: save_session_state
+  kind: function
+  file: session/state.py
+  line: 65
+  signature: 'def save_session_state(project_path: Path, state: SessionState) -> None'
+  module: session.state
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Saves session state to YAML.
+  category: service
+  depends_on:
+  - SessionState
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-close-close
+  name: close
+  kind: module
+  file: session/close.py
+  line: 1
+  signature: module close
+  module: session.close
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Session close orchestrator.
+  category: other
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-close-load_state_file
+  name: load_state_file
+  kind: function
+  file: session/close.py
+  line: 79
+  signature: 'def load_state_file(path: Path) -> CloseInput'
+  module: session.close
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Loads session close input from a YAML state file written by AI skill, returning populated CloseInput model.
+  category: utility
+  depends_on:
+  - CloseInput
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-close-process_session_close
+  name: process_session_close
+  kind: function
+  file: session/close.py
+  line: 113
+  signature: 'def process_session_close(close_input: CloseInput, profile: DeveloperProfile, project_path: Path) -> CloseResult'
+  module: session.close
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: 'Executes all session close writes atomically: records session, appends patterns, updates coaching, clears current
+    session, and saves session state.'
+  category: service
+  depends_on:
+  - CloseInput
+  - CloseResult
+  - DeveloperProfile
+  - SessionState
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-bundle-bundle
+  name: bundle
+  kind: module
+  file: session/bundle.py
+  line: 1
+  signature: module bundle
+  module: session.bundle
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Assembles token-optimized context bundle from profile, state, memory graph, and sessions.
+  category: builder
+  depends_on:
+  - Graph
+  - DeveloperProfile
+  - SessionState
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-bundle-get_foundational_patterns
+  name: get_foundational_patterns
+  kind: function
+  file: session/bundle.py
+  line: 32
+  signature: 'def get_foundational_patterns(project_path: Path) -> list[ConceptNode]'
+  module: session.bundle
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Queries graph for foundational patterns tagged foundational=true.
+  category: service
+  depends_on:
+  - Graph
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-bundle-get_always_on_primes
+  name: get_always_on_primes
+  kind: function
+  file: session/bundle.py
+  line: 59
+  signature: 'def get_always_on_primes(project_path: Path) -> list[ConceptNode]'
+  module: session.bundle
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Queries graph for all always_on governance and identity primes.
+  category: service
+  depends_on:
+  - Graph
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-bundle-assemble_context_bundle
+  name: assemble_context_bundle
+  kind: function
+  file: session/bundle.py
+  line: 322
+  signature: 'def assemble_context_bundle(profile: DeveloperProfile, state: SessionState | None, project_path: Path) -> str'
+  module: session.bundle
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Assembles context bundle from multiple sources for session start.
+  category: builder
+  depends_on:
+  - DeveloperProfile
+  - SessionState
+  - Graph
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-tools-tools
+  name: tools
+  kind: module
+  file: core/tools.py
+  line: 1
+  signature: module tools
+  module: core.tools
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides typed subprocess wrappers for external tools (git, ast-grep, ripgrep) with availability checking and DependencyError
+    on missing tools.
+  category: utility
+  depends_on:
+  - DependencyError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-tools-check_tool
+  name: check_tool
+  kind: function
+  file: core/tools.py
+  line: 79
+  signature: 'def check_tool(name: str) -> bool'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Check if an external tool is available.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-require_tool
+  name: require_tool
+  kind: function
+  file: core/tools.py
+  line: 95
+  signature: 'def require_tool(name: str) -> None'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Require an external tool, raising if unavailable.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-run_tool
+  name: run_tool
+  kind: function
+  file: core/tools.py
+  line: 122
+  signature: 'def run_tool(args: list[str], *, cwd: Path | None=None, check: bool=False) -> ToolResult'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Run an external tool and capture output.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-git_root
+  name: git_root
+  kind: function
+  file: core/tools.py
+  line: 172
+  signature: 'def git_root(cwd: Path | None=None) -> Path'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the root directory of the git repository.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-git_branch
+  name: git_branch
+  kind: function
+  file: core/tools.py
+  line: 198
+  signature: 'def git_branch(cwd: Path | None=None) -> str'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the current git branch name.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-git_status
+  name: git_status
+  kind: function
+  file: core/tools.py
+  line: 224
+  signature: 'def git_status(cwd: Path | None=None) -> GitStatus'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get structured git status.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-git_diff
+  name: git_diff
+  kind: function
+  file: core/tools.py
+  line: 277
+  signature: 'def git_diff(staged: bool=False, cwd: Path | None=None) -> str'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get git diff output.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-rg_search
+  name: rg_search
+  kind: function
+  file: core/tools.py
+  line: 308
+  signature: 'def rg_search(pattern: str, path: Path | None=None, *, glob: str | None=None, ignore_case: bool=False) -> list[SearchMatch]'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Search files using ripgrep.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-tools-sg_search
+  name: sg_search
+  kind: function
+  file: core/tools.py
+  line: 371
+  signature: 'def sg_search(pattern: str, path: Path | None=None, *, lang: str | None=None) -> list[SearchMatch]'
+  module: core.tools
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Search files using ast-grep.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-text-text
+  name: text
+  kind: module
+  file: core/text.py
+  line: 1
+  signature: module text
+  module: core.text
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: 'Shared text processing utilities: stopwords, keyword extraction, ID sanitization.'
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-text-extract_keywords
+  name: extract_keywords
+  kind: function
+  file: core/text.py
+  line: 121
+  signature: 'def extract_keywords(text: str) -> set[str]'
+  module: core.text
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract meaningful keywords from text.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-text-sanitize_id
+  name: sanitize_id
+  kind: function
+  file: core/text.py
+  line: 143
+  signature: 'def sanitize_id(name: str) -> str'
+  module: core.text
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Sanitize a name for use as an ID.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-files-files
+  name: files
+  kind: module
+  file: core/files.py
+  line: 1
+  signature: module files
+  module: core.files
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Shared file system utilities including directory exclusion logic for scanning.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-files-should_exclude_dir
+  name: should_exclude_dir
+  kind: function
+  file: core/files.py
+  line: 41
+  signature: 'def should_exclude_dir(dir_path: Path) -> bool'
+  module: core.files
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Check if a directory should be excluded from scanning.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-writer
+  name: writer
+  kind: module
+  file: memory/writer.py
+  line: 1
+  signature: module writer
+  module: memory.writer
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides functions to append new patterns, calibrations, and sessions to memory JSONL files with auto-ID generation
+    and cache invalidation.
+  category: service
+  depends_on:
+  - MemoryScope
+  - PatternSubType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-writer-validate_session_index
+  name: validate_session_index
+  kind: function
+  file: memory/writer.py
+  line: 141
+  signature: 'def validate_session_index(memory_dir: Path) -> SessionIndexValidation'
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Validate session index for data quality issues.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-get_memory_dir_for_scope
+  name: get_memory_dir_for_scope
+  kind: function
+  file: memory/writer.py
+  line: 270
+  signature: 'def get_memory_dir_for_scope(scope: MemoryScope, project_root: Path | None=None) -> Path'
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the appropriate memory directory for a given scope.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-append_pattern
+  name: append_pattern
+  kind: function
+  file: memory/writer.py
+  line: 341
+  signature: 'def append_pattern(memory_dir: Path, input_data: PatternInput, created: date | None=None, scope: MemoryScope=MemoryScope.PROJECT)
+    -> WriteResult'
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Append a new pattern to patterns.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-append_calibration
+  name: append_calibration
+  kind: function
+  file: memory/writer.py
+  line: 386
+  signature: 'def append_calibration(memory_dir: Path, input_data: CalibrationInput, created: date | None=None, scope: MemoryScope=MemoryScope.PROJECT)
+    -> WriteResult'
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Append a new calibration to calibration.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-writer-append_session
+  name: append_session
+  kind: function
+  file: memory/writer.py
+  line: 436
+  signature: 'def append_session(memory_dir: Path, input_data: SessionInput, session_date: date | None=None) -> WriteResult'
+  module: memory.writer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Append a new session to sessions/index.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-migration-migration
+  name: migration
+  kind: module
+  file: memory/migration.py
+  line: 1
+  signature: module migration
+  module: memory.migration
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides functions to migrate session, telemetry, and calibration data from project directory to personal directory
+    for proper multi-developer data separation.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-migration-needs_migration
+  name: needs_migration
+  kind: function
+  file: memory/migration.py
+  line: 83
+  signature: 'def needs_migration(memory_dir: Path, personal_dir: Path | None=None, rai_dir: Path | None=None) -> bool'
+  module: memory.migration
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Check if migration from project to personal is needed.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-migration-migrate_to_personal
+  name: migrate_to_personal
+  kind: function
+  file: memory/migration.py
+  line: 170
+  signature: 'def migrate_to_personal(memory_dir: Path, personal_dir: Path, rai_dir: Path | None=None, dry_run: bool=False)
+    -> MigrationResult'
+  module: memory.migration
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Migrate session, telemetry, and calibration data to personal directory.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-models-models
+  name: models
+  kind: module
+  file: memory/models.py
+  line: 1
+  signature: module models
+  module: memory.models
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides Pydantic models for representing memory concepts (patterns, calibrations, sessions) loaded from JSONL
+    files.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-loader-loader
+  name: loader
+  kind: module
+  file: memory/loader.py
+  line: 1
+  signature: module loader
+  module: memory.loader
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Loads memory concepts from JSONL files in .raise/rai/memory/, handling schema variations and date parsing.
+  category: service
+  depends_on:
+  - MemoryConcept
+  - MemoryConceptType
+  - MemoryScope
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-loader-parse_date
+  name: parse_date
+  kind: function
+  file: memory/loader.py
+  line: 22
+  signature: 'def parse_date(date_str: str) -> date'
+  module: memory.loader
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Parse a date string in YYYY-MM-DD format.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-loader-load_pattern
+  name: load_pattern
+  kind: function
+  file: memory/loader.py
+  line: 37
+  signature: 'def load_pattern(data: dict[str, Any], scope: MemoryScope=MemoryScope.PROJECT) -> MemoryConcept'
+  module: memory.loader
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Load a pattern concept from JSONL data.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-loader-load_calibration
+  name: load_calibration
+  kind: function
+  file: memory/loader.py
+  line: 76
+  signature: 'def load_calibration(data: dict[str, Any], scope: MemoryScope=MemoryScope.PROJECT) -> MemoryConcept'
+  module: memory.loader
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Load a calibration concept from JSONL data.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-loader-load_session
+  name: load_session
+  kind: function
+  file: memory/loader.py
+  line: 131
+  signature: 'def load_session(data: dict[str, Any], scope: MemoryScope=MemoryScope.PROJECT) -> MemoryConcept'
+  module: memory.loader
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Load a session concept from JSONL data.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-loader-load_jsonl_file
+  name: load_jsonl_file
+  kind: function
+  file: memory/loader.py
+  line: 172
+  signature: 'def load_jsonl_file(file_path: Path, concept_type: MemoryConceptType, scope: MemoryScope=MemoryScope.PROJECT)
+    -> tuple[list[MemoryConcept], list[str]]'
+  module: memory.loader
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Load concepts from a single JSONL file.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-loader-load_memory_from_directory
+  name: load_memory_from_directory
+  kind: function
+  file: memory/loader.py
+  line: 215
+  signature: 'def load_memory_from_directory(memory_dir: Path) -> MemoryLoadResult'
+  module: memory.loader
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Load all memory concepts from a .
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-migration-migration
+  name: migration
+  kind: module
+  file: onboarding/migration.py
+  line: 1
+  signature: module migration
+  module: onboarding.migration
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts developer profile data from existing memory artifacts during brownfield onboarding.
+  category: service
+  depends_on:
+  - DeveloperProfile
+  - ExperienceLevel
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-migration-migrate_emilio_profile
+  name: migrate_emilio_profile
+  kind: function
+  file: onboarding/migration.py
+  line: 132
+  signature: 'def migrate_emilio_profile(project_path: Path, *, name: str=''Emilio'', additional_skills: list[str] | None=None)
+    -> DeveloperProfile'
+  module: onboarding.migration
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Create Emilio's profile from existing memory data.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory_md-memory_md
+  name: memory_md
+  kind: module
+  file: onboarding/memory_md.py
+  line: 1
+  signature: module memory_md
+  module: onboarding.memory_md
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides agent-agnostic MEMORY.md generation from methodology and patterns.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-memory_md-generate_memory_md
+  name: generate_memory_md
+  kind: function
+  file: onboarding/memory_md.py
+  line: 356
+  signature: 'def generate_memory_md(methodology_path: Path | None=None, patterns_path: Path | None=None, project_name: str=''project'',
+    max_patterns: int=10) -> str'
+  module: onboarding.memory_md
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Convenience function to generate MEMORY.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-bootstrap-bootstrap
+  name: bootstrap
+  kind: module
+  file: onboarding/bootstrap.py
+  line: 1
+  signature: module bootstrap
+  module: onboarding.bootstrap
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Copies bundled base Rai assets from rai_base package to project .raise/rai/ during initialization.
+  category: service
+  depends_on:
+  - BootstrapResult
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-bootstrap-bootstrap_rai_base
+  name: bootstrap_rai_base
+  kind: function
+  file: onboarding/bootstrap.py
+  line: 43
+  signature: 'def bootstrap_rai_base(project_root: Path) -> BootstrapResult'
+  module: onboarding.bootstrap
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Copy bundled base Rai assets to project .
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-conventions
+  name: conventions
+  kind: module
+  file: onboarding/conventions.py
+  line: 1
+  signature: module conventions
+  module: onboarding.conventions
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Detects code style, naming, and structure conventions from brownfield projects by analyzing source files with confidence
+    scoring.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-conventions-calculate_confidence
+  name: calculate_confidence
+  kind: function
+  file: onboarding/conventions.py
+  line: 167
+  signature: 'def calculate_confidence(consistent: int, total: int) -> Confidence'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Calculate confidence based on consistency ratio and sample size.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-collect_python_files
+  name: collect_python_files
+  kind: function
+  file: onboarding/conventions.py
+  line: 223
+  signature: 'def collect_python_files(directory: Path, max_files: int=200) -> list[Path]'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Collect Python files from a directory recursively.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-detect_indentation
+  name: detect_indentation
+  kind: function
+  file: onboarding/conventions.py
+  line: 311
+  signature: 'def detect_indentation(files: list[Path]) -> IndentationConvention'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect indentation convention from Python files.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-detect_quotes
+  name: detect_quotes
+  kind: function
+  file: onboarding/conventions.py
+  line: 366
+  signature: 'def detect_quotes(files: list[Path]) -> QuoteConvention'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect quote style convention from Python files.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-detect_line_length
+  name: detect_line_length
+  kind: function
+  file: onboarding/conventions.py
+  line: 434
+  signature: 'def detect_line_length(files: list[Path]) -> LineLengthConvention'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect line length convention from Python files.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-classify_name
+  name: classify_name
+  kind: function
+  file: onboarding/conventions.py
+  line: 495
+  signature: 'def classify_name(name: str) -> Literal[''snake_case'', ''camelCase'', ''PascalCase'', ''UPPER_SNAKE_CASE'',
+    ''mixed'']'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Classify a name into its naming pattern.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-detect_naming
+  name: detect_naming
+  kind: function
+  file: onboarding/conventions.py
+  line: 586
+  signature: 'def detect_naming(files: list[Path]) -> NamingConventions'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect naming conventions for functions, classes, and constants.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-detect_structure
+  name: detect_structure
+  kind: function
+  file: onboarding/conventions.py
+  line: 609
+  signature: 'def detect_structure(directory: Path) -> StructureConventions'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect project structure conventions.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-conventions-detect_conventions
+  name: detect_conventions
+  kind: function
+  file: onboarding/conventions.py
+  line: 681
+  signature: 'def detect_conventions(directory: Path) -> ConventionResult'
+  module: onboarding.conventions
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect all conventions in a project directory.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-manifest-manifest
+  name: manifest
+  kind: module
+  file: onboarding/manifest.py
+  line: 1
+  signature: module manifest
+  module: onboarding.manifest
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Project manifest schema and persistence for .raise/manifest.yaml.
+  category: schema
+  depends_on:
+  - ProjectInfo
+  - ProjectType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-manifest-save_manifest
+  name: save_manifest
+  kind: function
+  file: onboarding/manifest.py
+  line: 50
+  signature: 'def save_manifest(manifest: ProjectManifest, project_root: Path) -> None'
+  module: onboarding.manifest
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Save project manifest to .
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-manifest-load_manifest
+  name: load_manifest
+  kind: function
+  file: onboarding/manifest.py
+  line: 74
+  signature: 'def load_manifest(project_root: Path) -> ProjectManifest | None'
+  module: onboarding.manifest
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Load project manifest from .
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-detection-detection
+  name: detection
+  kind: module
+  file: onboarding/detection.py
+  line: 1
+  signature: module detection
+  module: onboarding.detection
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Detects whether a directory is greenfield or brownfield by counting source files while excluding non-project directories.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-detection-count_code_files
+  name: count_code_files
+  kind: function
+  file: onboarding/detection.py
+  line: 104
+  signature: 'def count_code_files(directory: Path) -> int'
+  module: onboarding.detection
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Count code files in a directory recursively.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-detection-detect_project_type
+  name: detect_project_type
+  kind: function
+  file: onboarding/detection.py
+  line: 133
+  signature: 'def detect_project_type(directory: Path) -> DetectionResult'
+  module: onboarding.detection
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect whether a directory is greenfield or brownfield.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skills-skills
+  name: skills
+  kind: module
+  file: onboarding/skills.py
+  line: 1
+  signature: module skills
+  module: onboarding.skills
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts skill metadata from SKILL.md frontmatter to ConceptNode objects.
+  category: parser
+  depends_on: &id002
+  - ConceptNode
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-skills-scaffold_skills
+  name: scaffold_skills
+  kind: function
+  file: onboarding/skills.py
+  line: 76
+  signature: 'def scaffold_skills(project_root: Path) -> SkillScaffoldResult'
+  module: onboarding.skills
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Copy bundled skills to project .
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-governance-governance
+  name: governance
+  kind: module
+  file: onboarding/governance.py
+  line: 1
+  signature: module governance
+  module: onboarding.governance
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides governance generation and scaffolding for project onboarding.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-governance-generate_guardrails
+  name: generate_guardrails
+  kind: function
+  file: onboarding/governance.py
+  line: 348
+  signature: 'def generate_guardrails(conventions: ConventionResult, project_name: str | None=None) -> str'
+  module: onboarding.governance
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Convenience function to generate guardrails markdown.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-governance-scaffold_governance
+  name: scaffold_governance
+  kind: function
+  file: onboarding/governance.py
+  line: 402
+  signature: 'def scaffold_governance(project_path: Path, project_name: str) -> GovernanceScaffoldResult'
+  module: onboarding.governance
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Scaffold governance/ from bundled rai_base templates.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-claudemd-claudemd
+  name: claudemd
+  kind: module
+  file: onboarding/claudemd.py
+  line: 1
+  signature: module claudemd
+  module: onboarding.claudemd
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides CLAUDE.md generation from detection results for project onboarding.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-claudemd-generate_claude_md
+  name: generate_claude_md
+  kind: function
+  file: onboarding/claudemd.py
+  line: 187
+  signature: 'def generate_claude_md(project_name: str, detection: DetectionResult, conventions: ConventionResult | None=None)
+    -> str'
+  module: onboarding.claudemd
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Convenience function to generate CLAUDE.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-profile
+  name: profile
+  kind: module
+  file: onboarding/profile.py
+  line: 1
+  signature: module profile
+  module: onboarding.profile
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides developer profile schema and persistence in ~/.rai/developer.yaml.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-profile-get_rai_home
+  name: get_rai_home
+  kind: function
+  file: onboarding/profile.py
+  line: 216
+  signature: def get_rai_home() -> Path
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the path to ~/.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-load_developer_profile
+  name: load_developer_profile
+  kind: function
+  file: onboarding/profile.py
+  line: 225
+  signature: def load_developer_profile() -> DeveloperProfile | None
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Load developer profile from ~/.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-save_developer_profile
+  name: save_developer_profile
+  kind: function
+  file: onboarding/profile.py
+  line: 253
+  signature: 'def save_developer_profile(profile: DeveloperProfile) -> None'
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Save developer profile to ~/.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-increment_session
+  name: increment_session
+  kind: function
+  file: onboarding/profile.py
+  line: 276
+  signature: 'def increment_session(profile: DeveloperProfile, project_path: str | None=None) -> DeveloperProfile'
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Update session metadata (last_session date and projects list).
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-start_session
+  name: start_session
+  kind: function
+  file: onboarding/profile.py
+  line: 304
+  signature: 'def start_session(profile: DeveloperProfile, project_path: str) -> DeveloperProfile'
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Mark a session as active.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-end_session
+  name: end_session
+  kind: function
+  file: onboarding/profile.py
+  line: 324
+  signature: 'def end_session(profile: DeveloperProfile) -> DeveloperProfile'
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Clear the active session state.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-add_correction
+  name: add_correction
+  kind: function
+  file: onboarding/profile.py
+  line: 339
+  signature: 'def add_correction(profile: DeveloperProfile, session_id: str, what: str, lesson: str) -> DeveloperProfile'
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Add a coaching correction to the profile.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-add_deadline
+  name: add_deadline
+  kind: function
+  file: onboarding/profile.py
+  line: 364
+  signature: 'def add_deadline(profile: DeveloperProfile, name: str, deadline_date: date, notes: str='''') -> DeveloperProfile'
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Add an operational deadline to the profile.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-update_coaching
+  name: update_coaching
+  kind: function
+  file: onboarding/profile.py
+  line: 387
+  signature: 'def update_coaching(profile: DeveloperProfile, strengths: list[str] | None=None, growth_edge: str | None=None,
+    trust_level: str | None=None, autonomy: str | None=None, relationship: dict[str, str] | None=None, communication_notes:
+    list[str] | None=None) -> DeveloperProfile'
+  module: onboarding.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Update coaching context fields.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session_state-session_state
+  name: session_state
+  kind: module
+  file: schemas/session_state.py
+  line: 1
+  signature: module session_state
+  module: schemas.session_state
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Session state schema for .raise/rai/session-state.yaml.
+  category: schema
+  depends_on:
+  - CurrentWork
+  - LastSession
+  - PendingItems
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-analyzer-analyzer
+  name: analyzer
+  kind: module
+  file: discovery/analyzer.py
+  line: 1
+  signature: module analyzer
+  module: discovery.analyzer
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Enriches raw scan output with confidence scores, categories, hierarchical folding, and module grouping.
+  category: service
+  depends_on:
+  - ScanResult
+  - Symbol
+  - AnalyzedComponent
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-analyzer-match_path_category
+  name: match_path_category
+  kind: function
+  file: discovery/analyzer.py
+  line: 158
+  signature: 'def match_path_category(file_path: str, category_map: dict[str, str] | None=None) -> str | None'
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Match a file path against convention-based category patterns.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-compute_confidence
+  name: compute_confidence
+  kind: function
+  file: discovery/analyzer.py
+  line: 205
+  signature: 'def compute_confidence(symbol: Symbol, path_category: str | None) -> ConfidenceResult'
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Compute deterministic confidence score for a symbol.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-extract_first_sentence
+  name: extract_first_sentence
+  kind: function
+  file: discovery/analyzer.py
+  line: 292
+  signature: 'def extract_first_sentence(docstring: str | None) -> str'
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract the first sentence from a docstring.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-determine_category
+  name: determine_category
+  kind: function
+  file: discovery/analyzer.py
+  line: 316
+  signature: 'def determine_category(name: str, kind: str, path_category: str | None, base_class: str | None=None) -> str'
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Determine component category using priority chain.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-build_hierarchy
+  name: build_hierarchy
+  kind: function
+  file: discovery/analyzer.py
+  line: 390
+  signature: 'def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]'
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Fold methods into their parent classes.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-group_by_module
+  name: group_by_module
+  kind: function
+  file: discovery/analyzer.py
+  line: 498
+  signature: 'def group_by_module(components: list[AnalyzedComponent]) -> dict[str, list[str]]'
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Group component IDs by their source module file.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-analyzer-analyze
+  name: analyze
+  kind: function
+  file: discovery/analyzer.py
+  line: 515
+  signature: 'def analyze(scan_result: ScanResult, category_map: dict[str, str] | None=None) -> AnalysisResult'
+  module: discovery.analyzer
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Run the full deterministic analysis pipeline.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-scanner
+  name: scanner
+  kind: module
+  file: discovery/scanner.py
+  line: 1
+  signature: module scanner
+  module: discovery.scanner
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts code symbols from source files supporting Python, TypeScript, and JavaScript.
+  category: service
+  depends_on:
+  - Symbol
+  - ScanResult
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-scanner-extract_python_symbols
+  name: extract_python_symbols
+  kind: function
+  file: discovery/scanner.py
+  line: 164
+  signature: 'def extract_python_symbols(source: str, file_path: str) -> list[Symbol]'
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract symbols from Python source code.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-extract_typescript_symbols
+  name: extract_typescript_symbols
+  kind: function
+  file: discovery/scanner.py
+  line: 313
+  signature: 'def extract_typescript_symbols(source: str, file_path: str) -> list[Symbol]'
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract symbols from TypeScript source code.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-extract_javascript_symbols
+  name: extract_javascript_symbols
+  kind: function
+  file: discovery/scanner.py
+  line: 343
+  signature: 'def extract_javascript_symbols(source: str, file_path: str) -> list[Symbol]'
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract symbols from JavaScript source code.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-detect_language
+  name: detect_language
+  kind: function
+  file: discovery/scanner.py
+  line: 473
+  signature: 'def detect_language(file_path: str | Path) -> Language | None'
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect language from file extension.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-extract_symbols
+  name: extract_symbols
+  kind: function
+  file: discovery/scanner.py
+  line: 493
+  signature: 'def extract_symbols(source: str, file_path: str, language: Language) -> list[Symbol]'
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract symbols from source code in any supported language.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-scanner-scan_directory
+  name: scan_directory
+  kind: function
+  file: discovery/scanner.py
+  line: 622
+  signature: 'def scan_directory(path: Path, *, language: Language | None=None, pattern: str | None=None, exclude_patterns:
+    list[str] | None=None) -> ScanResult'
+  module: discovery.scanner
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Scan a directory for code symbols.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-drift-drift
+  name: drift
+  kind: module
+  file: discovery/drift.py
+  line: 1
+  signature: module drift
+  module: discovery.drift
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Detects architectural drift between new code and established component patterns.
+  category: service
+  depends_on:
+  - DriftWarning
+  - BaselineComponent
+  - Symbol
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-drift-detect_drift
+  name: detect_drift
+  kind: function
+  file: discovery/drift.py
+  line: 301
+  signature: 'def detect_drift(baseline: list[BaselineComponent], scanned: list[Symbol]) -> list[DriftWarning]'
+  module: discovery.drift
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Detect architectural drift between baseline and new code.
+  category: service
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-models-models
+  name: models
+  kind: module
+  file: governance/models.py
+  line: 1
+  signature: module models
+  module: governance.models
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides Pydantic models for representing semantic concepts extracted from governance markdown files.
+  category: model
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-extractor-extractor
+  name: extractor
+  kind: module
+  file: governance/extractor.py
+  line: 1
+  signature: module extractor
+  module: governance.extractor
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Coordinates multiple governance parsers to extract concepts from all governance markdown files.
+  category: service
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-query-query
+  name: query
+  kind: module
+  file: context/query.py
+  line: 1
+  signature: module query
+  module: context.query
+  confidence_tier: high
+  confidence_score: 90
+  purpose: Context query engine.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-query-estimate_tokens
+  name: estimate_tokens
+  kind: function
+  file: context/query.py
+  line: 181
+  signature: 'def estimate_tokens(text: str) -> int'
+  module: context.query
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Estimate token count for text.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-query-calculate_relevance_score
+  name: calculate_relevance_score
+  kind: function
+  file: context/query.py
+  line: 195
+  signature: 'def calculate_relevance_score(content: str, keywords: list[str], created: str) -> float'
+  module: context.query
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Calculate relevance score for a concept.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-graph-graph
+  name: graph
+  kind: module
+  file: context/graph.py
+  line: 1
+  signature: module graph
+  module: context.graph
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides Graph class wrapping NetworkX MultiDiGraph for storing and querying cross-domain concepts.
+  category: model
+  depends_on:
+  - ConceptEdge
+  - ConceptNode
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-builder-builder
+  name: builder
+  kind: module
+  file: context/builder.py
+  line: 1
+  signature: module builder
+  module: context.builder
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides the GraphBuilder class that merges governance, memory, work, and skills into a single Graph.
+  category: builder
+  depends_on:
+  - Graph
+  - GovernanceExtractor
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-models
+  name: models
+  kind: module
+  file: context/models.py
+  line: 1
+  signature: module models
+  module: context.models
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Pydantic data models for language-agnostic code analysis results (ModuleInfo).
+  category: model
+  depends_on: &id001 []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-settings-settings
+  name: settings
+  kind: module
+  file: config/settings.py
+  line: 1
+  signature: module settings
+  module: config.settings
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Configuration cascade using Pydantic Settings with CLI, env, pyproject.toml, and config.toml.
+  category: config
+  depends_on:
+  - RaiseSettings
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-paths-paths
+  name: paths
+  kind: module
+  file: config/paths.py
+  line: 1
+  signature: module paths
+  module: config.paths
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Path helpers for XDG directories and per-project RaiSE directory structure constants.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-paths-get_raise_dir
+  name: get_raise_dir
+  kind: function
+  file: config/paths.py
+  line: 49
+  signature: 'def get_raise_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the .
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_rai_dir
+  name: get_rai_dir
+  kind: function
+  file: config/paths.py
+  line: 62
+  signature: 'def get_rai_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the .
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_memory_dir
+  name: get_memory_dir
+  kind: function
+  file: config/paths.py
+  line: 74
+  signature: 'def get_memory_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the .
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_telemetry_dir
+  name: get_telemetry_dir
+  kind: function
+  file: config/paths.py
+  line: 86
+  signature: 'def get_telemetry_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the .
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_identity_dir
+  name: get_identity_dir
+  kind: function
+  file: config/paths.py
+  line: 100
+  signature: 'def get_identity_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the .
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_framework_dir
+  name: get_framework_dir
+  kind: function
+  file: config/paths.py
+  line: 112
+  signature: 'def get_framework_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the .
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_graph_dir
+  name: get_graph_dir
+  kind: function
+  file: config/paths.py
+  line: 124
+  signature: 'def get_graph_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the memory index directory (.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_global_rai_dir
+  name: get_global_rai_dir
+  kind: function
+  file: config/paths.py
+  line: 150
+  signature: def get_global_rai_dir() -> Path
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the global ~/.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-ensure_global_rai_dir
+  name: ensure_global_rai_dir
+  kind: function
+  file: config/paths.py
+  line: 173
+  signature: def ensure_global_rai_dir() -> Path
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Ensure the global ~/.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_personal_dir
+  name: get_personal_dir
+  kind: function
+  file: config/paths.py
+  line: 205
+  signature: 'def get_personal_dir(project_root: Path | None=None) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the personal directory for developer-specific project data.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_claude_memory_path
+  name: get_claude_memory_path
+  kind: function
+  file: config/paths.py
+  line: 227
+  signature: 'def get_claude_memory_path(project_root: Path) -> Path'
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the Claude Code MEMORY.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_config_dir
+  name: get_config_dir
+  kind: function
+  file: config/paths.py
+  line: 273
+  signature: def get_config_dir() -> Path
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the XDG config directory for raise-cli.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_cache_dir
+  name: get_cache_dir
+  kind: function
+  file: config/paths.py
+  line: 286
+  signature: def get_cache_dir() -> Path
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the XDG cache directory for raise-cli.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-paths-get_data_dir
+  name: get_data_dir
+  kind: function
+  file: config/paths.py
+  line: 299
+  signature: def get_data_dir() -> Path
+  module: config.paths
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the XDG data directory for raise-cli.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-console-console
+  name: console
+  kind: module
+  file: output/console.py
+  line: 1
+  signature: module console
+  module: output.console
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Provides a unified output interface that respects the --format flag for CLI output.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-console-get_console
+  name: get_console
+  kind: function
+  file: output/console.py
+  line: 331
+  signature: def get_console() -> OutputConsole
+  module: output.console
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get or create the output console singleton.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-console-set_console
+  name: set_console
+  kind: function
+  file: output/console.py
+  line: 347
+  signature: 'def set_console(console: OutputConsole | None) -> None'
+  module: output.console
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Set the output console (for testing or reconfiguration).
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-console-configure_console
+  name: configure_console
+  kind: function
+  file: output/console.py
+  line: 362
+  signature: 'def configure_console(format: OutputFormat=''human'', verbosity: int=0, color: bool=True) -> OutputConsole'
+  module: output.console
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Configure and return the global console.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-main-main
+  name: main
+  kind: module
+  file: cli/main.py
+  line: 1
+  signature: module main
+  module: cli.main
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Main CLI application entry point.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-main-get_output_format
+  name: get_output_format
+  kind: function
+  file: cli/main.py
+  line: 25
+  signature: def get_output_format() -> Literal['human', 'json', 'table']
+  module: cli.main
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get the current output format.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-main-version_callback
+  name: version_callback
+  kind: function
+  file: cli/main.py
+  line: 63
+  signature: 'def version_callback(value: bool) -> None'
+  module: cli.main
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Print version and exit.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-main-main
+  name: main
+  kind: function
+  file: cli/main.py
+  line: 71
+  signature: 'def main(ctx: typer.Context, version: Annotated[bool, typer.Option(''--version'', ''-V'', callback=version_callback,
+    is_eager=True, help=''Show version and exit'')]=False, format: Annotated[OutputFormat, typer.Option(''--format'', ''-f'',
+    help=''Output format (human, json, table)'')]=OutputFormat.human, verbose: Annotated[int, typer.Option(''--verbose'',
+    ''-v'', count=True, help=''Increase verbosity (-v, -vv, -vvv)'')]=0, quiet: Annotated[bool, typer.Option(''--quiet'',
+    ''-q'', help=''Suppress non-error output'')]=False) -> None'
+  module: cli.main
+  confidence_tier: high
+  confidence_score: 75
+  purpose: RaiSE CLI - Reliable AI Software Engineering governance framework.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-error_handler-error_handler
+  name: error_handler
+  kind: module
+  file: cli/error_handler.py
+  line: 1
+  signature: module error_handler
+  module: cli.error_handler
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Error presentation with Rich formatting for human output and JSON for scripting.
+  category: handler
+  depends_on:
+  - RaiseError
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:32:44.802127+00:00'
+- id: comp-error_handler-get_error_console
+  name: get_error_console
+  kind: function
+  file: cli/error_handler.py
+  line: 30
+  signature: def get_error_console() -> Console
+  module: cli.error_handler
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Get or create the stderr console singleton.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-error_handler-set_error_console
+  name: set_error_console
+  kind: function
+  file: cli/error_handler.py
+  line: 42
+  signature: 'def set_error_console(console: Console | None) -> None'
+  module: cli.error_handler
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Set the error console (for testing).
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-error_handler-handle_error
+  name: handle_error
+  kind: function
+  file: cli/error_handler.py
+  line: 52
+  signature: 'def handle_error(error: RaiseError, *, output_format: Literal[''human'', ''json'', ''table'']=''human'') ->
+    int'
+  module: cli.error_handler
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format and display error, return exit code.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-error_handler-cli_error
+  name: cli_error
+  kind: function
+  file: cli/error_handler.py
+  line: 112
+  signature: 'def cli_error(message: str, *, hint: str | None=None, exit_code: int=1) -> None'
+  module: cli.error_handler
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Print error message and exit with code.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-schema-schema
+  name: schema
+  kind: module
+  file: skills/schema.py
+  line: 1
+  signature: module schema
+  module: skills.schema
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Defines Pydantic models for SKILL.md frontmatter and structure.
+  category: schema
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-scaffold-scaffold
+  name: scaffold
+  kind: module
+  file: skills/scaffold.py
+  line: 1
+  signature: module scaffold
+  module: skills.scaffold
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Generates new skill directories with structured SKILL.md files.
+  category: builder
+  depends_on:
+  - SkillLocator
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-scaffold-scaffold_skill
+  name: scaffold_skill
+  kind: function
+  file: skills/scaffold.py
+  line: 140
+  signature: 'def scaffold_skill(name: str, lifecycle: str | None=None, after: str | None=None, before: str | None=None) ->
+    ScaffoldResult'
+  module: skills.scaffold
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Scaffolds a new skill with proper structure from template.
+  category: utility
+  depends_on:
+  - SkillLocator
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-validator-validator
+  name: validator
+  kind: module
+  file: skills/validator.py
+  line: 1
+  signature: module validator
+  module: skills.validator
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Validates SKILL.md files against RaiSE schema.
+  category: utility
+  depends_on:
+  - Skill
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-validator-validate_skill
+  name: validate_skill
+  kind: function
+  file: skills/validator.py
+  line: 119
+  signature: 'def validate_skill(skill: Skill) -> ValidationResult'
+  module: skills.validator
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Validates a parsed Skill object against schema requirements.
+  category: utility
+  depends_on:
+  - Skill
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-validator-validate_skill_file
+  name: validate_skill_file
+  kind: function
+  file: skills/validator.py
+  line: 143
+  signature: 'def validate_skill_file(path: str | Path) -> ValidationResult'
+  module: skills.validator
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Validates a SKILL.md file by path, parsing then validating.
+  category: utility
+  depends_on:
+  - parse_skill
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-parser-parser
+  name: parser
+  kind: module
+  file: skills/parser.py
+  line: 1
+  signature: module parser
+  module: skills.parser
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Extracts YAML frontmatter and body from SKILL.md files into Skill objects.
+  category: parser
+  depends_on:
+  - Skill
+  - SkillFrontmatter
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-parser-parse_frontmatter
+  name: parse_frontmatter
+  kind: function
+  file: skills/parser.py
+  line: 38
+  signature: 'def parse_frontmatter(content: str) -> tuple[dict[str, Any], str]'
+  module: skills.parser
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Extracts YAML frontmatter and body from markdown content.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-parser-parse_skill
+  name: parse_skill
+  kind: function
+  file: skills/parser.py
+  line: 120
+  signature: 'def parse_skill(path: str | Path) -> Skill'
+  module: skills.parser
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Parses a SKILL.md file into a Skill object with frontmatter and body.
+  category: parser
+  depends_on:
+  - Skill
+  - SkillFrontmatter
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-name_checker-name_checker
+  name: name_checker
+  kind: module
+  file: skills/name_checker.py
+  line: 1
+  signature: module name_checker
+  module: skills.name_checker
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Checks skill names against {domain}-{action} pattern and existing conflicts.
+  category: utility
+  depends_on:
+  - SkillLocator
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-name_checker-check_name
+  name: check_name
+  kind: function
+  file: skills/name_checker.py
+  line: 146
+  signature: 'def check_name(name: str) -> NameCheckResult'
+  module: skills.name_checker
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Checks a proposed skill name against ontology patterns.
+  category: utility
+  depends_on:
+  - SkillLocator
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-locator-locator
+  name: locator
+  kind: module
+  file: skills/locator.py
+  line: 1
+  signature: module locator
+  module: skills.locator
+  confidence_tier: medium
+  confidence_score: 40
+  purpose: Discovers skills in .claude/skills/ and organizes by lifecycle.
+  category: service
+  depends_on:
+  - Skill
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-locator-get_default_skill_dir
+  name: get_default_skill_dir
+  kind: function
+  file: skills/locator.py
+  line: 16
+  signature: 'def get_default_skill_dir(project_root: Path | None=None) -> Path'
+  module: skills.locator
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Returns the default skill directory path for a project.
+  category: utility
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-locator-list_skills
+  name: list_skills
+  kind: function
+  file: skills/locator.py
+  line: 112
+  signature: 'def list_skills(skill_dir: Path | None=None, project_root: Path | None=None) -> list[Skill]'
+  module: skills.locator
+  confidence_tier: medium
+  confidence_score: 55
+  purpose: Lists all skills from a skill directory.
+  category: utility
+  depends_on:
+  - SkillLocator
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-backlog-backlog
+  name: backlog
+  kind: module
+  file: governance/parsers/backlog.py
+  line: 1
+  signature: module backlog
+  module: governance.parsers.backlog
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts Project and Epic concepts from governance/backlog.md.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-backlog-normalize_status
+  name: normalize_status
+  kind: function
+  file: governance/parsers/backlog.py
+  line: 14
+  signature: 'def normalize_status(raw: str) -> str'
+  module: governance.parsers.backlog
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Normalize epic status to standard values.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-backlog-extract_project
+  name: extract_project
+  kind: function
+  file: governance/parsers/backlog.py
+  line: 107
+  signature: 'def extract_project(file_path: Path, project_root: Path | None=None) -> Concept | None'
+  module: governance.parsers.backlog
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract Project concept from backlog.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-backlog-extract_epics
+  name: extract_epics
+  kind: function
+  file: governance/parsers/backlog.py
+  line: 200
+  signature: 'def extract_epics(file_path: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.backlog
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract Epic concepts from backlog.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-constitution-constitution
+  name: constitution
+  kind: module
+  file: governance/parsers/constitution.py
+  line: 1
+  signature: module constitution
+  module: governance.parsers.constitution
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts principle concepts from Constitution markdown files.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-constitution-extract_principles
+  name: extract_principles
+  kind: function
+  file: governance/parsers/constitution.py
+  line: 16
+  signature: 'def extract_principles(file_path: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.constitution
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract §N principles from Constitution markdown file.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-vision-vision
+  name: vision
+  kind: module
+  file: governance/parsers/vision.py
+  line: 1
+  signature: module vision
+  module: governance.parsers.vision
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts outcome concepts from Vision markdown tables.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-vision-extract_outcomes
+  name: extract_outcomes
+  kind: function
+  file: governance/parsers/vision.py
+  line: 15
+  signature: 'def extract_outcomes(file_path: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.vision
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract outcomes from Vision markdown tables.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-prd-prd
+  name: prd
+  kind: module
+  file: governance/parsers/prd.py
+  line: 1
+  signature: module prd
+  module: governance.parsers.prd
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts requirement concepts from PRD markdown files.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-prd-extract_requirements
+  name: extract_requirements
+  kind: function
+  file: governance/parsers/prd.py
+  line: 14
+  signature: 'def extract_requirements(file_path: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.prd
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract RF-XX requirements from PRD markdown file.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-glossary-glossary
+  name: glossary
+  kind: module
+  file: governance/parsers/glossary.py
+  line: 1
+  signature: module glossary
+  module: governance.parsers.glossary
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Parses glossary term definitions from markdown with translations, version tags, and deprecated markers.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-glossary-extract_glossary_terms
+  name: extract_glossary_terms
+  kind: function
+  file: governance/parsers/glossary.py
+  line: 172
+  signature: 'def extract_glossary_terms(file_path: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.glossary
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract glossary terms from a glossary markdown file.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-glossary-extract_all_terms
+  name: extract_all_terms
+  kind: function
+  file: governance/parsers/glossary.py
+  line: 272
+  signature: 'def extract_all_terms(project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.glossary
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract all glossary terms from standard location.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-guardrails-guardrails
+  name: guardrails
+  kind: module
+  file: governance/parsers/guardrails.py
+  line: 1
+  signature: module guardrails
+  module: governance.parsers.guardrails
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts guardrail rules from governance markdown tables with MUST/SHOULD constraints.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-guardrails-extract_guardrails
+  name: extract_guardrails
+  kind: function
+  file: governance/parsers/guardrails.py
+  line: 192
+  signature: 'def extract_guardrails(file_path: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.guardrails
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract guardrails from a guardrails markdown file.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-guardrails-extract_all_guardrails
+  name: extract_all_guardrails
+  kind: function
+  file: governance/parsers/guardrails.py
+  line: 301
+  signature: 'def extract_all_guardrails(project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.guardrails
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract all guardrails from standard location.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-adr-adr
+  name: adr
+  kind: module
+  file: governance/parsers/adr.py
+  line: 1
+  signature: module adr
+  module: governance.parsers.adr
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Parses Architecture Decision Records with YAML frontmatter.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-adr-extract_decisions
+  name: extract_decisions
+  kind: function
+  file: governance/parsers/adr.py
+  line: 101
+  signature: 'def extract_decisions(directory: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.adr
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract ADR decisions from a directory.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-adr-extract_decision_from_file
+  name: extract_decision_from_file
+  kind: function
+  file: governance/parsers/adr.py
+  line: 141
+  signature: 'def extract_decision_from_file(file_path: Path, project_root: Path | None=None) -> Concept | None'
+  module: governance.parsers.adr
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract a single ADR decision from a file.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-adr-extract_all_decisions
+  name: extract_all_decisions
+  kind: function
+  file: governance/parsers/adr.py
+  line: 220
+  signature: 'def extract_all_decisions(project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.adr
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract all ADR decisions from standard locations.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-epic-epic
+  name: epic
+  kind: module
+  file: governance/parsers/epic.py
+  line: 1
+  signature: module epic
+  module: governance.parsers.epic
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts Epic and Story concepts from work/epics/*/scope.md files.
+  category: parser
+  depends_on:
+  - Concept
+  - ConceptType
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-epic-extract_epic_details
+  name: extract_epic_details
+  kind: function
+  file: governance/parsers/epic.py
+  line: 65
+  signature: 'def extract_epic_details(file_path: Path, project_root: Path | None=None) -> Concept | None'
+  module: governance.parsers.epic
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract detailed Epic concept from epic scope document.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-epic-extract_stories
+  name: extract_stories
+  kind: function
+  file: governance/parsers/epic.py
+  line: 174
+  signature: 'def extract_stories(file_path: Path, project_root: Path | None=None) -> list[Concept]'
+  module: governance.parsers.epic
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract Story concepts from epic scope document.
+  category: parser
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-python-python
+  name: python
+  kind: module
+  file: context/analyzers/python.py
+  line: 1
+  signature: module python
+  module: context.analyzers.python
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Python-specific code analyzer using ast for module structure extraction.
+  category: parser
+  depends_on:
+  - ModuleInfo
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-models-models
+  name: models
+  kind: module
+  file: context/analyzers/models.py
+  line: 1
+  signature: module models
+  module: context.analyzers.models
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Pydantic data models for language-agnostic code analysis results (ModuleInfo).
+  category: model
+  depends_on: *id001
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-protocol-protocol
+  name: protocol
+  kind: module
+  file: context/analyzers/protocol.py
+  line: 1
+  signature: module protocol
+  module: context.analyzers.protocol
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Protocol definition for code analyzers establishing language-agnostic contract.
+  category: schema
+  depends_on:
+  - ModuleInfo
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-skills-skills
+  name: skills
+  kind: module
+  file: context/extractors/skills.py
+  line: 1
+  signature: module skills
+  module: context.extractors.skills
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Extracts skill metadata from SKILL.md frontmatter to ConceptNode objects.
+  category: parser
+  depends_on: *id002
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-skills-extract_skill_metadata
+  name: extract_skill_metadata
+  kind: function
+  file: context/extractors/skills.py
+  line: 22
+  signature: 'def extract_skill_metadata(skill_path: Path) -> ConceptNode | None'
+  module: context.extractors.skills
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract metadata from SKILL.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skills-extract_all_skills
+  name: extract_all_skills
+  kind: function
+  file: context/extractors/skills.py
+  line: 95
+  signature: 'def extract_all_skills(skills_dir: Path) -> list[ConceptNode]'
+  module: context.extractors.skills
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract metadata from all skills in a directory.
+  category: builder
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-discover
+  name: discover
+  kind: module
+  file: output/formatters/discover.py
+  line: 1
+  signature: module discover
+  module: output.formatters.discover
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Formats discovery command results in human, json, and summary modes.
+  category: formatter
+  depends_on: &id003
+  - ScanResult
+  - DriftWarning
+  - AnalysisResult
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-discover-format_scan_result
+  name: format_scan_result
+  kind: function
+  file: output/formatters/discover.py
+  line: 24
+  signature: 'def format_scan_result(result: ScanResult, path: Path, output_format: str, language: str | None=None) -> None'
+  module: output.formatters.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format and print scan results.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-format_drift_result
+  name: format_drift_result
+  kind: function
+  file: output/formatters/discover.py
+  line: 121
+  signature: 'def format_drift_result(warnings: list[DriftWarning], files_scanned: int, symbols_checked: int, output_format:
+    str) -> None'
+  module: output.formatters.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format and print drift detection results.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-format_build_result
+  name: format_build_result
+  kind: function
+  file: output/formatters/discover.py
+  line: 219
+  signature: 'def format_build_result(input_path: Path, graph_path: Path, component_count: int, components_in_graph: int,
+    node_count: int, edge_count: int, categories: dict[str, int], sample_components: list[tuple[str, str, str]], output_format:
+    str) -> None'
+  module: output.formatters.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format and print discover build results.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-format_analyze_result
+  name: format_analyze_result
+  kind: function
+  file: output/formatters/discover.py
+  line: 338
+  signature: 'def format_analyze_result(result: AnalysisResult, output_format: str) -> None'
+  module: output.formatters.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format and print analysis results.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-skill
+  name: skill
+  kind: module
+  file: output/formatters/skill.py
+  line: 1
+  signature: module skill
+  module: output.formatters.skill
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Formats skill command outputs for human and JSON consumption.
+  category: formatter
+  depends_on: &id004
+  - Skill
+  - ValidationResult
+  - ScaffoldResult
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-skill-format_skill_list_human
+  name: format_skill_list_human
+  kind: function
+  file: output/formatters/skill.py
+  line: 17
+  signature: 'def format_skill_list_human(skills: list[Skill], grouped: dict[str, list[Skill]], console: Console) -> None'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format skill list for human output.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-format_skill_list_json
+  name: format_skill_list_json
+  kind: function
+  file: output/formatters/skill.py
+  line: 73
+  signature: 'def format_skill_list_json(skills: list[Skill], skill_dir: str) -> str'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format skill list as JSON.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-format_validation_human
+  name: format_validation_human
+  kind: function
+  file: output/formatters/skill.py
+  line: 107
+  signature: 'def format_validation_human(results: list[ValidationResult], console: Console) -> None'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format validation results for human output.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-format_validation_json
+  name: format_validation_json
+  kind: function
+  file: output/formatters/skill.py
+  line: 148
+  signature: 'def format_validation_json(results: list[ValidationResult]) -> str'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format validation results as JSON.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-format_name_check_human
+  name: format_name_check_human
+  kind: function
+  file: output/formatters/skill.py
+  line: 179
+  signature: 'def format_name_check_human(result: NameCheckResult, console: Console) -> None'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format name check result for human output.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-format_name_check_json
+  name: format_name_check_json
+  kind: function
+  file: output/formatters/skill.py
+  line: 230
+  signature: 'def format_name_check_json(result: NameCheckResult) -> str'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format name check result as JSON.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-format_scaffold_human
+  name: format_scaffold_human
+  kind: function
+  file: output/formatters/skill.py
+  line: 259
+  signature: 'def format_scaffold_human(result: ScaffoldResult, console: Console) -> None'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format scaffold result for human output.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-format_scaffold_json
+  name: format_scaffold_json
+  kind: function
+  file: output/formatters/skill.py
+  line: 277
+  signature: 'def format_scaffold_json(result: ScaffoldResult) -> str'
+  module: output.formatters.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Format scaffold result as JSON.
+  category: formatter
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-discover
+  name: discover
+  kind: module
+  file: cli/commands/discover.py
+  line: 1
+  signature: module discover
+  module: cli.commands.discover
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Formats discovery command results in human, json, and summary modes.
+  category: formatter
+  depends_on: *id003
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-discover-scan_command
+  name: scan_command
+  kind: function
+  file: cli/commands/discover.py
+  line: 42
+  signature: 'def scan_command(path: Annotated[Path, typer.Argument(help=''Directory to scan for source files'', exists=True,
+    file_okay=False, dir_okay=True, resolve_path=True)]=Path(''.''), language: Annotated[str | None, typer.Option(''--language'',
+    ''-l'', help=''Language to scan: python, typescript, javascript (auto-detect if not set)'')]=None, output: Annotated[str,
+    typer.Option(''--output'', ''-o'', help=''Output format: human, json, or summary'')]=''human'', pattern: Annotated[str
+    | None, typer.Option(''--pattern'', ''-p'', help=''Glob pattern for files (default: language-specific)'')]=None, exclude:
+    Annotated[list[str] | None, typer.Option(''--exclude'', ''-e'', help=''Patterns to exclude (can be repeated)'')]=None)
+    -> None'
+  module: cli.commands.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Scan a directory and extract code symbols.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-analyze_command
+  name: analyze_command
+  kind: function
+  file: cli/commands/discover.py
+  line: 143
+  signature: 'def analyze_command(input_file: Annotated[Path | None, typer.Option(''--input'', ''-i'', help=''Path to scan
+    result JSON (reads stdin if not provided)'')]=None, output: Annotated[str, typer.Option(''--output'', ''-o'', help=''Output
+    format: human, json, or summary'')]=''human'', category_map_file: Annotated[Path | None, typer.Option(''--category-map'',
+    ''-c'', help=''YAML file with custom path-to-category mappings'')]=None) -> None'
+  module: cli.commands.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Analyze scan results with confidence scoring and module grouping.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-build_command
+  name: build_command
+  kind: function
+  file: cli/commands/discover.py
+  line: 279
+  signature: 'def build_command(input_file: Annotated[Path | None, typer.Option(''--input'', ''-i'', help=''Path to validated
+    components JSON (default: work/discovery/components-validated.json)'')]=None, project_root: Annotated[Path, typer.Option(''--project-root'',
+    ''-r'', help=''Project root directory (default: current directory)'')]=Path(''.''), output: Annotated[str, typer.Option(''--output'',
+    ''-o'', help=''Output format: human, json, or summary'')]=''human'') -> None'
+  module: cli.commands.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Build unified graph with discovered components.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-discover-drift_command
+  name: drift_command
+  kind: function
+  file: cli/commands/discover.py
+  line: 400
+  signature: 'def drift_command(path: Annotated[Path | None, typer.Argument(help=''Directory to scan for drift (default: src/)'')]=None,
+    project_root: Annotated[Path, typer.Option(''--project-root'', ''-r'', help=''Project root directory (default: current
+    directory)'')]=Path(''.''), output: Annotated[str, typer.Option(''--output'', ''-o'', help=''Output format: human, json,
+    or summary'')]=''human'') -> None'
+  module: cli.commands.discover
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Check for architectural drift against baseline components.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-memory
+  name: memory
+  kind: module
+  file: cli/commands/memory.py
+  line: 1
+  signature: module memory
+  module: cli.commands.memory
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: 'CLI commands for Rai''s memory: query, build, and manage.'
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-memory-query
+  name: query
+  kind: function
+  file: cli/commands/memory.py
+  line: 86
+  signature: 'def query(query_str: Annotated[str, typer.Argument(help=''Query string (keywords or concept ID)'')], format:
+    Annotated[str, typer.Option(''--format'', ''-f'', help=''Output format (human or json)'')]=''human'', output: Annotated[Path
+    | None, typer.Option(''--output'', ''-o'', help=''Output file path (default: stdout)'')]=None, strategy: Annotated[str
+    | None, typer.Option(''--strategy'', ''-s'', help=''Query strategy (keyword_search, concept_lookup)'')]=None, types: Annotated[str
+    | None, typer.Option(''--types'', ''-t'', help=''Filter by types (comma-separated: pattern,calibration,principle,etc.)'')]=None,
+    edge_types: Annotated[str | None, typer.Option(''--edge-types'', help=''Filter by edge types (comma-separated: constrained_by,depends_on,etc.)'')]=None,
+    limit: Annotated[int, typer.Option(''--limit'', ''-l'', help=''Maximum number of results'')]=10, index_path: Annotated[Path
+    | None, typer.Option(''--index'', ''-i'', help=''Memory index path'')]=None) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Query Rai's memory for relevant concepts.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-context_cmd
+  name: context_cmd
+  kind: function
+  file: cli/commands/memory.py
+  line: 296
+  signature: 'def context_cmd(module_id: Annotated[str, typer.Argument(help=''Module ID (e.g., mod-memory)'')], format: Annotated[str,
+    typer.Option(''--format'', ''-f'', help=''Output format (human or json)'')]=''human'', index_path: Annotated[Path | None,
+    typer.Option(''--index'', ''-i'', help=''Memory index path'')]=None) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Show full architectural context for a module.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-generate_memory
+  name: generate_memory
+  kind: function
+  file: cli/commands/memory.py
+  line: 400
+  signature: 'def generate_memory(path: Annotated[Path | None, typer.Option(''--path'', ''-p'', help=''Project root (defaults
+    to current directory)'')]=None) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Generate MEMORY.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-build
+  name: build
+  kind: function
+  file: cli/commands/memory.py
+  line: 440
+  signature: 'def build(output: Annotated[Path | None, typer.Option(''--output'', ''-o'', help=''Path to save index JSON'')]=None)
+    -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Build memory index from all sources.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-validate
+  name: validate
+  kind: function
+  file: cli/commands/memory.py
+  line: 522
+  signature: 'def validate(index_file: Annotated[Path | None, typer.Option(''--index'', ''-i'', help=''Path to index JSON
+    file'')]=None) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Validate memory index structure and relationships.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-extract
+  name: extract
+  kind: function
+  file: cli/commands/memory.py
+  line: 638
+  signature: 'def extract(file_path: Annotated[Path | None, typer.Argument(help=''Path to governance file (optional, extracts
+    all if not provided)'')]=None, format: Annotated[str, typer.Option(''--format'', ''-f'', help=''Output format (human or
+    json)'')]=''human'') -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Extract concepts from governance markdown files.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-list_memory
+  name: list_memory
+  kind: function
+  file: cli/commands/memory.py
+  line: 773
+  signature: 'def list_memory(format: Annotated[str, typer.Option(''--format'', ''-f'', help=''Output format (human, json,
+    or table)'')]=''table'', output: Annotated[Path | None, typer.Option(''--output'', ''-o'', help=''Output file path (default:
+    stdout)'')]=None, index_path: Annotated[Path | None, typer.Option(''--index'', ''-i'', help=''Memory index path'')]=None,
+    memory_only: Annotated[bool, typer.Option(''--memory-only/--all'', help=''Show only memory types (pattern, calibration,
+    session) or all'')]=False) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: List concepts in memory.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-add_pattern
+  name: add_pattern
+  kind: function
+  file: cli/commands/memory.py
+  line: 919
+  signature: 'def add_pattern(content: Annotated[str, typer.Argument(help=''Pattern description'')], context: Annotated[str,
+    typer.Option(''--context'', ''-c'', help=''Context keywords (comma-separated)'')]='''', sub_type: Annotated[str, typer.Option(''--type'',
+    ''-t'', help=''Pattern type (codebase, process, architecture, technical)'')]=''process'', learned_from: Annotated[str
+    | None, typer.Option(''--from'', ''-f'', help=''Story/session where learned'')]=None, scope: Annotated[str, typer.Option(''--scope'',
+    ''-s'', help=''Memory scope (global, project, personal)'')]=''project'', memory_dir: Annotated[Path | None, typer.Option(''--memory-dir'',
+    ''-m'', help=''Memory directory path (overrides scope)'')]=None) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Add a new pattern to memory.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-add_calibration_cmd
+  name: add_calibration_cmd
+  kind: function
+  file: cli/commands/memory.py
+  line: 1017
+  signature: 'def add_calibration_cmd(story: Annotated[str, typer.Argument(help=''Story ID (e.g., F3.5)'')], name: Annotated[str,
+    typer.Option(''--name'', help=''Story name (required)'')], size: Annotated[str, typer.Option(''--size'', ''-s'', help=''T-shirt
+    size: XS, S, M, L, XL (required)'')], actual: Annotated[int, typer.Option(''--actual'', ''-a'', help=''Actual minutes
+    spent (required)'')], estimated: Annotated[int | None, typer.Option(''--estimated'', ''-e'', help=''Estimated minutes'')]=None,
+    sp: Annotated[int | None, typer.Option(''--sp'', help=''Story points'')]=None, kata: Annotated[bool, typer.Option(''--kata/--no-kata'',
+    help=''Kata cycle followed (default: yes)'')]=True, notes: Annotated[str | None, typer.Option(''--notes'', ''-n'', help=''Additional
+    notes'')]=None, scope: Annotated[str, typer.Option(''--scope'', help=''Memory scope (global, project, personal)'')]=''project'',
+    memory_dir: Annotated[Path | None, typer.Option(''--memory-dir'', ''-m'', help=''Memory directory path (overrides scope)'')]=None)
+    -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Add calibration data for a completed story.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-add_session_cmd
+  name: add_session_cmd
+  kind: function
+  file: cli/commands/memory.py
+  line: 1126
+  signature: 'def add_session_cmd(topic: Annotated[str, typer.Argument(help=''Session topic'')], outcomes: Annotated[str,
+    typer.Option(''--outcomes'', ''-o'', help=''Session outcomes (comma-separated)'')]='''', session_type: Annotated[str,
+    typer.Option(''--type'', ''-t'', help=''Session type (story, research, etc.)'')]=''story'', log_path: Annotated[str |
+    None, typer.Option(''--log'', ''-l'', help=''Path to session log file'')]=None, memory_dir: Annotated[Path | None, typer.Option(''--memory-dir'',
+    ''-m'', help=''Memory directory path'')]=None) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Add a session record to memory (personal scope).
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-emit_work
+  name: emit_work
+  kind: function
+  file: cli/commands/memory.py
+  line: 1194
+  signature: 'def emit_work(work_type: Annotated[str, typer.Argument(help=''Work type (epic, story)'')], work_id: Annotated[str,
+    typer.Argument(help=''Work ID (e.g., E9, F9.4)'')], event_type: Annotated[str, typer.Option(''--event'', ''-e'', help=''Event
+    type (start, complete, blocked, unblocked, abandoned)'')]=''start'', phase: Annotated[str, typer.Option(''--phase'', ''-p'',
+    help=''Phase (design, plan, implement, review)'')]=''design'', blocker: Annotated[str, typer.Option(''--blocker'', ''-b'',
+    help=''Blocker description (for blocked events)'')]='''') -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Emit a work lifecycle event for Lean flow analysis.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-emit_session_event
+  name: emit_session_event
+  kind: function
+  file: cli/commands/memory.py
+  line: 1340
+  signature: 'def emit_session_event(session_type: Annotated[str, typer.Option(''--type'', ''-t'', help=''Session type (e.g.,
+    story, research, maintenance)'')]=''story'', outcome: Annotated[str, typer.Option(''--outcome'', ''-o'', help=''Session
+    outcome (success, partial, abandoned)'')]=''success'', duration: Annotated[int, typer.Option(''--duration'', ''-d'', help=''Session
+    duration in minutes'')]=0, stories: Annotated[str, typer.Option(''--stories'', ''-f'', help=''Stories worked on (comma-separated)'')]='''')
+    -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Emit a session event to telemetry.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-memory-emit_calibration_event
+  name: emit_calibration_event
+  kind: function
+  file: cli/commands/memory.py
+  line: 1420
+  signature: 'def emit_calibration_event(story: Annotated[str, typer.Argument(help=''Story ID (e.g., F9.4)'')], size: Annotated[str,
+    typer.Option(''--size'', ''-s'', help=''T-shirt size (XS, S, M, L)'')]=''S'', estimated: Annotated[int, typer.Option(''--estimated'',
+    ''-e'', help=''Estimated duration in minutes'')]=0, actual: Annotated[int, typer.Option(''--actual'', ''-a'', help=''Actual
+    duration in minutes'')]=0) -> None'
+  module: cli.commands.memory
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Emit a calibration event to telemetry.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-skill
+  name: skill
+  kind: module
+  file: cli/commands/skill.py
+  line: 1
+  signature: module skill
+  module: cli.commands.skill
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: Formats skill command outputs for human and JSON consumption.
+  category: formatter
+  depends_on: *id004
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-skill-list_command
+  name: list_command
+  kind: function
+  file: cli/commands/skill.py
+  line: 44
+  signature: 'def list_command(format: Annotated[str, typer.Option(''--format'', ''-f'', help=''Output format: human or json'')]=''human'')
+    -> None'
+  module: cli.commands.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: List all skills in the skill directory.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-validate_command
+  name: validate_command
+  kind: function
+  file: cli/commands/skill.py
+  line: 71
+  signature: 'def validate_command(path: Annotated[str | None, typer.Argument(help=''Path to skill file or directory. Validates
+    all skills if not specified.'')]=None, format: Annotated[str, typer.Option(''--format'', ''-f'', help=''Output format:
+    human or json'')]=''human'') -> None'
+  module: cli.commands.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Validate skill structure against RaiSE schema.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-check_name_command
+  name: check_name_command
+  kind: function
+  file: cli/commands/skill.py
+  line: 138
+  signature: 'def check_name_command(name: Annotated[str, typer.Argument(help="Proposed skill name to check (e.g., ''story-validate'').")],
+    format: Annotated[str, typer.Option(''--format'', ''-f'', help=''Output format: human or json'')]=''human'') -> None'
+  module: cli.commands.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Check a proposed skill name against naming conventions.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-skill-scaffold_command
+  name: scaffold_command
+  kind: function
+  file: cli/commands/skill.py
+  line: 174
+  signature: 'def scaffold_command(name: Annotated[str, typer.Argument(help="Skill name to create (e.g., ''story-validate'').")],
+    lifecycle: Annotated[str | None, typer.Option(''--lifecycle'', ''-l'', help=''Lifecycle: session, epic, story, discovery,
+    utility, meta. Inferred from name if not specified.'')]=None, after: Annotated[str | None, typer.Option(''--after'', help=''Skill
+    that should come before this one (prerequisites).'')]=None, before: Annotated[str | None, typer.Option(''--before'', help=''Skill
+    that should come after this one (next).'')]=None, format: Annotated[str, typer.Option(''--format'', ''-f'', help=''Output
+    format: human or json'')]=''human'') -> None'
+  module: cli.commands.skill
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Create a new skill from template.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-init-init
+  name: init
+  kind: module
+  file: cli/commands/init.py
+  line: 1
+  signature: module init
+  module: cli.commands.init
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: CLI command for RaiSE project initialization with greenfield/brownfield detection.
+  category: command
+  depends_on:
+  - detect_project_type
+  - bootstrap_rai_base
+  - scaffold_skills
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-init-init_command
+  name: init_command
+  kind: function
+  file: cli/commands/init.py
+  line: 272
+  signature: 'def init_command(name: Annotated[str | None, typer.Option(''--name'', ''-n'', help=''Project name (defaults
+    to directory name)'')]=None, path: Annotated[Path | None, typer.Option(''--path'', ''-p'', help=''Project path (defaults
+    to current directory)'')]=None, detect: Annotated[bool, typer.Option(''--detect'', ''-d'', help=''Detect conventions and
+    generate guardrails.md'')]=False) -> None'
+  module: cli.commands.init
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Initialize a RaiSE project in the current directory.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session-session
+  name: session
+  kind: module
+  file: cli/commands/session.py
+  line: 1
+  signature: module session
+  module: cli.commands.session
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: CLI commands for session management.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-session-start
+  name: start
+  kind: function
+  file: cli/commands/session.py
+  line: 45
+  signature: 'def start(name: Annotated[str | None, typer.Option(''--name'', ''-n'', help=''Your name (required for first-time
+    setup)'')]=None, project: Annotated[str | None, typer.Option(''--project'', ''-p'', help=''Project path to associate with
+    this session'')]=None, context: Annotated[bool, typer.Option(''--context'', help=''Output a context bundle for AI consumption'')]=False)
+    -> None'
+  module: cli.commands.session
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Start a new working session.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-session-close
+  name: close
+  kind: function
+  file: cli/commands/session.py
+  line: 144
+  signature: 'def close(summary: Annotated[str | None, typer.Option(''--summary'', ''-s'', help=''Session summary'')]=None,
+    session_type: Annotated[str | None, typer.Option(''--type'', ''-t'', help=''Session type (feature, research, maintenance,
+    etc.)'')]=None, pattern: Annotated[str | None, typer.Option(''--pattern'', help="Pattern description to record (format:
+    ''description'')")]=None, correction: Annotated[str | None, typer.Option(''--correction'', help=''Coaching correction
+    observed'')]=None, correction_lesson: Annotated[str | None, typer.Option(''--correction-lesson'', help=''Lesson from the
+    correction'')]=None, state_file: Annotated[str | None, typer.Option(''--state-file'', help=''YAML file with full structured
+    session output'')]=None, project: Annotated[str | None, typer.Option(''--project'', ''-p'', help=''Project path'')]=None)
+    -> None'
+  module: cli.commands.session
+  confidence_tier: high
+  confidence_score: 75
+  purpose: End the current working session.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-profile-profile
+  name: profile
+  kind: module
+  file: cli/commands/profile.py
+  line: 1
+  signature: module profile
+  module: cli.commands.profile
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: CLI command for viewing developer profile from ~/.rai/developer.yaml.
+  category: command
+  depends_on:
+  - load_developer_profile
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-profile-show
+  name: show
+  kind: function
+  file: cli/commands/profile.py
+  line: 29
+  signature: def show() -> None
+  module: cli.commands.profile
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Display the developer profile in YAML format.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
+- id: comp-base-base
+  name: base
+  kind: module
+  file: cli/commands/base.py
+  line: 1
+  signature: module base
+  module: cli.commands.base
+  confidence_tier: medium
+  confidence_score: 60
+  purpose: CLI command for viewing bundled base Rai package information.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: human
+  validated_at: '2026-02-09T16:33:30.539105+00:00'
+- id: comp-base-show
+  name: show
+  kind: function
+  file: cli/commands/base.py
+  line: 62
+  signature: def show() -> None
+  module: cli.commands.base
+  confidence_tier: high
+  confidence_score: 75
+  purpose: Display base Rai package information.
+  category: command
+  depends_on: []
+  internal: false
+  validated: true
+  validated_by: auto
+  validated_at: '2026-02-09T16:32:06.678285+00:00'
