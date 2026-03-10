@@ -11,7 +11,7 @@
 # temporarily removed during sync.
 #
 # Excluded (internal):
-#   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/, governance/, .claude/, scripts/
+#   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/, governance/, .claude/, scripts/, src/rai_pro/
 #   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md, .gitlab-ci.yml
 #
 # Included (public):
@@ -84,6 +84,10 @@ done
 for file in "${EXCLUDED_FILES[@]}"; do
     git rm --cached --quiet --ignore-unmatch "$file"
 done
+
+# 3b. Remove private source directories
+git rm -r --cached --quiet --ignore-unmatch "src/rai_pro"
+info "Excluded src/rai_pro/"
 
 # 4. Write the filtered index as a tree object
 TREE=$(git write-tree)
