@@ -11,20 +11,16 @@
 # temporarily removed during sync.
 #
 # Excluded (internal):
-#   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/ (Starlight app),
-#          docs-github/, governance/, .claude/, .agent/, scripts/, htmlcov/,
-#          dist/, packages/, site/
+#   Dirs:  work/, dev/, .raise/, archive/, blog/, governance/, .claude/,
+#          .agent/, scripts/, htmlcov/, dist/, packages/, site/
 #   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md,
 #          .gitlab-ci.yml, .coverage, .envrc, DEMO-STRATEGY.md, AGENTS.md,
 #          sonar-project.properties, scope.md, docker-compose.yml, bug-*-*.md
 #
-# Remapped:
-#   docs-github/ → docs/  (plain markdown for GitHub rendering)
-#
 # Included (public):
-#   src/, tests/, framework/, docs/ (from docs-github/), .github/,
-#   pyproject.toml, uv.lock, README.md, LICENSE, CONTRIBUTING.md,
-#   CODE_OF_CONDUCT.md, NOTICE, CHANGELOG.md, SECURITY.md, llms.txt, .gitignore
+#   src/, tests/, framework/, docs/, .github/, pyproject.toml, uv.lock,
+#   README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, NOTICE,
+#   CHANGELOG.md, SECURITY.md, llms.txt, .gitignore
 #
 # Usage:
 #   ./scripts/sync-github.sh [source-branch] [target-branch]
@@ -43,7 +39,7 @@ set -euo pipefail
 
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
-EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs" "docs-github" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages" "site")
+EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages" "site")
 EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml" ".coverage" ".envrc" "DEMO-STRATEGY.md" "AGENTS.md" "sonar-project.properties" "scope.md" "docker-compose.yml" "bug-396-retro.md" "bug-396-scope.md" "bug-397-retro.md" "bug-397-scope.md" "bug-398-retro.md" "bug-398-scope.md")
 
 # Colors for output
@@ -93,24 +89,16 @@ for file in "${EXCLUDED_FILES[@]}"; do
     git rm --cached --quiet --ignore-unmatch "$file"
 done
 
-# 4. Graft docs-github/ as docs/ in the filtered tree
-#    Read the docs-github subtree from the source and add it as docs/
-DOCS_TREE=$(git rev-parse "$SOURCE_BRANCH:docs-github" 2>/dev/null || true)
-if [ -n "$DOCS_TREE" ]; then
-    git read-tree --prefix=docs/ "$DOCS_TREE"
-    info "Mapped docs-github/ → docs/"
-fi
-
-# 5. Write the filtered index as a tree object
+# 4. Write the filtered index as a tree object
 TREE=$(git write-tree)
 
-# 6. Create an orphan commit (no parent) from the filtered tree
+# 5. Create an orphan commit (no parent) from the filtered tree
 COMMIT=$(git commit-tree "$TREE" -m "RaiSE Framework v2 — $(date +%Y-%m-%d)
 
 Open core mirror of raise-commons.
 Source: $SOURCE_BRANCH ($SOURCE_SHA)")
 
-# 7. Force-push the commit to GitHub
+# 6. Force-push the commit to GitHub
 info "Pushing to github/$TARGET_BRANCH..."
 git push github "$COMMIT:refs/heads/$TARGET_BRANCH" --force
 
