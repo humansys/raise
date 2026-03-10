@@ -138,6 +138,6 @@ Next: /rai-session-start
 
 - Prerequisite: `rai init`
 - Sibling: `/rai-project-onboard` (brownfield)
-- Parser sources: `src/rai_cli/governance/parsers/*.py`
-- Template sources: `src/rai_cli/rai_base/governance/*.md`
+- Parser sources: `src/raise_cli/governance/parsers/*.py`
+- Template sources: `src/raise_cli/rai_base/governance/*.md`
 - Next: `/rai-session-start`

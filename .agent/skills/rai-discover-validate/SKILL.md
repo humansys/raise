@@ -20,6 +20,8 @@ name: rai-discover-validate
 
 # Discovery Validate
 
+> **Deprecated:** Use `/rai-discover` instead, which runs the full pipeline (detect → extract → describe → document → build) in one pass. This skill is kept for backward compatibility.
+
 ## Purpose
 
 Validate component descriptions using a confidence-tier workflow that reduces human decisions from O(components) to O(modules + exceptions).

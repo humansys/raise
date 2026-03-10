@@ -61,7 +61,7 @@ Scenario detected. `.raise/` exists.
 Ask developer's name (only mandatory question). Derive pattern prefix (first letter, uppercased), confirm.
 
 ```bash
-rai session start --name "{name}" --project "$(pwd)"
+rai session start --name "{name}" --project .
 ```
 
 Edit `~/.rai/developer.yaml` to add confirmed `pattern_prefix`.
@@ -90,7 +90,7 @@ Preferences saved or defaults accepted.
 Build graph if missing (`rai graph build`). Scaffold `CLAUDE.local.md` if missing. Run context bundle:
 
 ```bash
-rai session start --project "$(pwd)" --context
+rai session start --project . --context
 ```
 
 Check: developer name appears, session count shown, no errors.
@@ -128,6 +128,6 @@ Next: /rai-session-start
 
 ## References
 
-- Profile model: `src/rai_cli/onboarding/profile.py`
+- Profile model: `src/raise_cli/onboarding/profile.py`
 - Next: `/rai-session-start`
 - One-time skill: subsequent runs verify, not recreate

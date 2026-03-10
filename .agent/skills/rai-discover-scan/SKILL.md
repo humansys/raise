@@ -19,6 +19,8 @@ name: rai-discover-scan
 
 # Discovery Scan
 
+> **Deprecated:** Use `/rai-discover` instead, which runs the full pipeline (detect → extract → describe → document → build) in one pass. This skill is kept for backward compatibility.
+
 ## Purpose
 
 Extract symbols from the codebase and synthesize meaningful descriptions for each component. Produces a draft component catalog ready for human validation.
@@ -94,7 +96,7 @@ components:
   - id: comp-scanner-symbol
     name: Symbol
     kind: class
-    file: src/rai_cli/discovery/scanner.py
+    file: src/raise_cli/discovery/scanner.py
     line: 44
     signature: "class Symbol(BaseModel)"
     purpose: "Represents a code symbol extracted from source files."
