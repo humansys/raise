@@ -404,7 +404,7 @@ def append_pattern(
     Returns:
         WriteResult with generated ID and status.
     """
-    file_path = memory_dir / "patterns.jsonl"
+    file_path = memory_dir.resolve() / "patterns.jsonl"
     pattern_id = get_next_id(file_path, "PAT", developer_prefix=developer_prefix)
     created_date = created or date.today()
 
@@ -460,6 +460,7 @@ def reinforce_pattern(
     Raises:
         KeyError: If pattern_id is not found in the file.
     """
+    file_path = file_path.resolve()
     lines = file_path.read_text(encoding="utf-8").splitlines()
     records: list[dict[str, Any]] = []
     found = False
