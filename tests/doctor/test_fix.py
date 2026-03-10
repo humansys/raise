@@ -89,19 +89,20 @@ class TestAddGitignorePersonal:
         assert ".raise/rai/personal/" in gitignore.read_text()
 
     def test_returns_false_on_write_error(self, tmp_path: Path) -> None:
-        """RAISE-521: returns False when file write fails (OSError/PermissionError).
+        """RAISE-521: returns False when file write fails (OSError).
 
         SonarCloud BLOCKER AZy-yCoI4PF7cDTLpgfn — function must not always return True.
+        Uses mock instead of chmod so the test is reliable in root/CI environments.
         """
+        from unittest.mock import patch
+
         gitignore = tmp_path / ".gitignore"
         gitignore.write_text("*.pyc\n")
-        gitignore.chmod(0o444)  # read-only: open("a") will raise PermissionError
 
-        try:
+        with patch("raise_cli.doctor.fix.open", side_effect=OSError("permission denied")):
             result = add_gitignore_personal(tmp_path)
-            assert result is False
-        finally:
-            gitignore.chmod(0o644)  # restore for cleanup
+
+        assert result is False
 
 
 class TestRunFixes:
