@@ -20,6 +20,8 @@ name: rai-discover-document
 
 # Discover Document
 
+> **Deprecated:** Use `/rai-discover` instead, which runs the full pipeline (detect → extract → describe → document → build) in one pass. This skill is kept for backward compatibility.
+
 ## Purpose
 
 Generate architecture documentation from discovery data: system-level C4 docs, per-module docs with YAML frontmatter, domain model, and a compact index for AI context loading.
@@ -120,6 +122,6 @@ Module nodes appear in graph. No stale references.
 ## References
 
 - Previous: `/rai-discover-validate`
-- Graph builder: `src/rai_cli/context/builder.py` (`load_architecture()`)
+- Graph builder: `src/raise_cli/context/builder.py` (`load_architecture()`)
 - Components: `work/discovery/components-validated.json`
 - Governance: `governance/guardrails.md`, `governance/vision.md`

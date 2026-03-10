@@ -7,7 +7,22 @@
 @import './fonts.css';
 
 :root {
-  /* Override Starlight's color palette with our dark theme */
+  /* Accent color — copper/amber (constant across themes) */
+  --sl-color-accent-low: #5c3d1e;
+  --sl-color-accent: #c2813d;
+  --sl-color-accent-high: #d4944f;
+
+  /* Typography (constant across themes) */
+  --sl-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --sl-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Line heights (constant across themes) */
+  --sl-line-height: 1.6;
+  --sl-line-height-headings: 1.2;
+}
+
+/* Dark theme */
+[data-theme='dark'] {
   --sl-color-white: #fafafa;
   --sl-color-gray-1: #a1a1aa;
   --sl-color-gray-2: #71717a;
@@ -17,42 +32,24 @@
   --sl-color-gray-6: #1a1a1a;
   --sl-color-black: #0a0a0a;
 
-  /* Accent color — copper/amber */
-  --sl-color-accent-low: #5c3d1e;
-  --sl-color-accent: #c2813d;
-  --sl-color-accent-high: #d4944f;
-
-  /* Background colors */
   --sl-color-bg: #0a0a0a;
   --sl-color-bg-nav: #121212;
   --sl-color-bg-sidebar: #0a0a0a;
   --sl-color-bg-inline-code: #1a1a1a;
 
-  /* Text colors */
   --sl-color-text: #fafafa;
   --sl-color-text-accent: #c2813d;
+  --sl-color-text-invert: #0a0a0a;
 
-  /* Borders */
   --sl-color-hairline-light: #1a1a1a;
   --sl-color-hairline: #222222;
   --sl-color-hairline-shade: #2a2a2a;
-
-  /* Typography */
-  --sl-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --sl-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-
-  /* Line heights */
-  --sl-line-height: 1.6;
-  --sl-line-height-headings: 1.2;
-
-  /* Link colors */
-  --sl-color-text-invert: #0a0a0a;
 }
 
-/* Dark theme adjustments */
-[data-theme='dark'] {
-  --sl-color-white: #fafafa;
-  --sl-color-black: #0a0a0a;
+/* Light theme — let Starlight's inverted gray scale handle white/black/grays.
+   Only override specific values we want to customize. */
+[data-theme='light'] {
+  --sl-color-text-accent: #c2813d;
 }
 
 /* Code blocks */
@@ -133,10 +130,15 @@ html {
   }
 }
 
+/* Logo — SVG has hardcoded white fill, invert to black in light mode */
+[data-theme='light'] .site-title img {
+  filter: brightness(0);
+}
+
 /* Navigation */
 .header {
   background: var(--sl-color-bg-nav);
-  border-bottom: 1px solid var(--sl-color-hairline);
+  border-bottom: none;
 }
 
 /* Search */
@@ -145,6 +147,7 @@ html {
   border: 1px solid var(--sl-color-hairline);
 }
 
+
 /* Tables */
 table {
   border-color: var(--sl-color-hairline);
@@ -152,6 +155,7 @@ table {
 
 th {
   background: var(--sl-color-bg-inline-code);
+  color: var(--sl-color-text);
   border-color: var(--sl-color-hairline);
 }
 

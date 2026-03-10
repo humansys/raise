@@ -1,19 +1,20 @@
 {
   "schema_version": "1.0",
-  "rai_cli_version": "2.2.0",
+  "raise_cli_version": "2.2.0",
   "distributed_at": "2026-02-23T19:39:25.597338Z",
+  "skill_set": null,
   "skills": {
     "rai-session-close": {
-      "sha256": "6cf905bc46c890e0bc19ceb33dfb28f231d3f87afeecc0ff19927cb68e07f0f4",
+      "sha256": "fa3d5741f028e1b01338ed6d25488ae71a127b1f721cdcfac9e8e1cae5110755",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.710852Z"
+      "distributed_at": "2026-03-10T20:37:04.914178Z"
     },
     "rai-session-start": {
-      "sha256": "d19ca6c8190744356fe594f409ec0fbbaa0703d2439c535f83a88e9820cc8a1b",
+      "sha256": "8db8f64732b57955207832f2819845b905e05042d0ea9eb47d3038d1ff62bcd2",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.714036Z"
+      "distributed_at": "2026-03-10T20:37:04.916911Z"
     },
     "rai-story-close": {
       "sha256": "5d1ff76beda7c9dadf460b5ca3f81daa347d45b294be84fcca0f569cf7832eac",
@@ -40,10 +41,10 @@
       "distributed_at": "2026-03-02T20:27:33.725307Z"
     },
     "rai-story-review": {
-      "sha256": "657b029ad1135b46bbf191966581ea5ea1e6338bd65ad282345b8a8d29484a7d",
+      "sha256": "eb69eea561cb5706fa49d77680dbc0d0143d14b7c095f64797b8b244742010f3",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.727801Z"
+      "distributed_at": "2026-03-10T20:37:04.925689Z"
     },
     "rai-story-start": {
       "sha256": "de32f498c93f3f9bdefa1f631b3ba284fec953b7cdb60ffc02d5cba0ad0b99ac",
@@ -58,10 +59,10 @@
       "distributed_at": "2026-03-02T20:27:33.733619Z"
     },
     "rai-epic-design": {
-      "sha256": "41f9207cc68deca054386c4a39b851936b035387ad00f950458017eb9ac1abbb",
+      "sha256": "c753c09b1b906b6b1391468acb4747aae530de38e5ca6144dd68c7fc3445d507",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.736896Z"
+      "distributed_at": "2026-03-10T20:37:04.935114Z"
     },
     "rai-epic-plan": {
       "sha256": "36b6c940440a061ea9ee66212b0af72c3328dd2faa20e32e03a5841a64c31882",
@@ -76,46 +77,46 @@
       "distributed_at": "2026-03-02T20:27:33.742622Z"
     },
     "rai-discover-document": {
-      "sha256": "933c49e0648f5e16f47fecc9edcaf8e6c94177bb2860b82e65c462a48ea01df6",
+      "sha256": "6fe1084ec31067e3cfc93c13a50f79b1f45e5ad8a1a46fad579af4bc44b973f5",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.745107Z"
+      "distributed_at": "2026-03-10T20:37:04.947474Z"
     },
     "rai-discover-scan": {
-      "sha256": "7d6e197a420702a979443aa914bf1a49ea14b38440999b713e084392f19fd8b2",
+      "sha256": "7ff0c7207d37f10979f26f83866e476466dde140e14c047431529defd6405152",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.747497Z"
+      "distributed_at": "2026-03-10T20:37:04.949844Z"
     },
     "rai-discover-start": {
-      "sha256": "ba0dd1fb9e5837d191bf0934b44ae6fd43c44d79a6058f558d7f8a00a8ae3f28",
+      "sha256": "58b1bb0ddd2fe1b68a34ee74b5c0289ab62952552c81553c86cad4f35a7eec97",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.749946Z"
+      "distributed_at": "2026-03-10T20:37:04.952109Z"
     },
     "rai-discover-validate": {
-      "sha256": "a23aa86f8c8d27defdc7a110123d8eeede7fcece0c8f6bd71cc76978fae80c9b",
+      "sha256": "011adae207365234449d4be89350fd59ae2202494e33593b8535646383eeb169",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.752824Z"
+      "distributed_at": "2026-03-10T20:37:04.954409Z"
     },
     "rai-project-create": {
-      "sha256": "12f434c42627d07dd5e866ec0f1c54b1a37b52670b6f484e732dab3eca220922",
+      "sha256": "fee4f73bf249b7ba4144c75d88f89a6b19642c93548210f2c0f586e9ce81008f",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.755453Z"
+      "distributed_at": "2026-03-10T20:37:04.956845Z"
     },
     "rai-project-onboard": {
-      "sha256": "c0692e2379010dcef6fa8e9e3772036f2c8f3f2cf530b3275b0709ae79d780af",
+      "sha256": "ebb12a049f93359c6d4901c8e1277d84b6722434b2ea39ec5d568cd4e7e41394",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.758137Z"
+      "distributed_at": "2026-03-10T20:37:04.959861Z"
     },
     "rai-welcome": {
-      "sha256": "e7fa714787b5ec4f7180e93ff4238cdeb85a700e08e6b7910710780f8fda4a16",
+      "sha256": "a096bdea8cf246539a50e57976e120188033e0f1acf24b4d4bea0cc48b60dcfd",
       "version": "2.2.0",
       "origin": "framework",
-      "distributed_at": "2026-03-02T20:27:33.760671Z"
+      "distributed_at": "2026-03-10T20:37:04.962012Z"
     },
     "rai-docs-update": {
       "sha256": "abcc99f5c3562e0e9155a81b48c1b77301473226ad338860535ef09db7a5b278",
@@ -140,6 +141,48 @@
       "version": "2.2.0",
       "origin": "framework",
       "distributed_at": "2026-03-02T20:27:33.770989Z"
+    },
+    "rai-story-run": {
+      "sha256": "bc7c7e2f9dcd714105c0573f7412c92287994c24cb7e3e299768632360ce5bc0",
+      "version": "2.2.0",
+      "origin": "framework",
+      "distributed_at": "2026-03-10T20:37:04.928883Z"
+    },
+    "rai-epic-run": {
+      "sha256": "70dae16a65f4b7e5fa0e0a142a36af83101aefaeb3ad41e57aff87c6c68a7607",
+      "version": "2.2.0",
+      "origin": "framework",
+      "distributed_at": "2026-03-10T20:37:04.939727Z"
+    },
+    "rai-discover": {
+      "sha256": "9708b9cd87aa15639eef6e9e9778e86ba828b1db892b55cf707c819b50272d76",
+      "version": "2.2.0",
+      "origin": "framework",
+      "distributed_at": "2026-03-10T20:37:04.944896Z"
+    },
+    "rai-mcp-add": {
+      "sha256": "5187ec4adcb876be95c13a8fb72d04765c681adc2537f350ca27c7205c843c13",
+      "version": "2.2.0",
+      "origin": "framework",
+      "distributed_at": "2026-03-10T20:37:04.965600Z"
+    },
+    "rai-mcp-remove": {
+      "sha256": "ca6996c909207afca174261a4f18f198abad33b88e7dd077347a43563f958056",
+      "version": "2.2.0",
+      "origin": "framework",
+      "distributed_at": "2026-03-10T20:37:04.968033Z"
+    },
+    "rai-mcp-status": {
+      "sha256": "7910a90d444c875c05dda7b7b057e532ce1301fcc01671c13ec865c21367351e",
+      "version": "2.2.0",
+      "origin": "framework",
+      "distributed_at": "2026-03-10T20:37:04.971460Z"
+    },
+    "rai-doctor": {
+      "sha256": "eb37dddd0d793c431b683a15996f4f0393a5ec7f5e9f9f8d4e2c96679cab1e24",
+      "version": "2.2.0",
+      "origin": "framework",
+      "distributed_at": "2026-03-10T20:37:04.974699Z"
     }
   }
 }

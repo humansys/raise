@@ -19,6 +19,8 @@ name: rai-discover-start
 
 # Discovery Start
 
+> **Deprecated:** Use `/rai-discover` instead, which runs the full pipeline (detect → extract → describe → document → build) in one pass. This skill is kept for backward compatibility.
+
 ## Purpose
 
 Initialize codebase discovery by detecting languages, key directories, and entry points. Creates the context file that all subsequent discovery skills depend on.
@@ -95,8 +97,8 @@ Write `work/discovery/context.yaml`:
 project:
   name: {from pyproject.toml/package.json/directory name}
   languages: [python]
-  root_dirs: [src/rai_cli]
-  entry_points: [src/rai_cli/cli/main.py]
+  root_dirs: [src/raise_cli]
+  entry_points: [src/raise_cli/cli/main.py]
   detected_at: {ISO_TIMESTAMP}
 status: initialized
 ```

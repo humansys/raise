@@ -11,9 +11,17 @@ metadata:
   raise.fase: ''
   raise.frequency: on-demand
   raise.gate: 4-dimensional coverage gate
+  raise.inputs: '- project_root: path, required, argument
+
+    '
   raise.next: session-start
+  raise.outputs: '- governance_docs: file_path[] (governance/*.md)
+
+    - knowledge_graph: file_path (.raise/rai/memory/index.json)
+
+    '
   raise.prerequisites: rai init --detect
-  raise.version: 2.0.0
+  raise.version: 3.0.0
   raise.visibility: public
   raise.work_cycle: utility
 name: rai-project-onboard
@@ -62,29 +70,21 @@ grep -ciE "must-|should-" governance/guardrails.md 2>/dev/null || echo "0"
 Manifest exists, governance templates exist, conventions detected.
 </verification>
 
-### Step 2: Run Discovery & Check Docs
+### Step 2: Run Discovery
 
-```bash
-rai discover scan . -o json | rai discover analyze -o summary
-```
+If `/rai-discover` has not been run yet (no `work/discovery/components-validated.json`), run it now. It handles the full pipeline: detect → extract → describe → document → build graph.
 
-Also search for existing documentation:
+If already run, skip to Step 3 — discovery data is available.
 
-```bash
-find . -maxdepth 3 -not -path "./.git/*" -not -path "./.raise/*" -not -path "./governance/*" \( -name "*.md" -o -name "*.rst" \) | head -40
-```
-
-If docs found, ask user: "Read these to pre-populate governance?" Build coverage map of what's answered vs gaps.
+Also auto-read existing project documentation (README, ARCHITECTURE, CONTRIBUTING, etc.) to pre-populate governance fields. No need to ask — always read what's available.
 
 <verification>
-Discovery complete. Documentation coverage map built.
+Discovery complete. Existing docs read.
 </verification>
 
-### Step 3: Present Discovery & Fill Gaps
+### Step 3: Fill Governance Gaps
 
-Present discovery summary (modules, conventions, architecture signals). Ask user to confirm/correct.
-
-Then ask ONLY for fields not found in code or docs:
+Present what discovery + docs already covered. Ask ONLY for unfilled fields:
 - **Vision:** description, who uses it, why it exists
 - **Capabilities:** 3-5 core things it does → 5-8 RF-XX requirements
 - **Architecture gaps:** external actors/systems, interfaces, branch model
@@ -159,6 +159,6 @@ Next: /rai-session-start
 
 - Prerequisite: `rai init --detect`
 - Sibling: `/rai-project-create` (greenfield)
-- Discovery: `rai discover scan`, `rai discover analyze`
-- Parser sources: `src/rai_cli/governance/parsers/*.py`
+- Discovery: `/rai-discover` (unified pipeline)
+- Parser sources: `src/raise_cli/governance/parsers/*.py`
 - Next: `/rai-session-start`

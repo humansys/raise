@@ -10,7 +10,17 @@ metadata:
   raise.fase: '3'
   raise.frequency: per-epic
   raise.gate: ''
+  raise.inputs: '- brief: file_path, optional, previous_skill
+
+    - scope: file_path, required, previous_skill
+
+    '
   raise.next: epic-plan
+  raise.outputs: '- scope: file_path, next_skill
+
+    - design: file_path, optional, next_skill
+
+    '
   raise.prerequisites: project-backlog
   raise.version: 2.1.0
   raise.visibility: public
