@@ -16,7 +16,6 @@ resolution-markers = [
 [manifest]
 members = [
     "raise-cli",
-    "raise-core",
     "raise-server",
 ]
 
@@ -1250,7 +1249,6 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyyaml" },
-    { name = "raise-core" },
     { name = "requests" },
     { name = "rich" },
     { name = "tree-sitter" },
@@ -1301,7 +1299,6 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
     { name = "pyyaml", specifier = ">=6.0.1" },
-    { name = "raise-core", editable = "packages/raise-core" },
     { name = "raise-server", marker = "extra == 'dev'", editable = "packages/raise-server" },
     { name = "requests", specifier = ">=2.32.4" },
     { name = "rich", specifier = ">=13.7.0" },
@@ -1319,21 +1316,6 @@ requires-dist = [
 provides-extras = ["dev", "mcp", "observability", "csharp"]
 
 [[package]]
-name = "raise-core"
-version = "2.2.1"
-source = { editable = "packages/raise-core" }
-dependencies = [
-    { name = "networkx" },
-    { name = "pydantic" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "networkx", specifier = ">=3.6.1" },
-    { name = "pydantic", specifier = ">=2.6.0" },
-]
-
-[[package]]
 name = "raise-server"
 version = "2.2.1"
 source = { editable = "packages/raise-server" }
@@ -1342,7 +1324,6 @@ dependencies = [
     { name = "asyncpg" },
     { name = "fastapi" },
     { name = "pydantic-settings" },
-    { name = "raise-core" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -1353,7 +1334,6 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "fastapi", specifier = ">=0.115.0" },
     { name = "pydantic-settings", specifier = ">=2.7.0" },
-    { name = "raise-core", editable = "packages/raise-core" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.34.0" },
 ]
