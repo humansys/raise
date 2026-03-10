@@ -1268,6 +1268,7 @@ csharp = [
 dev = [
     { name = "bandit" },
     { name = "httpx" },
+    { name = "mcp" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1291,6 +1292,7 @@ requires-dist = [
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
     { name = "logfire", marker = "extra == 'observability'", specifier = ">=4.0" },
     { name = "logfire-api", specifier = ">=4.0" },
+    { name = "mcp", marker = "extra == 'dev'", specifier = ">=1.26,<2" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.26,<2" },
     { name = "networkx", specifier = ">=3.6.1" },
     { name = "pydantic", specifier = ">=2.6.0" },
