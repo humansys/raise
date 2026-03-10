@@ -459,8 +459,11 @@ def reinforce_pattern(
 
     Raises:
         KeyError: If pattern_id is not found in the file.
+        ValueError: If file_path does not resolve to a .jsonl file.
     """
     file_path = file_path.resolve()
+    if file_path.suffix != ".jsonl":
+        raise ValueError(f"Expected a .jsonl file, got: {file_path.suffix!r}")
     lines = file_path.read_text(encoding="utf-8").splitlines()
     records: list[dict[str, Any]] = []
     found = False
