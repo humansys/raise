@@ -80,7 +80,7 @@ def _create_graph(tmp_path: Path) -> Path:
                 "id": "decision-adr-001",
                 "type": "decision",
                 "content": "Use Pydantic for all data models",
-                "source_file": "dev/decisions/adr-001.md",
+                "source_file": "governance/adrs/adr-001.md",
                 "created": "2026-01-31",
                 "metadata": {},
             },

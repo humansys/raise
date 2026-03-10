@@ -144,7 +144,7 @@ class GovernanceExtractor:
                 )
 
         # ADR files — one locator per file (two directories)
-        for adr_dir in ["dev/decisions", "dev/decisions/v2"]:
+        for adr_dir in ["governance/adrs", "governance/adrs/v2"]:
             full_dir = root / adr_dir
             if full_dir.exists():
                 for adr_file in sorted(full_dir.glob("adr-*.md")):
@@ -280,9 +280,9 @@ class GovernanceExtractor:
         try:
             adr_concepts = extract_all_decisions(self.project_root)
             concepts.extend(adr_concepts)
-            adr_root_count = len(list(self.project_root.glob("dev/decisions/adr-*.md")))
+            adr_root_count = len(list(self.project_root.glob("governance/adrs/adr-*.md")))
             adr_v2_count = len(
-                list(self.project_root.glob("dev/decisions/v2/adr-*.md"))
+                list(self.project_root.glob("governance/adrs/v2/adr-*.md"))
             )
             files_processed += adr_root_count + adr_v2_count
         except Exception as e:

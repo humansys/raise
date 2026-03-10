@@ -122,19 +122,19 @@ def project_root(tmp_path: Path) -> Path:
     )
 
     # ADR
-    adr_dir = tmp_path / "dev" / "decisions"
+    adr_dir = tmp_path / "governance" / "adrs"
     adr_dir.mkdir(parents=True, exist_ok=True)
-    adr = adr_dir / "adr-001.md"
+    adr = adr_dir / "adr-026-filtered-github-mirror.md"
     adr.write_text(
         dedent("""\
         ---
-        id: ADR-001
+        id: ADR-026
         title: Test Decision
         status: accepted
         date: 2026-01-01
         ---
 
-        # ADR-001: Test Decision
+        # ADR-026: Test Decision
 
         ## Decision
         We decided to test.
@@ -383,14 +383,14 @@ class TestParse:
         parser = AdrParser()
         locator = _make_locator(
             CoreArtifactType.ADR,
-            "dev/decisions/adr-001.md",
+            "governance/adrs/adr-026-filtered-github-mirror.md",
             project_root,
         )
         nodes = parser.parse(locator)
 
         assert len(nodes) == 1
         assert nodes[0].type == "decision"
-        assert nodes[0].metadata["adr_id"] == "ADR-001"
+        assert nodes[0].metadata["adr_id"] == "ADR-026"
 
     def test_guardrails_parser(self, project_root: Path) -> None:
         from raise_cli.governance.parsers.guardrails import GuardrailsParser

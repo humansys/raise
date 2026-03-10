@@ -254,9 +254,9 @@ class TestExtractAllDecisions:
     """Tests for extract_all_decisions function."""
 
     def test_extracts_from_standard_locations(self, tmp_path: Path) -> None:
-        """Should extract from dev/decisions/ and dev/decisions/v2/."""
+        """Should extract from governance/adrs/ and governance/adrs/v2/."""
         # Create directory structure
-        root_dir = tmp_path / "dev" / "decisions"
+        root_dir = tmp_path / "governance" / "adrs"
         root_dir.mkdir(parents=True)
         v2_dir = root_dir / "v2"
         v2_dir.mkdir()
@@ -295,9 +295,9 @@ class TestExtractAllDecisions:
         assert "decision-adr-001" in ids
 
     def test_skips_v1_directory(self, tmp_path: Path) -> None:
-        """Should NOT extract from dev/decisions/v1/ (legacy)."""
+        """Should NOT extract from governance/adrs/v1/ (legacy)."""
         # Create directory structure
-        root_dir = tmp_path / "dev" / "decisions"
+        root_dir = tmp_path / "governance" / "adrs"
         root_dir.mkdir(parents=True)
         v1_dir = root_dir / "v1"
         v1_dir.mkdir()
@@ -315,7 +315,7 @@ class TestIntegrationWithRealData:
     """Integration tests with real ADR data."""
 
     @pytest.mark.skipif(
-        not (_PROJECT_ROOT / "dev/decisions/adr-019-unified-context-graph.md").exists(),
+        not (_PROJECT_ROOT / "governance/adrs/v1/adr-019-unified-context-graph.md").exists(),
         reason="Real ADR data not available",
     )
     def test_extracts_real_adrs(self) -> None:

@@ -21,4 +21,4 @@ layers: []
 
 ## Key Decisions
 
-<!-- Reference ADRs when available: dev/decisions/adr-XXX.md -->
+<!-- Reference ADRs when available: governance/adrs/adr-XXX.md -->

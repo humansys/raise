@@ -1,7 +1,7 @@
 """Parser for Architecture Decision Records (ADRs).
 
 Extracts decisions from ADR markdown files with YAML frontmatter.
-Supports ADRs in dev/decisions/ (root and v2 subdirectory).
+Supports ADRs in governance/adrs/ (root and v2 subdirectory).
 Legacy v1 ADRs without frontmatter are skipped.
 """
 
@@ -119,7 +119,7 @@ def extract_decisions(
 
     Examples:
         >>> from pathlib import Path
-        >>> decisions = extract_decisions(Path("dev/decisions"))
+        >>> decisions = extract_decisions(Path("governance/adrs"))
         >>> len(decisions) > 0
         True
         >>> decisions[0].type
@@ -156,7 +156,7 @@ def extract_decision_from_file(
 
     Examples:
         >>> from pathlib import Path
-        >>> decision = extract_decision_from_file(Path("dev/decisions/adr-019.md"))
+        >>> decision = extract_decision_from_file(Path("governance/adrs/adr-019.md"))
         >>> decision.id if decision else None
         'ADR-019'
     """
@@ -224,8 +224,8 @@ def extract_decision_from_file(
 def extract_all_decisions(project_root: Path | None = None) -> list[Concept]:
     """Extract all ADR decisions from standard locations.
 
-    Searches dev/decisions/ (root) and dev/decisions/v2/ for ADRs.
-    Skips dev/decisions/v1/ (legacy format without frontmatter).
+    Searches governance/adrs/ (root) and governance/adrs/v2/ for ADRs.
+    Skips governance/adrs/v1/ (legacy format without frontmatter).
 
     Args:
         project_root: Project root directory.
@@ -244,13 +244,13 @@ def extract_all_decisions(project_root: Path | None = None) -> list[Concept]:
 
     concepts: list[Concept] = []
 
-    # Root level ADRs
-    root_decisions = project_root / "dev" / "decisions"
+    # Root level ADRs (current series)
+    root_decisions = project_root / "governance" / "adrs"
     if root_decisions.exists():
         concepts.extend(extract_decisions(root_decisions, project_root))
 
     # v2 subdirectory ADRs
-    v2_decisions = project_root / "dev" / "decisions" / "v2"
+    v2_decisions = project_root / "governance" / "adrs" / "v2"
     if v2_decisions.exists():
         concepts.extend(extract_decisions(v2_decisions, project_root))
 
