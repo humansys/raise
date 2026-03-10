@@ -158,7 +158,7 @@ class TestPublish:
                 "page": {
                     "id": "3087892481",
                     "title": "Roadmap",
-                    "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
+                    "url": "https://example.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
                     "space": {"key": "rAIse", "name": "rAIse"},
                     "version": 1,
                     "content": {"value": "# Roadmap", "format": "markdown"},
@@ -203,7 +203,7 @@ class TestPublish:
                 "page": {
                     "id": "3087892481",
                     "title": "Roadmap",
-                    "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
+                    "url": "https://example.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
                     "space": {"key": "rAIse", "name": "rAIse"},
                     "version": 2,
                     "content": {"value": "# Roadmap v2", "format": "markdown"},
@@ -259,7 +259,7 @@ class TestPublish:
                     "page": {
                         "id": "NEW_PAGE_ID",
                         "title": "Roadmap",
-                        "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/NEW_PAGE_ID",
+                        "url": "https://example.atlassian.net/wiki/spaces/rAIse/pages/NEW_PAGE_ID",
                         "space": {"key": "rAIse"},
                         "version": 1,
                         "content": {"value": "# Roadmap", "format": "markdown"},
@@ -307,7 +307,7 @@ class TestGetPage:
                 "metadata": {
                     "id": "9240577",
                     "title": "Guardrails",
-                    "url": "https://humansys.atlassian.net/wiki/spaces/LA/pages/9240577",
+                    "url": "https://example.atlassian.net/wiki/spaces/LA/pages/9240577",
                     "space": {"key": "LA", "name": "Lean-Agile"},
                     "version": 3,
                     "content": {
@@ -348,14 +348,14 @@ class TestSearch:
                 {
                     "id": "3087892481",
                     "title": "Roadmap",
-                    "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
+                    "url": "https://example.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
                     "space": {"key": "rAIse", "name": "rAIse"},
                     "updated": "",
                 },
                 {
                     "id": "9240577",
                     "title": "Guardrails",
-                    "url": "https://humansys.atlassian.net/wiki/spaces/LA/pages/9240577",
+                    "url": "https://example.atlassian.net/wiki/spaces/LA/pages/9240577",
                     "space": {"key": "LA", "name": "Lean-Agile"},
                     "updated": "",
                 },

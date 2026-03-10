@@ -310,9 +310,9 @@ class TestJiraLinkFormat:
             | ID | Epic | Status | Scope Doc | Priority |
             |----|------|--------|-----------|----------|
             | E1 | **Core Foundation** | ✅ Complete | `scope.md` | — |
-            | [RAISE-275](https://humansys.atlassian.net/browse/RAISE-275) | **Shared Memory Backend** | ✅ Complete | `work/epics/e275/scope.md` | — |
-            | [RAISE-301](https://humansys.atlassian.net/browse/RAISE-301) | **Agent Tool Abstraction** | 🚀 In Progress | `work/epics/e301/scope.md` | P0 |
-            | [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | 📋 Backlog | — | P1 |
+            | [RAISE-275](https://example.atlassian.net/browse/RAISE-275) | **Shared Memory Backend** | ✅ Complete | `work/epics/e275/scope.md` | — |
+            | [RAISE-301](https://example.atlassian.net/browse/RAISE-301) | **Agent Tool Abstraction** | 🚀 In Progress | `work/epics/e301/scope.md` | P0 |
+            | [RAISE-325](https://example.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | 📋 Backlog | — | P1 |
             """
         )
         backlog_file = tmp_path / "governance" / "backlog.md"

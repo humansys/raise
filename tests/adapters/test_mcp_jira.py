@@ -74,7 +74,7 @@ workflow:
 
 team:
   - name: Emilio Osorio
-    identifier: emilio@humansys.ai
+    identifier: dev@example.com
     role: lead-dev
 """
 
@@ -204,7 +204,7 @@ class TestCreateIssue:
         adapter._bridge.call.return_value = _ok(
             {
                 "key": "RAISE-400",
-                "self": "https://humansys.atlassian.net/rest/api/2/issue/10400",
+                "self": "https://example.atlassian.net/rest/api/2/issue/10400",
             }
         )
 
@@ -251,7 +251,7 @@ class TestGetIssue:
                 "priority": {"name": "High"},
                 "created": "2026-02-28T10:00:00.000+0000",
                 "updated": "2026-02-28T12:00:00.000+0000",
-                "url": "https://humansys.atlassian.net/rest/api/2/issue/10301",
+                "url": "https://example.atlassian.net/rest/api/2/issue/10301",
             }
         )
 
@@ -437,7 +437,7 @@ class TestAddComment:
         adapter._bridge.call.return_value = _ok(
             {
                 "id": "10099",
-                "self": "https://humansys.atlassian.net/rest/api/2/issue/10301/comment/10099",
+                "self": "https://example.atlassian.net/rest/api/2/issue/10301/comment/10099",
             }
         )
 
