@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Docs site install commands corrected from `rai-cli` to `raise-cli` in EN and ES pages (RAISE-511)
+- Docs site dark/light mode toggle now switches the full page (background, text, sidebar, nav) instead of only code blocks (RAISE-512)
+- Docs site logo adapts to light mode; header border removed; sidebar mobile search icon no longer shows incorrect background in light mode (RAISE-512)
 
 ## [2.2.2] - 2026-03-09
 
