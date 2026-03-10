@@ -876,3 +876,28 @@ class TestReinforcePattern:
         )
         assert r.pattern_id == "PAT-E-001"
         assert r.was_updated is True
+
+    def test_resolves_file_path_internally(self, tmp_path: Path) -> None:
+        """RAISE-522: reinforce_pattern resolves file_path at entry (defense-in-depth).
+
+        Even when called with a non-canonical path containing '..' components,
+        the function must resolve it and operate on the correct file.
+        """
+        real_dir = tmp_path / "memory"
+        real_dir.mkdir()
+        real_file = real_dir / "patterns.jsonl"
+        real_file.write_text(
+            '{"id": "PAT-E-001", "content": "test", "created": "2026-01-01"}\n',
+            encoding="utf-8",
+        )
+
+        # Construct a non-canonical path: tmp/memory/../memory/patterns.jsonl
+        traversal_path = tmp_path / "memory" / ".." / "memory" / "patterns.jsonl"
+
+        result = reinforce_pattern(traversal_path, "PAT-E-001", vote=1)
+
+        assert result.was_updated is True
+        assert result.positives == 1
+        # The actual file on disk was updated — not some other path
+        data = json.loads(real_file.read_text(encoding="utf-8").splitlines()[0])
+        assert data["positives"] == 1
