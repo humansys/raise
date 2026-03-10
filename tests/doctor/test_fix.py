@@ -99,7 +99,9 @@ class TestAddGitignorePersonal:
         gitignore = tmp_path / ".gitignore"
         gitignore.write_text("*.pyc\n")
 
-        with patch("raise_cli.doctor.fix.open", side_effect=OSError("permission denied")):
+        with patch(
+            "raise_cli.doctor.fix.open", side_effect=OSError("permission denied")
+        ):
             result = add_gitignore_personal(tmp_path)
 
         assert result is False
