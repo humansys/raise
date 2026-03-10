@@ -14,6 +14,8 @@ import pytest
 from typer.testing import CliRunner
 
 from raise_cli.cli.main import app
+from raise_cli.memory.models import MemoryScope
+from raise_cli.memory.writer import PatternInput, append_pattern
 
 runner = CliRunner()
 
@@ -531,3 +533,60 @@ class TestPatternPromoteCommand:
             assert "not found" in result.output.lower()
         finally:
             os.chdir(original_cwd)
+
+
+# =============================================================================
+# RAISE-520 — path injection regression tests
+# =============================================================================
+
+
+class TestMemoryDirPathTraversal:
+    """Regression tests for RAISE-520: --memory-dir path traversal sanitization.
+
+    Tests are at the writer unit level because the CLI output does not expose
+    the full path — only the filename. The fix lives in append_pattern (writer.py)
+    and is verified via WriteResult.file_path.
+    """
+
+    def test_append_pattern_resolves_traversal_in_file_path(
+        self, tmp_path: Path
+    ) -> None:
+        """append_pattern resolves ../ traversal — WriteResult.file_path is canonical."""
+
+        sub = tmp_path / "sub"
+        sub.mkdir()
+        target = tmp_path / "memory"
+        target.mkdir()
+        traversal = tmp_path / "sub" / ".." / "memory"
+
+        result = append_pattern(
+            traversal,
+            PatternInput(content="test pattern"),
+            scope=MemoryScope.PROJECT,
+        )
+
+        assert result.success
+        # file_path must be canonical — no .. path components
+        assert "/.." not in result.file_path
+
+    def test_append_pattern_file_written_to_canonical_location(
+        self, tmp_path: Path
+    ) -> None:
+        """File is written to the resolved canonical path, not the traversal path."""
+
+        sub = tmp_path / "sub"
+        sub.mkdir()
+        target = tmp_path / "memory"
+        target.mkdir()
+        traversal = tmp_path / "sub" / ".." / "memory"
+
+        result = append_pattern(
+            traversal,
+            PatternInput(content="test pattern"),
+            scope=MemoryScope.PROJECT,
+        )
+
+        assert result.success
+        written_path = Path(result.file_path)
+        # Resolved path matches the canonical target — no symlink/traversal games
+        assert written_path.resolve() == (target / "patterns.jsonl").resolve()
