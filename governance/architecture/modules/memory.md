@@ -72,7 +72,7 @@ The three-tier architecture (global `~/.rai/`, project `.raise/rai/memory/`, per
 
 - JSONL is append-only — never edit or delete lines in place
 - New fields use backward-compatible pattern: read new key first, fall back to old key (PAT-153)
-- Pattern IDs use developer prefix: PAT-{X}-NNN (e.g., PAT-E-001 for Emilio, PAT-F-001 for Fer)
+- Pattern IDs use developer prefix: PAT-{X}-NNN (e.g., PAT-A-001 for Alice, PAT-B-001 for Bob)
 - Calibration and session IDs remain sequential: CAL-001, SES-001
 - Session and calibration data is personal-scoped (developer-specific, gitignored)
 - Pattern data is project-scoped (shared, committed) with developer-prefixed IDs to prevent collisions

@@ -103,8 +103,8 @@ workflow:
   lifecycle_mapping:
     story_start: 31
 team:
-  - name: Aquiles Lázaro
-    identifier: "557058:890eb66c-..."
+  - name: "Team Member"
+    identifier: "ATLASSIAN_ACCOUNT_ID"
     role: devops
 issue_types:
   - Sub-task   # NOT 'Subtask' — learned the hard way
@@ -159,7 +159,7 @@ ignore_policies:
 # Deterministic reference for code quality gate integration.
 
 connection:
-  server_url: "https://sonar.humansys.ai"  # Public URL, not secret
+  server_url: "https://sonar.example.com"  # Replace with your SonarQube URL
   project_key: "raise-commons"
 
 quality_gates:

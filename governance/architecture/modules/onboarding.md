@@ -40,7 +40,6 @@ public_api:
   - "increment_session"
   - "load_developer_profile"
   - "load_manifest"
-  - "migrate_emilio_profile"
   - "save_developer_profile"
   - "save_manifest"
 components: 69
