@@ -11,12 +11,16 @@
 # temporarily removed during sync.
 #
 # Excluded (internal):
-#   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/, governance/, .claude/, scripts/
-#   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md, .gitlab-ci.yml
+#   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/, governance/, .claude/,
+#          .agent/, scripts/, htmlcov/, dist/, packages/
+#   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md,
+#          .gitlab-ci.yml, .coverage, .envrc, DEMO-STRATEGY.md, AGENTS.md,
+#          sonar-project.properties, scope.md, docker-compose.yml, bug-*-*.md
 #
 # Included (public):
-#   src/, tests/, framework/, .github/, pyproject.toml, uv.lock,
-#   README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, NOTICE, CHANGELOG.md, .gitignore
+#   src/, tests/, framework/, site/, .github/, pyproject.toml, uv.lock,
+#   README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, NOTICE,
+#   CHANGELOG.md, SECURITY.md, llms.txt, .gitignore
 #
 # Usage:
 #   ./scripts/sync-github.sh [source-branch] [target-branch]
@@ -35,8 +39,8 @@ set -euo pipefail
 
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
-EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs" "governance" ".claude" "scripts")
-EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml")
+EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages")
+EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml" ".coverage" ".envrc" "DEMO-STRATEGY.md" "AGENTS.md" "sonar-project.properties" "scope.md" "docker-compose.yml" "bug-396-retro.md" "bug-396-scope.md" "bug-397-retro.md" "bug-397-scope.md" "bug-398-retro.md" "bug-398-scope.md")
 
 # Colors for output
 RED='\033[0;31m'
