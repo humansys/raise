@@ -771,72 +771,7 @@ version: 2.1.0
 
 ---
 
-## 9. Estrategia de Producto: Open Core
-
-### Modelo de Negocio
-
-```mermaid
-graph LR
-    subgraph OPEN["OPEN CORE (Free)"]
-        O1["Context layer"]
-        O2["All katas"]
-        O3["All skills"]
-        O4["Kata Harness"]
-        O5["Templates + Gates"]
-    end
-
-    subgraph LICENSED["LICENSED (Paid)"]
-        L1["Deterministic extraction"]
-        L2["Observability dashboard"]
-        L3["CI/CD integrations"]
-        L4["Multi-repo governance"]
-        L5["Enterprise support"]
-    end
-
-    OPEN -.->|"Mismo formato de output"| LICENSED
-
-    style OPEN fill:#e8f5e9
-    style LICENSED fill:#fff3e0
-```
-
-### Flywheel de Adopción
-
-```mermaid
-flowchart TD
-    A["Orquestador usa RaiSE Open Core (free)"] --> B["Ejecuta katas, usa skills"]
-    B --> C["Equipo ve valor en gobernanza estructurada"]
-    C --> D["Empresa necesita precisión + observabilidad"]
-    D --> E["Upgrade a Licensed"]
-    E -.->|"Más usuarios"| A
-
-    style A fill:#e3f2fd
-    style E fill:#fff8e1
-```
-
----
-
-## 10. Métricas de Éxito
-
-### Métricas de Producto
-
-| Métrica | Target | Descripción |
-|---------|--------|-------------|
-| Code review pass rate | >80% | Código con MVC pasa review |
-| Guardrail precision | >85% | Guardrails extraídos son correctos |
-| MVC retrieval latency | <200ms | Tiempo de respuesta |
-| Kata completion rate | >90% | Katas completadas sin abandono |
-
-### Métricas de Adopción
-
-| Métrica | Target |
-|---------|--------|
-| Proyectos con setup/ ejecutado | 10+ (Open Core) |
-| Guardrails extraídos total | 500+ |
-| Upgrade rate a Licensed | 10% |
-
----
-
-## 11. Terminología Canónica (v2.4)
+## 9. Terminología Canónica (v2.4)
 
 | Término | Definición |
 |---------|------------|
@@ -871,40 +806,7 @@ flowchart TD
 
 ---
 
-## 12. Roadmap de Alto Nivel
-
-### Fase 1: Foundation (Current)
-
-- [x] ADR-008: Context/Kata/Skill ontology
-- [x] Glossary v2.3
-- [x] Constitution migration
-- [x] Work Cycles formalization
-- [x] Vision v2.3 (este documento)
-- [ ] Kata Harness specification
-
-### Fase 2: Implementation
-
-- [ ] Migrate katas to `.raise/katas/{work_cycle}/`
-- [ ] Create skill YAML files in `.raise/skills/`
-- [ ] Implement Kata Harness runtime
-- [ ] Migrate gates to v2.0 format
-
-### Fase 3: Validation
-
-- [ ] Test katas in real projects
-- [ ] Validate MVC retrieval performance
-- [ ] Collect feedback from Dojos
-- [ ] Refine based on usage patterns
-
-### Fase 4: Launch
-
-- [ ] Documentation complete
-- [ ] Examples for each Work Cycle
-- [ ] Open Core release
-
----
-
-## 13. Referencias
+## 10. Referencias
 
 ### ADRs
 
