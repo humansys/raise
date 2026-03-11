@@ -208,7 +208,7 @@ def complex_operation(input_data):
 ## References
 
 **Related ADRs**:
-- [ADR-XXX: Decision Title](governance/adrs/adr-xxx.md)
+- [ADR-XXX: Decision Title](../../../dev/decisions/adr-xxx.md)
 
 **Related Features**:
 - F#.#: [Feature Title]

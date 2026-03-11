@@ -120,7 +120,7 @@ Scope document reviewable in <10 minutes. Parking lot updated.
 |------|-------------|
 | Scope document | `work/epics/e{N}-{name}/scope.md` |
 | Design document | `work/epics/e{N}-{name}/design.md` (if architecture) |
-| ADRs | `governance/adrs/adr-*.md` (0-3 typical) |
+| ADRs | `dev/decisions/adr-*.md` (0-3 typical) |
 | Parking lot | `dev/parking-lot.md` |
 | Next | `/rai-epic-plan` |
 
