@@ -4,7 +4,7 @@ project:
   project_type: brownfield
   language: python
   test_command: "uv run pytest --tb=short"
-  lint_command: "uv run ruff check && uv run ruff format --check"
+  lint_command: "uv run ruff check src/ tests/ && uv run ruff format --check src/ tests/"
   type_check_command: "uv run pyright"
   code_file_count: 302
   detected_at: '2026-02-23T19:45:58.377711Z'
