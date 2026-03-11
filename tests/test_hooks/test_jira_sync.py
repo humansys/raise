@@ -8,12 +8,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
-
 from rai_pro.hooks.jira_sync import (
     JiraSyncHook,
     _load_lifecycle_mapping,
     _resolve_status_name,
 )
+
 from raise_cli.hooks.events import WorkCloseEvent, WorkStartEvent
 from raise_cli.hooks.protocol import LifecycleHook
 
