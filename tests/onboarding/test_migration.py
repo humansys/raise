@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import date
 from pathlib import Path
 
-import logging
+import pytest
 
 from raise_cli.onboarding.migration import (
     _extract_sessions_data,
@@ -225,7 +226,7 @@ class TestLogInjection:
     """Regression tests for log injection (RAISE-533)."""
 
     def test_control_chars_stripped_from_log_output(
-        self, tmp_path: logging.Any, caplog: logging.Any
+        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
     ) -> None:
         """Control characters in JSONL must be sanitized before logging (RAISE-533)."""
         sessions_path = tmp_path / "index.jsonl"
