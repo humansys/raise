@@ -92,7 +92,7 @@ glossary = "raise_cli.governance.parsers.glossary:GlossaryParser"
 [project.entry-points."rai.hooks"]
 telemetry = "raise_cli.hooks.builtin.telemetry:TelemetryHook"
 gate-bridge = "raise_cli.hooks.builtin.gate_bridge:GateBridgeHook"
-jira-sync = "raise_cli.hooks.builtin.jira_sync:JiraSyncHook"
+jira-sync = "rai_pro.hooks.jira_sync:JiraSyncHook"
 backlog = "raise_cli.hooks.builtin.backlog:BacklogHook"
 memory-sync = "raise_cli.hooks.builtin.memory:MemoryMdSyncHook"
 
@@ -127,6 +127,7 @@ packages = ["src/raise_cli", "src/raise_core", "src/rai_pro"]
 include = [
     "/src/raise_cli/",
     "/src/raise_core/",
+    "/src/rai_pro/",
     "/LICENSE",
     "/README.md",
     "/pyproject.toml",
