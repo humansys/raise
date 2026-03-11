@@ -109,6 +109,8 @@ site/node_modules/
 site/dist/
 site/.astro/
 site/.wrangler/
+docs/node_modules/
+docs/.astro/
 
 # Issue analysis artifacts (PDFs, images — binary, no git value)
 dev/issues/**/*.pdf
