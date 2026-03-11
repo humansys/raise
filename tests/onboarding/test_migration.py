@@ -9,8 +9,8 @@ from pathlib import Path
 import pytest
 
 from raise_cli.onboarding.migration import (
-    _extract_sessions_data,
-    _extract_skills_from_sessions,
+    _extract_sessions_data,  # pyright: ignore[reportPrivateUsage]
+    _extract_skills_from_sessions,  # pyright: ignore[reportPrivateUsage]
     migrate_developer_profile,
 )
 from raise_cli.onboarding.profile import (
