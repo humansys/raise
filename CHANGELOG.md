@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.3] - 2026-03-11
+
 Initial open-source release. RaiSE Framework v2 — a lean methodology and deterministic
 toolkit for reliable AI-assisted software engineering.
 
@@ -42,3 +44,4 @@ toolkit for reliable AI-assisted software engineering.
 - **Gitignored adapter configs** (.raise/jira.yaml, .raise/confluence.yaml) to prevent PII leaks
 
 [Unreleased]: https://github.com/humansys/raise/compare/v2.2.3...HEAD
+[2.2.3]: https://github.com/humansys/raise/releases/tag/v2.2.3
