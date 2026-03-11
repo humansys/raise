@@ -55,6 +55,16 @@ class TestHasUnreleasedEntries:
         content = "# Changelog\n\n## [Unreleased]\n\n\n\n## [1.0.0] - 2026-01-01\n"
         assert has_unreleased_entries(content) is False
 
+    def test_unreleased_as_last_section(self) -> None:
+        """Unreleased is the only/last section — hits \\Z branch (RAISE-536)."""
+        content = "# Changelog\n\n## [Unreleased]\n\n### Added\n- First entry\n"
+        assert has_unreleased_entries(content) is True
+
+    def test_unreleased_as_last_section_empty(self) -> None:
+        """Unreleased is the only section and empty — hits \\Z branch."""
+        content = "# Changelog\n\n## [Unreleased]\n"
+        assert has_unreleased_entries(content) is False
+
 
 class TestPromoteUnreleased:
     """Test promoting unreleased entries to a versioned section."""
