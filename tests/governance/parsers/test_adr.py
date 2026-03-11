@@ -321,7 +321,9 @@ class TestIntegrationWithRealData:
     """Integration tests with real ADR data."""
 
     @pytest.mark.skipif(
-        not (_PROJECT_ROOT / "governance/adrs/v1/adr-019-unified-context-graph.md").exists(),
+        not (
+            _PROJECT_ROOT / "governance/adrs/v1/adr-019-unified-context-graph.md"
+        ).exists(),
         reason="Real ADR data not available",
     )
     def test_extracts_real_adrs(self) -> None:

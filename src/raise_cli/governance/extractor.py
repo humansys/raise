@@ -280,7 +280,9 @@ class GovernanceExtractor:
         try:
             adr_concepts = extract_all_decisions(self.project_root)
             concepts.extend(adr_concepts)
-            adr_root_count = len(list(self.project_root.glob("governance/adrs/adr-*.md")))
+            adr_root_count = len(
+                list(self.project_root.glob("governance/adrs/adr-*.md"))
+            )
             adr_v2_count = len(
                 list(self.project_root.glob("governance/adrs/v2/adr-*.md"))
             )

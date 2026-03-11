@@ -289,9 +289,7 @@ class QueryEngine:
 
         return QueryResult(concepts=concepts, metadata=metadata)
 
-    def _keyword_search(
-        self, query: Query
-    ) -> tuple[list[GraphNode], int]:
+    def _keyword_search(self, query: Query) -> tuple[list[GraphNode], int]:
         """Execute keyword search strategy.
 
         Matches keywords against node content, returns top N by relevance.
@@ -336,9 +334,7 @@ class QueryEngine:
         limited = [concept for _, concept in scored_concepts[: query.limit]]
         return limited, total_available
 
-    def _concept_lookup(
-        self, query: Query
-    ) -> tuple[list[GraphNode], int]:
+    def _concept_lookup(self, query: Query) -> tuple[list[GraphNode], int]:
         """Execute concept lookup strategy.
 
         Direct ID lookup with optional BFS neighbor traversal.
@@ -451,17 +447,13 @@ class QueryEngine:
         Returns:
             The release node, or None if not found.
         """
-        neighbors = self.graph.get_neighbors(
-            epic_id, depth=1, edge_types=["part_of"]
-        )
+        neighbors = self.graph.get_neighbors(epic_id, depth=1, edge_types=["part_of"])
         for node in neighbors:
             if node.type == "release":
                 return node
         return None
 
-    def get_architectural_context(
-        self, module_id: str
-    ) -> ArchitecturalContext | None:
+    def get_architectural_context(self, module_id: str) -> ArchitecturalContext | None:
         """Get full architectural context for a module.
 
         Combines domain, layer, constraints, and dependencies into a

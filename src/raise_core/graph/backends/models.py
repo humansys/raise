@@ -13,9 +13,7 @@ from pydantic import BaseModel, Field
 class BackendHealth(BaseModel):
     """Health check result for a graph backend."""
 
-    status: str = Field(
-        ..., description="'healthy', 'degraded', or 'unavailable'"
-    )
+    status: str = Field(..., description="'healthy', 'degraded', or 'unavailable'")
     message: str = Field(default="", description="Human-readable status detail")
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Backend-specific diagnostics"

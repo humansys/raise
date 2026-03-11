@@ -53,13 +53,9 @@ class FilesystemGraphBackend:
             FileNotFoundError: If the file doesn't exist.
             json.JSONDecodeError: If the file is not valid JSON.
         """
-        loaded_data: dict[str, Any] = json.loads(
-            self.path.read_text(encoding="utf-8")
-        )
+        loaded_data: dict[str, Any] = json.loads(self.path.read_text(encoding="utf-8"))
         instance = Graph()
-        instance.graph = nx.node_link_graph(
-            loaded_data, directed=True, multigraph=True
-        )
+        instance.graph = nx.node_link_graph(loaded_data, directed=True, multigraph=True)
         return instance
 
     def health(self) -> BackendHealth:
