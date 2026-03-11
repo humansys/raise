@@ -1,8 +1,7 @@
 """CLI commands for adapter discovery and validation.
 
-Provides `rai adapter list`, `rai adapter check`, `rai adapter validate`,
-and `rai adapter status` for inspecting, checking, and validating adapter
-configurations.
+Provides `rai adapter list`, `rai adapter check`, and `rai adapter validate`
+for inspecting, checking, and validating adapter configurations.
 
 Architecture: ADR-033 (PM), ADR-034 (Governance), ADR-036 (Graph Backend), ADR-041 (Declarative)
 """
@@ -10,7 +9,6 @@ Architecture: ADR-033 (PM), ADR-034 (Governance), ADR-036 (Graph Backend), ADR-0
 from __future__ import annotations
 
 import inspect
-import os
 from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Annotated, Any
@@ -253,114 +251,3 @@ def validate_command(
         raise typer.Exit(1) from None
 
     format_validate_human(config, console)
-
-
-# ---------------------------------------------------------------------------
-# rai adapter status — show configuration status for known adapters
-# ---------------------------------------------------------------------------
-
-# Jira env var names expected by McpJiraAdapter._create_bridge
-_JIRA_ENV_VARS: list[tuple[str, str]] = [
-    ("JIRA_URL", "Jira instance URL"),
-    ("JIRA_USERNAME", "Jira user email"),
-    ("JIRA_API_TOKEN", "Jira API token (or JIRA_TOKEN)"),
-]
-
-
-def _check_jira_config(project_root: Path) -> dict[str, Any]:
-    """Collect Jira adapter configuration status.
-
-    Returns a dict with keys: yaml_path, yaml_exists, env_vars (list of
-    dicts with name, set, description), and ready (bool).
-    """
-    yaml_path = project_root / ".raise" / "jira.yaml"
-    env_results: list[dict[str, Any]] = []
-    for var_name, description in _JIRA_ENV_VARS:
-        if var_name == "JIRA_API_TOKEN":
-            is_set = bool(
-                os.environ.get("JIRA_API_TOKEN") or os.environ.get("JIRA_TOKEN")
-            )
-        else:
-            is_set = bool(os.environ.get(var_name))
-        env_results.append(
-            {"name": var_name, "set": is_set, "description": description}
-        )
-
-    all_env_set = all(e["set"] for e in env_results)
-    return {
-        "yaml_path": str(yaml_path),
-        "yaml_exists": yaml_path.exists(),
-        "env_vars": env_results,
-        "ready": yaml_path.exists() and all_env_set,
-    }
-
-
-@adapters_app.command("status")
-def status_command(
-    format: Annotated[
-        str,
-        typer.Option(
-            "--format",
-            "-f",
-            help="Output format: human or json",
-        ),
-    ] = "human",
-) -> None:
-    """Show configuration status for known adapters.
-
-    Checks that required config files exist and environment variables
-    are set. Useful for verifying setup after configuring an adapter.
-
-    Examples:
-        $ rai adapter status
-        $ rai adapter status --format json
-    """
-    import json as json_mod
-
-    project_root = Path.cwd()
-    jira_status = _check_jira_config(project_root)
-
-    if format == "json":
-        typer.echo(json_mod.dumps({"jira": jira_status}, indent=2))
-        return
-
-    console.print("[bold]Adapter Configuration Status[/bold]\n")
-
-    # --- Jira ---
-    console.print("[bold]Jira[/bold]")
-
-    yaml_path = jira_status["yaml_path"]
-    if jira_status["yaml_exists"]:
-        console.print(f"  [green]\u2713[/green] Config: {yaml_path}")
-    else:
-        console.print(f"  [red]\u2717[/red] Config: {yaml_path} [red](not found)[/red]")
-        console.print(
-            "    [dim]Create .raise/jira.yaml with status_mapping and project config.[/dim]"
-        )
-
-    for env_var in jira_status["env_vars"]:
-        if env_var["set"]:
-            console.print(f"  [green]\u2713[/green] {env_var['name']}: set")
-        else:
-            console.print(
-                f"  [red]\u2717[/red] {env_var['name']}: [red]not set[/red]"
-                f"  [dim]({env_var['description']})[/dim]"
-            )
-
-    console.print()
-    if jira_status["ready"]:
-        console.print("[green]Jira adapter is fully configured.[/green]")
-    else:
-        missing: list[str] = []
-        if not jira_status["yaml_exists"]:
-            missing.append(".raise/jira.yaml")
-        for env_var in jira_status["env_vars"]:
-            if not env_var["set"]:
-                missing.append(env_var["name"])
-        console.print(
-            f"[yellow]Jira adapter is not ready.[/yellow] Missing: {', '.join(missing)}"
-        )
-        console.print(
-            "\n[dim]Set env vars in .env or shell. "
-            "See CLAUDE.md 'Jira Access' section for details.[/dim]"
-        )
