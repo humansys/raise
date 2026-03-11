@@ -48,7 +48,8 @@ def _extract_sessions_data(sessions_path: Path) -> tuple[int, date | None, date 
                 session: dict[str, Any] = json.loads(line)
                 sessions.append(session)
             except json.JSONDecodeError:
-                logger.warning("Invalid JSON in sessions index: %s", line[:50])
+                sanitized = line[:50].encode("unicode_escape").decode("ascii")
+                logger.warning("Invalid JSON in sessions index: %s", sanitized)
 
     if not sessions:
         return 0, None, None

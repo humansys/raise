@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+import logging
+
 from raise_cli.onboarding.migration import (
     _extract_sessions_data,
     _extract_skills_from_sessions,
@@ -217,3 +219,24 @@ class TestMigrateDeveloperProfile:
 
         assert "rai-debug" in profile.skills_mastered
         assert "custom-skill" in profile.skills_mastered
+
+
+class TestLogInjection:
+    """Regression tests for log injection (RAISE-533)."""
+
+    def test_control_chars_stripped_from_log_output(
+        self, tmp_path: logging.Any, caplog: logging.Any
+    ) -> None:
+        """Control characters in JSONL must be sanitized before logging (RAISE-533)."""
+        sessions_path = tmp_path / "index.jsonl"
+        # Craft a line with ANSI escape and carriage return (survive splitlines)
+        malicious = "bad json \x1b[31mRED\x1b[0m \x00null"
+        sessions_path.write_text(malicious + "\n")
+
+        with caplog.at_level(logging.WARNING, logger="raise_cli.onboarding.migration"):
+            _extract_sessions_data(sessions_path)
+
+        for record in caplog.records:
+            msg = record.getMessage()
+            assert "\x1b" not in msg, f"ANSI escape in log: {msg!r}"
+            assert "\x00" not in msg, f"Null byte in log: {msg!r}"
