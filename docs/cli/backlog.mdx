@@ -3,7 +3,107 @@ title: rai backlog
 description: Manage backlog items via project management adapters (Jira, etc.).
 ---
 
-Manage backlog items via `ProjectManagementAdapter`. The query format is adapter-specific (e.g., JQL for Jira). Use `-a` to select an adapter when multiple are registered.
+Manage backlog items via `ProjectManagementAdapter`. The adapter (Jira, filesystem, etc.) is selected automatically or via `-a`.
+
+## Setup
+
+### Machine Requirements
+
+The Jira adapter requires [`uv`](https://docs.astral.sh/uv/) on the system PATH. When `rai backlog` runs against Jira, it spawns `mcp-atlassian` via `uvx` — no manual install of `mcp-atlassian` needed, but `uv`/`uvx` must be available.
+
+```bash
+# Verify uv is installed
+uvx --version
+```
+
+### Environment Variables
+
+Set these before running any `rai backlog` command that targets Jira:
+
+| Variable | Description |
+|----------|-------------|
+| `JIRA_URL` | Your Jira instance URL, e.g. `https://your-org.atlassian.net` |
+| `JIRA_USERNAME` | Your Jira account email |
+| `JIRA_API_TOKEN` | Jira API token (also accepted as `JIRA_TOKEN`) |
+
+```bash
+export JIRA_URL=https://your-org.atlassian.net
+export JIRA_USERNAME=you@example.com
+export JIRA_API_TOKEN=your-api-token
+```
+
+Generate an API token at **Atlassian Account → Security → API tokens**.
+
+### Project Configuration
+
+**`.raise/jira.yaml`** — Required for `rai backlog transition`. The adapter reads `workflow.status_mapping` to resolve status names to Jira transition IDs.
+
+```yaml
+# .raise/jira.yaml
+workflow:
+  status_mapping:
+    backlog: 11
+    selected: 21
+    in-progress: 31
+    done: 41
+```
+
+**`.raise/manifest.yaml`** — Set the default adapter so you don't need `-a jira` on every command:
+
+```yaml
+# .raise/manifest.yaml
+backlog:
+  adapter_default: jira
+```
+
+Without `adapter_default`, `rai backlog` errors with "Multiple PM adapters found" because both `filesystem` and `jira` are always registered.
+
+### Adapter Selection
+
+Resolution order (first match wins):
+
+1. `-a <name>` flag on the command
+2. `backlog.adapter_default` in `.raise/manifest.yaml`
+3. Auto-detect — only works if exactly one adapter is registered
+
+Since `raise-cli` registers both `filesystem` and `jira` as entry points, auto-detect always fails. **You must use one of the first two options.**
+
+---
+
+## Jira Notes
+
+### Search requires JQL
+
+`rai backlog search` passes the query string directly to Jira's search API. Plain text does not work — you must use [JQL](https://support.atlassian.com/jira-software-cloud/docs/use-advanced-search-with-jira-query-language-jql/).
+
+```bash
+# wrong — returns no results
+rai backlog search "PROJ-302"
+
+# correct — JQL
+rai backlog search "issue = PROJ-302"
+rai backlog search "project = PROJ AND status = 'In Progress'"
+```
+
+If your project key is a reserved JQL keyword, quote it: `project = "MYPROJECT"`.
+
+### Status names for `transition`
+
+Use the lowercase keys from your `jira.yaml` `status_mapping`:
+
+| Status name | Jira state |
+|-------------|-----------|
+| `backlog` | Backlog |
+| `selected` | Selected for Development |
+| `in-progress` | In Progress |
+| `done` | Done |
+
+```bash
+rai backlog transition PROJ-123 in-progress
+rai backlog transition PROJ-123 done
+```
+
+---
 
 ## `rai backlog create`
 
@@ -15,7 +115,7 @@ Create a new backlog item.
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--project` | `-p` | Project key, e.g. `RAISE` (**required**) |
+| `--project` | `-p` | Project key, e.g. `PROJ` (**required**) |
 | `--type` | `-t` | Issue type. Default: `Task` |
 | `--labels` | `-l` | Comma-separated labels |
 | `--parent` | | Parent issue key |
@@ -25,10 +125,10 @@ Create a new backlog item.
 
 ```bash
 # Create a task
-rai backlog create "Add CLI docs" -p RAISE
+rai backlog create "Add CLI docs" -p PROJ
 
 # Create with labels and parent
-rai backlog create "Fix login bug" -p RAISE -t Bug -l "priority,frontend" --parent RAISE-100
+rai backlog create "Fix login bug" -p PROJ -t Bug -l "priority,frontend" --parent PROJ-100
 ```
 
 ---
@@ -39,14 +139,14 @@ Retrieve details for a single backlog item.
 
 | Argument | Description |
 |----------|-------------|
-| `KEY` | Issue key, e.g. `RAISE-123` (**required**) |
+| `KEY` | Issue key, e.g. `PROJ-123` (**required**) |
 
 | Flag | Short | Description |
 |------|-------|-------------|
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog get RAISE-123
+rai backlog get PROJ-123
 ```
 
 ---
@@ -65,8 +165,8 @@ Retrieve comments for a backlog item.
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog get-comments RAISE-123
-rai backlog get-comments RAISE-123 --limit 5
+rai backlog get-comments PROJ-123
+rai backlog get-comments PROJ-123 --limit 5
 ```
 
 ---
@@ -87,10 +187,10 @@ Search backlog items. Query format is adapter-specific (JQL for Jira).
 
 ```bash
 # JQL search
-rai backlog search "project = RAISE AND status = 'In Progress'"
+rai backlog search "project = PROJ AND status = 'In Progress'"
 
 # Limit results
-rai backlog search "project = RAISE" -n 10
+rai backlog search "project = PROJ" -n 10
 ```
 
 ---
@@ -109,8 +209,8 @@ Transition a backlog item to a new status.
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog transition RAISE-123 in-progress
-rai backlog transition RAISE-123 done
+rai backlog transition PROJ-123 in-progress
+rai backlog transition PROJ-123 done
 ```
 
 ---
@@ -129,7 +229,7 @@ Transition multiple backlog items at once.
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog batch-transition RAISE-1,RAISE-2,RAISE-3 done
+rai backlog batch-transition PROJ-1,PROJ-2,PROJ-3 done
 ```
 
 ---
@@ -151,8 +251,8 @@ Update fields on a backlog item.
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog update RAISE-123 -s "Updated title" -l "urgent"
-rai backlog update RAISE-123 --priority High --assignee alice
+rai backlog update PROJ-123 -s "Updated title" -l "urgent"
+rai backlog update PROJ-123 --priority High --assignee alice
 ```
 
 ---
@@ -172,8 +272,8 @@ Link two backlog items.
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog link RAISE-100 RAISE-101 blocks
-rai backlog link RAISE-200 RAISE-201 relates
+rai backlog link PROJ-100 PROJ-101 blocks
+rai backlog link PROJ-200 PROJ-201 relates
 ```
 
 ---
@@ -192,7 +292,7 @@ Add a comment to a backlog item.
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog comment RAISE-123 "Implementation complete, ready for review."
+rai backlog comment PROJ-123 "Implementation complete, ready for review."
 ```
 
 ---
@@ -203,11 +303,11 @@ Regenerate `governance/backlog.md` from a remote adapter.
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--project` | `-p` | Project key filter (e.g., `RAISE`) |
+| `--project` | `-p` | Project key filter (e.g., `PROJ`) |
 | `--adapter` | `-a` | Adapter name override |
 
 ```bash
-rai backlog sync -p RAISE
+rai backlog sync -p PROJ
 ```
 
 **See also:** [`rai adapter`](/docs/cli/adapter/)
