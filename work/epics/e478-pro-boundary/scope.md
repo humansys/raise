@@ -1,7 +1,7 @@
 ---
 epic_id: "E478"
 title: "Pro/Community Boundary"
-status: "active"
+status: "complete"
 created: "2026-03-11"
 ---
 
