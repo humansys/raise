@@ -64,14 +64,14 @@ class TestMcpConfluenceAdapterInit:
         (tmp_path / ".raise").mkdir()
         (tmp_path / ".raise" / "confluence.yaml").write_text(CONFLUENCE_YAML)
 
-        from raise_cli.adapters.mcp_confluence import McpConfluenceAdapter
+        from rai_pro.adapters.mcp_confluence import McpConfluenceAdapter
 
         adapter = McpConfluenceAdapter(project_root=tmp_path)
         assert adapter._space_key == "rAIse"
 
     def test_init_raises_on_missing_config(self, tmp_path: Path) -> None:
         """__init__ raises FileNotFoundError when confluence.yaml doesn't exist."""
-        from raise_cli.adapters.mcp_confluence import McpConfluenceAdapter
+        from rai_pro.adapters.mcp_confluence import McpConfluenceAdapter
 
         with pytest.raises(FileNotFoundError, match="confluence.yaml"):
             McpConfluenceAdapter(project_root=tmp_path)
@@ -81,7 +81,7 @@ class TestMcpConfluenceAdapterInit:
         (tmp_path / ".raise").mkdir()
         (tmp_path / ".raise" / "confluence.yaml").write_text(CONFLUENCE_YAML_NO_SPACE)
 
-        from raise_cli.adapters.mcp_confluence import McpConfluenceAdapter
+        from rai_pro.adapters.mcp_confluence import McpConfluenceAdapter
 
         with pytest.raises(ValueError, match="space_key"):
             McpConfluenceAdapter(project_root=tmp_path)
@@ -94,7 +94,7 @@ class TestMcpConfluenceAdapterInit:
         (tmp_path / ".raise" / "confluence.yaml").write_text(CONFLUENCE_YAML_NO_SPACE)
         monkeypatch.setenv("CONFLUENCE_SPACE_KEY", "ENV_SPACE")
 
-        from raise_cli.adapters.mcp_confluence import McpConfluenceAdapter
+        from rai_pro.adapters.mcp_confluence import McpConfluenceAdapter
 
         adapter = McpConfluenceAdapter(project_root=tmp_path)
         assert adapter._space_key == "ENV_SPACE"
@@ -110,7 +110,7 @@ def _make_adapter(tmp_path: Path) -> Any:
     (tmp_path / ".raise").mkdir(exist_ok=True)
     (tmp_path / ".raise" / "confluence.yaml").write_text(CONFLUENCE_YAML)
 
-    from raise_cli.adapters.mcp_confluence import McpConfluenceAdapter
+    from rai_pro.adapters.mcp_confluence import McpConfluenceAdapter
 
     adapter = McpConfluenceAdapter(project_root=tmp_path)
     adapter._bridge = AsyncMock()
@@ -438,7 +438,7 @@ class TestEntryPointDiscovery:
 
     def test_entry_point_loads_correct_class(self) -> None:
         """Entry point loads McpConfluenceAdapter class."""
-        from raise_cli.adapters.mcp_confluence import McpConfluenceAdapter
+        from rai_pro.adapters.mcp_confluence import McpConfluenceAdapter
 
         targets = get_doc_targets()
         assert targets["confluence"] is McpConfluenceAdapter
