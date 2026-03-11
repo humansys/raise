@@ -73,7 +73,7 @@ Recommend **(A)** — consistent with existing workspace pattern (`packages/rais
 
 | Story | Size | Status | Notes |
 |-------|:----:|:------:|-------|
-| S478.1 — Move pro adapters | S | Pending | |
+| S478.1 — Move pro adapters | S | Done | Merged to dev cc0bf418 |
 | S478.2 — Clean entry points & deps | S | Pending | |
 | S478.3 — Clean CLI logic | XS | Pending | |
 
