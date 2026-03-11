@@ -124,6 +124,12 @@ class TestExtractDecisionSummary:
         assert len(summary) <= 503  # 500 + "..."
         assert summary.endswith("...")
 
+    def test_decision_as_last_section(self) -> None:
+        """Decision is the last section — hits \\Z branch (RAISE-537)."""
+        content = "## Context\nSome context.\n\n## Decision\nWe chose Y.\n"
+        summary = _extract_decision_summary(content)
+        assert "We chose Y." in summary
+
     def test_returns_empty_for_no_decision(self) -> None:
         """Should return empty string if no Decision section."""
         content = "# Title\n\nJust content without Decision section."
