@@ -11,6 +11,12 @@
 You define what to build.  Rai executes with discipline.  RaiSE keeps it honest.
 ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/humansys/raise/main/docs/assets/knowledge-graph.png" alt="RaiSE Knowledge Graph — neurosymbolic memory across sessions" width="700">
+  <br>
+  <em>RaiSE's knowledge graph: patterns, components, governance, and decisions — all connected.</em>
+</p>
+
 ---
 
 ## The Problem
@@ -134,6 +140,22 @@ rai doctor                         # Diagnose setup issues
 ```
 
 17 command groups, 72 subcommands. See the [CLI reference](https://docs.raiseframework.ai/cli/).
+
+---
+
+## Why RaiSE?
+
+AI coding tools are powerful but unstructured. Here's what RaiSE adds:
+
+| Without RaiSE | With RaiSE |
+|----------------|------------|
+| Every session starts from scratch | Memory persists — patterns, velocity, decisions |
+| AI generates code, you hope it's right | Validation gates at every phase — tests, types, lint, review |
+| No traceability — who decided what and why? | Every decision traced to an artifact in Git |
+| AI writes code but doesn't learn | Patterns compound across sessions — Rai gets better |
+| You manage the process manually | 37 skills automate the SDLC from epic to release |
+
+RaiSE isn't a replacement for your AI assistant — it's the **discipline layer** that makes it reliable.
 
 ---
 
