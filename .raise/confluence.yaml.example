@@ -1,0 +1,5 @@
+# Confluence Configuration
+# Copy to confluence.yaml and fill in your space key.
+# Used by rai docs publish/get/search commands.
+
+space_key: YOUR_SPACE_KEY

@@ -1,0 +1,41 @@
+# RaiSE
+
+> Reliable AI Software Engineering — methodology + toolkit for professional developers using AI assistants.
+
+## Docs
+
+- [Getting Started](https://docs.raiseframework.ai/docs/getting-started/): Install and first session
+- [CLI Reference](https://docs.raiseframework.ai/docs/cli/): All rai commands
+- [CLI: init](https://docs.raiseframework.ai/docs/cli/init/): Initialize projects
+- [CLI: session](https://docs.raiseframework.ai/docs/cli/session/): Manage sessions
+- [CLI: graph](https://docs.raiseframework.ai/docs/cli/graph/): Knowledge graph
+- [CLI: pattern](https://docs.raiseframework.ai/docs/cli/pattern/): Learned patterns
+- [CLI: signal](https://docs.raiseframework.ai/docs/cli/signal/): Lifecycle signals
+- [CLI: backlog](https://docs.raiseframework.ai/docs/cli/backlog/): Backlog management
+- [CLI: skill](https://docs.raiseframework.ai/docs/cli/skill/): Skill management
+- [CLI: discover](https://docs.raiseframework.ai/docs/cli/discover/): Codebase discovery
+- [CLI: adapter](https://docs.raiseframework.ai/docs/cli/adapter/): Adapter management
+- [CLI: mcp](https://docs.raiseframework.ai/docs/cli/mcp/): MCP servers
+- [CLI: gate](https://docs.raiseframework.ai/docs/cli/gate/): Workflow gates
+- [CLI: doctor](https://docs.raiseframework.ai/docs/cli/doctor/): Diagnostics
+- [CLI: docs](https://docs.raiseframework.ai/docs/cli/docs/): Documentation targets
+- [CLI: artifact](https://docs.raiseframework.ai/docs/cli/artifact/): Skill artifacts
+- [CLI: release](https://docs.raiseframework.ai/docs/cli/release/): Release management
+- [CLI: info](https://docs.raiseframework.ai/docs/cli/info/): Package info
+- [CLI: profile](https://docs.raiseframework.ai/docs/cli/profile/): Developer profile
+
+## Concepts
+
+- [Governance](https://docs.raiseframework.ai/docs/concepts/governance/): Governance as code
+- [Knowledge Graph](https://docs.raiseframework.ai/docs/concepts/knowledge-graph/): Memory and context
+- [Skills](https://docs.raiseframework.ai/docs/concepts/skills/): Structured AI workflows
+
+## Guides
+
+- [First Story](https://docs.raiseframework.ai/docs/guides/first-story/): Complete your first story
+- [Setting Up](https://docs.raiseframework.ai/docs/guides/setting-up/): Project setup guide
+
+## Source
+
+- [GitHub](https://github.com/humansys/raise): Source code
+- [PyPI](https://pypi.org/project/rai-cli/): Python package
