@@ -65,9 +65,9 @@ Create a lean story specification optimized for both human review (clear intent)
 
 **Risk gate:** If story is marked HIGH RISK in epic scope, discuss risks before designing — name concerns, failure modes, and scope boundaries.
 
-**UX gate:** If story touches human interaction (workflows, prompts, DX), recommend `/rai-research` first (~10 min, PAT-E-263).
+**UX gate:** If story touches human interaction (workflows, prompts, DX), recommend `/rai-research` first (~10 min).
 
-**Integration gate (PAT-E-539):** If story name includes "dogfood", "E2E", or "integration", OR if epic has separate client/server stories developed with mocks — AC MUST include at least one scenario that runs with **real infrastructure** (docker compose, actual DB, real HTTP calls). Unit tests with mocks cannot catch cross-component contract mismatches (auth headers, payload validation, parameter limits).
+**Integration gate:** If story name includes "dogfood", "E2E", or "integration", OR if epic has separate client/server stories developed with mocks — AC MUST include at least one scenario that runs with **real infrastructure** (docker compose, actual DB, real HTTP calls). Unit tests with mocks cannot catch cross-component contract mismatches (auth headers, payload validation, parameter limits).
 
 <verification>
 Complexity assessed. Risk/UX/Integration gates evaluated.
@@ -92,9 +92,9 @@ Document WHAT you're building and WHY this approach (not detailed HOW):
 
 **For refactoring:** grep all call sites of the target. A half-migration is worse than none.
 
-**For data mutations:** What happens when inputs reference missing entities? Declare the strategy explicitly: reject with error, skip + report count, partial success with warnings. Silent drops are semantic bugs (PAT-E-523).
+**For data mutations:** What happens when inputs reference missing entities? Declare the strategy explicitly: reject with error, skip + report count, partial success with warnings. Silent drops are semantic bugs.
 
-**Value preservation gate (PAT-E-572):** Before finalizing components, ask: "What domain knowledge does this layer provide that a generic pass-through wouldn't?" If the answer is "none", the design may be over-abstracted. If the answer involves config/resolution/mapping that an existing pattern handles differently, check where that responsibility lives in the proven pattern. KISS means simplest that serves the purpose — removing domain intelligence to reduce LOC removes the value proposition.
+**Value preservation gate:** Before finalizing components, ask: "What domain knowledge does this layer provide that a generic pass-through wouldn't?" If the answer is "none", the design may be over-abstracted. If the answer involves config/resolution/mapping that an existing pattern handles differently, check where that responsibility lives in the proven pattern. KISS means simplest that serves the purpose — removing domain intelligence to reduce LOC removes the value proposition.
 
 For complex stories, add: scenarios (Gherkin), algorithm pseudocode, constraints, testing strategy.
 
@@ -188,9 +188,9 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 - [ ] What & Why clear in <2 minutes
 - [ ] Examples are concrete and runnable (100% coverage)
 - [ ] Acceptance criteria specific and testable (3-5 MUST items)
-- [ ] Risk/UX/Integration gates evaluated before designing (PAT-E-539)
-- [ ] Data mutation stories declare missing-entity strategy (PAT-E-523)
-- [ ] Value preservation gate: domain intelligence preserved, not simplified away (PAT-E-572)
+- [ ] Risk/UX/Integration gates evaluated before designing
+- [ ] Data mutation stories declare missing-entity strategy
+- [ ] Value preservation gate: domain intelligence preserved, not simplified away
 - [ ] Spec creation <30 minutes, review <5 minutes
 - [ ] NEVER over-specify HOW — trust AI for implementation details
 - [ ] NEVER skip examples — they are the most important section
@@ -198,6 +198,6 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 ## References
 
 - Next: `/rai-story-plan`
-- Risk assessment: PAT-186 (design not optional)
-- UX research gate: PAT-E-263
-- Value preservation gate: PAT-E-572
+- Risk assessment: design is not optional
+- UX research gate: `/rai-research` before UX stories
+- Value preservation gate: domain intelligence over abstraction

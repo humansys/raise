@@ -40,7 +40,7 @@ Record a reinforcement signal for a pattern. Called at story-review to indicate 
 
 | Argument | Description |
 |----------|-------------|
-| `PATTERN_ID` | Pattern ID to reinforce, e.g. `PAT-E-183` (**required**) |
+| `PATTERN_ID` | Pattern ID to reinforce, e.g. `PAT-001` (**required**) |
 
 | Flag | Short | Description |
 |------|-------|-------------|
@@ -51,13 +51,13 @@ Record a reinforcement signal for a pattern. Called at story-review to indicate 
 
 ```bash
 # Pattern was applied
-rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170
+rai pattern reinforce PAT-001 --vote 1 --from S101
 
 # Pattern not relevant
-rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170
+rai pattern reinforce PAT-002 --vote 0 --from S101
 
 # Pattern contradicted
-rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170
+rai pattern reinforce PAT-003 --vote -1 --from S101
 ```
 
 ---
@@ -68,14 +68,14 @@ Promote a pattern from personal scope to project scope. Moves the pattern entry 
 
 | Argument | Description |
 |----------|-------------|
-| `PATTERN_ID` | Pattern ID to promote, e.g. `PAT-E-123` (**required**) |
+| `PATTERN_ID` | Pattern ID to promote, e.g. `PAT-001` (**required**) |
 
 | Flag | Short | Description |
 |------|-------|-------------|
 | `--memory-dir` | `-m` | Memory directory path (overrides default) |
 
 ```bash
-rai pattern promote PAT-E-123
+rai pattern promote PAT-001
 ```
 
 **See also:** [`rai graph query`](/docs/cli/graph/), [`rai signal emit-work`](/docs/cli/signal/)

@@ -69,9 +69,9 @@ El **modificador Wilson** ajusta el score basado en el historial de refuerzo. Lo
 En cada revisión de story, evalúa los patrones que fueron cargados al inicio de la sesión:
 
 ```bash
-rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170   # aplicado
-rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170   # N/A
-rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170  # contradicho
+rai pattern reinforce PAT-001 --vote 1 --from S101   # aplicado
+rai pattern reinforce PAT-002 --vote 0 --from S101   # N/A
+rai pattern reinforce PAT-003 --vote -1 --from S101  # contradicho
 ```
 
 El voto `0` (N/A) no cuenta hacia las evaluaciones — úsalo libremente. El sistema es deliberadamente conservador con muestras pequeñas: un patrón con 1 evaluación positiva puntúa ~0.21, no 1.0. La confianza se construye gradualmente a través del uso real.

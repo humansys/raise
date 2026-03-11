@@ -4,7 +4,6 @@ title: "RaiSE Framework v2.5 - Solution Vision"
 version: "2.5.0"
 date: "2026-01-30"
 status: "Active"
-author: "Emilio + Claude Opus 4.5"
 supersedes: "VIS-RAISE-004 (v2.4 - Three-Level Artifact Hierarchy)"
 related_docs:
   - "[ADR-011: Three-Directory Model](../dev/decisions/framework/adr-011-three-directory-model.md)"

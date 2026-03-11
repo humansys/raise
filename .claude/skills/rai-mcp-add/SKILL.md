@@ -172,5 +172,4 @@ Result reported. Developer knows the server is ready (or what to fix).
 - CLI: `rai mcp install`, `rai mcp scaffold`, `rai mcp health`, `rai mcp tools`
 - Catalog: `.raise/mcp/catalog.yaml` (governance — known servers + package details)
 - Complement: `/rai-mcp-remove`, `/rai-mcp-status`
-- Pattern: PAT-E-608 (CLI = agent tools, Skills = human interface)
-- Epic: E338 MCP Platform
+- Pattern: CLI = agent tools, Skills = human interface

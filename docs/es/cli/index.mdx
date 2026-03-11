@@ -281,13 +281,13 @@ Registra una señal de refuerzo para un patrón. Se llama al revisar una story p
 
 ```bash
 # El patrón fue seguido durante la implementación
-rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170
+rai pattern reinforce PAT-001 --vote 1 --from S101
 
 # El patrón no fue relevante para esta story
-rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170
+rai pattern reinforce PAT-002 --vote 0 --from S101
 
 # El patrón fue contradicho
-rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170
+rai pattern reinforce PAT-003 --vote -1 --from S101
 ```
 
 ### `rai signal emit-calibration`

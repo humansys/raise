@@ -92,7 +92,7 @@ Create 2-4 intermediate checkpoints:
 
 Per milestone: stories included, success criteria (verifiable), demo capability.
 
-**Integration checkpoint (PAT-E-539):** For epics with multiple components (client/server, CLI/API, frontend/backend), schedule an **E2E integration milestone** before the final story. This checkpoint runs real infrastructure (docker compose, actual DB) and verifies cross-story contracts (auth headers, payload schemas, parameter limits). Unit tests with mocks cannot catch these mismatches — only real E2E validates the seams between stories.
+**Integration checkpoint:** For epics with multiple components (client/server, CLI/API, frontend/backend), schedule an **E2E integration milestone** before the final story. This checkpoint runs real infrastructure (docker compose, actual DB) and verifies cross-story contracts (auth headers, payload schemas, parameter limits). Unit tests with mocks cannot catch these mismatches — only real E2E validates the seams between stories.
 
 <verification>
 At least 2 milestones defined with clear success criteria. Multi-component epics include E2E integration checkpoint.
@@ -142,7 +142,7 @@ Scope document updated. Plan reviewable in <5 minutes. Human acknowledges.
 - [ ] Progress tracking in scope document
 - [ ] NEVER over-plan — plans are hypotheses, not commitments
 - [ ] NEVER sequence by size alone — use risk-first as default
-- [ ] Multi-component epics include E2E integration checkpoint (PAT-E-539)
+- [ ] Multi-component epics include E2E integration checkpoint
 
 ## References
 
