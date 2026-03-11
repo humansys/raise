@@ -1561,7 +1561,7 @@ def _read_gitignore(root: Path) -> list[str]:
             if "/" not in entry:
                 patterns.append(f"**/{entry}/**")
             else:
-                patterns.append(f"**/{entry}/**")
+                patterns.append(f"{entry}/**")
     except OSError:
         return []
     return patterns

@@ -10,6 +10,7 @@ import pytest
 from raise_cli.discovery.scanner import (
     ScanResult,
     Symbol,
+    _read_gitignore,
     detect_language,
     extract_csharp_symbols,
     extract_javascript_symbols,
@@ -1357,3 +1358,25 @@ class TestExtractCsharpSymbols:
         assert result.files_scanned == 1
         assert any(s.name == "UserService" for s in result.symbols)
         assert not any(s.name == "Main" for s in result.symbols)
+
+
+class TestReadGitignore:
+    """Regression tests for _read_gitignore (RAISE-534)."""
+
+    def test_bare_name_gets_double_star_prefix(self, tmp_path: Path) -> None:
+        """Bare names like 'node_modules' match anywhere: **/node_modules/**."""
+        (tmp_path / ".gitignore").write_text("node_modules\n")
+        patterns = _read_gitignore(tmp_path)
+        assert patterns == ["**/node_modules/**"]
+
+    def test_path_entry_no_double_star_prefix(self, tmp_path: Path) -> None:
+        """Entries with '/' are path-relative: should NOT get **/ prefix."""
+        (tmp_path / ".gitignore").write_text("build/output\n")
+        patterns = _read_gitignore(tmp_path)
+        assert patterns == ["build/output/**"]
+
+    def test_mixed_entries(self, tmp_path: Path) -> None:
+        """Bare and path entries produce distinct patterns."""
+        (tmp_path / ".gitignore").write_text("__pycache__\ndist/assets\n")
+        patterns = _read_gitignore(tmp_path)
+        assert patterns == ["**/__pycache__/**", "dist/assets/**"]
