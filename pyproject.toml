@@ -3,6 +3,7 @@ members = ["packages/*"]
 
 [tool.uv.sources]
 raise-server = { workspace = true }
+raise-pro = { workspace = true }
 
 [project]
 name = "raise-cli"
@@ -56,6 +57,7 @@ dev = [
     "pyright>=1.1.350",
     "bandit>=1.7.8",
     "raise-server",
+    "raise-pro",
     "httpx>=0.27.0",
     "mcp>=1.26,<2",
 ]
@@ -121,13 +123,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/raise_cli", "src/raise_core", "src/rai_pro"]
+packages = ["src/raise_cli", "src/raise_core"]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/src/raise_cli/",
     "/src/raise_core/",
-    "/src/rai_pro/",
     "/LICENSE",
     "/README.md",
     "/pyproject.toml",
@@ -162,7 +163,7 @@ indent-style = "space"
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
-include = ["src", "packages/raise-server/src"]
+include = ["src", "packages/raise-pro/src", "packages/raise-server/src"]
 exclude = [
     "**/__pycache__",
     "**/node_modules",
@@ -183,6 +184,7 @@ addopts = [
     "--strict-config",
     "--cov=src/raise_cli",
     "--cov=src/raise_core",
+    "--cov=packages/raise-pro/src/rai_pro",
     "--cov=packages/raise-server/src/raise_server",
     "--cov-report=term-missing",
     "--cov-report=html",
@@ -192,7 +194,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["src/raise_cli", "src/raise_core", "packages/raise-server/src/raise_server"]
+source = ["src/raise_cli", "src/raise_core", "packages/raise-pro/src/rai_pro", "packages/raise-server/src/raise_server"]
 omit = [
     "*/tests/*",
     "*/__main__.py",
