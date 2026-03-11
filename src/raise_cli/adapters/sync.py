@@ -10,7 +10,7 @@ Usage::
 
     async_adapter = JiraAdapter(config)
     sync_adapter = SyncPMAdapter(async_adapter)
-    issue = sync_adapter.get_issue("RAISE-301")  # sync call
+    issue = sync_adapter.get_issue("PROJ-301")  # sync call
 """
 
 from __future__ import annotations
@@ -51,7 +51,7 @@ def _run_sync[T](coro: Coroutine[Any, Any, T], closeable: Any = None) -> T:
         coro: The coroutine to run.
         closeable: Optional object with ``aclose()`` method. Called in a
             ``finally`` block within the same event loop to prevent
-            asyncgen finalizer tracebacks (RAISE-324).
+            asyncgen finalizer tracebacks.
     """
 
     async def _wrapped() -> T:

@@ -357,7 +357,7 @@ def get_next_id(
                     continue
 
     # Fallback: scan sibling directories matching {PREFIX}-{NNN} pattern.
-    # Guards against counter reset when index.jsonl is lost (RAISE-502).
+    # Guards against counter reset when index.jsonl is lost.
     parent = file_path.parent
     if parent.is_dir():
         dir_pattern = re.compile(rf"^{re.escape(full_prefix)}(\d+)$")

@@ -5,7 +5,7 @@ Provides commands for:
 - Running pre-publish quality checks
 - Orchestrating full releases (bump, changelog, commit, tag, push)
 
-The check and publish commands were absorbed from the `publish` group (RAISE-247/S5).
+The check and publish commands were absorbed from the `publish` group during CLI restructuring.
 """
 
 from __future__ import annotations

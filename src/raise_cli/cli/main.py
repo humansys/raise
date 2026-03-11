@@ -139,7 +139,7 @@ def main(
     global _current_output_format  # noqa: PLW0603
     _current_output_format = format.value  # type: ignore[assignment]
 
-    # Check for co-installed legacy packages (RAISE-482)
+    # Check for co-installed legacy packages (rai-cli ↔ raise-cli conflict)
     from raise_cli.compat import check_legacy_packages
 
     legacy_warning = check_legacy_packages()

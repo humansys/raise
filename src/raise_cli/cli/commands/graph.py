@@ -1,7 +1,7 @@
 """CLI commands for Rai's knowledge graph: build, query, validate, and manage.
 
 The graph group owns commands that operate on the knowledge graph structure.
-These were extracted from the `memory` God Object in RAISE-247 (ADR-038).
+These were extracted from the `memory` God Object (see ADR-038).
 
 Commands:
 - build: Build the graph index from all sources

@@ -2,7 +2,7 @@
 
 Skill sets live in ``.raise/skills/{name}/`` and contain skill directories
 with SKILL.md files. They overlay builtins when deployed with
-``rai init --skill-set``. (S340.4, RAISE-344)
+``rai init --skill-set``.
 """
 
 from __future__ import annotations

@@ -192,7 +192,7 @@ class McpConfluenceAdapter:
     # ----- Lifecycle -----
 
     async def aclose(self) -> None:
-        """Close the underlying MCP bridge (RAISE-324)."""
+        """Close the underlying MCP bridge — prevents asyncgen finalizer tracebacks."""
         await self._bridge.aclose()
 
     # ----- Response parsers (D5 — probed formats) -----

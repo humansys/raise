@@ -1,7 +1,7 @@
 """CLI commands for Rai's pattern memory: add, reinforce, promote.
 
 The pattern group owns commands that write to pattern memory (JSONL files).
-These were extracted from the `memory` God Object in RAISE-247 (ADR-038).
+These were extracted from the `memory` God Object (see ADR-038).
 
 Commands:
 - add: Add a new learned pattern to memory
@@ -61,9 +61,7 @@ def reinforce_cmd(
     ],
     story_id: Annotated[
         str | None,
-        typer.Option(
-            "--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"
-        ),
+        typer.Option("--from", "-f", help="Story ID for traceability (e.g., S101)"),
     ] = None,
     scope: Annotated[
         str,
@@ -83,9 +81,9 @@ def reinforce_cmd(
     Vote 0 (N/A) does not modify evaluations count.
 
     Examples:
-        $ rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170
-        $ rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170
-        $ rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170
+        $ rai pattern reinforce PAT-001 --vote 1 --from S101
+        $ rai pattern reinforce PAT-002 --vote -1 --from S101
+        $ rai pattern reinforce PAT-003 --vote 0 --from S101
     """
     if vote not in (1, 0, -1):
         cli_error(

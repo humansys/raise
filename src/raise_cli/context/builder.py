@@ -84,7 +84,7 @@ class GraphBuilder:
         # Must run before add_concept() so graph gets enriched copies
         self.load_code_structure(all_nodes)
 
-        # Fail on duplicate node IDs — silent overwrites lose data (RAISE-510)
+        # Fail on duplicate node IDs — silent overwrites lose data
         seen_ids: dict[str, str] = {}
         duplicates: list[str] = []
         for node in all_nodes:

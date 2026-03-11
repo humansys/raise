@@ -165,7 +165,7 @@ class McpBridge:
             # Redirect MCP server stderr to devnull to suppress banner/warning noise.
             # Server errors are captured via MCP protocol (isError), not stderr.
             # subprocess.DEVNULL is an int constant (-3) accepted by anyio.open_process;
-            # avoids sync open() in async context (RAISE-436).
+            # avoids sync open() in async context — asyncio forbids blocking I/O in event loop.
             read, write = await stack.enter_async_context(
                 stdio_client(params, errlog=subprocess.DEVNULL)  # type: ignore[arg-type]
             )
@@ -191,7 +191,7 @@ class McpBridge:
         """Close session and exit stack.
 
         Must be called within the same event loop that created the session.
-        Prevents asyncgen finalizer tracebacks from stdio_client (RAISE-324).
+        Prevents asyncgen finalizer tracebacks from stdio_client.
         """
         if self._cm_stack:
             with contextlib.suppress(Exception):

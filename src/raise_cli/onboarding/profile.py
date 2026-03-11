@@ -340,7 +340,7 @@ def get_rai_home() -> Path:
 def _migrate_current_session(profile: DeveloperProfile) -> DeveloperProfile:
     """Migrate old current_session format to active_sessions list.
 
-    Backward compatibility migration for RAISE-137. Converts single
+    Backward compatibility migration. Converts single
     current_session (dict) to active_sessions (list) with generated session ID.
 
     Args:
@@ -373,7 +373,7 @@ def load_developer_profile() -> DeveloperProfile | None:
     """Load developer profile from ~/.rai/developer.yaml.
 
     Automatically migrates old current_session format to active_sessions
-    if needed (backward compatibility for RAISE-137).
+    if needed (backward compatibility for single→multi session migration).
 
     Returns:
         DeveloperProfile if file exists and is valid, None otherwise.
@@ -492,7 +492,7 @@ def start_session(
         agent=agent,
     )
 
-    # Remove existing session for same project (idempotency — RAISE-155)
+    # Remove existing session for same project (idempotency)
     updated_sessions = [s for s in profile.active_sessions if s.project != project_path]
     updated_sessions.append(new_session)
     updated = profile.model_copy(update={"active_sessions": updated_sessions})

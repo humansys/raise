@@ -74,7 +74,7 @@ def migrate_flat_to_session(project_path: Path, session_id: str) -> bool:
 
     The target directory is determined by last_session.id in the flat state file
     (the session the state actually belongs to). Falls back to session_id if
-    last_session.id is not available. This prevents orphan directories (RAISE-505).
+    last_session.id is not available. This prevents orphan directories.
 
     Args:
         project_path: Absolute path to the project root.

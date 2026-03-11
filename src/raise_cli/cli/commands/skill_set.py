@@ -2,7 +2,6 @@
 
 Provides ``rai skill set create|list|diff`` for observable skill set
 operations. These commands are the foundation for ``/rai-skillset-manage``.
-(S340.4, RAISE-344)
 """
 
 from __future__ import annotations

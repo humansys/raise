@@ -1,7 +1,7 @@
 """CLI commands for Rai's telemetry signals: work lifecycle, sessions, calibration.
 
 The signal group owns commands that emit telemetry events to JSONL files.
-These were extracted from the `memory` God Object in RAISE-247 (ADR-038).
+These were extracted from the `memory` God Object (see ADR-038).
 
 Commands:
 - emit-work: Emit a work lifecycle event (epic/story phases)

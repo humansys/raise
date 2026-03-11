@@ -231,7 +231,7 @@ class McpJiraAdapter:
     # ----- Query -----
 
     async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
-        # Sanitize shell-escaped operators (RAISE-435: Claude Code Bash escapes ! to \!)
+        # Sanitize shell-escaped operators (Claude Code Bash escapes ! to \!)
         clean_query = query.replace("\\!", "!")
         result = await self._bridge.call(
             "jira_search",
@@ -244,7 +244,7 @@ class McpJiraAdapter:
     # ----- Lifecycle -----
 
     async def aclose(self) -> None:
-        """Close the underlying MCP bridge (RAISE-324)."""
+        """Close the underlying MCP bridge — prevents asyncgen finalizer tracebacks."""
         await self._bridge.aclose()
 
     # ----- Health -----

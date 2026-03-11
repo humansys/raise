@@ -285,8 +285,8 @@ def compute_confidence(
     - Medium: 40 <= score < 70
     - Low: score < 40
 
-    C# note: XML doc comments (///) are not yet extracted by the scanner
-    (tracked in RAISE-225). Until then, Signal 1 will always be 0 for C#
+    C# note: XML doc comments (///) are not yet extracted by the scanner.
+    Until then, Signal 1 will always be 0 for C#
     symbols. Signals 2, 5, and 7 compensate for this gap.
 
     Args:

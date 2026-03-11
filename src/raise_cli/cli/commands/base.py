@@ -1,9 +1,9 @@
 """Backward-compatible alias for the info command.
 
-The `base show` command has been moved to `rai info` (RAISE-247/S5).
+The `base show` command has been moved to `rai info` (CLI restructuring).
 
 This alias prints a deprecation warning and delegates to the canonical command.
-It will be removed in a future release (RAISE-247/S9).
+It will be removed in a future release (v3.0).
 """
 
 from __future__ import annotations

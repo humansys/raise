@@ -222,7 +222,7 @@ def start(
                 typer.echo(f"Warning: {validation.summary()}")
                 typer.echo("Run `raise memory validate` to fix data quality issues.\n")
 
-    # Auto-sync skills if CLI was upgraded (RAISE-509)
+    # Auto-sync skills if CLI was upgraded
     if project is not None:
         _maybe_sync_skills(Path(project))
 
@@ -461,7 +461,7 @@ def close(
                     typer.echo("No active session for this project.")
                 return
 
-        # CWD poka-yoke (RAISE-139): reject if project mismatch
+        # CWD poka-yoke: reject if project mismatch
         _check_cwd_guard(profile, resolved_session_id, legacy_project)
 
         # Emit before:session:close — hooks can abort
@@ -501,7 +501,7 @@ def close(
             session_type=session_type or "feature",
         )
 
-    # Coherence validation (RAISE-201): reject if state file session_id
+    # Coherence validation: reject if state file session_id
     # doesn't match the target session. Prevents race condition where
     # parallel sessions overwrite each other's state files.
     if (
@@ -529,7 +529,7 @@ def close(
     # Resolve project path
     project_path = Path(project) if project else Path.cwd()
 
-    # CWD poka-yoke (RAISE-139): reject if project mismatch
+    # CWD poka-yoke: reject if project mismatch
     # When no --session flag, find the active session for THIS project
     # (not just the first one — that may belong to a different project)
     guard_session_id = resolved_session_id

@@ -3,7 +3,7 @@
 Provides the top-level `rai info` command for viewing information about
 the bundled base Rai package.
 
-Moved from `base show` in RAISE-247/S5.
+Moved from `base show` during CLI restructuring.
 
 Example:
     $ rai info          # View base package info and install status

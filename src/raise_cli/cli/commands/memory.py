@@ -1,12 +1,12 @@
 """Backward-compatible aliases for commands extracted to graph, pattern, and signal groups.
 
-All active commands have been extracted to dedicated groups (RAISE-247):
+All active commands have been extracted to dedicated groups (CLI restructuring):
 - Graph: query, context, build, validate, extract, list, viz
 - Pattern: add-pattern, reinforce
 - Signal: emit-work, emit-session, emit-calibration
 
 These aliases print deprecation warnings and delegate to the canonical commands.
-They will be removed in a future release (RAISE-247/S9).
+They will be removed in a future release (v3.0).
 """
 
 from __future__ import annotations
@@ -44,8 +44,8 @@ def _deprecation_warning(
 
 
 # =============================================================================
-# Backward-Compat Aliases: graph commands (extracted to graph.py in RAISE-247)
-# These wrappers will be removed in a future release (RAISE-247/S9).
+# Backward-Compat Aliases: graph commands (extracted to graph.py during CLI restructuring)
+# These wrappers will be removed in a future release (v3.0).
 # =============================================================================
 
 
@@ -235,8 +235,8 @@ def viz(
 
 
 # =============================================================================
-# Backward-Compat Aliases: pattern commands (extracted to pattern.py in RAISE-247)
-# These wrappers will be removed in a future release (RAISE-247/S9).
+# Backward-Compat Aliases: pattern commands (extracted to pattern.py during CLI restructuring)
+# These wrappers will be removed in a future release (v3.0).
 # =============================================================================
 
 
@@ -255,9 +255,7 @@ def reinforce_cmd(
     ],
     story_id: Annotated[
         str | None,
-        typer.Option(
-            "--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"
-        ),
+        typer.Option("--from", "-f", help="Story ID for traceability (e.g., S101)"),
     ] = None,
     scope: Annotated[
         str,
@@ -328,8 +326,8 @@ def add_pattern(
 
 
 # =============================================================================
-# Backward-Compat Aliases: signal commands (extracted to signal.py in RAISE-247)
-# These wrappers will be removed in a future release (RAISE-247/S9).
+# Backward-Compat Aliases: signal commands (extracted to signal.py during CLI restructuring)
+# These wrappers will be removed in a future release (v3.0).
 # =============================================================================
 
 

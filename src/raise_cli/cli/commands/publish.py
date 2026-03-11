@@ -1,11 +1,11 @@
 """Backward-compatible aliases for commands moved to the release group.
 
-All active commands have been moved to the `release` group (RAISE-247/S5):
+All active commands have been moved to the `release` group (CLI restructuring):
 - publish check → release check
 - publish release → release publish
 
 These aliases print deprecation warnings and delegate to the canonical commands.
-They will be removed in a future release (RAISE-247/S9).
+They will be removed in a future release (v3.0).
 """
 
 from __future__ import annotations

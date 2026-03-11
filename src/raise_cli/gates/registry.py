@@ -4,7 +4,7 @@ Discovers WorkflowGate implementations registered via Python entry points
 (``[project.entry-points."rai.gates"]`` in pyproject.toml). Validates
 Protocol conformance before accepting gates.
 
-Architecture: ADR-039 §3 (Entry point discovery, same as RAISE-211)
+Architecture: ADR-039 §3 (Entry point discovery via stevedore)
 """
 
 from __future__ import annotations
