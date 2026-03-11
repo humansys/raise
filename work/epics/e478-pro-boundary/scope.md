@@ -75,7 +75,7 @@ Recommend **(A)** — consistent with existing workspace pattern (`packages/rais
 |-------|:----:|:------:|-------|
 | S478.1 — Move pro adapters | S | Done | Merged to dev cc0bf418 |
 | S478.2 — Clean entry points & deps | S | Done | Merged to dev 0b9c357c |
-| S478.3 — Clean CLI logic | XS | Pending | |
+| S478.3 — Clean CLI logic | XS | Done | Merged to dev 98db3e32 |
 
 ### Sequencing Risks
 
