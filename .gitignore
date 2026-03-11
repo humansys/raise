@@ -19,6 +19,10 @@ CLAUDE.local.md
 .raise/cache/
 .raise/confluence-pages.yaml
 
+# RaiSE adapter configs (contain PII — use .example templates)
+.raise/jira.yaml
+.raise/confluence.yaml
+
 # RaiSE derived artifacts (rebuild with `rai memory build`)
 .raise/rai/memory/index.json
 
