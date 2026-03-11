@@ -15,7 +15,7 @@ def has_unreleased_entries(content: str) -> bool:
         True if there are non-whitespace entries between [Unreleased] and the next section.
     """
     match = re.search(
-        r"^## \[Unreleased\]\s*$(.*?)(?=^## \[|\Z)",
+        r"^## \[Unreleased\]\s*$(.*?)(?=(?:^## \[)|\Z)",
         content,
         re.DOTALL | re.MULTILINE,
     )
