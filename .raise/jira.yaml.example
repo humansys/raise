@@ -1,24 +1,19 @@
-# Jira Configuration for raise-commons
+# Jira Configuration for your project
+# Copy to jira.yaml and fill in your values.
 # Used by rai-cli and AI agents to interact with Jira without token-expensive discovery.
 # Deterministic reference — agents read this instead of querying workflows each time.
 
 # ─── Projects ────────────────────────────────────────────────────────────────
 
 projects:
-  RAISE:
-    name: RAISE
+  MY_PROJECT:
+    name: My Project
     category: Development
-    description: Framework development (CLI, skills, memory, discovery)
+    description: Your project description
     board_type: scrum
 
-  RGTM:
-    name: RaiSE GTM
-    category: Go-to-Market
-    description: Marketing strategy, content, campaigns, sales enablement
-    board_type: scrum
-
-# ─── Workflow (shared by both projects) ──────────────────────────────────────
-# All transitions are open from any state (no restrictions).
+# ─── Workflow (adjust IDs to match your Jira instance) ─────────────────────
+# Run: rai backlog get-transitions <ISSUE_KEY> to discover your transition IDs.
 
 workflow:
   states:
@@ -43,7 +38,6 @@ workflow:
       description: Completed and verified
 
   # Status name → transition ID mapping for McpJiraAdapter
-  # Used by McpJiraAdapter._resolve_transition_id() for programmatic transitions.
   status_mapping:
     backlog: 11
     selected: 21
@@ -63,30 +57,12 @@ workflow:
 # Identifiers that work with MCP jira_create_issue / jira_update_issue assignee field.
 
 team:
-  - name: Emilio Osorio
-    identifier: emilio@humansys.ai    # email works
+  - name: Your Name
+    identifier: you@example.com
     role: lead-dev
     focus: product, architecture
 
-  - name: Aquiles Lázaro
-    identifier: "557058:890eb66c-5965-47ea-9f36-f9dc8f3b4547"  # account_id (no email in Jira)
-    role: devops
-    focus: CI/CD, quality gates, Windows
-
-  - name: gerardo davila
-    identifier: "gerardo davila"         # display name works for assignment (account_id fails on Sub-task create)
-    account_id: "712020:8448ec75-857f-4fbc-8da8-8e0fc3bdfa37"  # keep for JQL queries
-    role: cs-mobile
-    focus: Flutter/Dart, customer success
-
-  - name: Fernando Rodriguez Zapata
-    identifier: fernando@humansys.ai   # email works
-    role: enablement
-    focus: training, onboarding, content
-
 # ─── Issue Types ─────────────────────────────────────────────────────────────
-# Ontology decision: SES-226 / Tech Note TN-001
-# Rule: choose the type that changes HOW you work on the issue, not just how it's labeled.
 
 issue_types:
   - name: Epic
@@ -99,13 +75,11 @@ issue_types:
 
   - name: Improvement
     description: "Makes something existing better — process, tooling, DX, quality. Not a defect."
-    when_to_use: "When nothing is broken but something could work better. Includes refactors, process changes, config improvements."
-    example: "Multi-instance coordination file (RAISE-241), jira.yaml ontology update."
+    when_to_use: "When nothing is broken but something could work better."
 
   - name: Spike
-    description: "Time-boxed investigation. Produces knowledge, NOT a deliverable. No implementation commitment."
+    description: "Time-boxed investigation. Produces knowledge, NOT a deliverable."
     when_to_use: "When uncertainty must be reduced before committing to a Story or design."
-    contract: "Define: question to answer + timebox. Output: decision or recommendation, not code."
 
   - name: Task
     description: "Technical work with no direct user value. Infrastructure, CI, config, maintenance."
@@ -114,21 +88,10 @@ issue_types:
   - name: Bug
     description: "Something that worked and broke, or never worked as specified."
     when_to_use: "Defect. Use priority field for severity (Critical/Major/Minor)."
-    default_parent: "RAISE-144"   # → Engineering Health (see defaults section)
 
   - name: Sub-task
     description: "Child of any issue type. For breaking down complex work within a single issue."
     note: "Use 'Sub-task' NOT 'Subtask' — Jira API is case-sensitive."
-
-# ─── Defaults ────────────────────────────────────────────────────────────────
-# Repo-level defaults for issue creation. Agents MUST apply these unless
-# the human explicitly specifies otherwise.
-
-defaults:
-  RAISE:
-    bug_parent: "RAISE-144"       # All bugs → Engineering Health epic
-    task_parent: null             # Tasks go to their own epic explicitly
-    # Note: use additional_fields: {"parent": "RAISE-144"} when creating bugs
 
 # ─── Usage Notes for Agents ─────────────────────────────────────────────────
 #
@@ -137,10 +100,6 @@ defaults:
 #
 # To transition an issue:
 #   Use mcp__atlassian__jira_transition_issue with the state 'id' from workflow.states.
-#   All transitions are open — you can move from any state to any state.
 #
 # To link a story to an epic:
-#   Use additional_fields: {"parent": "RAISE-XXX"} when creating the issue.
-#
-# Project key in JQL:
-#   RAISE is a reserved word — always quote it: project = "RAISE"
+#   Use additional_fields: {"parent": "PROJECT-XXX"} when creating the issue.
