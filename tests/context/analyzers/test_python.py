@@ -421,3 +421,27 @@ class TestPythonAnalyzerModuleDiscovery:
         # Should still produce a result, just with partial data
         alpha_info = next((m for m in modules if m.name == "alpha"), None)
         assert alpha_info is not None
+
+    def test_imports_extracted_from_init_and_regular_files(
+        self, tmp_path: Path
+    ) -> None:
+        """Imports from __init__.py and regular files both contribute (RAISE-535)."""
+        pkg = tmp_path / "src" / "pkg"
+        mod = pkg / "mymod"
+        mod.mkdir(parents=True)
+        (mod / "__init__.py").write_text("from pkg.alpha import Foo\n")
+        (mod / "core.py").write_text("from pkg.beta import Bar\n")
+
+        # sibling modules so imports resolve
+        for name in ("alpha", "beta"):
+            d = pkg / name
+            d.mkdir()
+            (d / "__init__.py").write_text("")
+
+        analyzer = PythonAnalyzer(src_dir="src/pkg")
+        modules = analyzer.analyze_modules(tmp_path)
+        mymod = next((m for m in modules if m.name == "mymod"), None)
+        assert mymod is not None
+        # Both __init__.py and core.py imports must appear
+        assert "alpha" in mymod.imports
+        assert "beta" in mymod.imports

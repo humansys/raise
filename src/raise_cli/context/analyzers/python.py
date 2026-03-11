@@ -87,14 +87,8 @@ class PythonAnalyzer:
             if tree is None:
                 continue
 
-            # Skip __init__.py for imports (handled separately for exports)
-            if py_file.name != "__init__.py":
-                file_imports = self._extract_imports(tree, module_name)
-                imports.update(file_imports)
-            else:
-                # __init__.py imports from siblings also count as module deps
-                file_imports = self._extract_imports(tree, module_name)
-                imports.update(file_imports)
+            file_imports = self._extract_imports(tree, module_name)
+            imports.update(file_imports)
 
             component_count += self._count_components(tree)
 
