@@ -78,7 +78,7 @@ def _extract_decision_summary(content: str) -> str:
     """
     # Look for ## Decision or ## Decisión section
     match = re.search(
-        r"^##\s+(?:Decision|Decisión)\s*\n(.*?)(?=^##\s|\Z)",
+        r"^##\s+(?:Decision|Decisión)\s*\n(.*?)(?=(?:^##\s)|\Z)",
         content,
         re.MULTILINE | re.DOTALL | re.IGNORECASE,
     )
