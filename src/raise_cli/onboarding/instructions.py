@@ -42,7 +42,7 @@ class InstructionsGenerator:
         self,
         project_name: str,
         detection: DetectionResult,
-        conventions: ConventionResult | None = None,
+        conventions: ConventionResult | None = None,  # NOSONAR
         *,
         project_path: Path,
     ) -> str:
@@ -51,8 +51,7 @@ class InstructionsGenerator:
         Args:
             project_name: Name of the project.
             detection: Project detection result (type, file count).
-            conventions: Optional convention detection result (unused, kept
-                for backward compatibility).
+            conventions: Unused; kept for backward compatibility.
             project_path: Project root path containing .raise/ directory.
 
         Returns:
@@ -67,7 +66,7 @@ class InstructionsGenerator:
 
     def _generate_raise_project(
         self,
-        project_name: str,
+        _project_name: str,
         raise_dir: Path,
     ) -> str:
         """Generate CLAUDE.md for a RaiSE project from .raise/ sources.

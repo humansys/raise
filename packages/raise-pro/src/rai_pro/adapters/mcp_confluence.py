@@ -112,7 +112,7 @@ class McpConfluenceAdapter:
 
     # ----- DocumentationTarget methods -----
 
-    async def can_publish(self, doc_type: str, metadata: dict[str, Any]) -> bool:  # NOSONAR
+    async def can_publish(self, _doc_type: str, _metadata: dict[str, Any]) -> bool:  # NOSONAR
         """Accept all doc types — no restrictions.
 
         ``async`` is required by ``AsyncDocumentationTarget`` protocol; no internal

@@ -202,7 +202,7 @@ class FilesystemPMAdapter:
 
     # -- Write operations ---------------------------------------------------
 
-    def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
+    def create_issue(self, _project_key: str, issue: IssueSpec) -> IssueRef:
         """Create a new issue."""
         meta = issue.metadata or {}
         now = datetime.now(UTC).isoformat()

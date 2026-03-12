@@ -881,7 +881,7 @@ class GraphBuilder:
 
     def _extract_bounded_contexts(
         self,
-        all_nodes: list[GraphNode],
+        _all_nodes: list[GraphNode],
         node_by_id: dict[str, GraphNode],
     ) -> tuple[list[GraphNode], list[GraphEdge]]:
         """Extract bounded context nodes and belongs_to edges from domain model.
@@ -1026,7 +1026,7 @@ class GraphBuilder:
 
     def _extract_layers(
         self,
-        all_nodes: list[GraphNode],
+        _all_nodes: list[GraphNode],
         node_by_id: dict[str, GraphNode],
     ) -> tuple[list[GraphNode], list[GraphEdge]]:
         """Extract layer nodes and in_layer edges from system design.
@@ -1291,7 +1291,7 @@ class GraphBuilder:
     def _infer_learned_from(
         self,
         nodes: list[GraphNode],
-        node_by_id: dict[str, GraphNode],
+        _node_by_id: dict[str, GraphNode],
     ) -> list[GraphEdge]:
         """Infer learned_from edges from pattern metadata.
 

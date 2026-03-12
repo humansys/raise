@@ -28,12 +28,12 @@ class CopilotPlugin:
     and supports .github/prompts/*.prompt.md workflow files.
     """
 
-    def transform_instructions(self, content: str, config: AgentConfig) -> str:
+    def transform_instructions(self, content: str, _config: AgentConfig) -> str:
         """Return instructions unchanged — Copilot reads standard markdown."""
         return content
 
     def transform_skill(
-        self, frontmatter: dict[str, Any], body: str, config: AgentConfig
+        self, frontmatter: dict[str, Any], body: str, _config: AgentConfig
     ) -> tuple[dict[str, Any], str]:
         """Transform skill frontmatter to Copilot agent format.
 
