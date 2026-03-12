@@ -122,7 +122,7 @@ class FilesystemPMAdapter:
         if not query:
             return True
 
-        # field = value
+        # Parse "field = value" syntax
         m = re.match(r"(\w+)\s*=\s*(.+)", query)
         if m:
             field, value = m.group(1).lower(), m.group(2).strip().lower()
