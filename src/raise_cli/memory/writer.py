@@ -436,9 +436,11 @@ def reinforce_pattern(
     file_path: Path,
     pattern_id: str,
     vote: int,
-    story_id: str | None = None,  # noqa: ARG001  (traceability, not stored in v1)
+    story_id: str | None = None,  # noqa: ARG001
 ) -> ReinforceResult:
     """Update reinforcement fields for a pattern in a JSONL file.
+
+    ``story_id`` is accepted for traceability but not stored in v1.
 
     Vote semantics:
         +1 = implementation followed the pattern (positives + evaluations++)
