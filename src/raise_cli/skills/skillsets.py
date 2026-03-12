@@ -19,6 +19,8 @@ from raise_cli.onboarding.skills import copy_skill_tree
 
 logger = logging.getLogger(__name__)
 
+SKILL_MD_FILENAME = "SKILL.md"
+
 
 class CreateResult(BaseModel):
     """Result of skill set creation."""
@@ -56,7 +58,7 @@ def _count_skills(set_dir: Path) -> int:
     """Count skill directories containing SKILL.md."""
     if not set_dir.is_dir():
         return 0
-    return sum(1 for d in set_dir.iterdir() if d.is_dir() and (d / "SKILL.md").exists())
+    return sum(1 for d in set_dir.iterdir() if d.is_dir() and (d / SKILL_MD_FILENAME).exists())
 
 
 def create_skill_set(
@@ -166,7 +168,7 @@ def diff_skill_set(
     for skill_dir in sorted(set_dir.iterdir()):
         if not skill_dir.is_dir():
             continue
-        skill_md = skill_dir / "SKILL.md"
+        skill_md = skill_dir / SKILL_MD_FILENAME
         if not skill_md.exists():
             continue
 
@@ -178,7 +180,7 @@ def diff_skill_set(
 
         # Compare against builtin
         set_hash = compute_content_hash(skill_md.read_text(encoding="utf-8"))
-        builtin_content = (base / skill_name / "SKILL.md").read_text(encoding="utf-8")
+        builtin_content = (base / skill_name / SKILL_MD_FILENAME).read_text(encoding="utf-8")
         builtin_hash = compute_content_hash(builtin_content)
 
         if set_hash == builtin_hash:

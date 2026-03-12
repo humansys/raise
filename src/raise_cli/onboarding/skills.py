@@ -39,6 +39,8 @@ from raise_cli.onboarding.skill_manifest import (
 
 logger = logging.getLogger(__name__)
 
+SKILL_MD_FILENAME = "SKILL.md"
+
 
 class SkillScaffoldResult(BaseModel):
     """Result of skill scaffolding operation."""
@@ -95,7 +97,7 @@ def _read_bundled_content(
     Returns:
         The SKILL.md content as it would be written to disk.
     """
-    raw = (base / skill_name / "SKILL.md").read_text(encoding="utf-8")
+    raw = (base / skill_name / SKILL_MD_FILENAME).read_text(encoding="utf-8")
     if plugin is not None and agent_config is not None:
         raw = _apply_plugin_transform(raw, plugin, agent_config)
     return raw
@@ -221,7 +223,7 @@ def scaffold_skills(
 
     for skill_name in DISTRIBUTABLE_SKILLS:
         skill_dest = skills_dir / skill_name
-        skill_md = skill_dest / "SKILL.md"
+        skill_md = skill_dest / SKILL_MD_FILENAME
         source = base / skill_name
 
         bundled_content = _read_bundled_content(
@@ -404,7 +406,7 @@ def scaffold_skills(
             for skill_dir in sorted(overlay_dir.iterdir()):
                 if not skill_dir.is_dir():
                     continue
-                if not (skill_dir / "SKILL.md").exists():
+                if not (skill_dir / SKILL_MD_FILENAME).exists():
                     continue
                 copy_skill_tree(
                     skill_dir,
@@ -414,7 +416,7 @@ def scaffold_skills(
                     agent_config=config,
                     overwrite=True,
                 )
-                overlay_content = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
+                overlay_content = (skill_dir / SKILL_MD_FILENAME).read_text(encoding="utf-8")
                 manifest.skills[skill_dir.name] = SkillEntry(
                     sha256=compute_content_hash(overlay_content),
                     version=cli_version,

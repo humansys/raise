@@ -14,6 +14,8 @@ from pathlib import Path
 from raise_cli.compat import portable_path
 from raise_cli.context.analyzers.models import ModuleInfo
 
+_INIT_PY = "__init__.py"
+
 
 class PythonAnalyzer:
     """Analyzes Python modules using ast to extract structure.
@@ -58,7 +60,7 @@ class PythonAnalyzer:
                 continue
             if entry.name.startswith("__"):
                 continue
-            if not (entry / "__init__.py").exists():
+            if not (entry / _INIT_PY).exists():
                 continue
 
             info = self._analyze_module(entry, project_root)
@@ -149,7 +151,7 @@ class PythonAnalyzer:
         Returns:
             List of exported names.
         """
-        init_file = module_dir / "__init__.py"
+        init_file = module_dir / _INIT_PY
         if not init_file.exists():
             return []
 

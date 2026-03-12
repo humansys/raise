@@ -22,11 +22,14 @@ from raise_cli.schemas.session_state import SessionState
 
 logger = logging.getLogger(__name__)
 
+_RAISE_DIR_NAME = ".raise"
+_SESSION_STATE_YAML = "session-state.yaml"
+
 # New path: personal directory (gitignored, per-developer)
-SESSION_STATE_REL_PATH = Path(".raise") / "rai" / "personal" / "session-state.yaml"
+SESSION_STATE_REL_PATH = Path(_RAISE_DIR_NAME) / "rai" / "personal" / _SESSION_STATE_YAML
 
 # Legacy path for migration
-_LEGACY_SESSION_STATE_REL_PATH = Path(".raise") / "rai" / "session-state.yaml"
+_LEGACY_SESSION_STATE_REL_PATH = Path(_RAISE_DIR_NAME) / "rai" / _SESSION_STATE_YAML
 
 
 def get_session_state_path(project_path: Path, session_id: str | None = None) -> Path:
@@ -83,8 +86,8 @@ def migrate_flat_to_session(project_path: Path, session_id: str) -> bool:
     Returns:
         True if migration occurred, False if nothing to migrate.
     """
-    personal_dir = project_path / ".raise" / "rai" / "personal"
-    flat_state = personal_dir / "session-state.yaml"
+    personal_dir = project_path / _RAISE_DIR_NAME / "rai" / "personal"
+    flat_state = personal_dir / _SESSION_STATE_YAML
     flat_signals = personal_dir / "telemetry" / "signals.jsonl"
 
     # Nothing to migrate

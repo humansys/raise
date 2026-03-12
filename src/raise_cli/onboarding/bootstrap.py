@@ -32,6 +32,8 @@ from raise_cli.config.paths import (
 
 logger = logging.getLogger(__name__)
 
+_COPIED_LOG_MSG = "Copied: %s"
+
 
 class BootstrapResult(BaseModel):
     """Result of base Rai bootstrap operation."""
@@ -114,7 +116,7 @@ def _copy_identity(
         dest.write_text(content, encoding="utf-8")
         result.files_copied.append(str(dest))
         copied_any = True
-        logger.debug("Copied: %s", dest)
+        logger.debug(_COPIED_LOG_MSG, dest)
 
     result.identity_copied = copied_any
 
@@ -146,7 +148,7 @@ def _copy_patterns(
         dest.write_text(content, encoding="utf-8")
         result.files_copied.append(str(dest))
         result.patterns_copied = True
-        logger.debug("Copied: %s", dest)
+        logger.debug(_COPIED_LOG_MSG, dest)
         return
 
     # Re-init: merge base patterns into existing file
@@ -256,7 +258,7 @@ def _copy_methodology(
     dest.write_text(content, encoding="utf-8")
     result.files_copied.append(str(dest))
     result.methodology_copied = True
-    logger.debug("Copied: %s", dest)
+    logger.debug(_COPIED_LOG_MSG, dest)
 
 
 def ensure_gitignore(project_root: Path) -> bool:

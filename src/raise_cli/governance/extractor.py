@@ -29,6 +29,8 @@ from raise_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
+_EPIC_SCOPE_GLOB = "work/epics/*/scope.md"
+
 
 class GovernanceExtractor:
     """Orchestrates extraction of concepts from governance markdown files.
@@ -158,7 +160,7 @@ class GovernanceExtractor:
                     )
 
         # Epic scope files — one locator per scope.md
-        for scope_file in sorted(root.glob("work/epics/*/scope.md")):
+        for scope_file in sorted(root.glob(_EPIC_SCOPE_GLOB)):
             rel = str(scope_file.relative_to(root))
             locators.append(
                 ArtifactLocator(
@@ -273,7 +275,7 @@ class GovernanceExtractor:
         concepts.extend(work_concepts)
         backlog_file = self.project_root / "governance" / "backlog.md"
         backlog_count = 1 if backlog_file.exists() else 0
-        epic_count = len(list(self.project_root.glob("work/epics/*/scope.md")))
+        epic_count = len(list(self.project_root.glob(_EPIC_SCOPE_GLOB)))
         files_processed += backlog_count + epic_count
 
         # Extract ADR decisions (E12)
@@ -355,7 +357,7 @@ class GovernanceExtractor:
             except Exception as e:
                 logger.error(f"Error extracting from {backlog_file}: {e}")
 
-        for scope_file in self.project_root.glob("work/epics/*/scope.md"):
+        for scope_file in self.project_root.glob(_EPIC_SCOPE_GLOB):
             try:
                 epic_detail = extract_epic_details(scope_file, self.project_root)
                 if epic_detail:

@@ -45,6 +45,8 @@ pattern_app = typer.Typer(
 
 console = Console()
 
+_PATTERNS_FILE = "patterns.jsonl"
+
 
 @pattern_app.command("reinforce")
 def reinforce_cmd(
@@ -106,7 +108,7 @@ def reinforce_cmd(
         return
 
     mem_dir = (memory_dir or get_memory_dir_for_scope(memory_scope)).resolve()
-    patterns_file = mem_dir / "patterns.jsonl"
+    patterns_file = mem_dir / _PATTERNS_FILE
 
     if not patterns_file.exists():
         cli_error(
@@ -280,7 +282,7 @@ def promote_pattern(
     personal_dir = (
         memory_dir or get_memory_dir_for_scope(MemoryScope.PERSONAL)
     ).resolve()
-    personal_file = personal_dir / "patterns.jsonl"
+    personal_file = personal_dir / _PATTERNS_FILE
 
     if not personal_file.exists():
         cli_error(
@@ -315,7 +317,7 @@ def promote_pattern(
     # Append to project patterns
     project_dir = get_memory_dir_for_scope(MemoryScope.PROJECT)
     project_dir.mkdir(parents=True, exist_ok=True)
-    project_file = project_dir / "patterns.jsonl"
+    project_file = project_dir / _PATTERNS_FILE
     with project_file.open("a", encoding="utf-8") as f:
         f.write(json.dumps(dict(target)) + "\n")
 

@@ -43,6 +43,7 @@ from raise_core.graph.query import (
 
 # Default index file name
 INDEX_FILE = "index.json"
+_GRAPH_BUILD_HINT = "Run 'rai graph build' first to create the index"
 
 graph_app = typer.Typer(
     name="graph",
@@ -137,7 +138,7 @@ def query(
     except FileNotFoundError as e:
         cli_error(
             str(e),
-            hint="Run 'rai graph build' first to create the index",
+            hint=_GRAPH_BUILD_HINT,
             exit_code=4,
         )
 
@@ -377,7 +378,7 @@ def context_cmd(
     except FileNotFoundError as e:
         cli_error(
             str(e),
-            hint="Run 'rai graph build' first to create the index",
+            hint=_GRAPH_BUILD_HINT,
             exit_code=4,
         )
         return  # cli_error exits, but this satisfies pyright
@@ -628,7 +629,7 @@ def validate(
     if not index_path.exists():
         cli_error(
             f"Index file not found: {index_path}",
-            hint="Run 'rai graph build' first to create the index",
+            hint=_GRAPH_BUILD_HINT,
             exit_code=4,
         )
 
@@ -910,7 +911,7 @@ def list_graph(
     if not unified_path.exists():
         cli_error(
             f"Graph index not found: {unified_path}",
-            hint="Run 'rai graph build' first to create the index",
+            hint=_GRAPH_BUILD_HINT,
             exit_code=4,
         )
 
@@ -1075,7 +1076,7 @@ def viz(
     if not unified_path.exists():
         cli_error(
             f"Graph index not found: {unified_path}",
-            hint="Run 'rai graph build' first to create the index",
+            hint=_GRAPH_BUILD_HINT,
             exit_code=4,
         )
 

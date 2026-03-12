@@ -10,7 +10,7 @@ from textwrap import dedent
 
 from pydantic import BaseModel, Field
 
-from raise_cli.skills.locator import get_default_skill_dir
+from raise_cli.skills.locator import SKILL_MD_FILENAME, get_default_skill_dir
 
 # Mapping from domain prefix to lifecycle
 DOMAIN_TO_LIFECYCLE = {
@@ -183,10 +183,10 @@ def scaffold_skill(
 
     # "Customize builtin" mode: copy from deployed skill
     if from_builtin and skill_set is not None:
-        deployed = get_default_skill_dir() / name / "SKILL.md"
+        deployed = get_default_skill_dir() / name / SKILL_MD_FILENAME
         if deployed.exists():
             skill_path.mkdir(parents=True, exist_ok=True)
-            skill_file = skill_path / "SKILL.md"
+            skill_file = skill_path / SKILL_MD_FILENAME
             skill_file.write_text(
                 deployed.read_text(encoding="utf-8"), encoding="utf-8"
             )
@@ -205,7 +205,7 @@ def scaffold_skill(
 
     # Create skill directory and file
     skill_path.mkdir(parents=True, exist_ok=True)
-    skill_file = skill_path / "SKILL.md"
+    skill_file = skill_path / SKILL_MD_FILENAME
     skill_file.write_text(content, encoding="utf-8")
 
     return ScaffoldResult(

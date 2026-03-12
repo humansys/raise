@@ -20,6 +20,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
+_TIMESTAMP_DESC = "When the event occurred (UTC)"
+
 
 class SkillEvent(BaseModel):
     """A skill invocation event.
@@ -46,7 +48,7 @@ class SkillEvent(BaseModel):
     """
 
     type: Literal["skill_event"] = "skill_event"
-    timestamp: datetime = Field(..., description="When the event occurred (UTC)")
+    timestamp: datetime = Field(..., description=_TIMESTAMP_DESC)
     skill: str = Field(..., description="Name of the skill (e.g., 'story-design')")
     event: Literal["start", "complete", "abandon"] = Field(
         ..., description="Event type"
@@ -83,7 +85,7 @@ class SessionEvent(BaseModel):
     """
 
     type: Literal["session_event"] = "session_event"
-    timestamp: datetime = Field(..., description="When the event occurred (UTC)")
+    timestamp: datetime = Field(..., description=_TIMESTAMP_DESC)
     session_type: str = Field(
         ..., description="Type of session (e.g., 'story', 'research')"
     )
@@ -123,7 +125,7 @@ class CalibrationEvent(BaseModel):
     """
 
     type: Literal["calibration"] = "calibration"
-    timestamp: datetime = Field(..., description="When the event occurred (UTC)")
+    timestamp: datetime = Field(..., description=_TIMESTAMP_DESC)
     story_id: str = Field(..., description="Story identifier (e.g., 'F9.1')")
     story_size: str = Field(..., description="T-shirt size (XS, S, M, L)")
     estimated_min: int = Field(..., description="Estimated duration in minutes")
@@ -160,7 +162,7 @@ class ErrorEvent(BaseModel):
     """
 
     type: Literal["error_event"] = "error_event"
-    timestamp: datetime = Field(..., description="When the event occurred (UTC)")
+    timestamp: datetime = Field(..., description=_TIMESTAMP_DESC)
     tool: str = Field(..., description="Name of the tool that failed")
     error_type: str = Field(..., description="Type of error")
     context: str = Field(..., description="Brief context (no sensitive data)")
@@ -190,7 +192,7 @@ class CommandUsage(BaseModel):
     """
 
     type: Literal["command_usage"] = "command_usage"
-    timestamp: datetime = Field(..., description="When the event occurred (UTC)")
+    timestamp: datetime = Field(..., description=_TIMESTAMP_DESC)
     command: str = Field(..., description="Main command name (e.g., 'memory')")
     subcommand: str | None = Field(default=None, description="Subcommand name if any")
 
@@ -256,7 +258,7 @@ class WorkLifecycle(BaseModel):
     """
 
     type: Literal["work_lifecycle"] = "work_lifecycle"
-    timestamp: datetime = Field(..., description="When the event occurred (UTC)")
+    timestamp: datetime = Field(..., description=_TIMESTAMP_DESC)
     work_type: Literal["epic", "story"] = Field(
         ..., description="Type of work item (epic, story)"
     )

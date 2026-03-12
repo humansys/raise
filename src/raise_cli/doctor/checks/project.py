@@ -16,6 +16,10 @@ import yaml
 
 from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
+_RAISE_DIR_NAME = ".raise"
+_FIX_HINT_INIT = "run: rai init"
+_FIX_HINT_GRAPH_BUILD = "run: rai graph build"
+
 
 class ProjectCheck:
     """Diagnostic check for .raise/ project structure and coherence.
@@ -46,7 +50,7 @@ class ProjectCheck:
 
     def _check_raise_dir(self, root: Path) -> CheckResult:
         """Check that .raise/ directory exists."""
-        raise_dir = root / ".raise"
+        raise_dir = root / _RAISE_DIR_NAME
         if raise_dir.is_dir():
             return CheckResult(
                 check_id="project-raise-dir",
@@ -59,19 +63,19 @@ class ProjectCheck:
             category=self.category,
             status=CheckStatus.ERROR,
             message=".raise/ directory missing",
-            fix_hint="run: rai init",
+            fix_hint=_FIX_HINT_INIT,
         )
 
     def _check_manifest(self, root: Path) -> CheckResult:
         """Check that manifest.yaml exists and is valid YAML."""
-        manifest = root / ".raise" / "manifest.yaml"
+        manifest = root / _RAISE_DIR_NAME / "manifest.yaml"
         if not manifest.is_file():
             return CheckResult(
                 check_id="project-manifest",
                 category=self.category,
                 status=CheckStatus.ERROR,
                 message="manifest.yaml missing",
-                fix_hint="run: rai init",
+                fix_hint=_FIX_HINT_INIT,
             )
         try:
             content = manifest.read_text(encoding="utf-8")
@@ -100,14 +104,14 @@ class ProjectCheck:
     def _check_graph_staleness(self, root: Path) -> CheckResult:
         """Check if graph index exists and is not stale."""
         # Graph is stored at .raise/rai/memory/index.json (rai graph build output)
-        graph_index = root / ".raise" / "rai" / "memory" / "index.json"
+        graph_index = root / _RAISE_DIR_NAME / "rai" / "memory" / "index.json"
         if not graph_index.is_file():
             return CheckResult(
                 check_id="project-graph",
                 category=self.category,
                 status=CheckStatus.WARN,
                 message="graph not built (.raise/rai/memory/index.json missing)",
-                fix_hint="run: rai graph build",
+                fix_hint=_FIX_HINT_GRAPH_BUILD,
                 fix_id="rebuild-graph",
             )
 
@@ -123,7 +127,7 @@ class ProjectCheck:
                 category=self.category,
                 status=CheckStatus.WARN,
                 message="graph directory is empty",
-                fix_hint="run: rai graph build",
+                fix_hint=_FIX_HINT_GRAPH_BUILD,
                 fix_id="rebuild-graph",
             )
 
@@ -137,7 +141,7 @@ class ProjectCheck:
                 category=self.category,
                 status=CheckStatus.WARN,
                 message=f"graph is {days_old:.0f} days old",
-                fix_hint="run: rai graph build",
+                fix_hint=_FIX_HINT_GRAPH_BUILD,
                 fix_id="rebuild-graph",
             )
 
@@ -153,7 +157,7 @@ class ProjectCheck:
                         category=self.category,
                         status=CheckStatus.WARN,
                         message="governance files are newer than graph",
-                        fix_hint="run: rai graph build",
+                        fix_hint=_FIX_HINT_GRAPH_BUILD,
                         fix_id="rebuild-graph",
                     )
 
@@ -166,7 +170,7 @@ class ProjectCheck:
 
     def _check_adapter_config(self, root: Path) -> CheckResult:
         """Check if adapter config files are present (informational)."""
-        jira_config = root / ".raise" / "jira.yaml"
+        jira_config = root / _RAISE_DIR_NAME / "jira.yaml"
         if jira_config.is_file():
             return CheckResult(
                 check_id="project-adapter-config",
@@ -217,7 +221,7 @@ class ProjectCheck:
                 category=self.category,
                 status=CheckStatus.WARN,
                 message=".gitignore missing",
-                fix_hint="run: rai init",
+                fix_hint=_FIX_HINT_INIT,
             )
         content = gitignore.read_text(encoding="utf-8")
         # Check for the personal directory pattern
@@ -233,6 +237,6 @@ class ProjectCheck:
             category=self.category,
             status=CheckStatus.WARN,
             message=".raise/rai/personal/ not found in .gitignore",
-            fix_hint="run: rai init",
+            fix_hint=_FIX_HINT_INIT,
             fix_id="add-gitignore-personal",
         )

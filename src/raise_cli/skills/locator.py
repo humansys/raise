@@ -14,6 +14,8 @@ from raise_cli.config.agents import AgentConfig, get_agent_config
 from raise_cli.skills.parser import parse_skill
 from raise_cli.skills.schema import Skill
 
+SKILL_MD_FILENAME = "SKILL.md"
+
 
 def get_default_skill_dir(
     project_root: Path | None = None,
@@ -63,7 +65,7 @@ class SkillLocator:
 
         dirs: list[Path] = []
         for item in self.skill_dir.iterdir():
-            if item.is_dir() and (item / "SKILL.md").exists():
+            if item.is_dir() and (item / SKILL_MD_FILENAME).exists():
                 dirs.append(item)
 
         return sorted(dirs, key=lambda p: p.name)
@@ -77,7 +79,7 @@ class SkillLocator:
         Returns:
             Parsed Skill object, or None if not found.
         """
-        skill_path = self.skill_dir / name / "SKILL.md"
+        skill_path = self.skill_dir / name / SKILL_MD_FILENAME
         if not skill_path.exists():
             return None
 
@@ -91,7 +93,7 @@ class SkillLocator:
         """
         skills: list[Skill] = []
         for skill_dir in self.find_skill_dirs():
-            skill_path = skill_dir / "SKILL.md"
+            skill_path = skill_dir / SKILL_MD_FILENAME
             try:
                 skill = parse_skill(skill_path)
                 skills.append(skill)

@@ -23,6 +23,9 @@ from raise_cli.onboarding.conventions import (
 
 logger = logging.getLogger(__name__)
 
+_CATEGORY_CODE_STYLE = "Code Style"
+_VERIFICATION_RUFF_CHECK = "ruff check ."
+
 
 class GuardrailLevel(StrEnum):
     """Guardrail enforcement level.
@@ -103,9 +106,9 @@ class GuardrailGenerator:
             GeneratedGuardrail(
                 id=next_id(indent_level, "STYLE"),
                 level=indent_level,
-                category="Code Style",
+                category=_CATEGORY_CODE_STYLE,
                 description=indent_desc,
-                verification="ruff check ."
+                verification=_VERIFICATION_RUFF_CHECK
                 if indent_level == GuardrailLevel.MUST
                 else None,
             )
@@ -118,9 +121,9 @@ class GuardrailGenerator:
             GeneratedGuardrail(
                 id=next_id(quote_level, "STYLE"),
                 level=quote_level,
-                category="Code Style",
+                category=_CATEGORY_CODE_STYLE,
                 description=f"Use {quotes.style} quotes for strings",
-                verification="ruff check ."
+                verification=_VERIFICATION_RUFF_CHECK
                 if quote_level == GuardrailLevel.MUST
                 else None,
             )
@@ -133,9 +136,9 @@ class GuardrailGenerator:
             GeneratedGuardrail(
                 id=next_id(line_level, "STYLE"),
                 level=line_level,
-                category="Code Style",
+                category=_CATEGORY_CODE_STYLE,
                 description=f"Maximum line length: {line_length.max_length} characters",
-                verification="ruff check ."
+                verification=_VERIFICATION_RUFF_CHECK
                 if line_level == GuardrailLevel.MUST
                 else None,
             )

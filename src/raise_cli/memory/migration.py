@@ -11,6 +11,10 @@ import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
+_INDEX_JSONL = "index.jsonl"
+_SIGNALS_JSONL = "signals.jsonl"
+_CALIBRATION_JSONL = "calibration.jsonl"
+
 
 @dataclass
 class MigrationResult:
@@ -106,20 +110,20 @@ def needs_migration(
         rai_dir = memory_dir.parent
 
     # Check for sessions
-    project_sessions = memory_dir / "sessions" / "index.jsonl"
-    personal_sessions = personal_dir / "sessions" / "index.jsonl"
+    project_sessions = memory_dir / "sessions" / _INDEX_JSONL
+    personal_sessions = personal_dir / "sessions" / _INDEX_JSONL
     if _has_content(project_sessions) and not _has_content(personal_sessions):
         return True
 
     # Check for telemetry
-    project_telemetry = rai_dir / "telemetry" / "signals.jsonl"
-    personal_telemetry = personal_dir / "telemetry" / "signals.jsonl"
+    project_telemetry = rai_dir / "telemetry" / _SIGNALS_JSONL
+    personal_telemetry = personal_dir / "telemetry" / _SIGNALS_JSONL
     if _has_content(project_telemetry) and not _has_content(personal_telemetry):
         return True
 
     # Check for calibration
-    project_calibration = memory_dir / "calibration.jsonl"
-    personal_calibration = personal_dir / "calibration.jsonl"
+    project_calibration = memory_dir / _CALIBRATION_JSONL
+    personal_calibration = personal_dir / _CALIBRATION_JSONL
     return _has_content(project_calibration) and not _has_content(personal_calibration)
 
 
@@ -189,8 +193,8 @@ def migrate_to_personal(
     skipped: list[str] = []
 
     # Migrate sessions
-    project_sessions = memory_dir / "sessions" / "index.jsonl"
-    personal_sessions = personal_dir / "sessions" / "index.jsonl"
+    project_sessions = memory_dir / "sessions" / _INDEX_JSONL
+    personal_sessions = personal_dir / "sessions" / _INDEX_JSONL
     if _has_content(personal_sessions):
         if _has_content(project_sessions):
             skipped.append("sessions (personal already exists)")
@@ -200,8 +204,8 @@ def migrate_to_personal(
         )
 
     # Migrate telemetry
-    project_telemetry = rai_dir / "telemetry" / "signals.jsonl"
-    personal_telemetry = personal_dir / "telemetry" / "signals.jsonl"
+    project_telemetry = rai_dir / "telemetry" / _SIGNALS_JSONL
+    personal_telemetry = personal_dir / "telemetry" / _SIGNALS_JSONL
     if _has_content(personal_telemetry):
         if _has_content(project_telemetry):
             skipped.append("telemetry (personal already exists)")
@@ -211,8 +215,8 @@ def migrate_to_personal(
         )
 
     # Migrate calibration
-    project_calibration = memory_dir / "calibration.jsonl"
-    personal_calibration = personal_dir / "calibration.jsonl"
+    project_calibration = memory_dir / _CALIBRATION_JSONL
+    personal_calibration = personal_dir / _CALIBRATION_JSONL
     if _has_content(personal_calibration):
         if _has_content(project_calibration):
             skipped.append("calibration (personal already exists)")
