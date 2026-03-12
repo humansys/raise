@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
-from pydantic import ValidationError
 from rich.console import Console
 
 from raise_cli.artifacts.reader import read_artifact
@@ -70,7 +69,7 @@ def validate_command(
         try:
             read_artifact(path)
             results.append({"file": path.name, "passed": True, "error": None})
-        except (ValidationError, Exception) as exc:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             results.append({"file": path.name, "passed": False, "error": str(exc)})
 
     failed = [r for r in results if not r["passed"]]

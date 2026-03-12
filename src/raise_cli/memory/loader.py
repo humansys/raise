@@ -206,7 +206,7 @@ def load_jsonl_file(
                 data = json.loads(line)
                 concept = loader(data, scope=scope)
                 concepts.append(concept)
-            except (json.JSONDecodeError, KeyError, ValueError) as e:
+            except (KeyError, ValueError) as e:
                 errors.append(f"{file_path.name}:{line_num}: {e}")
 
     return concepts, errors

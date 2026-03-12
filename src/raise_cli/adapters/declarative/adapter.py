@@ -186,7 +186,7 @@ class DeclarativeMcpAdapter:
             try:
                 ref = await self.transition_issue(key, status)
                 succeeded.append(ref)
-            except (McpBridgeError, NotImplementedError, Exception) as exc:
+            except Exception as exc:
                 failed.append(FailureDetail(key=key, error=str(exc)))
 
         return BatchResult(succeeded=succeeded, failed=failed)

@@ -178,7 +178,7 @@ class McpJiraAdapter:
                 if not ref.key:
                     ref = IssueRef(key=key, url=ref.url)
                 succeeded.append(ref)
-            except (McpBridgeError, Exception) as exc:
+            except Exception as exc:
                 failed.append(FailureDetail(key=key, error=str(exc)))
 
         return BatchResult(succeeded=succeeded, failed=failed)
@@ -263,7 +263,7 @@ class McpJiraAdapter:
                 message="OK",
                 latency_ms=elapsed_ms,
             )
-        except (McpBridgeError, Exception) as exc:
+        except Exception as exc:
             elapsed_ms = int((time.monotonic() - start) * 1000)
             return AdapterHealth(
                 name="jira",

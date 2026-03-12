@@ -180,7 +180,7 @@ class McpConfluenceAdapter:
                 message="OK",
                 latency_ms=elapsed_ms,
             )
-        except (McpBridgeError, Exception) as exc:
+        except Exception as exc:
             elapsed_ms = int((time.monotonic() - start) * 1000)
             return AdapterHealth(
                 name="confluence",

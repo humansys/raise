@@ -353,7 +353,7 @@ def get_next_id(
                         num_str = entry_id[len(full_prefix) :]
                         num = int(num_str)
                         max_num = max(max_num, num)
-                except (json.JSONDecodeError, ValueError):
+                except ValueError:
                     continue
 
     # Fallback: scan sibling directories matching {PREFIX}-{NNN} pattern.

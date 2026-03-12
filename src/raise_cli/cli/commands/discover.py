@@ -233,7 +233,7 @@ def analyze_command(
 
         for sym_data in scan_data.get("symbols", []):
             scan_result.symbols.append(Symbol.model_validate(sym_data))
-    except (json.JSONDecodeError, KeyError, ValueError) as e:
+    except (KeyError, ValueError) as e:
         cli_error(
             f"Invalid scan result JSON: {e}",
             hint="Input must be JSON from 'raise discover scan --output json'",
