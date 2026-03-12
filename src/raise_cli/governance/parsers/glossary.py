@@ -213,7 +213,7 @@ def extract_glossary_terms(
         relative_path = file_path.name
 
     # Find ## section boundaries
-    section_pattern = re.compile(r"^##\s+(.+?)$", re.MULTILINE)
+    section_pattern = re.compile(r"^##\s+(.+)$", re.MULTILINE)
     section_matches = list(section_pattern.finditer(content))
 
     for i, match in enumerate(section_matches):

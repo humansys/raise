@@ -139,7 +139,9 @@ def extract_epic_details(
     # Extract objective (first paragraph after ## Objective)
     objective = None
     objective_match = re.search(
-        r"##\s*Objective\s*\n+(.+?)(?=\n\n|\n##|\Z)", text, re.DOTALL
+        r"##\s*Objective\s*\n+(.+?)(?=\n\n|\n##|\Z)",  # NOSONAR — lazy required: greedy would consume to \Z past section boundaries
+        text,
+        re.DOTALL,
     )
     if objective_match:
         objective = objective_match.group(1).strip()

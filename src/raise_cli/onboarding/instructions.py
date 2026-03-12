@@ -238,7 +238,7 @@ class InstructionsGenerator:
         # Find the "Internalized Philosophy" section first to avoid
         # matching other tables (e.g. comparison tables) in the file
         philosophy_match = re.search(
-            r"##\s+Internalized Philosophy\s*\n(.*?)(?=\n---|\n##|\Z)",
+            r"##\s+Internalized Philosophy\s*\n(.*?)(?=\n---|\n##|\Z)",  # NOSONAR — lazy required: greedy would consume to \Z
             text,
             re.DOTALL,
         )

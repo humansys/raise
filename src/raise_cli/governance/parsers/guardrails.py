@@ -166,7 +166,7 @@ def _find_section_tables(content: str) -> list[tuple[str, str]]:
     sections: list[tuple[str, str]] = []
 
     # Pattern to match section headers (### Section Name)
-    section_pattern = re.compile(r"^###\s+(.+?)$", re.MULTILINE)
+    section_pattern = re.compile(r"^###\s+(.+)$", re.MULTILINE)
 
     # Find all sections
     matches = list(section_pattern.finditer(content))
