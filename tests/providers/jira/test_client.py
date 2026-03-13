@@ -4,7 +4,6 @@ import time
 from unittest.mock import Mock, patch
 
 import pytest
-
 from rai_pro.providers.jira.client import JiraClient, RateLimiter
 from rai_pro.providers.jira.exceptions import (
     JiraAuthError,

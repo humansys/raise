@@ -9,7 +9,6 @@ from unittest.mock import Mock
 
 import pytest
 from pydantic import ValidationError
-
 from rai_pro.providers.jira.client import JiraClient
 from rai_pro.providers.jira.exceptions import JiraApiError
 from rai_pro.providers.jira.models import RaiSyncMetadata

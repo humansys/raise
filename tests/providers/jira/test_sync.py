@@ -7,7 +7,6 @@ from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from rai_pro.providers.jira.models import JiraEpic, JiraStory
 from rai_pro.providers.jira.sync import (
     LocalStory,

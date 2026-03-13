@@ -25,7 +25,6 @@ import os
 import time
 
 import pytest
-
 from rai_pro.providers.jira.client import JiraClient
 from rai_pro.providers.jira.models import StoryCreate
 
