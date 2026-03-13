@@ -12,6 +12,12 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+# Shared Field descriptions (S1192)
+_DESC_ISSUE_TITLE = "Issue title"
+_DESC_PARENT_KEY = "Parent issue key"
+_DESC_CREATED_TS = "ISO 8601 creation timestamp"
+_DESC_UPDATED_TS = "ISO 8601 last update timestamp"
+
 
 class CoreArtifactType(StrEnum):
     """Core governance artifact types.
@@ -46,7 +52,7 @@ class ArtifactLocator(BaseModel):
 class IssueSpec(BaseModel):
     """Specification for creating a PM issue."""
 
-    summary: str = Field(..., description="Issue title")
+    summary: str = Field(..., description=_DESC_ISSUE_TITLE)
     description: str = Field(default="", description="Issue body (markdown)")
     issue_type: str = Field(default="Task", description="Issue type name")
     labels: list[str] = Field(default_factory=list)
@@ -78,26 +84,26 @@ class IssueDetail(IssueRef):
     Empty string means timestamp not available.
     """
 
-    summary: str = Field(..., description="Issue title")
+    summary: str = Field(..., description=_DESC_ISSUE_TITLE)
     description: str = Field(default="", description="Issue body (markdown)")
     status: str = Field(..., description="Current status name")
     issue_type: str = Field(..., description="Issue type (e.g., 'Story', 'Bug')")
-    parent_key: str | None = Field(default=None, description="Parent issue key")
+    parent_key: str | None = Field(default=None, description=_DESC_PARENT_KEY)
     labels: list[str] = Field(default_factory=list)
     assignee: str | None = Field(default=None, description="Assignee identifier")
     priority: str | None = Field(default=None, description="Priority name")
-    created: str = Field(default="", description="ISO 8601 creation timestamp")
-    updated: str = Field(default="", description="ISO 8601 last update timestamp")
+    created: str = Field(default="", description=_DESC_CREATED_TS)
+    updated: str = Field(default="", description=_DESC_UPDATED_TS)
 
 
 class IssueSummary(BaseModel):
     """Compact issue for search results and listings."""
 
     key: str = Field(..., description="Issue key (e.g., 'PROJ-123')")
-    summary: str = Field(..., description="Issue title")
+    summary: str = Field(..., description=_DESC_ISSUE_TITLE)
     status: str = Field(..., description="Current status name")
     issue_type: str = Field(..., description="Issue type name")
-    parent_key: str | None = Field(default=None, description="Parent issue key")
+    parent_key: str | None = Field(default=None, description=_DESC_PARENT_KEY)
 
 
 class Comment(BaseModel):
@@ -106,7 +112,7 @@ class Comment(BaseModel):
     id: str = Field(..., description="Comment ID")
     body: str = Field(..., description="Comment body (markdown)")
     author: str = Field(..., description="Author identifier")
-    created: str = Field(..., description="ISO 8601 creation timestamp")
+    created: str = Field(..., description=_DESC_CREATED_TS)
 
 
 class CommentRef(BaseModel):
@@ -148,7 +154,7 @@ class PageSummary(BaseModel):
     title: str = Field(..., description="Page title")
     url: str = Field(default="", description="Web URL to the page")
     space_key: str = Field(default="", description="Space key")
-    updated: str = Field(default="", description="ISO 8601 last update timestamp")
+    updated: str = Field(default="", description=_DESC_UPDATED_TS)
 
 
 class AdapterHealth(BaseModel):
@@ -182,25 +188,25 @@ class BacklogComment(BaseModel):
     id: str = Field(..., description="Comment ID ({KEY}-{N})")
     body: str = Field(..., description="Comment body text")
     author: str = Field(..., description="Author identifier")
-    created: str = Field(..., description="ISO 8601 creation timestamp")
+    created: str = Field(..., description=_DESC_CREATED_TS)
 
 
 class BacklogItem(BaseModel):
     """Single backlog item stored as .raise/backlog/items/{KEY}.yaml."""
 
     key: str = Field(..., description="Issue key (E1, S1.1, etc.)")
-    summary: str = Field(..., description="Issue title")
+    summary: str = Field(..., description=_DESC_ISSUE_TITLE)
     issue_type: str = Field(..., description="Epic, Story, Task")
     status: str = Field(..., description="pending, in_progress, complete")
-    parent: str | None = Field(default=None, description="Parent issue key")
+    parent: str | None = Field(default=None, description=_DESC_PARENT_KEY)
     description: str = Field(default="", description="Issue description")
     labels: list[str] = Field(default_factory=list)
     priority: str | None = Field(default=None, description="Priority level")
     assignee: str | None = Field(default=None, description="Assignee identifier")
     comments: list[BacklogComment] = Field(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
     links: list[BacklogLink] = Field(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
-    created: str = Field(default="", description="ISO 8601 creation timestamp")
-    updated: str = Field(default="", description="ISO 8601 last update timestamp")
+    created: str = Field(default="", description=_DESC_CREATED_TS)
+    updated: str = Field(default="", description=_DESC_UPDATED_TS)
 
 
 # BackendHealth moved to raise_core.graph.backends.models (E275)

@@ -50,6 +50,9 @@ from raise_cli.session.state import (
     migrate_flat_to_session,
 )
 
+_ERR_NO_PROFILE = "No developer profile found"
+_DOT_RAISE = ".raise"
+
 
 def _maybe_sync_skills(project_path: Path) -> SkillScaffoldResult | None:
     """Auto-sync skills if CLI version is newer than last deployed version.
@@ -188,7 +191,7 @@ def start(
         # First-time user - need name to create profile
         if name is None:
             cli_error(
-                "No developer profile found",
+                _ERR_NO_PROFILE,
                 hint="Provide --name for first-time setup: raise session start --name 'Your Name'",
             )
             return  # cli_error raises, but this helps pyright
@@ -215,7 +218,7 @@ def start(
 
     # Jidoka: Validate session index if project specified
     if project is not None:
-        personal_dir = Path(project) / ".raise" / "rai" / "personal"
+        personal_dir = Path(project) / _DOT_RAISE / "rai" / "personal"
         if personal_dir.exists():
             validation = validate_session_index(personal_dir)
             if not validation.is_valid:
@@ -232,7 +235,7 @@ def start(
     # Generate session ID and add to active_sessions
     session_id: str | None = None
     if project is not None:
-        personal_dir = Path(project) / ".raise" / "rai" / "personal"
+        personal_dir = Path(project) / _DOT_RAISE / "rai" / "personal"
         sessions_index = personal_dir / "sessions" / "index.jsonl"
         session_id = get_next_id(sessions_index, "SES")
 
@@ -241,7 +244,7 @@ def start(
 
         # Ensure per-session directory exists (migration may have created it)
         session_dir = (
-            Path(project) / ".raise" / "rai" / "personal" / "sessions" / session_id
+            Path(project) / _DOT_RAISE / "rai" / "personal" / "sessions" / session_id
         )
         session_dir.mkdir(parents=True, exist_ok=True)
 
@@ -325,7 +328,7 @@ def context(
     """
     profile = load_developer_profile()
     if profile is None:
-        cli_error("No developer profile found")
+        cli_error(_ERR_NO_PROFILE)
         return
 
     project_path = Path(project)
@@ -422,7 +425,7 @@ def close(
     profile = load_developer_profile()
 
     if profile is None:
-        cli_error("No developer profile found")
+        cli_error(_ERR_NO_PROFILE)
         return  # cli_error raises, but this helps pyright
 
     # Resolve session ID (from --session flag or RAI_SESSION_ID env var)

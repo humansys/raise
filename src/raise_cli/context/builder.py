@@ -9,6 +9,7 @@ Architecture: ADR-019 Unified Context Graph Architecture
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -25,6 +26,8 @@ from raise_core.graph.models import GraphEdge, GraphNode
 if TYPE_CHECKING:
     from raise_cli.governance.extractor import GovernanceExtractor
     from raise_cli.governance.models import Concept
+
+_BULLET_RE = re.compile(r"^- (.+)$", re.MULTILINE)
 
 
 class GraphBuilder:
@@ -523,7 +526,7 @@ class GraphBuilder:
             end = matches[i + 1].start() if i + 1 < len(matches) else len(values_text)
             section_text = values_text[start:end]
 
-            bullet_match = re.search(r"^- (.+)$", section_text, re.MULTILINE)
+            bullet_match = _BULLET_RE.search(section_text)
             description = bullet_match.group(1).strip() if bullet_match else ""
 
             content = f"{title} — {description}" if description else title
@@ -588,7 +591,7 @@ class GraphBuilder:
             end = wont_match.start() if wont_match else len(boundaries_text)
             will_text = boundaries_text[start:end]
 
-            for bullet in re.finditer(r"^- (.+)$", will_text, re.MULTILINE):
+            for bullet in _BULLET_RE.finditer(will_text):
                 nodes.append(
                     GraphNode(
                         id=f"RAI-BND-{counter}",
@@ -612,7 +615,7 @@ class GraphBuilder:
             end = start + next_heading.start() if next_heading else len(boundaries_text)
             wont_text = boundaries_text[start:end]
 
-            for bullet in re.finditer(r"^- (.+)$", wont_text, re.MULTILINE):
+            for bullet in _BULLET_RE.finditer(wont_text):
                 nodes.append(
                     GraphNode(
                         id=f"RAI-BND-{counter}",

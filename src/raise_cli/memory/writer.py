@@ -436,7 +436,7 @@ def reinforce_pattern(
     file_path: Path,
     pattern_id: str,
     vote: int,
-    story_id: str | None = None,  # noqa: ARG001
+    story_id: str | None = None,  # noqa: ARG001  # NOSONAR — kept for API compat, stored in v2
 ) -> ReinforceResult:
     """Update reinforcement fields for a pattern in a JSONL file.
 

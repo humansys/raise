@@ -487,8 +487,8 @@ def detect_line_length(files: list[Path]) -> LineLengthConvention:
 
 
 # Regex patterns for extracting names
-FUNCTION_PATTERN = re.compile(r"^def\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(", re.MULTILINE)
-CLASS_PATTERN = re.compile(r"^class\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*[\(:]", re.MULTILINE)
+FUNCTION_PATTERN = re.compile(r"^def\s+([a-zA-Z_]\w*)\s*\(", re.MULTILINE)
+CLASS_PATTERN = re.compile(r"^class\s+([a-zA-Z_]\w*)\s*[\(:]", re.MULTILINE)
 CONSTANT_PATTERN = re.compile(r"^([A-Z][A-Z0-9_]*)\s*[=:]", re.MULTILINE)
 
 
