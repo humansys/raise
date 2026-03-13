@@ -1,3 +1,8 @@
+[tool.uv]
+# Security constraints for transitive dependencies
+# CVE-2026-32597: pyjwt <2.12.0 improper crit header validation (CVSS 8.7)
+constraint-dependencies = ["pyjwt>=2.12.0"]
+
 [tool.uv.workspace]
 members = ["packages/*"]
 

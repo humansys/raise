@@ -3,7 +3,6 @@
 from abc import ABC
 
 import pytest
-
 from rai_pro.providers.base import BacklogProvider
 from rai_pro.providers.jira.client import JiraClient
 
