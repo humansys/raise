@@ -120,7 +120,7 @@ Prove the extract→render pipeline E2E with the shortest path (mapping→git→
 
 | Story | Jira | Status | Branch | Notes |
 |-------|------|--------|--------|-------|
-| S479.1 | RAISE-558 | pending | — | — |
+| S479.1 | RAISE-558 | done | — | Merged to dev |
 | S479.2 | RAISE-559 | pending | — | — |
 | S479.3 | RAISE-560 | pending | — | — |
 | S479.4 | RAISE-561 | pending | — | — |
