@@ -58,7 +58,9 @@ def _count_skills(set_dir: Path) -> int:
     """Count skill directories containing SKILL.md."""
     if not set_dir.is_dir():
         return 0
-    return sum(1 for d in set_dir.iterdir() if d.is_dir() and (d / SKILL_MD_FILENAME).exists())
+    return sum(
+        1 for d in set_dir.iterdir() if d.is_dir() and (d / SKILL_MD_FILENAME).exists()
+    )
 
 
 def create_skill_set(
@@ -180,7 +182,9 @@ def diff_skill_set(
 
         # Compare against builtin
         set_hash = compute_content_hash(skill_md.read_text(encoding="utf-8"))
-        builtin_content = (base / skill_name / SKILL_MD_FILENAME).read_text(encoding="utf-8")
+        builtin_content = (base / skill_name / SKILL_MD_FILENAME).read_text(
+            encoding="utf-8"
+        )
         builtin_hash = compute_content_hash(builtin_content)
 
         if set_hash == builtin_hash:

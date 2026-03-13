@@ -26,7 +26,9 @@ _RAISE_DIR_NAME = ".raise"
 _SESSION_STATE_YAML = "session-state.yaml"
 
 # New path: personal directory (gitignored, per-developer)
-SESSION_STATE_REL_PATH = Path(_RAISE_DIR_NAME) / "rai" / "personal" / _SESSION_STATE_YAML
+SESSION_STATE_REL_PATH = (
+    Path(_RAISE_DIR_NAME) / "rai" / "personal" / _SESSION_STATE_YAML
+)
 
 # Legacy path for migration
 _LEGACY_SESSION_STATE_REL_PATH = Path(_RAISE_DIR_NAME) / "rai" / _SESSION_STATE_YAML

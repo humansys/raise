@@ -99,7 +99,9 @@ def _query_adapter(
         return LiveBacklogStatus(
             warning=f"Backlog query timeout ({timeout:.0f}s) — showing cached state"
         )
-    except SystemExit:  # NOSONAR — intentional: degrade gracefully when adapter unavailable
+    except (
+        SystemExit
+    ):  # NOSONAR — intentional: degrade gracefully when adapter unavailable
         # resolve_adapter() uses sys.exit() on failure; SystemExit is
         # BaseException, not Exception, so we catch it explicitly.
         logger.debug("Adapter unavailable (SystemExit)")

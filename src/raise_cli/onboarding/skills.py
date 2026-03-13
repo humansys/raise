@@ -416,7 +416,9 @@ def scaffold_skills(
                     agent_config=config,
                     overwrite=True,
                 )
-                overlay_content = (skill_dir / SKILL_MD_FILENAME).read_text(encoding="utf-8")
+                overlay_content = (skill_dir / SKILL_MD_FILENAME).read_text(
+                    encoding="utf-8"
+                )
                 manifest.skills[skill_dir.name] = SkillEntry(
                     sha256=compute_content_hash(overlay_content),
                     version=cli_version,
