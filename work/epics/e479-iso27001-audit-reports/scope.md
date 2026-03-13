@@ -79,3 +79,52 @@ S479.1 + extractors → S479.8
 | Git evidence insufficient for some controls (e.g. A.8.4) | High | Medium | Report as explicit gap, never fabricate evidence |
 | PDF format doesn't meet auditor expectations | Medium | Medium | Validate template with Vic in S479.6 before polishing |
 | Git history volume makes extraction slow | Low | High | Date range filter (audit period) |
+
+## Implementation Plan
+
+### Sequencing Strategy: Walking Skeleton
+
+Prove the extract→render pipeline E2E with the shortest path (mapping→git→markdown), then broaden.
+
+### Sequence
+
+| Order | Story | Jira | Size | Rationale | Enables |
+|-------|-------|------|------|-----------|---------|
+| 1 | S479.1 Control mapping | RAISE-558 | S | Foundation — all extractors depend on this | S479.2-4, S479.8 |
+| 2 | S479.2 Git extractor | RAISE-559 | M | Highest-value evidence source, proves pipeline | S479.5 |
+| 3 | S479.5 Report — Markdown | RAISE-562 | M | Walking skeleton complete: real report for Vic | S479.6, S479.7 |
+| 4 | S479.3 Gate extractor | RAISE-560 | S | Parallel with S479.4 after skeleton validated | S479.5 (enriches) |
+| 4 | S479.4 Session extractor | RAISE-561 | S | Parallel with S479.3 | S479.5 (enriches) |
+| 5 | S479.6 Report — PDF | RAISE-563 | S | Parallel with S479.7, S479.8 |  |
+| 5 | S479.7 Report — CSV | RAISE-564 | XS | Parallel with S479.6, S479.8 |  |
+| 5 | S479.8 Coverage dashboard | RAISE-565 | S | Parallel with S479.6, S479.7 |  |
+
+### Milestones
+
+#### M1: Walking Skeleton
+- **Stories:** S479.1, S479.2, S479.5
+- **Criteria:** One Markdown report with real git evidence for at least 1 control
+- **Demo:** Show Vic a real report from raise-commons data
+
+#### M2: Full Extraction
+- **Stories:** + S479.3, S479.4
+- **Criteria:** All 8 controls with evidence from 3 sources (git, gates, sessions)
+- **Demo:** Complete evidence collection, gap analysis visible
+
+#### M3: All Formats + Dashboard (Epic Complete)
+- **Stories:** + S479.6, S479.7, S479.8
+- **Criteria:** PDF, CSV, dashboard working. Vic validates against auditor expectations
+- **Demo:** Full audit report package ready for auditor
+
+### Progress Tracking
+
+| Story | Jira | Status | Branch | Notes |
+|-------|------|--------|--------|-------|
+| S479.1 | RAISE-558 | pending | — | — |
+| S479.2 | RAISE-559 | pending | — | — |
+| S479.3 | RAISE-560 | pending | — | — |
+| S479.4 | RAISE-561 | pending | — | — |
+| S479.5 | RAISE-562 | pending | — | — |
+| S479.6 | RAISE-563 | pending | — | — |
+| S479.7 | RAISE-564 | pending | — | — |
+| S479.8 | RAISE-565 | pending | — | — |
