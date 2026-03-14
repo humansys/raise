@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 # Git extractors handled by this module
 _COMMIT_EXTRACTORS = frozenset({"commits"})
 _MERGE_EXTRACTORS = frozenset({"pull_requests", "approvals"})
+_TAG_EXTRACTORS = frozenset({"tags"})
+_BRANCH_EXTRACTORS = frozenset({"branches"})
 
 # Git log format: hash|author|ISO-date|subject
 _LOG_FORMAT = "%H|%an|%aI|%s"
@@ -67,6 +69,14 @@ class GitEvidenceExtractor:
                 elif source.extractor in _MERGE_EXTRACTORS:
                     items.extend(
                         self._extract_merge_commits(control, start_date, end_date),
+                    )
+                elif source.extractor in _TAG_EXTRACTORS:
+                    items.extend(
+                        self._extract_tags(control, start_date, end_date),
+                    )
+                elif source.extractor in _BRANCH_EXTRACTORS:
+                    items.extend(
+                        self._extract_branches(control, start_date, end_date),
                     )
 
         return items
@@ -147,6 +157,106 @@ class GitEvidenceExtractor:
                     description=f"Commit by {author}: {subject}",
                     timestamp=timestamp,
                     source_ref=commit_hash,
+                ),
+            )
+
+        return items
+
+    def _extract_tags(
+        self,
+        control: ControlConfig,
+        start_date: date | None,
+        end_date: date | None,
+    ) -> list[EvidenceItem]:
+        """Extract tags from git.
+
+        Tags lack --after/--before support, so date filtering is post-extraction.
+        """
+        cmd = [
+            "git", "tag", "--sort=-creatordate",
+            '--format=%(refname:short)|%(creatordate:iso-strict)|%(subject)',
+        ]
+        output = self._run_git(cmd)
+        items: list[EvidenceItem] = []
+
+        for line in output.strip().splitlines():
+            if not line.strip():
+                continue
+
+            parts = line.split("|", maxsplit=2)
+            if len(parts) < 3:  # noqa: PLR2004
+                logger.warning("Skipping malformed tag line: %s", line)
+                continue
+
+            tag_name, date_str, subject = parts
+
+            try:
+                timestamp = datetime.fromisoformat(date_str)
+            except ValueError:
+                logger.warning("Skipping tag with invalid date: %s", line)
+                continue
+
+            # Post-extraction date filtering
+            tag_date = timestamp.date()
+            if start_date is not None and tag_date < start_date:
+                continue
+            if end_date is not None and tag_date > end_date:
+                continue
+
+            items.append(
+                EvidenceItem(
+                    control_id=control.id,
+                    control_name=control.name,
+                    evidence_type="git",
+                    title=f"Tag {tag_name}: {subject}" if subject else f"Tag {tag_name}",
+                    description=f"Release tag {tag_name}",
+                    timestamp=timestamp,
+                    source_ref=tag_name,
+                ),
+            )
+
+        return items
+
+    def _extract_branches(
+        self,
+        control: ControlConfig,
+        start_date: date | None,
+        end_date: date | None,
+    ) -> list[EvidenceItem]:
+        """Extract branch information from git."""
+        cmd = [
+            "git", "branch", "-a",
+            '--format=%(refname:short)|%(committerdate:iso-strict)',
+        ]
+        output = self._run_git(cmd)
+        items: list[EvidenceItem] = []
+
+        for line in output.strip().splitlines():
+            if not line.strip():
+                continue
+
+            parts = line.split("|", maxsplit=1)
+            if len(parts) < 2:  # noqa: PLR2004
+                logger.warning("Skipping malformed branch line: %s", line)
+                continue
+
+            branch_name, date_str = parts
+
+            try:
+                timestamp = datetime.fromisoformat(date_str)
+            except ValueError:
+                logger.warning("Skipping branch with invalid date: %s", line)
+                continue
+
+            items.append(
+                EvidenceItem(
+                    control_id=control.id,
+                    control_name=control.name,
+                    evidence_type="git",
+                    title=f"Branch: {branch_name}",
+                    description=f"Git branch {branch_name}",
+                    timestamp=timestamp,
+                    source_ref=branch_name,
                 ),
             )
 
