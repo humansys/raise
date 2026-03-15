@@ -1,0 +1,81 @@
+session_id: "SES-011"
+summary: "SES-011: E479 ISO 27001 Audit Reports — problem shape con Vic (Konesh), epic diseñada, S479.1 y S479.2 completas"
+type: feature
+outcomes:
+  - "Problem Brief ISO 27001 con Vic (Konesh) — publicado en Confluence"
+  - "Epic E479 inicializada: 8 stories, 3 milestones, walking skeleton strategy"
+  - "8 Jira issues creados (RAISE-557 a RAISE-565)"
+  - "S479.1 (control mapping config) completa — YAML + Pydantic models + loader, 27 tests"
+  - "S479.2 (git evidence extractor) completa — EvidenceItem model + GitEvidenceExtractor, 31 tests"
+  - "Walking skeleton M1: 2/3 stories done, falta S479.5 (Markdown report)"
+  - "Deuda técnica documentada en RAISE-557 (6 items de AR/QR)"
+  - "Todo pusheado a dev (f15ae24a), Jira actualizado con contexto completo"
+patterns:
+  - description: "YAML config + Pydantic validation pattern for domain-specific mappings"
+    context: "compliance,config,pydantic,yaml"
+    type: technical
+  - description: "Date filtering consistency — test with data OUTSIDE the range, not just inside"
+    context: "testing,date-filtering,evidence"
+    type: process
+corrections: []
+coaching:
+  autonomy: "high — full story runs with NOTIFY delegation"
+  relationship:
+    quality: "productive — demo session with client stakeholder"
+    trajectory: "stable"
+current_work:
+  release: v2.2.4
+  epic: E479
+  story: S479.5
+  phase: pending
+  branch: dev
+pending:
+  decisions: []
+  blockers: []
+  next_actions:
+    - "S479.5 (RAISE-562): Markdown report engine — cierra walking skeleton M1"
+    - "Después M2: S479.3 (gate extractor) y S479.4 (session extractor)"
+    - "Después M3: S479.6 (PDF), S479.7 (CSV), S479.8 (dashboard)"
+    - "Deuda técnica: branch date filter, --no-merges, subprocess error handling"
+    - "RAISE-554 (Windows Unicode) sigue pendiente en branch separada"
+narrative: |
+  ## Decisions
+  - ISO 27001 scope: Annex A.8 technological controls only (8 of 93)
+  - Walking skeleton strategy: mapping → git extractor → markdown report
+  - Evidence sources: git-only for v1 (Konesh uses only Git)
+  - Output formats: Markdown, PDF, CSV (all three, per Vic)
+  - Architecture: extract → transform → render pipeline, no complex abstractions
+
+  ## Research
+  - Problem shaped with Vic (Konesh) — already ISO 27001 certified, needs recertification automation
+  - Root cause: evidence collection hasn't competed vs business projects because automation wasn't demonstrated
+
+  ## Artifacts
+  - work/problem-briefs/iso27001-audit-reports-2026-03-13.md
+  - work/epics/e479-iso27001-audit-reports/ (brief, scope, design)
+  - src/raise_cli/compliance/ (models, loader, controls.yaml, evidence, extractors/git)
+  - Confluence: https://humansys.atlassian.net/wiki/spaces/RaiSE1/pages/3115089921
+
+  ## Branch State
+  - dev: f15ae24a, clean, pushed to remote
+  - All story branches merged and deleted
+  - Stash exists from RAISE-554 branch (work/bugs/RAISE-554/plan.md)
+next_session_prompt: |
+  E479 ISO 27001 — walking skeleton 2/3 done.
+
+  NEXT: S479.5 (RAISE-562) Markdown report engine.
+  Contexto en comentario de RAISE-562. Dependencias resueltas:
+  ControlMapping, EvidenceItem, GitEvidenceExtractor ya en dev.
+
+  DESPUÉS: M2 (gate + session extractors), M3 (PDF/CSV/dashboard).
+
+  DEUDA TÉCNICA (6 items en comentario de RAISE-557):
+  - _extract_branches no filtra por fecha
+  - Commits/merge commits duplican evidencia
+  - approvals → merge commits es impreciso
+  - subprocess.CalledProcessError sin manejar
+  - Falta __all__ en compliance modules
+  - Guard para YAML vacío en loader
+
+  NOTA: hay un stash pendiente del branch bug/raise-554 (plan.md modificado).
+  RAISE-554 (Windows Unicode) sigue abierto en su branch.
