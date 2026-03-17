@@ -115,12 +115,58 @@ All tasks committed. All gates pass. Bug no longer reproduces.
 
 ### Step 5: Review *(mirrors `rai-story-review`)*
 
-Verify: fix addresses root cause (not symptom), regression test green, no regressions introduced. Write `work/bugs/RAISE-{N}/retro.md`.
+Verify: fix addresses root cause (not symptom), regression test green, no regressions introduced.
 
-If recurring: `rai pattern add "{causal insight}" --context "{keywords}" --type process --from RAISE-{N}`
+**Heutagogical checkpoint** — answer with specific examples:
+1. What did you learn about this system or codebase?
+2. What would you change about the fix process?
+3. Are there improvements for the framework (skill, guardrail, template)?
+4. What are you more capable of now?
+
+**Add patterns** worth preserving (causal insights, recurring failure modes):
+
+```bash
+rai pattern add "{causal insight}" --context "{keywords}" --type process --scope project --from RAISE-{N}
+```
+
+Types: `process`, `technical`, `architecture`, `codebase`. Use `--scope project` — bug insights are codebase-specific.
+
+**Reinforce behavioral patterns** loaded at session start:
+
+```bash
+rai pattern reinforce {pattern_id} --vote {1|0|-1} --from RAISE-{N}
+```
+
+| Vote | Meaning |
+|:----:|---------|
+| `1` | Fix followed the pattern |
+| `0` | Pattern not relevant (does NOT count toward scoring) |
+| `-1` | Fix contradicted the pattern |
+
+Only evaluate patterns you consciously considered. `0` is correct for most patterns.
+
+**Write `work/bugs/RAISE-{N}/retro.md`:**
+
+```markdown
+## Retrospective: RAISE-{N}
+
+### Summary
+- Root cause: {one line}
+- Fix approach: {one line}
+
+### Heutagogical Checkpoint
+1. Learned: ...
+2. Process change: ...
+3. Framework improvement: ...
+4. Capability gained: ...
+
+### Patterns
+- Added: {pattern IDs or "none"}
+- Reinforced: {pattern IDs and votes, or "none evaluated"}
+```
 
 <verification>
-Retro written. Pattern emitted if applicable. All gates green.
+Retro written. Checkpoint answered. Patterns added/reinforced. All gates green.
 </verification>
 
 ### Step 6: Close *(mirrors `rai-story-close`)*
@@ -159,9 +205,12 @@ Merged to `{dev_branch}`. Branch deleted. Jira updated.
 - [ ] Regression test written RED-first (Step 4)
 - [ ] All gates pass: test runner, linter, type checker (Step 4)
 - [ ] Fix verified against root cause — not symptom (Step 5)
+- [ ] Heutagogical checkpoint answered with specific examples (Step 5)
+- [ ] Patterns added with `--scope project` if applicable (Step 5)
 - [ ] Branch deleted after merge (Step 6)
 - [ ] NEVER fix before analysing — symptoms recur without root cause
 - [ ] NEVER merge without retro — learnings compound
+- [ ] NEVER skip pattern reinforce — scoring system depends on it
 
 ## References
 
