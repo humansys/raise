@@ -18,6 +18,7 @@ CLAUDE.local.md
 # RaiSE generated/cache files
 .raise/cache/
 .raise/confluence-pages.yaml
+.raise/backlog/
 
 # RaiSE adapter configs (contain PII — use .example templates)
 .raise/jira.yaml
@@ -33,6 +34,7 @@ CLAUDE.local.md
 .raise/rai/sync/
 
 # Temporary files
+req.txt
 *.tmp
 *.bak-*
 *.log
