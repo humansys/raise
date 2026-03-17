@@ -142,10 +142,12 @@ RAISE-244 (bugfix — validation client)
 |-------|:----:|:------:|-------|
 | RAISE-243 | M | ✅ Done | 1.33x velocity (original) + ADR-040 compliance 0.83x (reopen) |
 | RAISE-244 | S | ✅ Done | 0.67x velocity — design pivot (single vs family) + language-agnostic fix |
+| RAISE-567 | XS | ✅ Done | rai-bugfix Step 5 retrospective — checkpoint, pattern reinforce, --scope project |
 
 **Milestones:**
 - [x] M1: Creator works (2026-02-20)
 - [x] M2: Epic complete (2026-02-27)
+- [x] M3: rai-bugfix retrospective hardened (2026-03-17)
 
 ---
 
