@@ -1149,3 +1149,79 @@ class TestSessionCloseCoherenceValidation:
             )
 
         assert result.exit_code == 0
+
+
+class TestSessionStartContextLoadsState:
+    """Regression test for RAISE-566: prior session state must survive migration."""
+
+    def test_session_start_loads_prior_state(self, tmp_path: Path) -> None:
+        """state passed to assemble_context_bundle is not None when flat state exists.
+
+        Before the fix: migrate_flat_to_session moves session-state.yaml to
+        SES-{prev}/state.yaml, then load_session_state(session_id=SES-{new})
+        looks in the wrong dir → returns None.
+        """
+        import yaml
+
+        profile = DeveloperProfile(name="Fer")
+        project = tmp_path / "project"
+        personal_dir = project / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        (personal_dir / "session-state.yaml").write_text(
+            yaml.dump(
+                {
+                    "current_work": {
+                        "story": "RAISE-566",
+                        "epic": "E479",
+                        "phase": "fix",
+                        "branch": "bug/raise-566/session-start-context-loss",
+                        "release": "",
+                    },
+                    "last_session": {
+                        "id": "SES-085",
+                        "date": "2026-03-17",
+                        "developer": "Fer",
+                        "summary": "RAISE-566 scoped",
+                    },
+                }
+            )
+        )
+
+        captured: list[object] = []
+
+        def capture_bundle(
+            dev_profile: object,
+            state: object,
+            project_path: object,
+            **kwargs: object,
+        ) -> str:
+            captured.append(state)
+            return "# Session Context\n"
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch(
+                "raise_cli.cli.commands.session.assemble_context_bundle",
+                side_effect=capture_bundle,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "start", "--project", str(project), "--context"],
+            )
+
+        assert result.exit_code == 0
+        assert len(captured) == 1, "assemble_context_bundle must be called once"
+        state = captured[0]
+        assert state is not None, (
+            "state must not be None when flat session-state.yaml exists before start"
+        )
+        from raise_cli.schemas.session_state import SessionState
+
+        assert isinstance(state, SessionState)
+        assert state.current_work.story == "RAISE-566"
