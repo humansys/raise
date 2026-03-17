@@ -41,6 +41,7 @@ from raise_cli.onboarding.profile import (
     save_developer_profile,
     start_session,
 )
+from raise_cli.schemas.session_state import SessionState
 from raise_cli.session.bundle import assemble_context_bundle, assemble_sections
 from raise_cli.session.close import CloseInput, load_state_file, process_session_close
 from raise_cli.session.resolver import resolve_session_id
@@ -234,10 +235,14 @@ def start(
 
     # Generate session ID and add to active_sessions
     session_id: str | None = None
+    prev_state: SessionState | None = None
     if project is not None:
         personal_dir = Path(project) / _DOT_RAISE / "rai" / "personal"
         sessions_index = personal_dir / "sessions" / "index.jsonl"
         session_id = get_next_id(sessions_index, "SES")
+
+        # Load prior state before migration moves the flat file to SES-{prev}/
+        prev_state = load_session_state(Path(project))
 
         # Migrate flat files if they exist (before creating dir)
         migrate_flat_to_session(Path(project), session_id)
@@ -281,9 +286,7 @@ def start(
 
     if context and project is not None:
         project_path = Path(project)
-        # Load state from per-session dir (migration moved flat file there)
-        # Falls back to flat file if no session_id
-        state = load_session_state(project_path, session_id=session_id)
+        state = prev_state
         bundle = assemble_context_bundle(
             updated, state, project_path, session_id=session_id
         )
