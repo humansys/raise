@@ -16,7 +16,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
   raise.visibility: internal
 ---
 
@@ -48,6 +48,15 @@ Guide the developer through a formal 6-phase bug fix lifecycle — branch, analy
 
 `git checkout {dev_branch} && git checkout -b bug/raise-{N}/{bug-slug}`
 
+Update the tracker immediately — assign to yourself and move to In Progress:
+
+```bash
+rai backlog update RAISE-{N} --assignee "{developer-email}" -a jira
+rai backlog transition RAISE-{N} "In Progress" -a jira
+```
+
+Use the developer's Jira email from memory or session context. If not known, ask before proceeding.
+
 Reproduce the bug — confirm it is observable. Write `work/bugs/RAISE-{N}/scope.md`:
 
 ```
@@ -59,7 +68,7 @@ Done when: [specific observable outcome]
 ```
 
 <verification>
-On `bug/raise-{N}/{slug}` branch. Bug reproduces. Scope artifact committed.
+On `bug/raise-{N}/{slug}` branch. Jira issue assigned and In Progress. Bug reproduces. Scope artifact committed.
 </verification>
 
 ### Step 2: Analyse *(mirrors `rai-story-design`)*
@@ -181,10 +190,14 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 git branch -D bug/raise-{N}/{slug}
 ```
 
-Update tracker: `rai backlog transition RAISE-{N} "Done" -a jira`
+Update tracker:
+
+```bash
+rai backlog transition RAISE-{N} "Done" -a jira
+```
 
 <verification>
-Merged to `{dev_branch}`. Branch deleted. Jira updated.
+Merged to `{dev_branch}`. Branch deleted. Jira transitioned to Done.
 </verification>
 
 ## Output
@@ -200,6 +213,7 @@ Merged to `{dev_branch}`. Branch deleted. Jira updated.
 
 ## Quality Checklist
 
+- [ ] Jira issue assigned and transitioned to In Progress (Step 1)
 - [ ] Bug reproduces before any fix (Step 1)
 - [ ] Root cause confirmed with evidence (Step 2)
 - [ ] Regression test written RED-first (Step 4)
@@ -208,6 +222,7 @@ Merged to `{dev_branch}`. Branch deleted. Jira updated.
 - [ ] Heutagogical checkpoint answered with specific examples (Step 5)
 - [ ] Patterns added with `--scope project` if applicable (Step 5)
 - [ ] Branch deleted after merge (Step 6)
+- [ ] Jira transitioned to Done (Step 6)
 - [ ] NEVER fix before analysing — symptoms recur without root cause
 - [ ] NEVER merge without retro — learnings compound
 - [ ] NEVER skip pattern reinforce — scoring system depends on it
