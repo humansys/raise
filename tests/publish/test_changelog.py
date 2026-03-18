@@ -96,3 +96,13 @@ class TestPromoteUnreleased:
         # Find the 2.0.0 section and verify it has the categories
         assert "### Added" in result
         assert "### Fixed" in result
+
+    def test_promote_unreleased_as_last_section(self) -> None:
+        """Promote succeeds when Unreleased is the last section (no prior version)."""
+        content = (
+            "# Changelog\n\n## [Unreleased]\n\n### Added\n- First release feature\n"
+        )
+        result = promote_unreleased(content, "1.0.0", "2026-03-18")
+        assert "## [1.0.0] - 2026-03-18" in result
+        assert "## [Unreleased]" in result
+        assert "First release feature" in result
