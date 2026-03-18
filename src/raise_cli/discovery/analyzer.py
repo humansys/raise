@@ -532,6 +532,7 @@ def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
                 internal=class_name.startswith("_"),
                 methods=[m.name for m in methods],
                 docstring=class_sym.docstring,
+                depends_on=class_sym.depends_on,
             )
         )
 

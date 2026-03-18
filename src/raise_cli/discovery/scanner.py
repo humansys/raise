@@ -91,7 +91,9 @@ class Symbol(BaseModel):
     signature: str = Field(default="", description="Full signature")
     docstring: str | None = Field(default=None, description="Symbol docstring")
     parent: str | None = Field(default=None, description="Parent symbol name")
-    depends_on: list[str] = Field(default_factory=list, description="Dependency type names")
+    depends_on: list[str] = Field(
+        default_factory=list, description="Dependency type names"
+    )
 
 
 class ScanResult(BaseModel):
