@@ -8,6 +8,7 @@ from typing import Any
 from rich.console import Console
 from rich.table import Table
 
+from raise_cli.output.symbols import CHECK, CROSS, WARN
 from raise_cli.skills.name_checker import NameCheckResult
 from raise_cli.skills.scaffold import ScaffoldResult
 from raise_cli.skills.schema import Skill
@@ -126,16 +127,16 @@ def format_validation_human(
         console.print(f"\n[bold]Validating:[/bold] {result.path}")
 
         if result.is_valid and result.warning_count == 0:
-            console.print("[green]✓ All checks passed[/green]")
+            console.print("[green]{CHECK} All checks passed[/green]")
             continue
 
         # Show errors
         for error in result.errors:
-            console.print(f"[red]✗ {error}[/red]")
+            console.print(f"[red]{CROSS} {error}[/red]")
 
         # Show warnings
         for warning in result.warnings:
-            console.print(f"[yellow]⚠ {warning}[/yellow]")
+            console.print(f"[yellow]{WARN} {warning}[/yellow]")
 
     # Summary
     console.print()
@@ -192,31 +193,31 @@ def format_name_check_human(result: NameCheckResult, console: Console) -> None:
 
     # Pattern check
     if result.valid_pattern:
-        console.print("[green]✓ Follows {domain}-{action} pattern[/green]")
+        console.print("[green]{CHECK} Follows {domain}-{action} pattern[/green]")
     else:
-        console.print("[red]✗ Does not follow {domain}-{action} pattern[/red]")
+        console.print("[red]{CROSS} Does not follow {domain}-{action} pattern[/red]")
 
     # Skill conflict
     if result.no_skill_conflict:
-        console.print("[green]✓ No conflict with existing skills[/green]")
+        console.print("[green]{CHECK} No conflict with existing skills[/green]")
     else:
         console.print(
-            f"[red]✗ Conflicts with existing skill: {result.conflicting_skill}[/red]"
+            f"[red]{CROSS} Conflicts with existing skill: {result.conflicting_skill}[/red]"
         )
 
     # CLI conflict
     if result.no_cli_conflict:
-        console.print("[green]✓ No CLI command conflict[/green]")
+        console.print("[green]{CHECK} No CLI command conflict[/green]")
     else:
         console.print(
-            f"[red]✗ Conflicts with CLI command: {result.conflicting_command}[/red]"
+            f"[red]{CROSS} Conflicts with CLI command: {result.conflicting_command}[/red]"
         )
 
     # Lifecycle check
     if result.known_lifecycle:
-        console.print("[green]✓ Domain is a known lifecycle[/green]")
+        console.print("[green]{CHECK} Domain is a known lifecycle[/green]")
     else:
-        console.print("[yellow]⚠ Domain is not a standard lifecycle[/yellow]")
+        console.print("[yellow]{WARN} Domain is not a standard lifecycle[/yellow]")
 
     # Final verdict
     console.print()
@@ -269,13 +270,13 @@ def format_scaffold_human(result: ScaffoldResult, console: Console) -> None:
         console: Rich console for output.
     """
     if result.created:
-        console.print(f"\n[green]✓ Created skill at:[/green] {result.path}")
+        console.print(f"\n[green]{CHECK} Created skill at:[/green] {result.path}")
         console.print("\n[dim]Next steps:[/dim]")
         console.print("  1. Edit the SKILL.md to add description and steps")
         console.print("  2. Run [cyan]raise skill validate[/cyan] to check structure")
         console.print("  3. Test the skill with Claude Code")
     else:
-        console.print("\n[red]✗ Failed to create skill[/red]")
+        console.print("\n[red]{CROSS} Failed to create skill[/red]")
         console.print(f"[red]  {result.error}[/red]")
 
 

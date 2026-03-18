@@ -19,6 +19,7 @@ import typer
 from rich.console import Console
 
 from raise_cli.cli.error_handler import cli_error
+from raise_cli.output.symbols import CHECK, CROSS
 from raise_cli.session.resolver import resolve_session_id_optional
 from raise_cli.telemetry.schemas import (
     CalibrationEvent,
@@ -203,7 +204,7 @@ def emit_work(
         if event_type == "start":
             console.print(f"\n[green]▶[/green] {label} → {phase} started")
         elif event_type == "complete":
-            console.print(f"\n[green]✓[/green] {label} → {phase} complete")
+            console.print(f"\n[green]{CHECK}[/green] {label} → {phase} complete")
         elif event_type == "blocked":
             console.print(f"\n[red]⏸[/red] {label} → {phase} blocked")
             if blocker_value:
@@ -211,7 +212,7 @@ def emit_work(
         elif event_type == "unblocked":
             console.print(f"\n[green]▶[/green] {label} → {phase} unblocked")
         elif event_type == "abandoned":
-            console.print(f"\n[yellow]✗[/yellow] {label} → {phase} abandoned")
+            console.print(f"\n[yellow]{CROSS}[/yellow] {label} → {phase} abandoned")
 
         console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
     else:
@@ -299,7 +300,7 @@ def emit_session(
     result = emit(event, session_id=session_id)
 
     if result.success:
-        console.print("\n[green]✓[/green] Session event recorded")
+        console.print("\n[green]{CHECK}[/green] Session event recorded")
         console.print(f"  Type: {session_type}")
         console.print(f"  Outcome: {outcome}")
         console.print(f"  Duration: {duration} min")
@@ -393,7 +394,7 @@ def emit_calibration(
     result = emit(event, session_id=session_id)
 
     if result.success:
-        console.print("\n[green]✓[/green] Calibration event recorded")
+        console.print("\n[green]{CHECK}[/green] Calibration event recorded")
         console.print(f"  Story: {story}")
         console.print(f"  Size: {size_upper}")
         console.print(f"  Estimated: {estimated} min")

@@ -126,7 +126,7 @@ def format_validate_human(
     unsupported = sum(1 for v in config.methods.values() if v is None)
     server_cmd = f"{config.server.command} {' '.join(config.server.args)}".strip()
 
-    console.print("[green]✓ Valid adapter config[/green]")
+    console.print("[green]{CHECK} Valid adapter config[/green]")
     console.print(f"  Name:        {config.adapter.name}")
     console.print(f"  Protocol:    {config.adapter.protocol}")
     if config.adapter.description:

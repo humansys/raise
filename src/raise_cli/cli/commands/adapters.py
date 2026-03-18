@@ -38,6 +38,7 @@ from raise_cli.output.formatters.adapters import (
     format_list_json,
     format_validate_human,
 )
+from raise_cli.output.symbols import CROSS
 from raise_cli.tier.context import TierContext
 from raise_core.graph.backends.protocol import KnowledgeGraphBackend
 
@@ -231,19 +232,19 @@ def validate_command(
     try:
         raw = yaml.safe_load(file.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
-        console.print(f"[red]✗ Invalid adapter config:[/red] {file.name}")
+        console.print(f"[red]{CROSS} Invalid adapter config:[/red] {file.name}")
         console.print(f"  Cannot parse YAML: {exc}")
         raise typer.Exit(1) from None
 
     if not isinstance(raw, dict):
-        console.print(f"[red]✗ Invalid adapter config:[/red] {file.name}")
+        console.print(f"[red]{CROSS} Invalid adapter config:[/red] {file.name}")
         console.print("  YAML content is not a mapping")
         raise typer.Exit(1)
 
     try:
         config = DeclarativeAdapterConfig.model_validate(raw)
     except ValidationError as exc:
-        console.print(f"[red]✗ Invalid adapter config:[/red] {file.name}")
+        console.print(f"[red]{CROSS} Invalid adapter config:[/red] {file.name}")
         for err in exc.errors():
             loc = ".".join(str(p) for p in err["loc"])
             console.print(f"  {loc}")

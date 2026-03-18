@@ -14,6 +14,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from raise_cli.output.symbols import CHECK, CROSS
 from raise_cli.skills.skillsets import (
     create_skill_set,
     diff_skill_set,
@@ -55,12 +56,14 @@ def create_command(
     if format == "json":
         print(result.model_dump_json(indent=2))
     elif result.created:
-        console.print(f"[green]✓[/green] Skill set '{name}' created at {result.path}")
+        console.print(
+            f"[green]{CHECK}[/green] Skill set '{name}' created at {result.path}"
+        )
         console.print(f"  {result.skill_count} skills copied from builtins")
         console.print("\n  Next: customize skills, then deploy with:")
         console.print(f"  [bold]rai init --skill-set {name}[/bold]")
     else:
-        console.print(f"[red]✗[/red] {result.error}")
+        console.print(f"[red]{CROSS}[/red] {result.error}")
         raise typer.Exit(code=1)
 
 
@@ -115,7 +118,7 @@ def diff_command(
     diff = diff_skill_set(name, project_root)
 
     if diff is None:
-        console.print(f"[red]✗[/red] Skill set '{name}' not found")
+        console.print(f"[red]{CROSS}[/red] Skill set '{name}' not found")
         raise typer.Exit(code=1)
 
     if format == "json":

@@ -22,6 +22,7 @@ from pydantic import BaseModel
 
 from raise_cli.graph.backends import get_active_backend
 from raise_cli.onboarding.profile import DeveloperProfile
+from raise_cli.output.symbols import WARN
 from raise_cli.schemas.session_state import SessionState
 from raise_core.graph.models import GraphNode
 
@@ -266,7 +267,7 @@ def _format_work_section(
 
     # Warning line for degraded live status
     if live and live.warning:
-        lines.append(f"⚠ {live.warning}")
+        lines.append(f"{WARN} {live.warning}")
 
     return "\n".join(lines)
 

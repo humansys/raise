@@ -32,6 +32,7 @@ from raise_cli.memory import (
     reinforce_pattern,
 )
 from raise_cli.onboarding.profile import load_developer_profile
+from raise_cli.output.symbols import CHECK
 from raise_core.graph.query import (
     SCORING_LOW_WILSON_THRESHOLD,
     wilson_lower_bound,
@@ -131,7 +132,7 @@ def reinforce_cmd(
         return
 
     if not result.was_updated:
-        console.print(f"\n[green]✓[/green] {pattern_id}: N/A (not counted)\n")
+        console.print(f"\n[green]{CHECK}[/green] {pattern_id}: N/A (not counted)\n")
         return
 
     summary = (
@@ -147,7 +148,7 @@ def reinforce_cmd(
             wilson_str += " [yellow]↓ consider reviewing[/yellow]"
         summary += f", {wilson_str}"
 
-    console.print(f"\n[green]✓[/green] {pattern_id}: {summary}\n")
+    console.print(f"\n[green]{CHECK}[/green] {pattern_id}: {summary}\n")
 
 
 @pattern_app.command("add")
@@ -247,7 +248,7 @@ def add_pattern(
                 context=context,
             )
         )
-        console.print(f"\n[green]✓[/green] {result.message}")
+        console.print(f"\n[green]{CHECK}[/green] {result.message}")
         console.print(f"  ID: [cyan]{result.id}[/cyan]")
         console.print(f"  Content: {content[:60]}...")
         if context_list:
@@ -343,6 +344,6 @@ def promote_pattern(
         )
     )
 
-    console.print(f"\n[green]✓[/green] Promoted {pattern_id} to project scope")
+    console.print(f"\n[green]{CHECK}[/green] Promoted {pattern_id} to project scope")
     console.print(f"  Content: {content_str[:60]}")
     console.print()
