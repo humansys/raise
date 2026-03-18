@@ -20,9 +20,9 @@ class TestDefaultControlMapping:
     def test_every_control_has_evidence_sources(self) -> None:
         mapping = load_control_mapping()
         for control in mapping.controls:
-            assert (
-                len(control.evidence_sources) >= 1
-            ), f"{control.id} has no evidence sources"
+            assert len(control.evidence_sources) >= 1, (
+                f"{control.id} has no evidence sources"
+            )
 
     def test_all_evidence_source_types_valid(self) -> None:
         mapping = load_control_mapping()
@@ -38,9 +38,7 @@ class TestDefaultControlMapping:
         control = _find_control(mapping, "A.8.4")
         assert control is not None, "A.8.4 not found"
         assert any(s.type == "git" for s in control.evidence_sources)
-        assert any(
-            s.extractor == "permissions" for s in control.evidence_sources
-        )
+        assert any(s.extractor == "permissions" for s in control.evidence_sources)
 
     def test_a825_secure_development_lifecycle(self) -> None:
         mapping = load_control_mapping()
@@ -75,9 +73,7 @@ class TestDefaultControlMapping:
         assert ids == expected
 
 
-def _find_control(
-    mapping: ControlMapping, control_id: str
-) -> ControlConfig | None:
+def _find_control(mapping: ControlMapping, control_id: str) -> ControlConfig | None:
     """Find a control by ID in a mapping."""
     for control in mapping.controls:
         if control.id == control_id:

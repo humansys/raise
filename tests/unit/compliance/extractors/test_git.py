@@ -58,9 +58,7 @@ GIT_LOG_OUTPUT = (
     "789012ghi345|Bob Dev|2025-06-14T09:00:00+00:00|fix: correct password hashing\n"
 )
 
-MERGE_LOG_OUTPUT = (
-    "merge111aaa|Alice Dev|2025-06-15T11:00:00+00:00|Merge pull request #42 from feature/login\n"
-)
+MERGE_LOG_OUTPUT = "merge111aaa|Alice Dev|2025-06-15T11:00:00+00:00|Merge pull request #42 from feature/login\n"
 
 TAG_OUTPUT = (
     "v2.1.0|2025-06-10T14:00:00+00:00|Release 2.1.0\n"
@@ -86,7 +84,9 @@ class TestGitEvidenceExtractorCommits:
             mock_run.return_value = subprocess.CompletedProcess(
                 args=[], returncode=0, stdout=GIT_LOG_OUTPUT, stderr=""
             )
-            items = extractor.extract(mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30))
+            items = extractor.extract(
+                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30)
+            )
 
         assert len(items) == 2
         assert all(isinstance(i, EvidenceItem) for i in items)
@@ -99,7 +99,9 @@ class TestGitEvidenceExtractorCommits:
             mock_run.return_value = subprocess.CompletedProcess(
                 args=[], returncode=0, stdout=GIT_LOG_OUTPUT, stderr=""
             )
-            items = extractor.extract(mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30))
+            items = extractor.extract(
+                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30)
+            )
 
         first = items[0]
         assert first.control_id == "A.8.32"
@@ -117,7 +119,9 @@ class TestGitEvidenceExtractorCommits:
             mock_run.return_value = subprocess.CompletedProcess(
                 args=[], returncode=0, stdout="", stderr=""
             )
-            extractor.extract(mapping, start_date=date(2025, 3, 1), end_date=date(2025, 3, 31))
+            extractor.extract(
+                mapping, start_date=date(2025, 3, 1), end_date=date(2025, 3, 31)
+            )
 
         call_args = mock_run.call_args[0][0]
         assert "--after=2025-03-01" in call_args
@@ -131,7 +135,9 @@ class TestGitEvidenceExtractorCommits:
             mock_run.return_value = subprocess.CompletedProcess(
                 args=[], returncode=0, stdout="", stderr=""
             )
-            items = extractor.extract(mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30))
+            items = extractor.extract(
+                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30)
+            )
 
         assert items == []
 
@@ -144,7 +150,9 @@ class TestGitEvidenceExtractorCommits:
             mock_run.return_value = subprocess.CompletedProcess(
                 args=[], returncode=0, stdout=malformed, stderr=""
             )
-            items = extractor.extract(mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30))
+            items = extractor.extract(
+                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30)
+            )
 
         assert len(items) == 1
         assert items[0].source_ref == "abc123"
@@ -163,7 +171,9 @@ class TestGitEvidenceExtractorMergeCommits:
             mock_run.return_value = subprocess.CompletedProcess(
                 args=[], returncode=0, stdout=MERGE_LOG_OUTPUT, stderr=""
             )
-            items = extractor.extract(mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30))
+            items = extractor.extract(
+                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30)
+            )
 
         assert len(items) == 1
         assert items[0].source_ref == "merge111aaa"
@@ -179,7 +189,9 @@ class TestGitEvidenceExtractorMergeCommits:
             mock_run.return_value = subprocess.CompletedProcess(
                 args=[], returncode=0, stdout="", stderr=""
             )
-            extractor.extract(mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30))
+            extractor.extract(
+                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30)
+            )
 
         call_args = mock_run.call_args[0][0]
         assert "--merges" in call_args
@@ -210,7 +222,9 @@ class TestGitEvidenceExtractorNonGitControls:
         extractor = GitEvidenceExtractor(repo_path=Path("/fake/repo"))
 
         with patch("raise_cli.compliance.extractors.git.subprocess.run") as mock_run:
-            items = extractor.extract(mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30))
+            items = extractor.extract(
+                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30)
+            )
 
         assert items == []
         mock_run.assert_not_called()
@@ -244,7 +258,9 @@ class TestGitEvidenceExtractorTags:
                 args=[], returncode=0, stdout=TAG_OUTPUT, stderr=""
             )
             items = extractor.extract(
-                mapping, start_date=date(2025, 1, 1), end_date=date(2025, 12, 31),
+                mapping,
+                start_date=date(2025, 1, 1),
+                end_date=date(2025, 12, 31),
             )
 
         # v2.1.0 and v2.0.0 are in range; v1.0.0 is 2024 (out of range)
@@ -263,7 +279,9 @@ class TestGitEvidenceExtractorTags:
                 args=[], returncode=0, stdout=TAG_OUTPUT, stderr=""
             )
             items = extractor.extract(
-                mapping, start_date=date(2025, 1, 1), end_date=date(2025, 12, 31),
+                mapping,
+                start_date=date(2025, 1, 1),
+                end_date=date(2025, 12, 31),
             )
 
         first = items[0]
@@ -283,7 +301,9 @@ class TestGitEvidenceExtractorTags:
                 args=[], returncode=0, stdout=TAG_OUTPUT, stderr=""
             )
             items = extractor.extract(
-                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30),
+                mapping,
+                start_date=date(2025, 6, 1),
+                end_date=date(2025, 6, 30),
             )
 
         # Only v2.1.0 (2025-06-10) is in June
@@ -315,7 +335,9 @@ class TestGitEvidenceExtractorTags:
                 args=[], returncode=0, stdout="", stderr=""
             )
             items = extractor.extract(
-                mapping, start_date=date(2025, 1, 1), end_date=date(2025, 12, 31),
+                mapping,
+                start_date=date(2025, 1, 1),
+                end_date=date(2025, 12, 31),
             )
 
         assert items == []
@@ -335,7 +357,9 @@ class TestGitEvidenceExtractorBranches:
                 args=[], returncode=0, stdout=BRANCH_OUTPUT, stderr=""
             )
             items = extractor.extract(
-                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30),
+                mapping,
+                start_date=date(2025, 6, 1),
+                end_date=date(2025, 6, 30),
             )
 
         assert len(items) == 3
@@ -352,7 +376,9 @@ class TestGitEvidenceExtractorBranches:
                 args=[], returncode=0, stdout=BRANCH_OUTPUT, stderr=""
             )
             items = extractor.extract(
-                mapping, start_date=date(2025, 6, 1), end_date=date(2025, 6, 30),
+                mapping,
+                start_date=date(2025, 6, 1),
+                end_date=date(2025, 6, 30),
             )
 
         first = items[0]

@@ -173,8 +173,10 @@ class GitEvidenceExtractor:
         Tags lack --after/--before support, so date filtering is post-extraction.
         """
         cmd = [
-            "git", "tag", "--sort=-creatordate",
-            '--format=%(refname:short)|%(creatordate:iso-strict)|%(subject)',
+            "git",
+            "tag",
+            "--sort=-creatordate",
+            "--format=%(refname:short)|%(creatordate:iso-strict)|%(subject)",
         ]
         output = self._run_git(cmd)
         items: list[EvidenceItem] = []
@@ -208,7 +210,9 @@ class GitEvidenceExtractor:
                     control_id=control.id,
                     control_name=control.name,
                     evidence_type="git",
-                    title=f"Tag {tag_name}: {subject}" if subject else f"Tag {tag_name}",
+                    title=f"Tag {tag_name}: {subject}"
+                    if subject
+                    else f"Tag {tag_name}",
                     description=f"Release tag {tag_name}",
                     timestamp=timestamp,
                     source_ref=tag_name,
@@ -225,8 +229,10 @@ class GitEvidenceExtractor:
     ) -> list[EvidenceItem]:
         """Extract branch information from git."""
         cmd = [
-            "git", "branch", "-a",
-            '--format=%(refname:short)|%(committerdate:iso-strict)',
+            "git",
+            "branch",
+            "-a",
+            "--format=%(refname:short)|%(committerdate:iso-strict)",
         ]
         output = self._run_git(cmd)
         items: list[EvidenceItem] = []
