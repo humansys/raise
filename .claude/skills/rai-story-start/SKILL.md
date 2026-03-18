@@ -121,12 +121,13 @@ If the story has a backlog ticket (Jira key or local key):
 
 ```bash
 rai backlog transition {story_key} in_progress
+rai signal emit-work story S{N}.{M} --event start
 ```
 
 | Condition | Action |
 |-----------|--------|
 | Story has ticket | Transition to `in_progress` |
-| No ticket found | Skip (not all stories are tracked externally) |
+| No ticket found | Skip backlog transition (not all stories are tracked externally) |
 | Transition fails | Log warning and continue — backlog errors are **non-blocking** for lifecycle |
 
 <if-blocked>
