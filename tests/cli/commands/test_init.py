@@ -1176,6 +1176,59 @@ class TestInitAgentFlag:
 
         assert not (greenfield_project / ".claude").exists()
 
+    def test_agent_cursor_ide_type_consistent(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent cursor writes ide.type: cursor (consistent with agents.types)."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "cursor"],
+                catch_exceptions=False,
+            )
+
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert manifest.agents.types == ["cursor"]
+        assert manifest.ide.type == "cursor"
+
+    def test_agent_windsurf_ide_type_consistent(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent windsurf writes ide.type: windsurf (consistent with agents.types)."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "windsurf"],
+                catch_exceptions=False,
+            )
+
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert manifest.agents.types == ["windsurf"]
+        assert manifest.ide.type == "windsurf"
+
+    def test_default_agent_ide_type_is_claude(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Default init (no --agent) writes ide.type: claude."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project)],
+                catch_exceptions=False,
+            )
+
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert manifest.ide.type == "claude"
+
 
 class TestInitDetectAgents:
     """Tests for --detect auto-detection of agents."""
