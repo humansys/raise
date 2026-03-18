@@ -365,7 +365,9 @@ class TestSearch:
 
         _run(run())
         sent_jql = adapter._bridge.call.call_args[0][1]["jql"]
-        assert sent_jql == "issue = RAISE-539", f"Expected JQL wrapping, got: {sent_jql}"
+        assert sent_jql == "issue = RAISE-539", (
+            f"Expected JQL wrapping, got: {sent_jql}"
+        )
 
     def test_search_passes_explicit_jql_unchanged(self, tmp_path: Path) -> None:
         """RAISE-552: query containing JQL operators is passed through unchanged."""

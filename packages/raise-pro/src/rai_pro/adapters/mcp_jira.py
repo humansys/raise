@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from pathlib import Path
 from typing import Any, cast
@@ -230,9 +231,30 @@ class McpJiraAdapter:
 
     # ----- Query -----
 
+    @staticmethod
+    def _to_jql(query: str) -> str:
+        """Normalize a user query to valid JQL.
+
+        Rules (RAISE-552):
+        - ``PROJECT-NNN`` issue key → ``issue = PROJECT-NNN``
+        - Query already containing JQL operators → pass through unchanged
+        - Plain text → ``text ~ "query"``
+        """
+        _JQL_OPERATORS = re.compile(
+            r"\b(AND|OR|NOT|IN|IS|ORDER BY)\b|[=!<>~]",
+            re.IGNORECASE,
+        )
+        _ISSUE_KEY = re.compile(r"^[A-Z][A-Z0-9_]+-\d+$")
+
+        if _ISSUE_KEY.match(query):
+            return f"issue = {query}"
+        if _JQL_OPERATORS.search(query):
+            return query
+        return f'text ~ "{query}"'
+
     async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
         # Sanitize shell-escaped operators (Claude Code Bash escapes ! to \!)
-        clean_query = query.replace("\\!", "!")
+        clean_query = self._to_jql(query.replace("\\!", "!"))
         result = await self._bridge.call(
             "jira_search",
             {"jql": clean_query, "limit": limit},
