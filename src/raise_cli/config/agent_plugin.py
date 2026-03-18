@@ -90,16 +90,16 @@ class DefaultAgentPlugin:
     as-is with no transformation. Four of five built-in agents use this.
     """
 
-    def transform_instructions(self, content: str, _config: AgentConfig) -> str:
+    def transform_instructions(self, content: str, config: AgentConfig) -> str:
         """Return content unchanged."""
         return content
 
     def transform_skill(
-        self, frontmatter: dict[str, Any], body: str, _config: AgentConfig
+        self, frontmatter: dict[str, Any], body: str, config: AgentConfig
     ) -> tuple[dict[str, Any], str]:
         """Return frontmatter and body unchanged (copies, not references)."""
         return dict(frontmatter), body
 
-    def post_init(self, _project_root: Path, _config: AgentConfig) -> list[str]:
+    def post_init(self, project_root: Path, config: AgentConfig) -> list[str]:
         """No-op — return empty list."""
         return []
