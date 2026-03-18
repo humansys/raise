@@ -39,6 +39,7 @@ from raise_cli.onboarding.instructions import generate_instructions
 from raise_cli.onboarding.manifest import (
     AgentsManifest,
     BranchConfig,
+    IdeManifest,
     ProjectInfo,
     ProjectManifest,
     load_manifest,
@@ -571,9 +572,15 @@ def init_command(
             detection.toolchain.type_check_command if detection.toolchain else None
         ),
     )
+    primary = valid_agent_types[0]
+    try:
+        ide_manifest = IdeManifest(type=primary)  # type: ignore[arg-type]
+    except Exception:
+        ide_manifest = IdeManifest()  # custom agents outside BuiltinAgentType
     manifest = ProjectManifest(
         project=project_info,
         agents=AgentsManifest(types=valid_agent_types),
+        ide=ide_manifest,
         branches=existing_manifest.branches if existing_manifest else BranchConfig(),
         tier=existing_manifest.tier if existing_manifest else None,
     )
