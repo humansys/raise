@@ -355,6 +355,45 @@ class TestSearch:
         )
         assert "!=" in sent_jql
 
+    def test_search_wraps_issue_key_to_jql(self, tmp_path: Path) -> None:
+        """RAISE-552: plain issue key is wrapped to 'issue = KEY' JQL."""
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call.return_value = _ok({"issues": []})
+
+        async def run() -> list[IssueSummary]:
+            return await adapter.search("RAISE-539")
+
+        _run(run())
+        sent_jql = adapter._bridge.call.call_args[0][1]["jql"]
+        assert sent_jql == "issue = RAISE-539", f"Expected JQL wrapping, got: {sent_jql}"
+
+    def test_search_passes_explicit_jql_unchanged(self, tmp_path: Path) -> None:
+        """RAISE-552: query containing JQL operators is passed through unchanged."""
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call.return_value = _ok({"issues": []})
+        jql = 'fixVersion = "2.2.4" AND project = RAISE'
+
+        async def run() -> list[IssueSummary]:
+            return await adapter.search(jql)
+
+        _run(run())
+        sent_jql = adapter._bridge.call.call_args[0][1]["jql"]
+        assert sent_jql == jql, f"JQL was modified unexpectedly: {sent_jql}"
+
+    def test_search_wraps_plain_text_to_text_query(self, tmp_path: Path) -> None:
+        """RAISE-552: plain text without operators is wrapped to 'text ~ \"...\"' JQL."""
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call.return_value = _ok({"issues": []})
+
+        async def run() -> list[IssueSummary]:
+            return await adapter.search("backlog search error")
+
+        _run(run())
+        sent_jql = adapter._bridge.call.call_args[0][1]["jql"]
+        assert sent_jql == 'text ~ "backlog search error"', (
+            f"Expected text ~ wrapping, got: {sent_jql}"
+        )
+
 
 class TestGetComments:
     def test_get_comments_passes_limit_as_comment_limit(self, tmp_path: Path) -> None:
