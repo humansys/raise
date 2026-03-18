@@ -92,7 +92,11 @@ def create(
         labels=labels.split(",") if labels else [],
         metadata={"parent": parent} if parent else {},
     )
-    ref = pm.create_issue(project, spec)
+    try:
+        ref = pm.create_issue(project, spec)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
     if format == "agent":
         print(ref.key)
     else:
@@ -107,7 +111,11 @@ def transition(
 ) -> None:
     """Transition a backlog item to a new status."""
     pm = resolve_adapter(adapter)
-    ref = pm.transition_issue(key, status)
+    try:
+        ref = pm.transition_issue(key, status)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
     console.print(f"{ref.key}: transitioned \u2192 {status}")
 
 
@@ -144,7 +152,11 @@ def update(
         console.print("[yellow]Warning:[/yellow] No fields to update.")
         raise typer.Exit(0)
 
-    ref = pm.update_issue(key, fields)
+    try:
+        ref = pm.update_issue(key, fields)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
     console.print(f"{ref.key}: updated")
 
 
@@ -159,7 +171,11 @@ def link(
 ) -> None:
     """Link two backlog items (AR4: uses link_issues only)."""
     pm = resolve_adapter(adapter)
-    pm.link_issues(source, target, link_type)
+    try:
+        pm.link_issues(source, target, link_type)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
     console.print(f"{source} \u2192 {link_type} \u2192 {target}: linked")
 
 
@@ -171,7 +187,11 @@ def comment(
 ) -> None:
     """Add a comment to a backlog item."""
     pm = resolve_adapter(adapter)
-    ref = pm.add_comment(key, body)
+    try:
+        ref = pm.add_comment(key, body)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
     console.print(f"{key}: comment added ({ref.id})")
 
 
@@ -256,7 +276,11 @@ def search(
     """Search backlog items. Query format is adapter-specific (AR5)."""
     _validate_format(format)
     pm = resolve_adapter(adapter)
-    results = pm.search(query, limit=limit)
+    try:
+        results = pm.search(query, limit=limit)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
     if not results:
         if format != "agent":
             console.print("No results.")
@@ -286,7 +310,11 @@ def batch_transition(
         console.print("[red]Error:[/red] No valid keys provided.")
         raise typer.Exit(1)
 
-    result = pm.batch_transition(key_list, status)
+    try:
+        result = pm.batch_transition(key_list, status)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
     succeeded = len(result.succeeded)
     failed = len(result.failed)
     total = succeeded + failed

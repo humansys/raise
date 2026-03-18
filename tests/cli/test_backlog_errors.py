@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-import pytest
 from typer.testing import CliRunner
 
 from raise_cli.cli.main import app
@@ -38,7 +37,9 @@ class TestBacklogErrorHandling:
     @patch(_PATCH)
     def test_create_shows_clean_error(self, mock_resolve: MagicMock) -> None:
         mock_resolve.return_value = _mock_adapter(_ERROR)
-        result = runner.invoke(app, ["backlog", "create", "Test summary", "-p", "RAISE"])
+        result = runner.invoke(
+            app, ["backlog", "create", "Test summary", "-p", "RAISE"]
+        )
         assert result.exit_code == 1
         assert "Error:" in result.output
         assert "Traceback" not in result.output
@@ -64,9 +65,7 @@ class TestBacklogErrorHandling:
     @patch(_PATCH)
     def test_link_shows_clean_error(self, mock_resolve: MagicMock) -> None:
         mock_resolve.return_value = _mock_adapter(_ERROR)
-        result = runner.invoke(
-            app, ["backlog", "link", "RAISE-1", "RAISE-2", "blocks"]
-        )
+        result = runner.invoke(app, ["backlog", "link", "RAISE-1", "RAISE-2", "blocks"])
         assert result.exit_code == 1
         assert "Error:" in result.output
         assert "Traceback" not in result.output
