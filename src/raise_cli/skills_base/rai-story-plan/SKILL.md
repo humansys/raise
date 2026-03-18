@@ -77,7 +77,7 @@ Divide story into atomic, individually verifiable tasks. One commit per task.
 - Description, files to create/modify
 - TDD cycle: RED (failing test) → GREEN (minimal code) → REFACTOR
 - AC reference: link to `story.md` Gherkin scenario (if exists)
-- Verification commands (resolve from `.raise/manifest.yaml` first, then language defaults — see `/rai-story-implement` Step 3 for the full priority chain)
+- Verification commands: use the **project-wide** command from `.raise/manifest.yaml` (`test_command`, `lint_command`, `type_check_command`). **Never use file-specific paths** (e.g. `pyright src/module/file.py`) — the project config already defines the correct scope including `tests/`. If manifest commands are absent, use language defaults (see `/rai-story-implement` Step 3).
 - Size (XS/S/M/L) and dependencies
 
 **Always include as final task:** Manual integration test — validate end-to-end with running software.
