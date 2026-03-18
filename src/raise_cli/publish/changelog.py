@@ -44,7 +44,7 @@ def promote_unreleased(content: str, version: str, date: str) -> str:
 
     # Extract the unreleased body
     match = re.search(
-        r"(^## \[Unreleased\])\s*$(.*?)(?=^## \[)",  # NOSONAR — lazy required: greedy would consume past section boundary
+        r"(^## \[Unreleased\])\s*$(.*?)(?=^## \[|\Z)",  # NOSONAR — lazy required: greedy would consume past section boundary
         content,
         re.DOTALL | re.MULTILINE,
     )
