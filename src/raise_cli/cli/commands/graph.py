@@ -32,6 +32,7 @@ from raise_cli.governance import Concept, ConceptType, GovernanceExtractor
 from raise_cli.graph.backends import get_active_backend
 from raise_cli.hooks.emitter import create_emitter
 from raise_cli.hooks.events import GraphBuildEvent
+from raise_cli.output.symbols import CHECK, CROSS, WARN
 from raise_core.graph.models import GraphEdge, GraphNode
 from raise_core.graph.query import (
     ArchitecturalContext,
@@ -198,7 +199,7 @@ def query(
     # Write to file or stdout
     if output:
         output.write_text(output_text, encoding="utf-8")
-        console.print(f"✓ Results written to [cyan]{output}[/cyan]")
+        console.print(f"{CHECK} Results written to [cyan]{output}[/cyan]")
         console.print(f"  Concepts: {result.metadata.total_concepts}")
         console.print(f"  Tokens: ~{result.metadata.token_estimate}")
         console.print(f"  Execution: {result.metadata.execution_time_ms:.2f}ms\n")
@@ -599,7 +600,7 @@ def _format_build_result(
         if diff.impact != "none":
             console.print(f"[bold]Impact:[/bold] {diff.impact}")
 
-    console.print(f"\n✓ Saved to [cyan]{output_path}[/cyan]\n")
+    console.print(f"\n{CHECK} Saved to [cyan]{output_path}[/cyan]\n")
 
 
 @graph_app.command()
@@ -636,7 +637,7 @@ def validate(
     console.print(f"\nLoading index from [cyan]{index_path}[/cyan]...")
     graph = get_active_backend(index_path).load()
     console.print(
-        f"  ✓ Loaded index with {graph.node_count} concepts, {graph.edge_count} relationships"
+        f"  {CHECK} Loaded index with {graph.node_count} concepts, {graph.edge_count} relationships"
     )
 
     console.print("\nValidating index...")
@@ -650,17 +651,17 @@ def validate(
     for edge in edges_list:
         if edge.source not in node_ids:
             console.print(
-                f"  [red]✗[/red] Invalid edge: source '{edge.source}' not in index"
+                f"  [red]{CROSS}[/red] Invalid edge: source '{edge.source}' not in index"
             )
             valid_edges = False
         if edge.target not in node_ids:
             console.print(
-                f"  [red]✗[/red] Invalid edge: target '{edge.target}' not in index"
+                f"  [red]{CROSS}[/red] Invalid edge: target '{edge.target}' not in index"
             )
             valid_edges = False
 
     if valid_edges:
-        console.print("  ✓ All relationships valid")
+        console.print("  {CHECK} All relationships valid")
 
     # Check 2: Detect cycles in depends_on relationships
     depends_edges = [e for e in edges_list if e.type == "depends_on"]
@@ -668,15 +669,15 @@ def validate(
         cycles = _detect_cycles(graph, depends_edges)
         if cycles:
             console.print(
-                f"  [yellow]⚠[/yellow]  {len(cycles)} cycle(s) detected in depends_on relationships"
+                f"  [yellow]{WARN}[/yellow]  {len(cycles)} cycle(s) detected in depends_on relationships"
             )
             for cycle in cycles[:3]:  # Show first 3
                 console.print(f"      {' → '.join(cycle)}")
         else:
-            console.print("  ✓ No cycles detected")
+            console.print("  {CHECK} No cycles detected")
 
     # Check 3: Reachability
-    console.print(f"  ✓ {graph.node_count}/{graph.node_count} concepts reachable")
+    console.print(f"  {CHECK} {graph.node_count}/{graph.node_count} concepts reachable")
 
     # Check 4: Completeness — expected node types present
     expected_types: dict[str, int] = {
@@ -695,11 +696,11 @@ def validate(
             missing.append((node_type, min_count, actual))
 
     if missing:
-        console.print("  [yellow]⚠[/yellow]  Completeness gaps:")
+        console.print("  [yellow]{WARN}[/yellow]  Completeness gaps:")
         for node_type, expected, actual in missing:
             console.print(f"    {node_type}: expected ≥{expected}, found {actual}")
     else:
-        console.print("  ✓ Completeness check passed")
+        console.print("  {CHECK} Completeness check passed")
 
     console.print("\n[green]Memory index is valid.[/green]\n")
 
@@ -800,7 +801,7 @@ def extract(
 
             for concept in concepts:
                 console.print(
-                    f"  ✓ Found {concept.metadata.get('requirement_id') or concept.metadata.get('principle_number') or concept.section}"
+                    f"  {CHECK} Found {concept.metadata.get('requirement_id') or concept.metadata.get('principle_number') or concept.section}"
                 )
 
             console.print(f"→ Extracted [green]{len(concepts)}[/green] concepts\n")
@@ -859,7 +860,7 @@ def extract(
             if result.errors:
                 console.print("[yellow]Warnings:[/yellow]")
                 for error in result.errors:
-                    console.print(f"  ⚠  {error}")
+                    console.print(f"  {WARN}  {error}")
 
 
 # =============================================================================
@@ -964,7 +965,7 @@ def list_graph(
     # Write to file or stdout
     if output:
         output.write_text(output_text, encoding="utf-8")
-        console.print(f"✓ Graph written to [cyan]{output}[/cyan]\n")
+        console.print(f"{CHECK} Graph written to [cyan]{output}[/cyan]\n")
     elif format != "table":
         console.print(output_text)
 
@@ -1084,7 +1085,7 @@ def viz(
 
     console.print(f"\nGenerating visualization from [cyan]{unified_path}[/cyan]...")
     result_path = generate_viz_html(unified_path, output_path)
-    console.print(f"✓ Written to [cyan]{result_path}[/cyan]\n")
+    console.print(f"{CHECK} Written to [cyan]{result_path}[/cyan]\n")
 
     if open_browser:
         webbrowser.open(to_file_uri(result_path))

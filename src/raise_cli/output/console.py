@@ -20,6 +20,8 @@ from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
 
+from raise_cli.output.symbols import CHECK, WARN
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -121,9 +123,9 @@ class OutputConsole:
                     " (" + ", ".join(f"{k}: {v}" for k, v in details.items()) + ")"
                 )
             if self.color:
-                self._console.print(f"[green]✓[/] {message}{detail_str}")
+                self._console.print(f"[green]{CHECK}[/] {message}{detail_str}")
             else:
-                self._console.print(f"✓ {message}{detail_str}")
+                self._console.print(f"{CHECK} {message}{detail_str}")
 
     def print_warning(
         self, message: str, *, details: dict[str, Any] | None = None
@@ -154,9 +156,9 @@ class OutputConsole:
                     " (" + ", ".join(f"{k}: {v}" for k, v in details.items()) + ")"
                 )
             if self.color:
-                self._console.print(f"[yellow]⚠[/] {message}{detail_str}")
+                self._console.print(f"[yellow]{WARN}[/] {message}{detail_str}")
             else:
-                self._console.print(f"⚠ {message}{detail_str}")
+                self._console.print(f"{WARN} {message}{detail_str}")
 
     def print_data(self, data: dict[str, Any], *, title: str | None = None) -> None:
         """Print a data structure.

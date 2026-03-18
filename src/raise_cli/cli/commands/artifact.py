@@ -83,7 +83,7 @@ def validate_command(
         )
     else:
         for r in results:
-            marker = "[green]✓[/green]" if r["passed"] else "[red]✗[/red]"
+            marker = "[green]{CHECK}[/green]" if r["passed"] else "[red]{CROSS}[/red]"
             console.print(f"  {marker} {r['file']}")
             if r["error"]:
                 # Show first line of error only

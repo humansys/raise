@@ -57,7 +57,7 @@ def _run_gate(gate: WorkflowGate, context: GateContext) -> GateResult:
 
 def _print_result(result: GateResult) -> None:
     """Print a single gate result in human format."""
-    marker = "[green]✓[/green]" if result.passed else "[red]✗[/red]"
+    marker = "[green]{CHECK}[/green]" if result.passed else "[red]{CROSS}[/red]"
     console.print(f"  {marker} {result.gate_id}: {result.message}")
     for detail in result.details:
         console.print(f"    {detail}")

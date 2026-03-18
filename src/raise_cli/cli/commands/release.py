@@ -22,6 +22,7 @@ from rich.table import Table
 
 from raise_cli.cli.error_handler import cli_error
 from raise_cli.graph.backends import get_active_backend
+from raise_cli.output.symbols import CHECK
 from raise_cli.publish.check import CheckResult, run_checks
 from raise_cli.publish.version import (
     BumpType,
@@ -71,7 +72,7 @@ def _display_results(results: list[CheckResult]) -> bool:
 
     passed_count = 0
     for r in results:
-        icon = "[green]✓[/green]" if r.passed else "[red]✗[/red]"
+        icon = "[green]{CHECK}[/green]" if r.passed else "[red]{CROSS}[/red]"
         console.print(f"  {icon} {r.gate}: {r.message}")
         if r.passed:
             passed_count += 1
@@ -291,7 +292,7 @@ def publish_command(
     # Execute
     # 1-2: Bump version files
     sync_version_files(new_version, pyproject_path=pyproject_path, init_path=init_path)
-    console.print("[green]✓ Version bumped[/green]")
+    console.print("[green]{CHECK} Version bumped[/green]")
 
     # 3: Update changelog
     if changelog_path.exists():
@@ -301,9 +302,9 @@ def publish_command(
         try:
             content = promote_unreleased(content, new_version, today)
             changelog_path.write_text(content, encoding="utf-8")
-            console.print("[green]✓ Changelog updated[/green]")
+            console.print("[green]{CHECK} Changelog updated[/green]")
         except ValueError:
-            console.print("[yellow]⚠ No unreleased entries to promote[/yellow]")
+            console.print("[yellow]{WARN} No unreleased entries to promote[/yellow]")
 
     # 4: Commit
     subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
@@ -316,7 +317,7 @@ def publish_command(
         cwd=project,
         check=True,
     )
-    console.print(f"[green]✓ Committed: release: v{new_version}[/green]")
+    console.print(f"[green]{CHECK} Committed: release: v{new_version}[/green]")
 
     # 5: Tag
     subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
@@ -324,7 +325,7 @@ def publish_command(
         cwd=project,
         check=True,
     )
-    console.print(f"[green]✓ Tagged: v{new_version}[/green]")
+    console.print(f"[green]{CHECK} Tagged: v{new_version}[/green]")
 
     # 6: Push (with confirmation already given)
     subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
@@ -332,7 +333,7 @@ def publish_command(
         cwd=project,
         check=True,
     )
-    console.print("[green]✓ Pushed to origin[/green]")
+    console.print("[green]{CHECK} Pushed to origin[/green]")
 
     console.print(f"\n[bold green]Release v{new_version} published.[/bold green]")
     console.print("GitHub Actions will handle PyPI upload.")

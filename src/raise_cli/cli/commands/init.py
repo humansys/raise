@@ -51,6 +51,7 @@ from raise_cli.onboarding.profile import (
     save_developer_profile,
 )
 from raise_cli.onboarding.skills import SkillScaffoldResult
+from raise_cli.output.symbols import WARN
 
 console = Console()
 
@@ -708,7 +709,7 @@ def init_command(
         skill_cmd, _ = _get_skill_recommendation("brownfield")
         if profile.experience_level == ExperienceLevel.RI:
             console.print(
-                f"\n[yellow]⚠ Governance docs are empty templates.[/yellow] "
+                f"\n[yellow]{WARN} Governance docs are empty templates.[/yellow] "
                 f"Run [bold cyan]{skill_cmd}[/bold cyan] to fill them."
             )
         else:
@@ -720,7 +721,7 @@ def init_command(
                     f"Fill them before starting work:\n"
                     f"  [bold cyan]{skill_cmd}[/bold cyan]",
                     border_style="yellow",
-                    title="[yellow]⚠ Next step required[/yellow]",
+                    title="[yellow]{WARN} Next step required[/yellow]",
                 )
             )
 

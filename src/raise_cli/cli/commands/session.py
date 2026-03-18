@@ -261,7 +261,7 @@ def start(
 
         # Warn about stale sessions
         if stale_sessions:
-            typer.echo("⚠ Warning: Stale sessions detected (started >24h ago):")
+            typer.echo("{WARN} Warning: Stale sessions detected (started >24h ago):")
             for stale in stale_sessions:
                 typer.echo(
                     f"  - {stale.session_id} (started {stale.started_at.date()}, project: {stale.project})"
