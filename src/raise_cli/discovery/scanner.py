@@ -91,6 +91,9 @@ class Symbol(BaseModel):
     signature: str = Field(default="", description="Full signature")
     docstring: str | None = Field(default=None, description="Symbol docstring")
     parent: str | None = Field(default=None, description="Parent symbol name")
+    depends_on: list[str] = Field(
+        default_factory=list, description="Dependency type names"
+    )
 
 
 class ScanResult(BaseModel):
@@ -1093,6 +1096,51 @@ def _extract_csharp_signature(node: Node, source: bytes) -> str:
     return ""
 
 
+def _extract_csharp_constructor_deps(body: Node, source: bytes) -> list[str]:
+    """Extract dependency type names from constructor parameters in a C# class body.
+
+    Walks all constructor_declaration nodes in the body, collects parameter type
+    names, and returns non-primitive custom types (interfaces, classes).
+
+    Args:
+        body: The declaration_list node of the class.
+        source: Source code as bytes.
+
+    Returns:
+        Deduplicated list of dependency type names.
+    """
+    deps: list[str] = []
+    for child in body.children:
+        if child.type != "constructor_declaration":
+            continue
+        param_list = _find_child_by_type(child, "parameter_list")
+        if not param_list:
+            continue
+        for param in param_list.children:
+            if param.type != "parameter":
+                continue
+            for pchild in param.children:
+                if pchild.type == "predefined_type":
+                    break  # primitive — skip
+                if pchild.type == "generic_name":
+                    # e.g. IRepository<User> → IRepository
+                    name_node = _find_child_by_type(pchild, "identifier")
+                    if name_node:
+                        deps.append(_get_node_text(name_node, source))
+                    break
+                if pchild.type == "identifier":
+                    deps.append(_get_node_text(pchild, source))
+                    break
+    # Deduplicate while preserving order
+    seen: set[str] = set()
+    result: list[str] = []
+    for dep in deps:
+        if dep not in seen:
+            seen.add(dep)
+            result.append(dep)
+    return result
+
+
 def _extract_csharp_symbols_from_tree(
     root: Node,
     source: bytes,
@@ -1146,6 +1194,9 @@ def _extract_csharp_symbols_from_tree(
             if node_type == "interface_declaration":
                 kind = "interface"
 
+            body = _find_child_by_type(node, "declaration_list")
+            deps = _extract_csharp_constructor_deps(body, source) if body else []
+
             symbols.append(
                 Symbol(
                     name=local_name,
@@ -1153,10 +1204,10 @@ def _extract_csharp_symbols_from_tree(
                     file=file_path,
                     line=node.start_point[0] + 1,
                     signature=_extract_csharp_signature(node, source),
+                    depends_on=deps,
                 )
             )
 
-            body = _find_child_by_type(node, "declaration_list")
             if body:
                 for child in body.children:
                     walk(child, parent_name=local_name)

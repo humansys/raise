@@ -1322,6 +1322,51 @@ class TestExtractCsharpSymbols:
         symbols = extract_csharp_symbols(source, "empty.cs")
         assert symbols == []
 
+    def test_constructor_deps_extracted(self) -> None:
+        """Regression RAISE-227: constructor parameter types populate depends_on."""
+        source = dedent("""\
+            public class OrderHandler {
+                private readonly IOrderRepository _repo;
+                private readonly IValidator _validator;
+
+                public OrderHandler(IOrderRepository repo, IValidator validator) {
+                    _repo = repo;
+                    _validator = validator;
+                }
+
+                public void Handle() { }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "OrderHandler.cs")
+        classes = [s for s in symbols if s.kind == "class"]
+        assert len(classes) == 1
+        assert set(classes[0].depends_on) == {"IOrderRepository", "IValidator"}
+
+    def test_constructor_deps_no_params(self) -> None:
+        """Class with parameterless constructor has empty depends_on."""
+        source = dedent("""\
+            public class SimpleService {
+                public SimpleService() { }
+                public void Run() { }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "SimpleService.cs")
+        classes = [s for s in symbols if s.kind == "class"]
+        assert len(classes) == 1
+        assert classes[0].depends_on == []
+
+    def test_constructor_deps_excludes_primitives(self) -> None:
+        """Primitive types (string, int, bool) are excluded from depends_on."""
+        source = dedent("""\
+            public class Config {
+                public Config(string connectionString, int timeout, bool enableCache) { }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "Config.cs")
+        classes = [s for s in symbols if s.kind == "class"]
+        assert len(classes) == 1
+        assert classes[0].depends_on == []
+
     def test_designer_cs_excluded_from_scan(self, tmp_path: Path) -> None:
         """Test that .Designer.cs files are excluded from C# scan."""
         cs_file = tmp_path / "Form1.cs"
