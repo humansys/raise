@@ -794,7 +794,10 @@ class GraphBuilder:
             GraphNode with type "architecture".
         """
         # Synthesize content from layers
-        layers: list[dict[str, Any]] = frontmatter.get("layers", [])
+        raw_layers: list[Any] = frontmatter.get("layers", [])
+        layers: list[dict[str, Any]] = [
+            layer for layer in raw_layers if isinstance(layer, dict)
+        ]
         layer_parts: list[str] = []
         for layer in layers:
             name = layer.get("name", "unknown")

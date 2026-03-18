@@ -1084,6 +1084,36 @@ class TestLoadArchitectureDocTypes:
         assert len(node.metadata["external_dependencies"]) == 2
         assert len(node.metadata["governed_by"]) == 2
 
+    def test_loads_architecture_design_doc_with_string_layers(
+        self, tmp_path: Path
+    ) -> None:
+        """Should not crash when layers are strings instead of dicts (RS-6)."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "system-design.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_design
+            project: test-project
+            status: current
+            layers:
+              - Frontend
+              - Backend
+              - Database
+            ---
+
+            # System Design
+            """)
+        )
+
+        builder = GraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.type == "architecture"]
+        assert len(arch_nodes) == 1
+        assert arch_nodes[0].id == "arch-design"
+
     def test_loads_architecture_design_doc(self, tmp_path: Path) -> None:
         """Should parse architecture_design doc into architecture node."""
         arch_dir = tmp_path / "governance" / "architecture"
