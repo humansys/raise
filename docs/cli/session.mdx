@@ -29,6 +29,10 @@ rai session start --project . --context
 rai session start
 ```
 
+:::note[Windows users]
+Use `.` (dot) for the current directory — it works on all platforms. Avoid `$(pwd)`, which does not expand on Windows CMD or PowerShell. If you need an explicit path: CMD → `%cd%`, PowerShell → `$PWD`.
+:::
+
 ---
 
 ## `rai session close`

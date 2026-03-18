@@ -64,6 +64,10 @@ Después, inicia sesiones con un bundle de contexto:
 rai session start --project . --context
 ```
 
+:::note[Windows]
+Usa `.` (punto) para el directorio actual — funciona en todas las plataformas. Evita `$(pwd)`, que no expande en CMD ni en PowerShell. Si necesitas una ruta explícita: CMD → `%cd%`, PowerShell → `$PWD`.
+:::
+
 El flag `--context` genera un bundle optimizado en tokens (~150 tokens) con tu perfil de desarrollador, estado de sesión y patrones de memoria. Pásalo a tu asistente de IA — le da conciencia completa de dónde estás y en qué estás trabajando.
 
 ## El ciclo de vida de una story
