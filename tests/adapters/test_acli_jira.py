@@ -10,7 +10,12 @@ from unittest.mock import AsyncMock
 import pytest
 from rai_pro.adapters.acli_jira import AcliJiraAdapter, normalize_status
 
-from raise_cli.adapters.models import AdapterHealth
+from raise_cli.adapters.models import (
+    AdapterHealth,
+    BatchResult,
+    IssueRef,
+    IssueSpec,
+)
 
 # ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -114,3 +119,140 @@ class TestHealth:
         result = _run(adapter.health())
         assert result.healthy is True
         assert result.name == "jira-acli"
+
+
+# ── Helpers for mocking bridge ──────────────────────────────────────────────
+
+
+def _adapter_with_mock_bridge(tmp_path: Path) -> AcliJiraAdapter:
+    """Create adapter with mocked bridge.call()."""
+    adapter = _make_adapter(tmp_path)
+    adapter._bridge.call = AsyncMock()  # pyright: ignore[reportPrivateUsage]
+    return adapter
+
+
+def _set_bridge_response(adapter: AcliJiraAdapter, response: Any) -> None:
+    """Set the return value for the next bridge.call()."""
+    adapter._bridge.call.return_value = response  # pyright: ignore[reportPrivateUsage, reportAttributeAccessIssue]
+
+
+def _get_bridge_call_args(
+    adapter: AcliJiraAdapter,
+) -> tuple[list[str], dict[str, str]]:
+    """Get (subcommand, flags) from last bridge.call()."""
+    call: AsyncMock = adapter._bridge.call  # pyright: ignore[reportPrivateUsage, reportAssignmentType]
+    args = call.call_args
+    return args[0][0], args[0][1]  # type: ignore[return-value]
+
+
+# ── Result envelope (shared by write ops) ───────────────────────────────────
+
+RESULT_ENVELOPE = {
+    "results": [{"status": "SUCCESS", "message": "OK", "id": "RAISE-99"}],
+    "totalCount": 1,
+    "successCount": 1,
+}
+
+
+# ── Write ops ───────────────────────────────────────────────────────────────
+
+
+class TestCreateIssue:
+    """create_issue maps IssueSpec → ACLI flags, parses envelope → IssueRef."""
+
+    def test_creates_issue_with_correct_flags(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, RESULT_ENVELOPE)
+
+        spec = IssueSpec(summary="Test issue", issue_type="Story", labels=["backend"])
+        result = _run(adapter.create_issue("RAISE", spec))
+
+        assert isinstance(result, IssueRef)
+        assert result.key == "RAISE-99"
+        assert "humansys.atlassian.net" in result.url
+
+        sub, flags = _get_bridge_call_args(adapter)
+        assert sub == ["workitem", "create"]
+        assert flags["--project"] == "RAISE"
+        assert flags["--summary"] == "Test issue"
+        assert flags["--type"] == "Story"
+
+    def test_creates_issue_with_description(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, RESULT_ENVELOPE)
+
+        spec = IssueSpec(summary="Test", description="Body text")
+        _run(adapter.create_issue("RAISE", spec))
+
+        _, flags = _get_bridge_call_args(adapter)
+        assert flags["--description"] == "Body text"
+
+
+class TestUpdateIssue:
+    """update_issue maps fields dict → ACLI flags."""
+
+    def test_updates_issue(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, RESULT_ENVELOPE)
+
+        result = _run(adapter.update_issue("RAISE-99", {"summary": "New title"}))
+
+        assert result.key == "RAISE-99"
+        sub, flags = _get_bridge_call_args(adapter)
+        assert sub == ["workitem", "edit"]
+        assert flags["--key"] == "RAISE-99"
+        assert flags["--summary"] == "New title"
+
+
+class TestTransitionIssue:
+    """transition_issue normalizes status and calls ACLI."""
+
+    def test_transitions_with_normalized_name(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, RESULT_ENVELOPE)
+
+        result = _run(adapter.transition_issue("RAISE-99", "in-progress"))
+
+        assert result.key == "RAISE-99"
+        sub, flags = _get_bridge_call_args(adapter)
+        assert sub == ["workitem", "transition"]
+        assert flags["--status"] == "In Progress"
+
+
+class TestBatchTransition:
+    """batch_transition loops with error isolation."""
+
+    def test_batch_all_succeed(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        envelopes = [
+            {"results": [{"status": "SUCCESS", "id": f"RAISE-{i}"}]} for i in range(3)
+        ]
+        adapter._bridge.call = AsyncMock(side_effect=envelopes)  # pyright: ignore[reportPrivateUsage]
+
+        result = _run(
+            adapter.batch_transition(["RAISE-0", "RAISE-1", "RAISE-2"], "done")
+        )
+
+        assert isinstance(result, BatchResult)
+        assert len(result.succeeded) == 3
+        assert len(result.failed) == 0
+
+    def test_batch_partial_failure(self, tmp_path: Path) -> None:
+        from rai_pro.adapters.acli_bridge import AcliBridgeError
+
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        adapter._bridge.call = AsyncMock(  # pyright: ignore[reportPrivateUsage]
+            side_effect=[
+                {"results": [{"status": "SUCCESS", "id": "RAISE-1"}]},
+                AcliBridgeError("transition failed"),
+                {"results": [{"status": "SUCCESS", "id": "RAISE-3"}]},
+            ]
+        )
+
+        result = _run(
+            adapter.batch_transition(["RAISE-1", "RAISE-2", "RAISE-3"], "done")
+        )
+
+        assert len(result.succeeded) == 2
+        assert len(result.failed) == 1
+        assert result.failed[0].key == "RAISE-2"

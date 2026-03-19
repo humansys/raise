@@ -17,7 +17,13 @@ from typing import Any
 
 import yaml
 
-from raise_cli.adapters.models import AdapterHealth
+from raise_cli.adapters.models import (
+    AdapterHealth,
+    BatchResult,
+    FailureDetail,
+    IssueRef,
+    IssueSpec,
+)
 
 from .acli_bridge import AcliJiraBridge
 
@@ -71,6 +77,72 @@ class AcliJiraAdapter:
         if not site:
             return ""
         return f"https://{site}/browse/{key}"
+
+    # ----- Response parsers -----
+
+    def _parse_result_envelope(self, data: dict[str, Any]) -> IssueRef:
+        """Parse ACLI result envelope into IssueRef.
+
+        Envelope format: ``{results: [{status, message, id}], totalCount, successCount}``
+        The ``id`` field contains the issue key (e.g. "RAISE-99").
+        """
+        results = data.get("results", [])
+        key = results[0]["id"] if results else ""
+        return IssueRef(key=key, url=self.build_url(key))
+
+    # ----- CRUD -----
+
+    async def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
+        """Create a Jira issue via ``acli jira workitem create``."""
+        flags: dict[str, str] = {
+            "--project": project_key,
+            "--summary": issue.summary,
+            "--type": issue.issue_type,
+        }
+        if issue.description:
+            flags["--description"] = issue.description
+        if issue.labels:
+            flags["--label"] = ",".join(issue.labels)
+
+        result = await self._bridge.call(["workitem", "create"], flags)
+        return self._parse_result_envelope(result)
+
+    async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
+        """Update issue fields via ``acli jira workitem edit``."""
+        flags: dict[str, str] = {"--key": key}
+        for field, value in fields.items():
+            flags[f"--{field}"] = str(value)
+
+        result = await self._bridge.call(["workitem", "edit"], flags)
+        return self._parse_result_envelope(result)
+
+    async def transition_issue(self, key: str, status: str) -> IssueRef:
+        """Transition issue status via ``acli jira workitem transition``."""
+        jira_status = normalize_status(status)
+        flags = {"--key": key, "--status": jira_status}
+
+        result = await self._bridge.call(["workitem", "transition"], flags)
+        return self._parse_result_envelope(result)
+
+    # ----- Batch -----
+
+    async def batch_transition(self, keys: list[str], status: str) -> BatchResult:
+        """Transition multiple issues, isolating failures per key."""
+        jira_status = normalize_status(status)
+        succeeded: list[IssueRef] = []
+        failed: list[FailureDetail] = []
+
+        for key in keys:
+            try:
+                result = await self._bridge.call(
+                    ["workitem", "transition"],
+                    {"--key": key, "--status": jira_status},
+                )
+                succeeded.append(self._parse_result_envelope(result))
+            except Exception as exc:
+                failed.append(FailureDetail(key=key, error=str(exc)))
+
+        return BatchResult(succeeded=succeeded, failed=failed)
 
     # ----- Health -----
 
