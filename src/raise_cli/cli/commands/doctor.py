@@ -63,6 +63,41 @@ def _render_json_output(
     out.print_json(json.dumps(data))
 
 
+def _render_human_output(
+    results: list[CheckResult],
+    passes: int,
+    warns: int,
+    errors: int,
+    verbose: bool,
+) -> None:
+    """Render check results as human-readable output to stdout."""
+    out = Console()
+    if not results:
+        out.print(
+            "No checks registered. Install raise-cli with extras for diagnostics."
+        )
+        return
+
+    for r in results:
+        if not verbose and r.status == CheckStatus.PASS:
+            continue
+        out.print(_format_result_line(r.category, r.message, r.status))
+        if r.fix_hint:
+            from rich.markup import escape
+
+            out.print(f"       hint: {escape(r.fix_hint)}")
+
+    if warns == 0 and errors == 0:
+        out.print("\n[green]All checks passed.[/green]")
+    else:
+        parts: list[str] = []
+        if warns:
+            parts.append(f"{warns} warning{'s' if warns > 1 else ''}")
+        if errors:
+            parts.append(f"{errors} error{'s' if errors > 1 else ''}")
+        out.print(f"\n{', '.join(parts)}.")
+
+
 @doctor_app.callback()
 def doctor(
     ctx: typer.Context,
@@ -114,31 +149,7 @@ def doctor(
     if json_output:
         _render_json_output(results, passes, warns, errors)
     else:
-        out = Console()
-        if not results:
-            out.print(
-                "No checks registered. Install raise-cli with extras for diagnostics."
-            )
-            return
-
-        for r in results:
-            if not verbose and r.status == CheckStatus.PASS:
-                continue
-            out.print(_format_result_line(r.category, r.message, r.status))
-            if r.fix_hint:
-                from rich.markup import escape
-
-                out.print(f"       hint: {escape(r.fix_hint)}")
-
-        if warns == 0 and errors == 0:
-            out.print("\n[green]All checks passed.[/green]")
-        else:
-            parts: list[str] = []
-            if warns:
-                parts.append(f"{warns} warning{'s' if warns > 1 else ''}")
-            if errors:
-                parts.append(f"{errors} error{'s' if errors > 1 else ''}")
-            out.print(f"\n{', '.join(parts)}.")
+        _render_human_output(results, passes, warns, errors, verbose)
 
     if fix:
         fixable = [r for r in results if r.fix_id and r.status != CheckStatus.PASS]
