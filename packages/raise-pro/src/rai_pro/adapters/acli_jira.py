@@ -190,7 +190,10 @@ class AcliJiraAdapter:
 
     async def get_issue(self, key: str) -> IssueDetail:
         """Get full issue detail via ``acli jira workitem view``."""
-        result = await self._bridge.call(["workitem", "view"], {"--key": key})
+        # Key is positional for view: acli jira workitem view KEY --json
+        result = await self._bridge.call(
+            ["workitem", "view", key], {"--fields": "*all"}
+        )
         return self._parse_issue_detail(result)
 
     async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
