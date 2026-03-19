@@ -1,9 +1,9 @@
 ---
 name: rai-story-close
 description: >
-  Complete a story with retrospective verification, push to origin,
-  create merge request, and update tracking. Use after review to
-  formally close the story lifecycle.
+  Complete a story with retrospective verification, local merge to dev,
+  and tracking update. MRs are created at epic level, not per story.
+  Use after review to formally close the story lifecycle.
 
 license: MIT
 
@@ -29,12 +29,12 @@ metadata:
 
 ## Purpose
 
-Complete a story by verifying the retrospective, pushing the story branch to origin, creating a merge request to the development branch, and updating epic tracking.
+Complete a story by verifying the retrospective, merging locally to the development branch, and updating epic tracking. Remote push and merge requests happen at epic level (see `/rai-epic-close`).
 
 ## Mastery Levels (ShuHaRi)
 
-- **Shu**: Follow all steps, verify retrospective, push + create MR, update epic
-- **Ha**: Adjust MR description for small fixes, skip epic update for standalone
+- **Shu**: Follow all steps, verify retrospective, merge locally, update epic
+- **Ha**: Skip epic update for standalone stories
 - **Ri**: Integrate with CI/CD pipelines, automate cleanup workflows
 
 ## Context
@@ -93,41 +93,29 @@ git status --short
 `git status` shows clean working tree (or only unrelated files explicitly acknowledged).
 </verification>
 
-### Step 3: Push and Create Merge Request
+### Step 3: Merge Locally to Dev
 
-**Never merge locally to `{dev_branch}`.** Push the story branch and create a merge request in GitLab.
+Merge the story branch into `{dev_branch}` locally with `--no-ff` to preserve story history:
 
 ```bash
-# Push story branch to origin
-git push origin {story_branch} -u
+git checkout {dev_branch}
+git merge story/s{N}.{M}/{slug} --no-ff -m "Merge branch 'story/s{N}.{M}/{slug}' into {dev_branch}
 
-# Create merge request via glab
-glab mr create \
-  --source-branch {story_branch} \
-  --target-branch {dev_branch} \
-  --title "feat(s{N}.{M}): {story-name}" \
-  --description "## Completed
-- [summary of deliverables]
+S{N}.{M}: {story-name} — {1-line summary}
 
-Co-Authored-By: Rai <rai@humansys.ai>" \
-  --no-editor
+Tracker: {JIRA_KEY} / E{N}"
 ```
 
-Present the MR URL to the developer for review.
+Remote push and merge requests are handled at epic level during `/rai-epic-close`.
 
 | Condition | Action |
 |-----------|--------|
-| MR created | Continue to Step 4 |
-| `glab` not available | Provide the GitLab URL from `git push` output for manual MR creation |
-| Push rejected (branch behind) | `git pull --rebase origin {dev_branch}` on story branch, resolve conflicts, push again |
+| Merge succeeds | Continue to Step 4 |
+| Merge conflicts | Resolve on story branch first, then retry merge |
 
 <verification>
-MR created in GitLab targeting `{dev_branch}`. MR URL presented to developer.
+Story merged to `{dev_branch}` locally via `--no-ff`.
 </verification>
-
-<if-blocked>
-Push fails → check remote permissions or network. Never fall back to local merge.
-</if-blocked>
 
 ### Step 4: Update Epic Scope
 
@@ -141,14 +129,14 @@ Epic scope reflects story completion.
 
 ### Step 5: Local Cleanup
 
-Delete the local story branch. The remote branch will be deleted by GitLab when the MR is merged (configure "Delete source branch" in MR settings).
+Delete the local story branch (already merged to `{dev_branch}`):
 
 ```bash
-git branch -D story/s{N}.{M}/{slug}
+git branch -d story/s{N}.{M}/{slug}
 ```
 
 <verification>
-Local story branch deleted. Remote branch managed by GitLab MR.
+Local story branch deleted.
 </verification>
 
 ### Step 6: Update Context & Emit
@@ -175,24 +163,24 @@ Adapter not configured or transition fails → log and continue. Backlog sync is
 
 | Item | Destination |
 |------|-------------|
-| Merge request | GitLab MR: `{story_branch}` → `{dev_branch}` |
+| Local merge | `{story_branch}` merged to `{dev_branch}` via `--no-ff` |
 | Epic update | `work/epics/e{N}-{name}/scope.md` |
-| Branch cleanup | Local branch deleted; remote via MR merge |
+| Branch cleanup | Local story branch deleted |
 | Backlog update | via `rai backlog transition` (best-effort) |
 | Context update | `CLAUDE.local.md` |
+| Remote push + MR | Deferred to `/rai-epic-close` |
 
 ## Quality Checklist
 
-- [ ] Retrospective complete before push (gate)
-- [ ] Tests pass before push
-- [ ] Story branch pushed to origin — never merge locally to `{dev_branch}`
-- [ ] Merge request created in GitLab targeting `{dev_branch}`
-- [ ] Local story branch deleted after MR creation
+- [ ] Retrospective complete before merge (gate)
+- [ ] Tests pass before merge
+- [ ] Story branch merged locally to `{dev_branch}` via `--no-ff`
+- [ ] Local story branch deleted after merge
 - [ ] Epic scope updated with completion status
-- [ ] Working tree clean before push — no orphaned artifacts
-- [ ] NEVER merge locally to `{dev_branch}` — always via MR
+- [ ] Working tree clean before merge — no orphaned artifacts
 - [ ] NEVER merge without retrospective — learnings compound
 - [ ] NEVER leave stale local branches — clean as you go
+- [ ] Remote push and MR happen at epic level (`/rai-epic-close`), not per story
 
 ## References
 
