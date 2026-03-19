@@ -15,7 +15,7 @@ def has_unreleased_entries(content: str) -> bool:
         True if there are non-whitespace entries between [Unreleased] and the next section.
     """
     match = re.search(
-        r"^## \[Unreleased\]\s*$(.*?)(?=(?:^## \[)|\Z)",  # NOSONAR — lazy required: greedy would consume to \Z
+        r"^## \[Unreleased\]\s*$(.*?)(?=(?:^## \[|\Z))",
         content,
         re.DOTALL | re.MULTILINE,
     )
@@ -44,7 +44,7 @@ def promote_unreleased(content: str, version: str, date: str) -> str:
 
     # Extract the unreleased body
     match = re.search(
-        r"(^## \[Unreleased\])\s*$(.*?)(?=^## \[|\Z)",  # NOSONAR — lazy required: greedy would consume past section boundary
+        r"(^## \[Unreleased\])\s*$(.*?)(?=(?:^## \[|\Z))",
         content,
         re.DOTALL | re.MULTILINE,
     )
