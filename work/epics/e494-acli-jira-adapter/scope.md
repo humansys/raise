@@ -52,12 +52,12 @@ error handling. Single function that all protocol methods delegate to.
 
 **Dependencies:** S494.1 findings
 
-### S494.3: Full protocol implementation (M)
+### S494.3: Full protocol implementation (M) ✓
 
 All 11 `AsyncProjectManagementAdapter` methods via ACLI commands.
-Reuse existing `_to_jql()`, response parsers where the JSON format matches.
+170 LOC adapter, 31 tests, nested-only parsers, convention-based status.
 
-**Dependencies:** S494.2
+**Dependencies:** S494.2 | **Completed:** 2026-03-19
 
 ### S494.4: Multi-instance config and site switching (S)
 
