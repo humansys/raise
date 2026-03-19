@@ -107,9 +107,7 @@ def _apply_fixes(results: list[CheckResult]) -> None:
         out = Console()
         outcomes = run_fixes(fixable, Path.cwd())
         for fix_id, success in outcomes:
-            status_label = (
-                "[green]fixed[/green]" if success else "[red]failed[/red]"
-            )
+            status_label = "[green]fixed[/green]" if success else "[red]failed[/red]"
             out.print(f"  fix: {fix_id} -- {status_label}")
 
 
