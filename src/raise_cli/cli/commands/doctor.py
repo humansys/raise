@@ -63,9 +63,18 @@ def _render_json_output(
     out.print_json(json.dumps(data))
 
 
+def _format_summary_line(warns: int, errors: int) -> str:
+    """Build the summary line listing warning and error counts."""
+    parts: list[str] = []
+    if warns:
+        parts.append(f"{warns} warning{'s' if warns > 1 else ''}")
+    if errors:
+        parts.append(f"{errors} error{'s' if errors > 1 else ''}")
+    return f"\n{', '.join(parts)}."
+
+
 def _render_human_output(
     results: list[CheckResult],
-    passes: int,
     warns: int,
     errors: int,
     verbose: bool,
@@ -90,12 +99,7 @@ def _render_human_output(
     if warns == 0 and errors == 0:
         out.print("\n[green]All checks passed.[/green]")
     else:
-        parts: list[str] = []
-        if warns:
-            parts.append(f"{warns} warning{'s' if warns > 1 else ''}")
-        if errors:
-            parts.append(f"{errors} error{'s' if errors > 1 else ''}")
-        out.print(f"\n{', '.join(parts)}.")
+        out.print(_format_summary_line(warns, errors))
 
 
 def _apply_fixes(results: list[CheckResult]) -> None:
@@ -162,7 +166,7 @@ def doctor(
     if json_output:
         _render_json_output(results, passes, warns, errors)
     else:
-        _render_human_output(results, passes, warns, errors, verbose)
+        _render_human_output(results, warns, errors, verbose)
 
     if fix:
         _apply_fixes(results)
