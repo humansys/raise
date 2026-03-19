@@ -98,6 +98,21 @@ def _render_human_output(
         out.print(f"\n{', '.join(parts)}.")
 
 
+def _apply_fixes(results: list[CheckResult]) -> None:
+    """Run auto-fixes for fixable non-passing results."""
+    fixable = [r for r in results if r.fix_id and r.status != CheckStatus.PASS]
+    if fixable:
+        from raise_cli.doctor.fix import run_fixes
+
+        out = Console()
+        outcomes = run_fixes(fixable, Path.cwd())
+        for fix_id, success in outcomes:
+            status_label = (
+                "[green]fixed[/green]" if success else "[red]failed[/red]"
+            )
+            out.print(f"  fix: {fix_id} -- {status_label}")
+
+
 @doctor_app.callback()
 def doctor(
     ctx: typer.Context,
@@ -152,17 +167,7 @@ def doctor(
         _render_human_output(results, passes, warns, errors, verbose)
 
     if fix:
-        fixable = [r for r in results if r.fix_id and r.status != CheckStatus.PASS]
-        if fixable:
-            from raise_cli.doctor.fix import run_fixes
-
-            out = Console()
-            outcomes = run_fixes(fixable, Path.cwd())
-            for fix_id, success in outcomes:
-                status_label = (
-                    "[green]fixed[/green]" if success else "[red]failed[/red]"
-                )
-                out.print(f"  fix: {fix_id} -- {status_label}")
+        _apply_fixes(results)
 
     if errors > 0:
         raise typer.Exit(1)
