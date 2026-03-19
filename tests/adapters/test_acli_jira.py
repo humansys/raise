@@ -13,6 +13,8 @@ from rai_pro.adapters.acli_jira import AcliJiraAdapter, normalize_status, to_jql
 from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
+    Comment,
+    CommentRef,
     IssueDetail,
     IssueRef,
     IssueSpec,
@@ -380,3 +382,114 @@ class TestToJql:
             to_jql("project = RAISE AND status \\!= Done")
             == "project = RAISE AND status != Done"
         )
+
+
+# ── Comments ────────────────────────────────────────────────────────────────
+
+ACLI_COMMENTS_RESPONSE: dict[str, Any] = {
+    "comments": [
+        {"id": "101", "author": "Emilio Osorio", "body": "First comment"},
+        {"id": "102", "author": "Rai", "body": "Second comment"},
+    ],
+    "isLast": True,
+    "maxResults": 10,
+    "startAt": 0,
+    "total": 2,
+}
+
+COMMENT_CREATE_ENVELOPE: dict[str, Any] = {
+    "results": [{"status": "SUCCESS", "id": "101"}],
+    "totalCount": 1,
+    "successCount": 1,
+}
+
+
+class TestAddComment:
+    """add_comment sends body to ACLI, parses envelope → CommentRef."""
+
+    def test_creates_comment(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, COMMENT_CREATE_ENVELOPE)
+
+        result = _run(adapter.add_comment("RAISE-99", "test body"))
+
+        assert isinstance(result, CommentRef)
+        assert result.id == "101"
+
+        sub, flags = _get_bridge_call_args(adapter)
+        assert sub == ["workitem", "comment", "create"]
+        assert flags["--key"] == "RAISE-99"
+        assert flags["--body"] == "test body"
+
+
+class TestGetComments:
+    """get_comments parses ACLI comment format (author string, no created)."""
+
+    def test_parses_comments(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, ACLI_COMMENTS_RESPONSE)
+
+        results = _run(adapter.get_comments("RAISE-99", limit=10))
+
+        assert len(results) == 2
+        assert all(isinstance(c, Comment) for c in results)
+        assert results[0].id == "101"
+        assert results[0].author == "Emilio Osorio"
+        assert results[0].body == "First comment"
+        assert results[0].created == ""  # ACLI omits created
+
+    def test_empty_comments(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, {"comments": [], "total": 0})
+
+        results = _run(adapter.get_comments("RAISE-99"))
+        assert results == []
+
+    def test_passes_limit(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, {"comments": [], "total": 0})
+
+        _run(adapter.get_comments("RAISE-99", limit=5))
+
+        _, flags = _get_bridge_call_args(adapter)
+        assert flags["--limit"] == "5"
+
+
+# ── Links ───────────────────────────────────────────────────────────────────
+
+LINK_ENVELOPE: dict[str, Any] = {
+    "results": [{"status": "SUCCESS", "id": "link-1"}],
+    "totalCount": 1,
+    "successCount": 1,
+}
+
+
+class TestLinkIssues:
+    """link_issues sends out/in/type flags to ACLI."""
+
+    def test_creates_link(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, LINK_ENVELOPE)
+
+        _run(adapter.link_issues("RAISE-1", "RAISE-2", "blocks"))
+
+        sub, flags = _get_bridge_call_args(adapter)
+        assert sub == ["workitem", "link", "create"]
+        assert flags["--out"] == "RAISE-1"
+        assert flags["--in"] == "RAISE-2"
+        assert flags["--type"] == "blocks"
+
+
+class TestLinkToParent:
+    """link_to_parent sets parent via workitem edit."""
+
+    def test_sets_parent(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, RESULT_ENVELOPE)
+
+        _run(adapter.link_to_parent("RAISE-2", "RAISE-1"))
+
+        sub, flags = _get_bridge_call_args(adapter)
+        assert sub == ["workitem", "edit"]
+        assert flags["--key"] == "RAISE-2"
+        assert flags["--parent"] == "RAISE-1"

@@ -21,6 +21,8 @@ import yaml
 from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
+    Comment,
+    CommentRef,
     FailureDetail,
     IssueDetail,
     IssueRef,
@@ -225,6 +227,54 @@ class AcliJiraAdapter:
                 failed.append(FailureDetail(key=key, error=str(exc)))
 
         return BatchResult(succeeded=succeeded, failed=failed)
+
+    # ----- Relationships -----
+
+    async def link_to_parent(self, child_key: str, parent_key: str) -> None:
+        """Set parent via ``acli jira workitem edit``."""
+        await self._bridge.call(
+            ["workitem", "edit"],
+            {"--key": child_key, "--parent": parent_key},
+        )
+
+    async def link_issues(self, source: str, target: str, link_type: str) -> None:
+        """Create link via ``acli jira workitem link create``."""
+        await self._bridge.call(
+            ["workitem", "link", "create"],
+            {"--out": source, "--in": target, "--type": link_type},
+        )
+
+    # ----- Comments -----
+
+    async def add_comment(self, key: str, body: str) -> CommentRef:
+        """Add comment via ``acli jira workitem comment create``."""
+        result = await self._bridge.call(
+            ["workitem", "comment", "create"],
+            {"--key": key, "--body": body},
+        )
+        envelope = self._parse_result_envelope(result)
+        return CommentRef(id=envelope.key, url="")
+
+    async def get_comments(self, key: str, limit: int = 10) -> list[Comment]:
+        """Get comments via ``acli jira workitem comment list``.
+
+        ACLI comment format: ``{comments: [{id, author, body}]}``.
+        ``created`` is missing — set to empty string (D3).
+        """
+        result = await self._bridge.call(
+            ["workitem", "comment", "list"],
+            {"--key": key, "--limit": str(limit)},
+        )
+        comments_data: list[dict[str, Any]] = result.get("comments", [])
+        return [
+            Comment(
+                id=str(c.get("id", "")),
+                body=c.get("body", ""),
+                author=c.get("author", ""),
+                created="",
+            )
+            for c in comments_data
+        ]
 
     # ----- Health -----
 
