@@ -328,6 +328,16 @@ class TestGetIssue:
         assert result.assignee is None
         assert result.priority is None
 
+    def test_handles_fields_null(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, {"key": "RAISE-44", "fields": None})
+
+        result = _run(adapter.get_issue("RAISE-44"))
+
+        assert result.key == "RAISE-44"
+        assert result.summary == ""
+        assert result.status == ""
+
 
 class TestSearch:
     """search handles top-level array (not {issues: [...]})."""

@@ -116,8 +116,8 @@ class AcliJiraAdapter:
         ACLI always returns nested format (``fields.summary``, ``fields.status.name``).
         No ``is_flat`` parameter — D1 from architecture review.
         """
-        fields = data.get("fields", {})
-        parent = fields.get("parent")
+        fields: dict[str, Any] = data.get("fields") or {}
+        parent: dict[str, Any] | None = fields.get("parent")
         return {
             "key": data.get("key", ""),
             "summary": fields.get("summary", ""),
@@ -129,9 +129,9 @@ class AcliJiraAdapter:
     def _parse_issue_detail(self, data: dict[str, Any]) -> IssueDetail:
         """Parse single nested issue → IssueDetail."""
         common = self._extract_issue_fields(data)
-        fields = data.get("fields", {})
-        assignee = fields.get("assignee")
-        priority = fields.get("priority")
+        fields: dict[str, Any] = data.get("fields") or {}
+        assignee: dict[str, Any] | None = fields.get("assignee")
+        priority: dict[str, Any] | None = fields.get("priority")
 
         return IssueDetail(
             **common,
