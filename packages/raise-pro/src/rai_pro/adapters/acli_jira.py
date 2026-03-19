@@ -12,8 +12,9 @@ Architecture: E494 design (D1-D4), S494.3
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -21,14 +22,40 @@ from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
     FailureDetail,
+    IssueDetail,
     IssueRef,
     IssueSpec,
+    IssueSummary,
 )
 
 from .acli_bridge import AcliJiraBridge
 
 # Module-level config path as test seam (PAT-E-589)
 _JIRA_YAML_PATH = Path(".raise") / "jira.yaml"
+
+
+_JQL_OPERATORS = re.compile(
+    r"\b(AND|OR|NOT|IN|IS|ORDER BY)\b|[=!<>~]",
+    re.IGNORECASE,
+)
+_ISSUE_KEY = re.compile(r"^[A-Z][A-Z0-9_]+-\d+$")
+
+
+def to_jql(query: str) -> str:
+    r"""Normalize a user query to valid JQL.
+
+    Rules (RAISE-552):
+    - ``PROJECT-NNN`` issue key → ``issue = PROJECT-NNN``
+    - Query already containing JQL operators → pass through unchanged
+    - Plain text → ``text ~ "query"``
+    - Escaped operators (``\!``) are unescaped before processing
+    """
+    clean = query.replace("\\!", "!")
+    if _ISSUE_KEY.match(clean):
+        return f"issue = {clean}"
+    if _JQL_OPERATORS.search(clean):
+        return clean
+    return f'text ~ "{clean}"'
 
 
 def normalize_status(status: str) -> str:
@@ -80,6 +107,41 @@ class AcliJiraAdapter:
 
     # ----- Response parsers -----
 
+    @staticmethod
+    def _extract_issue_fields(data: dict[str, Any]) -> dict[str, Any]:
+        """Extract common fields from nested Jira API format.
+
+        ACLI always returns nested format (``fields.summary``, ``fields.status.name``).
+        No ``is_flat`` parameter — D1 from architecture review.
+        """
+        fields = data.get("fields", {})
+        parent = fields.get("parent")
+        return {
+            "key": data.get("key", ""),
+            "summary": fields.get("summary", ""),
+            "status": fields.get("status", {}).get("name", ""),
+            "issue_type": fields.get("issuetype", {}).get("name", ""),
+            "parent_key": parent.get("key") if parent else None,
+        }
+
+    def _parse_issue_detail(self, data: dict[str, Any]) -> IssueDetail:
+        """Parse single nested issue → IssueDetail."""
+        common = self._extract_issue_fields(data)
+        fields = data.get("fields", {})
+        assignee = fields.get("assignee")
+        priority = fields.get("priority")
+
+        return IssueDetail(
+            **common,
+            url=self.build_url(common["key"]),
+            description=str(fields.get("description", "")),
+            labels=fields.get("labels", []),
+            assignee=assignee.get("displayName") if assignee else None,
+            priority=priority.get("name") if priority else None,
+            created=fields.get("created", ""),
+            updated=fields.get("updated", ""),
+        )
+
     def _parse_result_envelope(self, data: dict[str, Any]) -> IssueRef:
         """Parse ACLI result envelope into IssueRef.
 
@@ -123,6 +185,26 @@ class AcliJiraAdapter:
 
         result = await self._bridge.call(["workitem", "transition"], flags)
         return self._parse_result_envelope(result)
+
+    async def get_issue(self, key: str) -> IssueDetail:
+        """Get full issue detail via ``acli jira workitem view``."""
+        result = await self._bridge.call(["workitem", "view"], {"--key": key})
+        return self._parse_issue_detail(result)
+
+    async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
+        """Search issues via ``acli jira workitem search``.
+
+        ACLI returns a top-level array, not ``{issues: [...]}``.
+        """
+        jql = to_jql(query)
+        result = await self._bridge.call(
+            ["workitem", "search"],
+            {"--jql": jql, "--limit": str(limit)},
+        )
+        issues = (
+            cast("list[dict[str, Any]]", result) if isinstance(result, list) else []
+        )
+        return [IssueSummary(**self._extract_issue_fields(i)) for i in issues]
 
     # ----- Batch -----
 

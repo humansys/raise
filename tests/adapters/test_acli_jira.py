@@ -8,13 +8,15 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
-from rai_pro.adapters.acli_jira import AcliJiraAdapter, normalize_status
+from rai_pro.adapters.acli_jira import AcliJiraAdapter, normalize_status, to_jql
 
 from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
+    IssueDetail,
     IssueRef,
     IssueSpec,
+    IssueSummary,
 )
 
 # ── Fixtures ────────────────────────────────────────────────────────────────
@@ -256,3 +258,125 @@ class TestBatchTransition:
         assert len(result.succeeded) == 2
         assert len(result.failed) == 1
         assert result.failed[0].key == "RAISE-2"
+
+
+# ── Read ops ────────────────────────────────────────────────────────────────
+
+NESTED_ISSUE: dict[str, Any] = {
+    "key": "RAISE-42",
+    "self": "https://api.atlassian.net/rest/api/2/issue/12345",
+    "fields": {
+        "summary": "Test issue",
+        "status": {"name": "In Progress"},
+        "issuetype": {"name": "Story"},
+        "priority": {"name": "Medium"},
+        "assignee": {"displayName": "Emilio Osorio"},
+        "labels": ["backend", "acli"],
+        "parent": {"key": "RAISE-10"},
+        "created": "2026-03-19T10:00:00.000+0000",
+        "updated": "2026-03-19T12:00:00.000+0000",
+        "description": {"type": "doc", "content": []},
+    },
+}
+
+NESTED_ISSUE_MINIMAL: dict[str, Any] = {
+    "key": "RAISE-43",
+    "fields": {
+        "summary": "Minimal issue",
+        "status": {"name": "Backlog"},
+        "issuetype": {"name": "Task"},
+        "priority": None,
+        "assignee": None,
+        "labels": [],
+        "parent": None,
+        "created": "2026-03-19T10:00:00.000+0000",
+        "updated": "",
+        "description": "",
+    },
+}
+
+
+class TestGetIssue:
+    """get_issue parses nested Jira API format → IssueDetail."""
+
+    def test_parses_full_issue(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, NESTED_ISSUE)
+
+        result = _run(adapter.get_issue("RAISE-42"))
+
+        assert isinstance(result, IssueDetail)
+        assert result.key == "RAISE-42"
+        assert result.summary == "Test issue"
+        assert result.status == "In Progress"
+        assert result.issue_type == "Story"
+        assert result.parent_key == "RAISE-10"
+        assert result.assignee == "Emilio Osorio"
+        assert result.priority == "Medium"
+        assert result.labels == ["backend", "acli"]
+        assert "humansys.atlassian.net" in result.url
+
+    def test_handles_null_fields(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, NESTED_ISSUE_MINIMAL)
+
+        result = _run(adapter.get_issue("RAISE-43"))
+
+        assert result.parent_key is None
+        assert result.assignee is None
+        assert result.priority is None
+
+
+class TestSearch:
+    """search handles top-level array (not {issues: [...]})."""
+
+    def test_parses_array_response(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, [NESTED_ISSUE, NESTED_ISSUE_MINIMAL])
+
+        results = _run(adapter.search("project = RAISE", limit=10))
+
+        assert len(results) == 2
+        assert all(isinstance(r, IssueSummary) for r in results)
+        assert results[0].key == "RAISE-42"
+        assert results[1].key == "RAISE-43"
+        assert results[0].status == "In Progress"
+
+    def test_empty_results(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, [])
+
+        results = _run(adapter.search("project = NONEXISTENT"))
+        assert results == []
+
+    def test_passes_jql_and_limit(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, [])
+
+        _run(adapter.search("project = RAISE ORDER BY created", limit=5))
+
+        _, flags = _get_bridge_call_args(adapter)
+        assert flags["--jql"] == "project = RAISE ORDER BY created"
+        assert flags["--limit"] == "5"
+
+
+class TestToJql:
+    """to_jql normalizes user queries to valid JQL."""
+
+    def test_issue_key(self) -> None:
+        assert to_jql("RAISE-123") == "issue = RAISE-123"
+
+    def test_jql_passthrough(self) -> None:
+        assert (
+            to_jql("project = RAISE AND status = Done")
+            == "project = RAISE AND status = Done"
+        )
+
+    def test_text_search(self) -> None:
+        assert to_jql("some text query") == 'text ~ "some text query"'
+
+    def test_escaped_operators(self) -> None:
+        assert (
+            to_jql("project = RAISE AND status \\!= Done")
+            == "project = RAISE AND status != Done"
+        )
