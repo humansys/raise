@@ -1,3 +1,7 @@
+---
+title: Installation Guide
+---
+
 # Installation Guide
 
 Step-by-step instructions for installing RaiSE CLI on macOS, Linux, and Windows (WSL).
