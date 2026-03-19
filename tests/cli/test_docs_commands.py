@@ -91,7 +91,7 @@ class TestPublish:
     def test_publish_success(
         self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """publish resolves artifact type to governance/{type}.md and publishes."""
+        """Publish resolves artifact type to governance/{type}.md and publishes."""
         gov_dir = tmp_path / "governance"
         gov_dir.mkdir()
         (gov_dir / "roadmap.md").write_text("# Roadmap\nQ1 stuff")
@@ -127,7 +127,7 @@ class TestPublish:
     def test_publish_file_not_found(
         self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """publish with nonexistent artifact type → error."""
+        """Publish with nonexistent artifact type → error."""
         monkeypatch.chdir(tmp_path)
 
         result = runner.invoke(app, ["docs", "publish", "nonexistent"])
@@ -153,7 +153,7 @@ class TestPublish:
 
 class TestGet:
     def test_get_page(self) -> None:
-        """get retrieves page and displays content."""
+        """Get retrieves page and displays content."""
         with _patch_target(_MockDocsTarget()):
             result = runner.invoke(app, ["docs", "get", "123"])
 
@@ -163,7 +163,7 @@ class TestGet:
         assert "RAISE" in result.output
 
     def test_get_shows_version(self) -> None:
-        """get shows version number when > 1."""
+        """Get shows version number when > 1."""
         with _patch_target(_MockDocsTarget()):
             result = runner.invoke(app, ["docs", "get", "123"])
 
@@ -172,7 +172,7 @@ class TestGet:
 
 class TestSearch:
     def test_search_results(self) -> None:
-        """search lists matching pages."""
+        """Search lists matching pages."""
         with _patch_target(_MockDocsTarget()):
             result = runner.invoke(app, ["docs", "search", "architecture"])
 
@@ -182,7 +182,7 @@ class TestSearch:
         assert "RAISE" in result.output
 
     def test_search_empty(self) -> None:
-        """search with no results shows message."""
+        """Search with no results shows message."""
         with _patch_target(_MockDocsTarget()):
             result = runner.invoke(app, ["docs", "search", "empty query"])
 

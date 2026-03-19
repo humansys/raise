@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 PIPELINE_ORDER: list[str] = [
     "environment",
+    "developer",
     "project",
     "adapters",
     "skills",

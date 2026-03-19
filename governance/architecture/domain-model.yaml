@@ -1,0 +1,34 @@
+type: architecture_domain_model
+project: rai-cli
+status: current
+bounded_contexts:
+  - name: governance
+    modules: [governance]
+    description: "Extract structured knowledge from markdown governance documents"
+  - name: discovery
+    modules: [discovery]
+    description: "Scan codebases to extract structural knowledge from source code, including convention detection"
+  - name: ontology
+    modules: [context, memory]
+    description: "Persist, integrate, and query accumulated knowledge — the ontological backbone of RaiSE"
+  - name: skills
+    modules: [skills]
+    description: "Skill parsing, location, validation, and scaffolding — process knowledge infrastructure"
+  - name: experience
+    modules: [onboarding, output]
+    description: "First-run setup, developer profiles, and presentation"
+  - name: observability
+    modules: [telemetry]
+    description: "Local signal collection for process improvement"
+  - name: integrations
+    modules: [rai_pro]
+    description: "External platform adapters (JIRA backlog sync, OAuth, entity properties) — enterprise features in rai_pro package"
+shared_kernel:
+  modules: [config, core, schemas]
+  description: "Foundation utilities shared across all contexts"
+application_layer:
+  modules: [cli]
+  description: "Thin orchestration shell — depends on everything, nothing depends on it"
+distribution:
+  modules: [rai_base, skills_base]
+  description: "Packaged content for pip distribution — no runtime logic"

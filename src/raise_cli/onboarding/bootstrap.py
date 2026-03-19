@@ -101,7 +101,7 @@ def _copy_identity(
     identity_dir = get_identity_dir(project_root)
     identity_base = base / "identity"
 
-    identity_files = ["core.md", "perspective.md"]
+    identity_files = ["core.yaml", "perspective.md"]
     copied_any = False
 
     for filename in identity_files:
@@ -121,7 +121,7 @@ def _copy_identity(
     result.identity_copied = copied_any
 
 
-def _copy_patterns(
+def _copy_patterns(  # noqa: C901 -- complexity 12, refactor deferred
     base: Traversable, project_root: Path, result: BootstrapResult
 ) -> None:
     """Copy or merge base patterns to .raise/rai/memory/patterns.jsonl.
@@ -299,8 +299,7 @@ def ensure_gitignore(project_root: Path) -> bool:
         "",
         "# RaiSE personal directory (per-developer, not shared)",
     ]
-    for entry in missing:
-        block_lines.append(entry)
+    block_lines.extend(missing)
     block_lines.append("")
 
     block = "\n".join(block_lines)

@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
+from unittest.mock import patch
+
+import pytest
 from typer.testing import CliRunner
 
 from raise_cli.cli.main import app
@@ -80,6 +85,37 @@ class TestSettingsIntegration:
         """Verbosity should cap at 3."""
         settings = RaiSettings(verbosity=3)
         assert settings.verbosity == 3
+
+
+class TestDotenvLoading:
+    """Tests for .env file loading at CLI startup."""
+
+    def test_load_dotenv_called_on_startup(self) -> None:
+        """CLI should call load_dotenv during startup."""
+        with patch("raise_cli.cli.main.load_dotenv") as mock_load:
+            # Use "profile" to trigger main() callback (--help is eager, skips callback)
+            runner.invoke(app, ["profile"])
+            mock_load.assert_called_once_with(override=False)
+
+    def test_no_crash_without_dotenv_file(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """.env absent should not cause errors."""
+        monkeypatch.chdir(tmp_path)
+        result = runner.invoke(app, ["profile"])
+        assert result.exit_code == 0
+
+    def test_existing_env_vars_take_precedence(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Shell env vars should not be overridden by .env (override=False)."""
+        env_file = tmp_path / ".env"
+        env_file.write_text("TEST_RAI_PRECEDENCE=from_dotenv\n")
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("TEST_RAI_PRECEDENCE", "from_shell")
+
+        runner.invoke(app, ["profile"])
+        assert os.environ.get("TEST_RAI_PRECEDENCE") == "from_shell"
 
 
 class TestBackwardCompatibility:

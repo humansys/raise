@@ -55,7 +55,7 @@ def extract_skill_metadata(skill_path: Path) -> GraphNode | None:
         return None
 
     # Cast to typed dict for pyright
-    fm: dict[str, Any] = cast(dict[str, Any], frontmatter)
+    fm: dict[str, Any] = cast("dict[str, Any]", frontmatter)
 
     # Name is required
     name_value = fm.get("name")
@@ -73,7 +73,7 @@ def extract_skill_metadata(skill_path: Path) -> GraphNode | None:
     meta_value = fm.get("metadata", {})
     metadata_section: dict[str, Any] = {}
     if isinstance(meta_value, dict):
-        metadata_section = cast(dict[str, Any], meta_value)
+        metadata_section = cast("dict[str, Any]", meta_value)
 
     # Get file modification time for created timestamp
     try:

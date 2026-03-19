@@ -52,7 +52,7 @@ def _load_yaml_dir(directory: Path) -> dict[str, AgentConfig]:
             if not isinstance(raw, dict):
                 logger.warning("Skipping %s: not a YAML mapping", yaml_file)
                 continue
-            config = _parse_agent_config(cast(dict[str, Any], raw))
+            config = _parse_agent_config(cast("dict[str, Any]", raw))
             configs[config.agent_type] = config
         except (yaml.YAMLError, KeyError, TypeError, ValueError) as e:
             logger.warning("Skipping %s: %s", yaml_file, e)
@@ -71,7 +71,7 @@ def _load_builtin_agents() -> dict[str, AgentConfig]:
             if not isinstance(raw, dict):
                 logger.warning("Skipping built-in %s: not a YAML mapping", entry.name)
                 continue
-            config = _parse_agent_config(cast(dict[str, Any], raw))
+            config = _parse_agent_config(cast("dict[str, Any]", raw))
             configs[config.agent_type] = config
         except (yaml.YAMLError, KeyError, TypeError, ValueError) as e:
             logger.warning("Skipping built-in %s: %s", entry.name, e)

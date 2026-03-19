@@ -19,7 +19,7 @@ def _mock_session() -> AsyncSession:
     return session
 
 
-@pytest.fixture()
+@pytest.fixture
 def org_id() -> uuid.UUID:
     return uuid.UUID("00000000-0000-0000-0000-000000000001")
 
@@ -27,7 +27,7 @@ def org_id() -> uuid.UUID:
 class TestInsertEvent:
     """insert_event inserts a telemetry event and returns its UUID."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_uuid(self, org_id: uuid.UUID) -> None:
         from raise_server.db.agent_queries import insert_event
 
@@ -43,7 +43,7 @@ class TestInsertEvent:
         assert result == expected_id
         session.execute.assert_called_once()
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_payload(self, org_id: uuid.UUID) -> None:
         from raise_server.db.agent_queries import insert_event
 
@@ -59,7 +59,7 @@ class TestInsertEvent:
 class TestListEvents:
     """list_events returns dicts ordered by created_at desc."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_list_of_dicts(self, org_id: uuid.UUID) -> None:
         from raise_server.db.agent_queries import list_events
 
@@ -81,7 +81,7 @@ class TestListEvents:
         assert len(result) == 1
         assert result[0]["event_type"] == "a"
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_result(self, org_id: uuid.UUID) -> None:
         from raise_server.db.agent_queries import list_events
 

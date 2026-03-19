@@ -1,0 +1,36 @@
+type: module
+name: adapters
+purpose: "Protocol contracts, boundary models, and entry point registry for raise-cli extensibility"
+status: current
+depends_on: [context]
+depended_by: []
+entry_points: []
+public_api:
+  - "ProjectManagementAdapter"
+  - "GovernanceSchemaProvider"
+  - "GovernanceParser"
+  - "DocumentationTarget"
+  - "KnowledgeGraphBackend"
+  - "ArtifactLocator"
+  - "BackendHealth"
+  - "CoreArtifactType"
+  - "IssueRef"
+  - "IssueSpec"
+  - "PublishResult"
+  - "get_pm_adapters"
+  - "get_governance_schemas"
+  - "get_governance_parsers"
+  - "get_doc_targets"
+  - "get_graph_backends"
+  - "EP_PM_ADAPTERS"
+  - "EP_GOVERNANCE_SCHEMAS"
+  - "EP_GOVERNANCE_PARSERS"
+  - "EP_DOC_TARGETS"
+  - "EP_GRAPH_BACKENDS"
+components: 16
+layer: leaf
+domain: extensibility
+constraints:
+  - "MUST remain a leaf module — no runtime imports from context.graph (TYPE_CHECKING only)"
+  - "MUST use runtime_checkable Protocols, not ABCs"
+  - "MUST validate entry points are classes via inspect.isclass()"

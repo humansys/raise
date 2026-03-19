@@ -1,0 +1,27 @@
+type: architecture_context
+project: rai-cli
+version: 2.0.0-alpha
+status: current
+tech_stack:
+  language: "Python 3.12+"
+  framework: "Pydantic AI"
+  validation: "Pydantic v2"
+  cli: "Typer"
+  distribution: "uv + pipx"
+  ast_analysis: "Python AST (stdlib) + ast-grep (shell)"
+  search: "ripgrep (shell)"
+  testing: "pytest"
+  graph: "NetworkX"
+  code_analysis: "Python AST (context/analyzers subpackage)"
+external_dependencies:
+  - "Git (version control, governance-as-code transport)"
+  - "Python AST (code structure extraction)"
+  - "ripgrep (fast content search)"
+  - "ast-grep (AST pattern matching)"
+users:
+  - "RaiSE Engineers (human developers)"
+  - "Rai (AI partner, reads architecture docs for grounding)"
+governed_by:
+  - "framework/reference/constitution.md"
+  - "governance/guardrails.md"
+  - "governance/vision.md"

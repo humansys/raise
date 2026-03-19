@@ -304,7 +304,7 @@ class TestMemoryDeprecationWrappers:
     """Tests for backward-compat deprecation wrappers on memory group."""
 
     def test_memory_build_deprecated(self, tmp_path: Path) -> None:
-        """rai memory build prints DEPRECATED warning."""
+        """Rai memory build prints DEPRECATED warning."""
         # Only verify the wrapper prints the deprecation warning.
         # Functional behavior is covered by TestGraphBuildCommand::test_build_basic.
         from unittest.mock import patch
@@ -317,7 +317,7 @@ class TestMemoryDeprecationWrappers:
         mock_build.assert_called_once()
 
     def test_memory_query_deprecated(self, sample_graph: Path, tmp_path: Path) -> None:
-        """rai memory query prints DEPRECATED and still works."""
+        """Rai memory query prints DEPRECATED and still works."""
         result = runner.invoke(
             app, ["memory", "query", "testing", "--index", str(sample_graph)]
         )
@@ -325,7 +325,7 @@ class TestMemoryDeprecationWrappers:
         assert "DEPRECATED" in result.output
 
     def test_memory_validate_deprecated(self, sample_graph: Path) -> None:
-        """rai memory validate prints DEPRECATED and still works."""
+        """Rai memory validate prints DEPRECATED and still works."""
         result = runner.invoke(
             app, ["memory", "validate", "--index", str(sample_graph)]
         )
@@ -333,20 +333,20 @@ class TestMemoryDeprecationWrappers:
         assert "DEPRECATED" in result.output
 
     def test_memory_list_deprecated(self, sample_graph: Path) -> None:
-        """rai memory list prints DEPRECATED and still works."""
+        """Rai memory list prints DEPRECATED and still works."""
         result = runner.invoke(app, ["memory", "list", "--index", str(sample_graph)])
         assert result.exit_code == 0
         assert "DEPRECATED" in result.output
 
     def test_memory_extract_deprecated(self, tmp_path: Path) -> None:
-        """rai memory extract prints DEPRECATED (missing file still errors)."""
+        """Rai memory extract prints DEPRECATED (missing file still errors)."""
         missing = tmp_path / "missing.md"
         result = runner.invoke(app, ["memory", "extract", str(missing)])
         # Should print DEPRECATED before failing on missing file
         assert "DEPRECATED" in result.output
 
     def test_memory_context_deprecated(self, tmp_path: Path) -> None:
-        """rai memory context prints DEPRECATED (missing index still errors)."""
+        """Rai memory context prints DEPRECATED (missing index still errors)."""
         missing = tmp_path / "missing.json"
         result = runner.invoke(
             app, ["memory", "context", "mod-x", "--index", str(missing)]
@@ -354,7 +354,7 @@ class TestMemoryDeprecationWrappers:
         assert "DEPRECATED" in result.output
 
     def test_memory_viz_deprecated(self, tmp_path: Path) -> None:
-        """rai memory viz prints DEPRECATED (missing index still errors)."""
+        """Rai memory viz prints DEPRECATED (missing index still errors)."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)

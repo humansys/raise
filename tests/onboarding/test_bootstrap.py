@@ -17,11 +17,11 @@ class TestBootstrapRaiBase:
     """Tests for bootstrap_rai_base() function."""
 
     def test_copies_identity_files(self, tmp_path: Path) -> None:
-        """Should copy core.md and perspective.md to .raise/rai/identity/."""
+        """Should copy core.yaml and perspective.md to .raise/rai/identity/."""
         result = bootstrap_rai_base(tmp_path)
 
         identity_dir = tmp_path / ".raise" / "rai" / "identity"
-        assert (identity_dir / "core.md").exists()
+        assert (identity_dir / "core.yaml").exists()
         assert (identity_dir / "perspective.md").exists()
         assert result.identity_copied
 
@@ -72,8 +72,8 @@ class TestBootstrapRaiBase:
         bootstrap_rai_base(tmp_path)
 
         base = files("raise_cli.rai_base")
-        original = (base / "identity" / "core.md").read_text(encoding="utf-8")
-        copied = (tmp_path / ".raise" / "rai" / "identity" / "core.md").read_text(
+        original = (base / "identity" / "core.yaml").read_text(encoding="utf-8")
+        copied = (tmp_path / ".raise" / "rai" / "identity" / "core.yaml").read_text(
             encoding="utf-8"
         )
         assert copied == original
@@ -88,13 +88,13 @@ class TestBootstrapIdempotency:
         bootstrap_rai_base(tmp_path)
 
         # Modify identity file
-        core_path = tmp_path / ".raise" / "rai" / "identity" / "core.md"
-        core_path.write_text("# Custom identity")
+        core_path = tmp_path / ".raise" / "rai" / "identity" / "core.yaml"
+        core_path.write_text("values: []")
 
         # Second bootstrap
         result = bootstrap_rai_base(tmp_path)
 
-        assert core_path.read_text(encoding="utf-8") == "# Custom identity"
+        assert core_path.read_text(encoding="utf-8") == "values: []"
         assert not result.identity_copied
 
     def test_does_not_overwrite_patterns(self, tmp_path: Path) -> None:
@@ -147,7 +147,7 @@ class TestBootstrapPartialState:
         # Create identity manually
         identity_dir = tmp_path / ".raise" / "rai" / "identity"
         identity_dir.mkdir(parents=True)
-        (identity_dir / "core.md").write_text("# Existing")
+        (identity_dir / "core.yaml").write_text("values: []")
         (identity_dir / "perspective.md").write_text("# Existing")
 
         result = bootstrap_rai_base(tmp_path)
@@ -164,7 +164,7 @@ class TestBootstrapPartialState:
         # Create identity and patterns manually
         identity_dir = tmp_path / ".raise" / "rai" / "identity"
         identity_dir.mkdir(parents=True)
-        (identity_dir / "core.md").write_text("# Existing")
+        (identity_dir / "core.yaml").write_text("values: []")
         (identity_dir / "perspective.md").write_text("# Existing")
 
         memory_dir = tmp_path / ".raise" / "rai" / "memory"

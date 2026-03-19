@@ -26,22 +26,26 @@ from raise_cli.schemas.session_state import (
 )
 from raise_cli.session.bundle import (
     SECTION_REGISTRY,
-    LiveBacklogStatus,
-    SectionManifest,
-    _fetch_live_status,
-    _format_governance_primes,
-    _format_manifest,
-    _format_narrative,
-    _format_next_session_prompt,
-    _format_progress,
-    _format_recent_sessions,
-    _format_work_section,
     assemble_context_bundle,
     assemble_orientation,
     assemble_sections,
     count_section_items,
+)
+from raise_cli.session.bundle_data import (
+    LiveBacklogStatus,
+    SectionManifest,
+    fetch_live_status,
     get_always_on_primes,
     get_foundational_patterns,
+)
+from raise_cli.session.bundle_formatters import (
+    format_governance_primes,
+    format_manifest,
+    format_narrative,
+    format_next_session_prompt,
+    format_progress,
+    format_recent_sessions,
+    format_work_section,
 )
 from raise_core.graph.models import GraphNode
 
@@ -493,7 +497,7 @@ class TestGetAlwaysOnPrimes:
 
 
 class TestFormatGovernancePrimes:
-    """Tests for _format_governance_primes."""
+    """Tests for format_governance_primes."""
 
     def test_formats_guardrails_and_principles(self) -> None:
         """Governance primes include guardrails and non-identity principles."""
@@ -505,7 +509,7 @@ class TestFormatGovernancePrimes:
                 "principle-lean", "principle", "Lean software development"
             ),
         ]
-        result = _format_governance_primes(nodes)
+        result = format_governance_primes(nodes)
         assert "# Governance Primes" in result
         assert "guardrail-must-code-001" in result
         assert "principle-lean" in result
@@ -519,7 +523,7 @@ class TestFormatGovernancePrimes:
                 "guardrail-must-code-001", "guardrail", "[MUST] Type hints"
             ),
         ]
-        result = _format_governance_primes(nodes)
+        result = format_governance_primes(nodes)
         assert "RAI-VAL-1" not in result
         assert "RAI-BND-1" not in result
         assert "guardrail-must-code-001" in result
@@ -529,7 +533,7 @@ class TestFormatGovernancePrimes:
         nodes = [
             _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
         ]
-        result = _format_governance_primes(nodes)
+        result = format_governance_primes(nodes)
         assert result == ""
 
     def test_truncates_long_content(self) -> None:
@@ -541,7 +545,7 @@ class TestFormatGovernancePrimes:
                 "A" * 100,
             ),
         ]
-        result = _format_governance_primes(nodes)
+        result = format_governance_primes(nodes)
         assert "..." in result
 
 
@@ -580,7 +584,7 @@ class TestIdentityPrimesRemoved:
 
 
 class TestFormatProgress:
-    """Tests for _format_progress."""
+    """Tests for format_progress."""
 
     def test_formats_progress(self) -> None:
         """Progress shows story and SP counts."""
@@ -593,7 +597,7 @@ class TestFormatProgress:
             sp_total=25,
         )
         state.completed_epics = ["E1", "E2", "E3"]
-        result = _format_progress(state)
+        result = format_progress(state)
         assert "E15" in result
         assert "5/8" in result
         assert "16/25" in result
@@ -609,24 +613,24 @@ class TestFormatProgress:
             sp_done=6,
             sp_total=25,
         )
-        result = _format_progress(state)
+        result = format_progress(state)
         assert "2/8" in result
         assert "Completed:" not in result
 
     def test_returns_empty_when_no_progress(self) -> None:
         """Returns empty string when no progress set."""
         state = _make_state()
-        result = _format_progress(state)
+        result = format_progress(state)
         assert result == ""
 
     def test_returns_empty_when_state_is_none(self) -> None:
         """Returns empty string when state is None."""
-        result = _format_progress(None)
+        result = format_progress(None)
         assert result == ""
 
 
 class TestFormatRecentSessions:
-    """Tests for _format_recent_sessions."""
+    """Tests for format_recent_sessions."""
 
     def test_reads_last_3_sessions(self, tmp_path: Path) -> None:
         """Reads last 3 sessions from index.jsonl."""
@@ -647,7 +651,7 @@ class TestFormatRecentSessions:
         ]
         index_file.write_text("\n".join(json.dumps(s) for s in sessions))
 
-        result = _format_recent_sessions(tmp_path, limit=3)
+        result = format_recent_sessions(tmp_path, limit=3)
         assert "SES-004" in result
         assert "SES-003" in result
         assert "SES-002" in result
@@ -656,7 +660,7 @@ class TestFormatRecentSessions:
 
     def test_returns_empty_when_no_index(self, tmp_path: Path) -> None:
         """Returns empty string when index file doesn't exist."""
-        result = _format_recent_sessions(tmp_path)
+        result = format_recent_sessions(tmp_path)
         assert result == ""
 
     def test_returns_empty_when_empty_index(self, tmp_path: Path) -> None:
@@ -664,7 +668,7 @@ class TestFormatRecentSessions:
         index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         index_dir.mkdir(parents=True)
         (index_dir / "index.jsonl").write_text("")
-        result = _format_recent_sessions(tmp_path)
+        result = format_recent_sessions(tmp_path)
         assert result == ""
 
     def test_fewer_sessions_than_limit(self, tmp_path: Path) -> None:
@@ -683,7 +687,7 @@ class TestFormatRecentSessions:
         ]
         (index_dir / "index.jsonl").write_text(json.dumps(sessions[0]))
 
-        result = _format_recent_sessions(tmp_path, limit=3)
+        result = format_recent_sessions(tmp_path, limit=3)
         assert "SES-001" in result
 
     def test_truncates_long_topics(self, tmp_path: Path) -> None:
@@ -700,7 +704,7 @@ class TestFormatRecentSessions:
         }
         (index_dir / "index.jsonl").write_text(json.dumps(session))
 
-        result = _format_recent_sessions(tmp_path, limit=3)
+        result = format_recent_sessions(tmp_path, limit=3)
         assert "..." in result
 
 
@@ -1298,7 +1302,7 @@ class TestAssembleOrientation:
 
 
 class TestFormatManifest:
-    """Tests for _format_manifest."""
+    """Tests for format_manifest."""
 
     def test_manifest_format(self) -> None:
         """Manifest formats section counts and token estimates."""
@@ -1308,7 +1312,7 @@ class TestFormatManifest:
             SectionManifest(name="coaching", count=1, token_estimate=80),
             SectionManifest(name="deadlines", count=0, token_estimate=0),
         ]
-        result = _format_manifest(manifests)
+        result = format_manifest(manifests)
 
         assert "# Available Context" in result
         assert "governance: 14 items (~350 tokens)" in result
@@ -1318,13 +1322,13 @@ class TestFormatManifest:
 
     def test_manifest_empty_list(self) -> None:
         """Empty manifest list returns empty string."""
-        result = _format_manifest([])
+        result = format_manifest([])
         assert result == ""
 
     def test_manifest_zero_count_omits_tokens(self) -> None:
         """Zero-count sections don't show token estimate."""
         manifests = [SectionManifest(name="deadlines", count=0, token_estimate=0)]
-        result = _format_manifest(manifests)
+        result = format_manifest(manifests)
         assert "deadlines: 0 items" in result
         assert "tokens" not in result.split("deadlines")[1]
 
@@ -1432,9 +1436,9 @@ class TestAssembleSections:
 
 
 class TestLiveBacklogStatus:
-    """Tests for LiveBacklogStatus model and _fetch_live_status()."""
+    """Tests for LiveBacklogStatus model and fetch_live_status()."""
 
-    def test_fetch_live_status_no_work(self) -> None:
+    def testfetch_live_status_no_work(self) -> None:
         """When current_work has no epic/story keys, return empty status immediately."""
         state = SessionState(
             current_work=CurrentWork(epic="", story="", phase="", branch=""),
@@ -1445,14 +1449,14 @@ class TestLiveBacklogStatus:
                 summary="test",
             ),
         )
-        result = _fetch_live_status(state)
+        result = fetch_live_status(state)
         assert result == LiveBacklogStatus()
         assert result.epic_status == ""
         assert result.story_status == ""
         assert result.warning == ""
 
     @patch("raise_cli.cli.commands._resolve.resolve_adapter")
-    def test_fetch_live_status_success(self, mock_resolve: MagicMock) -> None:
+    def testfetch_live_status_success(self, mock_resolve: MagicMock) -> None:
         """When adapter returns IssueDetail, populate status/summary fields."""
         from raise_cli.adapters.models import IssueDetail
 
@@ -1489,7 +1493,7 @@ class TestLiveBacklogStatus:
                 summary="test",
             ),
         )
-        result = _fetch_live_status(state, timeout=5.0)
+        result = fetch_live_status(state, timeout=5.0)
         assert result.epic_status == "in_progress"
         assert result.epic_summary == "Backlog Automation"
         assert result.story_status == "selected_for_development"
@@ -1497,7 +1501,7 @@ class TestLiveBacklogStatus:
         assert result.warning == ""
 
     @patch("raise_cli.cli.commands._resolve.resolve_adapter")
-    def test_fetch_live_status_timeout(self, mock_resolve: MagicMock) -> None:
+    def testfetch_live_status_timeout(self, mock_resolve: MagicMock) -> None:
         """When adapter.get_issue hangs, return warning with 'timeout'."""
         mock_adapter = MagicMock()
         mock_resolve.return_value = mock_adapter
@@ -1522,11 +1526,11 @@ class TestLiveBacklogStatus:
             ),
         )
         # Use very short timeout to trigger quickly
-        result = _fetch_live_status(state, timeout=0.1)
+        result = fetch_live_status(state, timeout=0.1)
         assert "timeout" in result.warning.lower()
 
     @patch("raise_cli.cli.commands._resolve.resolve_adapter")
-    def test_fetch_live_status_unavailable(self, mock_resolve: MagicMock) -> None:
+    def testfetch_live_status_unavailable(self, mock_resolve: MagicMock) -> None:
         """When resolve_adapter raises SystemExit, return warning with 'unavailable'."""
         mock_resolve.side_effect = SystemExit(1)
 
@@ -1544,10 +1548,10 @@ class TestLiveBacklogStatus:
                 summary="test",
             ),
         )
-        result = _fetch_live_status(state)
+        result = fetch_live_status(state)
         assert "unavailable" in result.warning.lower()
 
-    def test_format_work_section_with_live_status(self) -> None:
+    def testformat_work_section_with_live_status(self) -> None:
         """Live status adds annotation to epic and story lines."""
         state = SessionState(
             current_work=CurrentWork(
@@ -1569,11 +1573,11 @@ class TestLiveBacklogStatus:
             story_status="selected_for_development",
             story_summary="Session-start live query",
         )
-        result = _format_work_section(state, live=live)
+        result = format_work_section(state, live=live)
         assert "in_progress (live)" in result
         assert "selected_for_development (live)" in result
 
-    def test_format_work_section_with_live_warning(self) -> None:
+    def testformat_work_section_with_live_warning(self) -> None:
         """Warning line appended when live has warning."""
         state = SessionState(
             current_work=CurrentWork(
@@ -1592,11 +1596,11 @@ class TestLiveBacklogStatus:
         live = LiveBacklogStatus(
             warning="Backlog adapter unavailable — showing cached state"
         )
-        result = _format_work_section(state, live=live)
+        result = format_work_section(state, live=live)
         assert "⚠" in result
         assert "unavailable" in result.lower()
 
-    def test_format_work_section_no_live(self) -> None:
+    def testformat_work_section_no_live(self) -> None:
         """Existing behavior unchanged when live=None."""
         state = SessionState(
             current_work=CurrentWork(
@@ -1612,18 +1616,18 @@ class TestLiveBacklogStatus:
                 summary="test",
             ),
         )
-        result = _format_work_section(state, live=None)
+        result = format_work_section(state, live=None)
         assert "(live)" not in result
         assert "⚠" not in result
         assert "Story: S347.5 [implement]" in result
         assert "Epic: E347" in result
 
-    @patch("raise_cli.session.bundle._fetch_live_status")
-    @patch("raise_cli.session.bundle._find_release_for_current_epic")
+    @patch("raise_cli.session.bundle.fetch_live_status")
+    @patch("raise_cli.session.bundle.find_release_for_current_epic")
     def test_assemble_orientation_calls_live_status(
         self, mock_release: MagicMock, mock_fetch: MagicMock
     ) -> None:
-        """assemble_orientation calls _fetch_live_status and includes annotation."""
+        """assemble_orientation calls fetch_live_status and includes annotation."""
         mock_release.return_value = None
         mock_fetch.return_value = LiveBacklogStatus(
             epic_status="in_progress",
@@ -1673,7 +1677,7 @@ class TestStalenessDisclaimer:
             ),
             next_session_prompt="ADR-015 still uncommitted. Branch has 3 commits ahead of dev.",
         )
-        result = _format_next_session_prompt(state)
+        result = format_next_session_prompt(state)
 
         assert "# Next Session Prompt" in result
         assert "2026-03-01" in result
@@ -1683,7 +1687,7 @@ class TestStalenessDisclaimer:
         assert "ADR-015 still uncommitted" in result
 
     def test_narrative_includes_staleness_caveat(self) -> None:
-        """narrative includes capture date and staleness warning."""
+        """Narrative includes capture date and staleness warning."""
         state = SessionState(
             current_work=CurrentWork(
                 epic="E15", story="S15.7", phase="implement", branch="dev"
@@ -1696,7 +1700,7 @@ class TestStalenessDisclaimer:
             ),
             narrative="## Branch State\n- 3 commits ahead of dev, ADR-015 uncommitted",
         )
-        result = _format_narrative(state)
+        result = format_narrative(state)
 
         assert "# Session Narrative" in result
         assert "2026-03-01" in result
@@ -1714,7 +1718,7 @@ class TestStalenessDisclaimer:
             ),
             next_session_prompt="",
         )
-        assert _format_next_session_prompt(state) == ""
+        assert format_next_session_prompt(state) == ""
 
     def test_empty_narrative_no_caveat(self) -> None:
         """Empty narrative returns empty string — no caveat noise."""
@@ -1725,9 +1729,9 @@ class TestStalenessDisclaimer:
             ),
             narrative="",
         )
-        assert _format_narrative(state) == ""
+        assert format_narrative(state) == ""
 
     def test_none_state_no_caveat(self) -> None:
         """None state returns empty string for both formatters."""
-        assert _format_next_session_prompt(None) == ""
-        assert _format_narrative(None) == ""
+        assert format_next_session_prompt(None) == ""
+        assert format_narrative(None) == ""

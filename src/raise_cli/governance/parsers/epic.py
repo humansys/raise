@@ -66,6 +66,74 @@ def _extract_frontmatter(text: str) -> dict[str, str | None]:
     return metadata
 
 
+def _parse_epic_id_and_name(
+    parent_dir: str, lines: list[str]
+) -> tuple[str, str, int] | None:
+    """Parse epic ID and name from directory name and H1 header.
+
+    Args:
+        parent_dir: Epic directory name (e.g., 'e08-backlog').
+        lines: Document lines.
+
+    Returns:
+        Tuple of (epic_id, epic_name, header_line) or None if ID not found.
+    """
+    epic_id_match = re.search(r"^e(\d+)", parent_dir, re.IGNORECASE)
+    if not epic_id_match:
+        return None
+
+    epic_id = f"E{int(epic_id_match.group(1))}"  # E8 (normalize: e08 -> E8)
+
+    # Extract epic name from H1: # Epic E8: Work Tracking Graph - Scope
+    epic_name = None
+    header_line = 1
+    for i, line in enumerate(lines, 1):
+        match = re.match(r"^#\s*Epic\s+E\d+[:\s]+(.+?)(?:\s*-\s*Scope)?$", line)
+        if match:
+            epic_name = match.group(1).strip()
+            header_line = i
+            break
+
+    if not epic_name:
+        epic_name = f"Epic {epic_id}"
+
+    return epic_id, epic_name, header_line
+
+
+def _build_epic_content(
+    epic_id: str,
+    epic_name: str,
+    frontmatter: dict[str, str | None],
+    text: str,
+) -> str:
+    """Build epic content summary from metadata and objective.
+
+    Args:
+        epic_id: Normalized epic ID (e.g., 'E8').
+        epic_name: Epic name.
+        frontmatter: Extracted frontmatter metadata.
+        text: Full document text for objective extraction.
+
+    Returns:
+        Content summary string, truncated to 500 chars.
+    """
+    content = f"Epic {epic_id}: {epic_name}"
+    if frontmatter["status"]:
+        content += f" ({frontmatter['status']})"
+
+    # Extract objective (first paragraph after ## Objective)
+    objective_match = re.search(
+        r"##\s*Objective\s*\n+(.+?)(?=\n\n|\n##|\Z)", text, re.DOTALL
+    )
+    if objective_match:
+        objective = objective_match.group(1).strip()
+        if len(objective) > 300:
+            objective = objective[:297] + "..."
+        content += f". {objective}"
+
+    return content[:500]
+
+
 def extract_epic_details(
     file_path: Path, project_root: Path | None = None
 ) -> Concept | None:
@@ -96,65 +164,25 @@ def extract_epic_details(
         return None
 
     if project_root is None:
-        # work/epics/e08-name/scope.md -> project root is 4 levels up
         project_root = file_path.parent.parent.parent.parent
 
     text = file_path.read_text(encoding="utf-8")
     lines = text.split("\n")
 
-    # Extract epic ID from parent directory: e08-backlog -> E8
-    parent_dir = file_path.parent.name  # e08-backlog
-    epic_id_match = re.search(r"^e(\d+)", parent_dir, re.IGNORECASE)
-    if not epic_id_match:
+    parsed = _parse_epic_id_and_name(file_path.parent.name, lines)
+    if parsed is None:
         return None
+    epic_id, epic_name, header_line = parsed
 
-    epic_id = f"E{int(epic_id_match.group(1))}"  # E8 (normalize: e08 -> E8)
-
-    # Extract epic name from H1: # Epic E8: Work Tracking Graph - Scope
-    epic_name = None
-    header_line = 1
-    for i, line in enumerate(lines, 1):
-        match = re.match(r"^#\s*Epic\s+E\d+[:\s]+(.+?)(?:\s*-\s*Scope)?$", line)
-        if match:
-            epic_name = match.group(1).strip()
-            header_line = i
-            break
-
-    if not epic_name:
-        # Fallback: use epic ID
-        epic_name = f"Epic {epic_id}"
-
-    # Extract frontmatter
     frontmatter = _extract_frontmatter(text)
-
-    # Count stories in table
     story_count = len(re.findall(r"^\|\s*F\d+\.\d+\s*\|", text, re.MULTILINE))
 
-    # Calculate relative file path
     try:
         relative_path = portable_path(file_path, project_root)
     except ValueError:
         relative_path = file_path.name
 
-    # Extract objective (first paragraph after ## Objective)
-    objective = None
-    objective_match = re.search(
-        r"##\s*Objective\s*\n+(.+?)(?=\n\n|\n##|\Z)",  # NOSONAR — lazy required: greedy would consume to \Z past section boundaries
-        text,
-        re.DOTALL,
-    )
-    if objective_match:
-        objective = objective_match.group(1).strip()
-        # Truncate if too long
-        if len(objective) > 300:
-            objective = objective[:297] + "..."
-
-    # Build content summary
-    content = f"Epic {epic_id}: {epic_name}"
-    if frontmatter["status"]:
-        content += f" ({frontmatter['status']})"
-    if objective:
-        content += f". {objective}"
+    content = _build_epic_content(epic_id, epic_name, frontmatter, text)
 
     return Concept(
         id=f"epic-{epic_id.lower()}",
@@ -162,7 +190,7 @@ def extract_epic_details(
         file=relative_path,
         section=f"Epic {epic_id}: {epic_name}",
         lines=(header_line, min(header_line + 20, len(lines))),
-        content=content[:500],  # Truncate to 500 chars
+        content=content,
         metadata={
             "epic_id": epic_id,
             "name": epic_name,
@@ -175,6 +203,64 @@ def extract_epic_details(
             "scope_doc": relative_path,
         },
     )
+
+
+class _StoryColumns:
+    """Parsed story table columns."""
+
+    __slots__ = ("size", "status", "sp", "description")
+
+    def __init__(
+        self,
+        size: str | None,
+        status: str | None,
+        sp: int | None,
+        description: str | None,
+    ) -> None:
+        self.size = size
+        self.status = status
+        self.sp = sp
+        self.description = description
+
+
+def _parse_story_columns(col3: str, col4: str, col5: str) -> _StoryColumns:
+    """Parse ambiguous story table columns into structured fields.
+
+    Story tables have varying column layouts. This function determines
+    which column holds size, SP, status, and description.
+
+    Args:
+        col3: Third table column value (size or SP).
+        col4: Fourth table column value (status or SP).
+        col5: Fifth table column value (description, status, or empty).
+
+    Returns:
+        Parsed story column data.
+    """
+    size: str | None = None
+    status: str | None = None
+    sp: int | None = None
+    description: str | None = None
+
+    if re.match(r"^(XS|S|M|L)$", col3, re.IGNORECASE):
+        size = col3.upper()
+        if re.match(r"^\d+$", col4):
+            sp = int(col4)
+            status = normalize_status(col5) if col5 else "pending"
+        else:
+            status = normalize_status(col4)
+            description = col5
+    elif re.match(r"^\d+$", col3):
+        sp = int(col3)
+        status = normalize_status(col4)
+        if col5 and not re.match(r"^\d+\s*min", col5):
+            description = col5
+    else:
+        size = col3[:2].upper() if col3 else None
+        status = normalize_status(col4)
+        description = col5
+
+    return _StoryColumns(size=size, status=status, sp=sp, description=description)
 
 
 def extract_stories(file_path: Path, project_root: Path | None = None) -> list[Concept]:
@@ -210,12 +296,10 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
     text = file_path.read_text(encoding="utf-8")
     lines = text.split("\n")
 
-    # Extract epic ID from parent directory: e08-backlog -> E8
     parent_dir = file_path.parent.name
     epic_id_match = re.search(r"^e(\d+)", parent_dir, re.IGNORECASE)
     epic_id = f"E{int(epic_id_match.group(1))}" if epic_id_match else "E0"
 
-    # Calculate relative file path
     try:
         relative_path = portable_path(file_path, project_root)
     except ValueError:
@@ -223,67 +307,34 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
 
     concepts: list[Concept] = []
 
-    # Parse story table rows
-    # Pattern variants:
-    # | F8.1 | Backlog Parser | S | Pending | Description |
-    # | F8.1 | Backlog Parser | S | 2 | Pending | Description |
-    # | F2.1 | Concept Extraction | 3 | ✅ Complete | 52 min | 3.5x |
     story_pattern = re.compile(
-        r"^\|\s*(F\d+\.\d+)\s*\|"  # Story ID
-        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"  # Story name (with optional bold)
-        r"\s*([^|]+?)\s*\|"  # Size or SP
-        r"\s*([^|]+?)\s*\|"  # Status or SP (depends on format)
-        r"(?:\s*([^|]*?)\s*\|)?"  # Optional: Description or Status or Time
+        r"^\|\s*(F\d+\.\d+)\s*\|"
+        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"
+        r"\s*([^|]+?)\s*\|"
+        r"\s*([^|]+?)\s*\|"
+        r"(?:\s*([^|]*?)\s*\|)?"
     )
 
     for i, line in enumerate(lines, 1):
         match = story_pattern.match(line)
-        if match:
-            story_id = match.group(1).strip()
-            name = match.group(2).strip()
-            col3 = match.group(3).strip()
-            col4 = match.group(4).strip()
-            col5 = match.group(5).strip() if match.group(5) else ""
+        if not match:
+            continue
 
-            # Determine column mapping based on content
-            # If col3 looks like size (XS/S/M/L) or small number (1-3), it's size
-            # If col4 looks like status, use col3 as size and col4 as status
-            size = None
-            status = None
-            sp = None
-            description = None
+        story_id = match.group(1).strip()
+        name = match.group(2).strip()
+        col5 = match.group(5).strip() if match.group(5) else ""
+        cols = _parse_story_columns(
+            match.group(3).strip(), match.group(4).strip(), col5
+        )
 
-            # Check if col3 is size (XS/S/M/L)
-            if re.match(r"^(XS|S|M|L)$", col3, re.IGNORECASE):
-                size = col3.upper()
-                # col4 could be SP or Status
-                if re.match(r"^\d+$", col4):
-                    sp = int(col4)
-                    status = normalize_status(col5) if col5 else "pending"
-                else:
-                    status = normalize_status(col4)
-                    description = col5
-            # Check if col3 is SP (number)
-            elif re.match(r"^\d+$", col3):
-                sp = int(col3)
-                status = normalize_status(col4)
-                # col5 might be actual time or description
-                if col5 and not re.match(r"^\d+\s*min", col5):
-                    description = col5
-            else:
-                # Fallback: treat col3 as size text, col4 as status
-                size = col3[:2].upper() if col3 else None
-                status = normalize_status(col4)
-                description = col5
+        content = f"{story_id}: {name}"
+        if cols.status:
+            content += f" ({cols.status})"
+        if cols.description:
+            content += f" - {cols.description}"
 
-            # Build content
-            content = f"{story_id}: {name}"
-            if status:
-                content += f" ({status})"
-            if description:
-                content += f" - {description}"
-
-            concept = Concept(
+        concepts.append(
+            Concept(
                 id=f"story-{story_id.lower().replace('.', '-')}",
                 type=ConceptType.STORY,
                 file=relative_path,
@@ -293,14 +344,14 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
                 metadata={
                     "story_id": story_id,
                     "name": name,
-                    "status": status or "pending",
-                    "size": size,
-                    "sp": sp,
-                    "description": description,
+                    "status": cols.status or "pending",
+                    "size": cols.size,
+                    "sp": cols.sp,
+                    "description": cols.description,
                     "epic_id": epic_id,
                 },
             )
-            concepts.append(concept)
+        )
 
     return concepts
 

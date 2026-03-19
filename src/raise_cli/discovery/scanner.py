@@ -92,7 +92,8 @@ class Symbol(BaseModel):
     docstring: str | None = Field(default=None, description="Symbol docstring")
     parent: str | None = Field(default=None, description="Parent symbol name")
     depends_on: list[str] = Field(
-        default_factory=list, description="Dependency type names"
+        default_factory=list,
+        description="Dependencies extracted from signature (e.g., constructor params)",
     )
 
 
@@ -311,7 +312,7 @@ def _extract_ts_signature(node: Node, source: bytes) -> str:
             return f"class {name} {_get_node_text(heritage, source)}"
         return f"class {name}"
 
-    elif node_type in ("function_declaration", "generator_function_declaration"):
+    if node_type in ("function_declaration", "generator_function_declaration"):
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         params_node = _find_child_by_type(node, "formal_parameters")
@@ -322,24 +323,24 @@ def _extract_ts_signature(node: Node, source: bytes) -> str:
             return f"function {name}{params}{_get_node_text(return_type, source)}"
         return f"function {name}{params}"
 
-    elif node_type in ("method_definition", "method_signature"):
+    if node_type in ("method_definition", "method_signature"):
         name_node = _find_child_by_type(node, "property_identifier", "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         params_node = _find_child_by_type(node, "formal_parameters")
         params = _get_node_text(params_node, source) if params_node else "()"
         return f"{name}{params}"
 
-    elif node_type == "interface_declaration":
+    if node_type == "interface_declaration":
         name_node = _find_child_by_type(node, "type_identifier", "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"interface {name}"
 
-    elif node_type == "enum_declaration":
+    if node_type == "enum_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"enum {name}"
 
-    elif node_type == "type_alias_declaration":
+    if node_type == "type_alias_declaration":
         name_node = _find_child_by_type(node, "type_identifier", "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"type {name}"
@@ -407,6 +408,180 @@ def extract_javascript_symbols(source: str, file_path: str) -> list[Symbol]:
     return _extract_ts_js_symbols(tree.root_node, source_bytes, file_path)
 
 
+def _extract_ts_js_exported_const(
+    node: Node,
+    symbols: list[Symbol],
+    source: bytes,
+    file_path: str,
+) -> None:
+    """Extract exported const variable declarations as constants."""
+    # export_statement → declaration → lexical_declaration → variable_declarator
+    # Also handle top-level lexical_declaration directly
+    decl = node
+    if node.type == "export_statement":
+        decl = _find_child_by_type(node, "lexical_declaration")
+        if decl is None:
+            return
+
+    if decl.type != "lexical_declaration":
+        return
+
+    # Only extract 'const' (not 'let' or 'var')
+    first_child = decl.children[0] if decl.children else None
+    if first_child is None or _get_node_text(first_child, source) != "const":
+        return
+
+    for child in decl.children:
+        if child.type == "variable_declarator":
+            name_node = _find_child_by_type(child, "identifier")
+            if name_node:
+                name = _get_node_text(name_node, source)
+                symbols.append(
+                    Symbol(
+                        name=name,
+                        kind="constant",
+                        file=file_path,
+                        line=child.start_point[0] + 1,
+                        signature=f"const {name}",
+                    )
+                )
+
+
+# TS/JS node type sets (module-level constants for _walk_ts_js_node)
+_TS_CLASS_TYPES = frozenset({"class_declaration"})
+_TS_FUNCTION_TYPES = frozenset(
+    {"function_declaration", "generator_function_declaration"}
+)
+_TS_METHOD_TYPES = frozenset({"method_definition", "method_signature"})
+_TS_INTERFACE_TYPES = frozenset({"interface_declaration"})
+_TS_ENUM_TYPES = frozenset({"enum_declaration"})
+_TS_TYPE_ALIAS_TYPES = frozenset({"type_alias_declaration"})
+
+
+def _walk_ts_js_node(  # noqa: C901 -- AST walker with many node types; inherent complexity
+    node: Node,
+    *,
+    symbols: list[Symbol],
+    source: bytes,
+    file_path: str,
+    parent_class: str | None = None,
+) -> None:
+    """Walk a TS/JS tree-sitter node and collect symbols."""
+    node_type = node.type
+
+    if node_type in _TS_CLASS_TYPES:
+        name_node = _find_child_by_type(node, "type_identifier", "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=name,
+                kind="class",
+                file=file_path,
+                line=node.start_point[0] + 1,  # tree-sitter is 0-indexed
+                signature=_extract_ts_signature(node, source),
+            )
+        )
+
+        # Walk class body for methods
+        body = _find_child_by_type(node, "class_body")
+        if body:
+            for child in body.children:
+                _walk_ts_js_node(
+                    child,
+                    symbols=symbols,
+                    source=source,
+                    file_path=file_path,
+                    parent_class=name,
+                )
+        return  # Don't recurse further into class
+
+    if node_type in _TS_FUNCTION_TYPES and parent_class is None:
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=name,
+                kind="function",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_ts_signature(node, source),
+            )
+        )
+
+    elif node_type in _TS_METHOD_TYPES and parent_class is not None:
+        name_node = _find_child_by_type(node, "property_identifier", "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=name,
+                kind="method",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_ts_signature(node, source),
+                parent=parent_class,
+            )
+        )
+
+    elif node_type in _TS_INTERFACE_TYPES:
+        name_node = _find_child_by_type(node, "type_identifier", "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=name,
+                kind="interface",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_ts_signature(node, source),
+            )
+        )
+
+    elif node_type in _TS_ENUM_TYPES:
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=name,
+                kind="enum",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_ts_signature(node, source),
+            )
+        )
+
+    elif node_type in _TS_TYPE_ALIAS_TYPES:
+        name_node = _find_child_by_type(node, "type_identifier", "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=name,
+                kind="type_alias",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_ts_signature(node, source),
+            )
+        )
+
+    elif node_type == "export_statement":
+        # Handle exported const declarations
+        _extract_ts_js_exported_const(node, symbols, source, file_path)
+
+    # Recurse into children
+    for child in node.children:
+        _walk_ts_js_node(
+            child,
+            symbols=symbols,
+            source=source,
+            file_path=file_path,
+            parent_class=parent_class,
+        )
+
+
 def _extract_ts_js_symbols(
     root: Node,
     source: bytes,
@@ -425,152 +600,7 @@ def _extract_ts_js_symbols(
         List of Symbol objects.
     """
     symbols: list[Symbol] = []
-
-    # Node types we care about
-    class_types = {"class_declaration"}
-    function_types = {"function_declaration", "generator_function_declaration"}
-    method_types = {"method_definition", "method_signature"}
-    interface_types = {"interface_declaration"}
-    enum_types = {"enum_declaration"}
-    type_alias_types = {"type_alias_declaration"}
-
-    def _extract_exported_const(node: Node) -> None:
-        """Extract exported const variable declarations as constants."""
-        # export_statement → declaration → lexical_declaration → variable_declarator
-        # Also handle top-level lexical_declaration directly
-        decl = node
-        if node.type == "export_statement":
-            decl = _find_child_by_type(node, "lexical_declaration")
-            if decl is None:
-                return
-
-        if decl.type != "lexical_declaration":
-            return
-
-        # Only extract 'const' (not 'let' or 'var')
-        first_child = decl.children[0] if decl.children else None
-        if first_child is None or _get_node_text(first_child, source) != "const":
-            return
-
-        for child in decl.children:
-            if child.type == "variable_declarator":
-                name_node = _find_child_by_type(child, "identifier")
-                if name_node:
-                    name = _get_node_text(name_node, source)
-                    symbols.append(
-                        Symbol(
-                            name=name,
-                            kind="constant",
-                            file=file_path,
-                            line=child.start_point[0] + 1,
-                            signature=f"const {name}",
-                        )
-                    )
-
-    def walk(node: Node, parent_class: str | None = None) -> None:
-        node_type = node.type
-
-        if node_type in class_types:
-            name_node = _find_child_by_type(node, "type_identifier", "identifier")
-            name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=name,
-                    kind="class",
-                    file=file_path,
-                    line=node.start_point[0] + 1,  # tree-sitter is 0-indexed
-                    signature=_extract_ts_signature(node, source),
-                )
-            )
-
-            # Walk class body for methods
-            body = _find_child_by_type(node, "class_body")
-            if body:
-                for child in body.children:
-                    walk(child, parent_class=name)
-            return  # Don't recurse further into class
-
-        elif node_type in function_types and parent_class is None:
-            name_node = _find_child_by_type(node, "identifier")
-            name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=name,
-                    kind="function",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_ts_signature(node, source),
-                )
-            )
-
-        elif node_type in method_types and parent_class is not None:
-            name_node = _find_child_by_type(node, "property_identifier", "identifier")
-            name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=name,
-                    kind="method",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_ts_signature(node, source),
-                    parent=parent_class,
-                )
-            )
-
-        elif node_type in interface_types:
-            name_node = _find_child_by_type(node, "type_identifier", "identifier")
-            name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=name,
-                    kind="interface",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_ts_signature(node, source),
-                )
-            )
-
-        elif node_type in enum_types:
-            name_node = _find_child_by_type(node, "identifier")
-            name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=name,
-                    kind="enum",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_ts_signature(node, source),
-                )
-            )
-
-        elif node_type in type_alias_types:
-            name_node = _find_child_by_type(node, "type_identifier", "identifier")
-            name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=name,
-                    kind="type_alias",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_ts_signature(node, source),
-                )
-            )
-
-        elif node_type == "export_statement":
-            # Handle exported const declarations
-            _extract_exported_const(node)
-
-        # Recurse into children
-        for child in node.children:
-            walk(child, parent_class)
-
-    walk(root)
+    _walk_ts_js_node(root, symbols=symbols, source=source, file_path=file_path)
     return symbols
 
 
@@ -598,7 +628,7 @@ def _get_php_parser() -> Parser:
     return Parser(lang)
 
 
-def _extract_php_signature(node: Node, source: bytes) -> str:
+def _extract_php_signature(node: Node, source: bytes) -> str:  # noqa: C901 -- complexity 14, refactor deferred
     """Extract a signature from a PHP AST node."""
     node_type = node.type
 
@@ -614,17 +644,17 @@ def _extract_php_signature(node: Node, source: bytes) -> str:
             parts.append(_get_node_text(iface, source))
         return " ".join(parts)
 
-    elif node_type == "interface_declaration":
+    if node_type == "interface_declaration":
         name_node = _find_child_by_type(node, "name")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"interface {name}"
 
-    elif node_type == "trait_declaration":
+    if node_type == "trait_declaration":
         name_node = _find_child_by_type(node, "name")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"trait {name}"
 
-    elif node_type == "function_definition":
+    if node_type == "function_definition":
         name_node = _find_child_by_type(node, "name")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         params_node = _find_child_by_type(node, "formal_parameters")
@@ -635,7 +665,7 @@ def _extract_php_signature(node: Node, source: bytes) -> str:
             return f"function {name}{params}: {_get_node_text(ret_type, source)}"
         return f"function {name}{params}"
 
-    elif node_type == "method_declaration":
+    if node_type == "method_declaration":
         parts: list[str] = []
         vis = _find_child_by_type(node, "visibility_modifier")
         if vis:
@@ -654,7 +684,7 @@ def _extract_php_signature(node: Node, source: bytes) -> str:
             sig += f": {_get_node_text(ret_type, source)}"
         return sig
 
-    elif node_type == "enum_declaration":
+    if node_type == "enum_declaration":
         name_node = _find_child_by_type(node, "name")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         # Backed enum type (e.g., ": string")
@@ -664,6 +694,147 @@ def _extract_php_signature(node: Node, source: bytes) -> str:
         return f"enum {name}"
 
     return ""
+
+
+def _qualify_php_name(ns: list[str], name: str) -> str:
+    """Qualify a PHP name with its namespace.
+
+    Uses dot separator for internal IDs — PHP uses backslash for namespaces
+    but backslashes in component IDs break JSON, graph queries, and ID dedup.
+    """
+    return f"{ns[0]}.{name}" if ns[0] else name
+
+
+# PHP container types (module-level constant for _walk_php_node)
+_PHP_CONTAINER_TYPES = frozenset(
+    {
+        "class_declaration",
+        "interface_declaration",
+        "trait_declaration",
+    }
+)
+
+
+def _walk_php_node(  # noqa: C901 -- AST walker with many PHP node types; inherent complexity
+    node: Node,
+    *,
+    symbols: list[Symbol],
+    ns: list[str],
+    source: bytes,
+    file_path: str,
+    parent_name: str | None = None,
+) -> None:
+    """Walk a PHP tree-sitter node and collect symbols."""
+    node_type = node.type
+
+    if node_type == "namespace_definition":
+        ns_node = _find_child_by_type(node, "namespace_name")
+        if ns_node:
+            # Normalize PHP backslash separators to dots for graph IDs
+            ns[0] = _get_node_text(ns_node, source).replace("\\", ".")
+        # Continue walking children (declarations inside namespace)
+        for child in node.children:
+            _walk_php_node(
+                child,
+                symbols=symbols,
+                ns=ns,
+                source=source,
+                file_path=file_path,
+                parent_name=parent_name,
+            )
+        return
+
+    if node_type in _PHP_CONTAINER_TYPES:
+        name_node = _find_child_by_type(node, "name")
+        local_name = _get_node_text(name_node, source) if name_node else "unknown"
+        qualified = _qualify_php_name(ns, local_name)
+
+        kind: SymbolKind = "class"
+        if node_type == "interface_declaration":
+            kind = "interface"
+        elif node_type == "trait_declaration":
+            kind = "trait"
+
+        symbols.append(
+            Symbol(
+                name=qualified,
+                kind=kind,
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_php_signature(node, source),
+            )
+        )
+
+        # Walk declaration_list for methods
+        body = _find_child_by_type(node, "declaration_list")
+        if body:
+            for child in body.children:
+                _walk_php_node(
+                    child,
+                    symbols=symbols,
+                    ns=ns,
+                    source=source,
+                    file_path=file_path,
+                    parent_name=qualified,
+                )
+        return
+
+    if node_type == "method_declaration" and parent_name is not None:
+        name_node = _find_child_by_type(node, "name")
+        local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=local_name,
+                kind="method",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_php_signature(node, source),
+                parent=parent_name,
+            )
+        )
+        return
+
+    if node_type == "function_definition" and parent_name is None:
+        name_node = _find_child_by_type(node, "name")
+        local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=_qualify_php_name(ns, local_name),
+                kind="function",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_php_signature(node, source),
+            )
+        )
+        return
+
+    if node_type == "enum_declaration":
+        name_node = _find_child_by_type(node, "name")
+        local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+        symbols.append(
+            Symbol(
+                name=_qualify_php_name(ns, local_name),
+                kind="enum",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_php_signature(node, source),
+            )
+        )
+        return
+
+    # Recurse into children
+    for child in node.children:
+        _walk_php_node(
+            child,
+            symbols=symbols,
+            ns=ns,
+            source=source,
+            file_path=file_path,
+            parent_name=parent_name,
+        )
 
 
 def _extract_php_symbols(
@@ -685,113 +856,9 @@ def _extract_php_symbols(
         List of Symbol objects.
     """
     symbols: list[Symbol] = []
-    namespace = ""
-
-    # Container types whose children include methods
-    container_types = {
-        "class_declaration",
-        "interface_declaration",
-        "trait_declaration",
-    }
-
-    def _qualify(name: str) -> str:
-        # Use dot separator for internal IDs — PHP uses backslash for namespaces
-        # but backslashes in component IDs break JSON, graph queries, and ID dedup.
-        return f"{namespace}.{name}" if namespace else name
-
-    def walk(node: Node, parent_name: str | None = None) -> None:
-        nonlocal namespace
-        node_type = node.type
-
-        if node_type == "namespace_definition":
-            ns_node = _find_child_by_type(node, "namespace_name")
-            if ns_node:
-                # Normalize PHP backslash separators to dots for graph IDs
-                namespace = _get_node_text(ns_node, source).replace("\\", ".")
-            # Continue walking children (declarations inside namespace)
-            for child in node.children:
-                walk(child, parent_name)
-            return
-
-        if node_type in container_types:
-            name_node = _find_child_by_type(node, "name")
-            local_name = _get_node_text(name_node, source) if name_node else "unknown"
-            qualified = _qualify(local_name)
-
-            kind: SymbolKind = "class"
-            if node_type == "interface_declaration":
-                kind = "interface"
-            elif node_type == "trait_declaration":
-                kind = "trait"
-
-            symbols.append(
-                Symbol(
-                    name=qualified,
-                    kind=kind,
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_php_signature(node, source),
-                )
-            )
-
-            # Walk declaration_list for methods
-            body = _find_child_by_type(node, "declaration_list")
-            if body:
-                for child in body.children:
-                    walk(child, parent_name=qualified)
-            return
-
-        if node_type == "method_declaration" and parent_name is not None:
-            name_node = _find_child_by_type(node, "name")
-            local_name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=local_name,
-                    kind="method",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_php_signature(node, source),
-                    parent=parent_name,
-                )
-            )
-            return
-
-        if node_type == "function_definition" and parent_name is None:
-            name_node = _find_child_by_type(node, "name")
-            local_name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=_qualify(local_name),
-                    kind="function",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_php_signature(node, source),
-                )
-            )
-            return
-
-        if node_type == "enum_declaration":
-            name_node = _find_child_by_type(node, "name")
-            local_name = _get_node_text(name_node, source) if name_node else "unknown"
-
-            symbols.append(
-                Symbol(
-                    name=_qualify(local_name),
-                    kind="enum",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_php_signature(node, source),
-                )
-            )
-            return
-
-        # Recurse into children
-        for child in node.children:
-            walk(child, parent_name)
-
-    walk(root)
+    # Mutable container for namespace (modified by walker)
+    ns: list[str] = [""]
+    _walk_php_node(root, symbols=symbols, ns=ns, source=source, file_path=file_path)
     return symbols
 
 
@@ -855,7 +922,7 @@ def _get_svelte_parser() -> Parser:
     return Parser(lang)
 
 
-def _detect_svelte_script_lang(script_element: Node, source: bytes) -> Language:
+def _detect_svelte_script_lang(script_element: Node, source: bytes) -> Language:  # noqa: C901 -- complexity 13, refactor deferred
     """Detect whether a Svelte script block uses TypeScript or JavaScript.
 
     Checks for ``lang="ts"`` or ``lang="typescript"`` attribute on the
@@ -1015,7 +1082,7 @@ def _get_csharp_parser() -> Parser:
     return Parser(lang)
 
 
-def _extract_csharp_signature(node: Node, source: bytes) -> str:
+def _extract_csharp_signature(node: Node, source: bytes) -> str:  # noqa: C901 -- AST signature extraction with many node types
     """Extract a signature from a C# AST node."""
     node_type = node.type
 
@@ -1027,12 +1094,12 @@ def _extract_csharp_signature(node: Node, source: bytes) -> str:
             return f"class {name} {_get_node_text(base_list, source)}"
         return f"class {name}"
 
-    elif node_type == "interface_declaration":
+    if node_type == "interface_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"interface {name}"
 
-    elif node_type == "struct_declaration":
+    if node_type == "struct_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         base_list = _find_child_by_type(node, "base_list")
@@ -1040,17 +1107,17 @@ def _extract_csharp_signature(node: Node, source: bytes) -> str:
             return f"struct {name} {_get_node_text(base_list, source)}"
         return f"struct {name}"
 
-    elif node_type == "record_declaration":
+    if node_type == "record_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"record {name}"
 
-    elif node_type == "enum_declaration":
+    if node_type == "enum_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"enum {name}"
 
-    elif node_type == "method_declaration":
+    if node_type == "method_declaration":
         parts: list[str] = []
         for child in node.children:
             if child.type == "modifier":
@@ -1078,7 +1145,7 @@ def _extract_csharp_signature(node: Node, source: bytes) -> str:
             parts.append(_get_node_text(params_node, source))
         return " ".join(parts)
 
-    elif node_type == "property_declaration":
+    if node_type == "property_declaration":
         parts_p: list[str] = []
         for child in node.children:
             if child.type == "modifier":
@@ -1096,7 +1163,16 @@ def _extract_csharp_signature(node: Node, source: bytes) -> str:
     return ""
 
 
-def _extract_csharp_constructor_deps(body: Node, source: bytes) -> list[str]:
+def _get_csharp_name(node: Node, source: bytes) -> str:
+    """Get the identifier name from a C# AST node."""
+    name_node = _find_child_by_type(node, "identifier")
+    return _get_node_text(name_node, source) if name_node else "unknown"
+
+
+def _extract_csharp_constructor_deps(  # noqa: C901
+    body: Node,
+    source: bytes,
+) -> list[str]:
     """Extract dependency type names from constructor parameters in a C# class body.
 
     Walks all constructor_declaration nodes in the body, collects parameter type
@@ -1141,6 +1217,138 @@ def _extract_csharp_constructor_deps(body: Node, source: bytes) -> list[str]:
     return result
 
 
+# C# container types (module-level constant for _walk_csharp_node)
+_CS_CONTAINER_TYPES = frozenset(
+    {
+        "class_declaration",
+        "interface_declaration",
+        "struct_declaration",
+        "record_declaration",
+    }
+)
+
+
+def _walk_csharp_node(  # noqa: C901 -- AST walker with many C# node types; inherent complexity
+    node: Node,
+    *,
+    symbols: list[Symbol],
+    ns: list[str],
+    source: bytes,
+    file_path: str,
+    parent_name: str | None = None,
+) -> None:
+    """Walk a C# tree-sitter node and collect symbols."""
+    node_type = node.type
+
+    if node_type == "namespace_declaration":
+        ns_node = _find_child_by_type(node, "qualified_name", "identifier")
+        if ns_node:
+            ns[0] = _get_node_text(ns_node, source)
+        body = _find_child_by_type(node, "declaration_list")
+        if body:
+            for child in body.children:
+                _walk_csharp_node(
+                    child,
+                    symbols=symbols,
+                    ns=ns,
+                    source=source,
+                    file_path=file_path,
+                    parent_name=parent_name,
+                )
+        return
+
+    if node_type in _CS_CONTAINER_TYPES:
+        local_name = _get_csharp_name(node, source)
+
+        kind: SymbolKind = "class"
+        if node_type == "interface_declaration":
+            kind = "interface"
+
+        body = _find_child_by_type(node, "declaration_list")
+        deps = _extract_csharp_constructor_deps(body, source) if body else []
+
+        symbols.append(
+            Symbol(
+                name=local_name,
+                kind=kind,
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_csharp_signature(node, source),
+                depends_on=deps,
+            )
+        )
+
+        if body:
+            for child in body.children:
+                _walk_csharp_node(
+                    child,
+                    symbols=symbols,
+                    ns=ns,
+                    source=source,
+                    file_path=file_path,
+                    parent_name=local_name,
+                )
+        return
+
+    if node_type == "method_declaration" and parent_name is not None:
+        # Find the method name — last identifier before parameter_list
+        method_name = "unknown"
+        for child in node.children:
+            if child.type == "identifier":
+                method_name = _get_node_text(child, source)
+            elif child.type == "parameter_list":
+                break
+
+        symbols.append(
+            Symbol(
+                name=method_name,
+                kind="method",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_csharp_signature(node, source),
+                parent=parent_name,
+            )
+        )
+        return
+
+    if node_type == "property_declaration" and parent_name is not None:
+        local_name = _get_csharp_name(node, source)
+        symbols.append(
+            Symbol(
+                name=local_name,
+                kind="method",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_csharp_signature(node, source),
+                parent=parent_name,
+            )
+        )
+        return
+
+    if node_type == "enum_declaration":
+        local_name = _get_csharp_name(node, source)
+        symbols.append(
+            Symbol(
+                name=local_name,
+                kind="enum",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_csharp_signature(node, source),
+            )
+        )
+        return
+
+    for child in node.children:
+        _walk_csharp_node(
+            child,
+            symbols=symbols,
+            ns=ns,
+            source=source,
+            file_path=file_path,
+            parent_name=parent_name,
+        )
+
+
 def _extract_csharp_symbols_from_tree(
     root: Node,
     source: bytes,
@@ -1160,111 +1368,9 @@ def _extract_csharp_symbols_from_tree(
         List of Symbol objects.
     """
     symbols: list[Symbol] = []
-    namespace = ""
-
-    container_types = {
-        "class_declaration",
-        "interface_declaration",
-        "struct_declaration",
-        "record_declaration",
-    }
-
-    def _get_name(node: Node) -> str:
-        name_node = _find_child_by_type(node, "identifier")
-        return _get_node_text(name_node, source) if name_node else "unknown"
-
-    def walk(node: Node, parent_name: str | None = None) -> None:
-        nonlocal namespace
-        node_type = node.type
-
-        if node_type == "namespace_declaration":
-            ns_node = _find_child_by_type(node, "qualified_name", "identifier")
-            if ns_node:
-                namespace = _get_node_text(ns_node, source)
-            body = _find_child_by_type(node, "declaration_list")
-            if body:
-                for child in body.children:
-                    walk(child, parent_name)
-            return
-
-        if node_type in container_types:
-            local_name = _get_name(node)
-
-            kind: SymbolKind = "class"
-            if node_type == "interface_declaration":
-                kind = "interface"
-
-            body = _find_child_by_type(node, "declaration_list")
-            deps = _extract_csharp_constructor_deps(body, source) if body else []
-
-            symbols.append(
-                Symbol(
-                    name=local_name,
-                    kind=kind,
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_csharp_signature(node, source),
-                    depends_on=deps,
-                )
-            )
-
-            if body:
-                for child in body.children:
-                    walk(child, parent_name=local_name)
-            return
-
-        if node_type == "method_declaration" and parent_name is not None:
-            # Find the method name — last identifier before parameter_list
-            method_name = "unknown"
-            for child in node.children:
-                if child.type == "identifier":
-                    method_name = _get_node_text(child, source)
-                elif child.type == "parameter_list":
-                    break
-
-            symbols.append(
-                Symbol(
-                    name=method_name,
-                    kind="method",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_csharp_signature(node, source),
-                    parent=parent_name,
-                )
-            )
-            return
-
-        if node_type == "property_declaration" and parent_name is not None:
-            local_name = _get_name(node)
-            symbols.append(
-                Symbol(
-                    name=local_name,
-                    kind="method",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_csharp_signature(node, source),
-                    parent=parent_name,
-                )
-            )
-            return
-
-        if node_type == "enum_declaration":
-            local_name = _get_name(node)
-            symbols.append(
-                Symbol(
-                    name=local_name,
-                    kind="enum",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_csharp_signature(node, source),
-                )
-            )
-            return
-
-        for child in node.children:
-            walk(child, parent_name)
-
-    walk(root)
+    # Mutable container for namespace (modified by walker)
+    ns: list[str] = [""]
+    _walk_csharp_node(root, symbols=symbols, ns=ns, source=source, file_path=file_path)
     return symbols
 
 
@@ -1339,12 +1445,12 @@ def _extract_dart_signature(node: Node, source: bytes) -> str:
             return f"{prefix} {name} {_get_node_text(superclass, source)}"
         return f"{prefix} {name}"
 
-    elif node_type == "mixin_declaration":
+    if node_type == "mixin_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"mixin {name}"
 
-    elif node_type == "extension_declaration":
+    if node_type == "extension_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         # Find the "on" type
@@ -1353,15 +1459,129 @@ def _extract_dart_signature(node: Node, source: bytes) -> str:
             return f"extension {name} on {_get_node_text(type_node, source)}"
         return f"extension {name}"
 
-    elif node_type == "enum_declaration":
+    if node_type == "enum_declaration":
         name_node = _find_child_by_type(node, "identifier")
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"enum {name}"
 
-    elif node_type == "function_signature" or node_type == "method_signature":
+    if node_type in {"function_signature", "method_signature"}:
         return _get_node_text(node, source).strip()
 
     return ""
+
+
+def _get_dart_name(node: Node, source: bytes) -> str:
+    """Get the identifier name from a Dart AST node."""
+    name_node = _find_child_by_type(node, "identifier")
+    return _get_node_text(name_node, source) if name_node else "unknown"
+
+
+# Dart container types (module-level constant for _walk_dart_node)
+_DART_CONTAINER_TYPES = frozenset(
+    {
+        "class_definition",
+        "mixin_declaration",
+        "extension_declaration",
+    }
+)
+
+
+def _walk_dart_node(
+    node: Node,
+    *,
+    symbols: list[Symbol],
+    source: bytes,
+    file_path: str,
+    parent_name: str | None = None,
+) -> None:
+    """Walk a Dart tree-sitter node and collect symbols."""
+    node_type = node.type
+
+    if node_type in _DART_CONTAINER_TYPES:
+        local_name = _get_dart_name(node, source)
+
+        kind: SymbolKind = "class"
+        if node_type == "mixin_declaration":
+            kind = "trait"
+
+        symbols.append(
+            Symbol(
+                name=local_name,
+                kind=kind,
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_dart_signature(node, source),
+            )
+        )
+
+        # Walk into body for methods
+        body = _find_child_by_type(node, "class_body", "extension_body")
+        if body:
+            for child in body.children:
+                _walk_dart_node(
+                    child,
+                    symbols=symbols,
+                    source=source,
+                    file_path=file_path,
+                    parent_name=local_name,
+                )
+        return
+
+    if node_type == "enum_declaration":
+        local_name = _get_dart_name(node, source)
+        symbols.append(
+            Symbol(
+                name=local_name,
+                kind="enum",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_dart_signature(node, source),
+            )
+        )
+        return
+
+    # Top-level function: function_signature at program level
+    if node_type == "function_signature" and parent_name is None:
+        local_name = _get_dart_name(node, source)
+        symbols.append(
+            Symbol(
+                name=local_name,
+                kind="function",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_dart_signature(node, source),
+            )
+        )
+        return
+
+    # Method inside a container
+    if node_type == "method_signature" and parent_name is not None:
+        # method_signature contains function_signature or getter_signature
+        inner = _find_child_by_type(node, "function_signature", "getter_signature")
+        method_name = (
+            _get_dart_name(inner, source) if inner else _get_dart_name(node, source)
+        )
+
+        symbols.append(
+            Symbol(
+                name=method_name,
+                kind="method",
+                file=file_path,
+                line=node.start_point[0] + 1,
+                signature=_extract_dart_signature(node, source),
+                parent=parent_name,
+            )
+        )
+        return
+
+    for child in node.children:
+        _walk_dart_node(
+            child,
+            symbols=symbols,
+            source=source,
+            file_path=file_path,
+            parent_name=parent_name,
+        )
 
 
 def _extract_dart_symbols_from_tree(
@@ -1383,93 +1603,7 @@ def _extract_dart_symbols_from_tree(
         List of Symbol objects.
     """
     symbols: list[Symbol] = []
-
-    container_types = {
-        "class_definition",
-        "mixin_declaration",
-        "extension_declaration",
-    }
-
-    def _get_name(node: Node) -> str:
-        name_node = _find_child_by_type(node, "identifier")
-        return _get_node_text(name_node, source) if name_node else "unknown"
-
-    def walk(node: Node, parent_name: str | None = None) -> None:
-        node_type = node.type
-
-        if node_type in container_types:
-            local_name = _get_name(node)
-
-            kind: SymbolKind = "class"
-            if node_type == "mixin_declaration":
-                kind = "trait"
-
-            symbols.append(
-                Symbol(
-                    name=local_name,
-                    kind=kind,
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_dart_signature(node, source),
-                )
-            )
-
-            # Walk into body for methods
-            body = _find_child_by_type(node, "class_body", "extension_body")
-            if body:
-                for child in body.children:
-                    walk(child, parent_name=local_name)
-            return
-
-        if node_type == "enum_declaration":
-            local_name = _get_name(node)
-            symbols.append(
-                Symbol(
-                    name=local_name,
-                    kind="enum",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_dart_signature(node, source),
-                )
-            )
-            return
-
-        # Top-level function: function_signature at program level
-        if node_type == "function_signature" and parent_name is None:
-            local_name = _get_name(node)
-            symbols.append(
-                Symbol(
-                    name=local_name,
-                    kind="function",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_dart_signature(node, source),
-                )
-            )
-            return
-
-        # Method inside a container
-        if node_type == "method_signature" and parent_name is not None:
-            # method_signature contains function_signature or getter_signature
-            inner = _find_child_by_type(node, "function_signature", "getter_signature")
-            method_name = _get_name(inner) if inner else _get_name(node)
-
-            symbols.append(
-                Symbol(
-                    name=method_name,
-                    kind="method",
-                    file=file_path,
-                    line=node.start_point[0] + 1,
-                    signature=_extract_dart_signature(node, source),
-                    parent=parent_name,
-                )
-            )
-            return
-
-        for child in node.children:
-            walk(child, parent_name)
-
-    walk(root)
+    _walk_dart_node(root, symbols=symbols, source=source, file_path=file_path)
     return symbols
 
 
@@ -1545,20 +1679,19 @@ def extract_symbols(source: str, file_path: str, language: Language) -> list[Sym
     """
     if language == "python":
         return extract_python_symbols(source, file_path)
-    elif language == "typescript":
+    if language == "typescript":
         return extract_typescript_symbols(source, file_path)
-    elif language == "javascript":
+    if language == "javascript":
         return extract_javascript_symbols(source, file_path)
-    elif language == "php":
+    if language == "php":
         return extract_php_symbols(source, file_path)
-    elif language == "svelte":
+    if language == "svelte":
         return extract_svelte_symbols(source, file_path)
-    elif language == "csharp":
+    if language == "csharp":
         return extract_csharp_symbols(source, file_path)
-    elif language == "dart":
+    if language == "dart":
         return extract_dart_symbols(source, file_path)
-    else:
-        raise ValueError(f"Unsupported language: {language}")
+    raise ValueError(f"Unsupported language: {language}")
 
 
 # Default patterns to exclude when scanning directories
@@ -1644,9 +1777,8 @@ def _should_exclude(file_path: Path, exclude_patterns: list[str]) -> bool:
         if dir_name is not None:
             if dir_name in parts:
                 return True
-        else:
-            if file_path.match(pattern):
-                return True
+        elif file_path.match(pattern):
+            return True
     return False
 
 
@@ -1667,7 +1799,7 @@ def _process_source_file(
         result.errors.append(f"{rel_str}: {e}")
 
 
-def scan_directory(
+def scan_directory(  # noqa: C901 -- complexity 11, refactor deferred
     path: Path,
     *,
     language: Language | None = None,

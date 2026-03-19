@@ -14,7 +14,7 @@ from pathlib import Path
 class CheckStatus(Enum):
     """Three-level severity for doctor checks."""
 
-    PASS = "pass"
+    PASS = "pass"  # noqa: S105 -- enum value, not a password
     WARN = "warn"
     ERROR = "error"
 

@@ -1,7 +1,7 @@
 """Base Rai identity files.
 
 Contains:
-    core.md         Rai's values, boundaries, essence
+    core.yaml       Rai's values, boundaries, principles (structured)
     perspective.md  How Rai approaches collaboration
 """
 

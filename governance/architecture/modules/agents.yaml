@@ -1,0 +1,14 @@
+type: module
+name: agents
+purpose: "Bundled YAML agent configurations and CopilotPlugin for multi-agent skill distribution"
+status: current
+depends_on: [config]
+depended_by: [onboarding, cli]
+entry_points: []
+public_api:
+  - "copilot_plugin.CopilotPlugin"
+components: 7
+constraints:
+  - "YAML files are package data — not Python. Read via importlib.resources."
+  - "Plugin classes must satisfy AgentPlugin Protocol from config.agent_plugin"
+  - "Built-in configs are Tier-1 only — community Tier-2 and third-party Tier-3 live outside the package"

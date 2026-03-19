@@ -13,7 +13,7 @@ from raise_cli.compliance.evidence import EvidenceItem
 class TestEvidenceItem:
     """Tests for EvidenceItem Pydantic model."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def sample_item(self) -> EvidenceItem:
         return EvidenceItem(
             control_id="A.8.32",

@@ -57,7 +57,7 @@ class MemoryMdSyncHook:
 
     def _do_handle(self, event: HookEvent) -> HookResult:
         """Internal handler — may raise, caller catches."""
-        assert isinstance(event, (HookEvent, GraphBuildEvent))
+        assert isinstance(event, (HookEvent, GraphBuildEvent))  # noqa: S101 -- type narrowing for hook dispatch
 
         project_path = getattr(event, "project_path", None)
         if project_path is None:
@@ -100,7 +100,6 @@ class MemoryMdSyncHook:
         Returns:
             Tuple of (project_name, development_branch) with defaults.
         """
-
         project_name = "project"
         dev_branch = "main"
 

@@ -4,6 +4,9 @@ This module contains parsers for different governance document types
 (PRD, Vision, Constitution, Backlog, Epic, ADR, Guardrails) that extract semantic concepts.
 """
 
+from __future__ import annotations
+
+from raise_cli.adapters.protocols import GovernanceParser
 from raise_cli.governance.parsers.adr import (
     extract_all_decisions,
     extract_decision_from_file,
@@ -20,6 +23,7 @@ from raise_cli.governance.parsers.prd import extract_requirements
 from raise_cli.governance.parsers.vision import extract_outcomes
 
 __all__ = [
+    "GovernanceParser",
     "extract_requirements",
     "extract_outcomes",
     "extract_principles",

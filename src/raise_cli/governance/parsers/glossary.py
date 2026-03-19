@@ -131,7 +131,10 @@ def _extract_term_content(content: str) -> tuple[str, str | None]:
 
 
 def _find_terms_in_section(
-    content: str, section_start: int, section_end: int, lines: list[str]
+    content: str,
+    section_start: int,
+    section_end: int,
+    lines: list[str],  # noqa: ARG001 -- API signature consistency with other parsers
 ) -> list[tuple[int, str, str]]:
     """Find all term definitions within a section.
 

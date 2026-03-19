@@ -209,10 +209,9 @@ def calculate_confidence(consistent: int, total: int) -> Confidence:
     # Rule 3: >10 samples = ratio determines confidence
     if ratio > 0.9:
         return Confidence.HIGH
-    elif ratio >= 0.7:
+    if ratio >= 0.7:
         return Confidence.MEDIUM
-    else:
-        return Confidence.LOW
+    return Confidence.LOW
 
 
 # =============================================================================
@@ -606,7 +605,7 @@ def detect_naming(files: list[Path]) -> NamingConventions:
 # =============================================================================
 
 
-def detect_structure(directory: Path) -> StructureConventions:
+def detect_structure(directory: Path) -> StructureConventions:  # noqa: C901 -- complexity 14, refactor deferred
     """Detect project structure conventions.
 
     Identifies source directories, test directories, and common patterns.

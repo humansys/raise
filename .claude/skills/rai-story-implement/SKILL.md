@@ -73,17 +73,19 @@ Run the verification defined in the plan. Resolve commands using this priority c
 2. **Detect language** from `project.project_type` in manifest, or scan file extensions
 3. **Map language to default:**
 
-| Language | Test | Lint | Type Check |
-|----------|------|------|------------|
-| Python | `uv run pytest --tb=short` | `uv run ruff check` | `uv run pyright` |
-| TypeScript | `npx vitest run` | `npx eslint src/` | `npx tsc --noEmit` |
-| JavaScript | `npx vitest run` | `npx eslint src/` | — |
-| C# | `dotnet test` | `dotnet format --check` | `dotnet build` |
-| Go | `go test ./...` | `golangci-lint run` | `go vet ./...` |
-| PHP | `vendor/bin/phpunit` | `php-cs-fixer check` | `vendor/bin/phpstan` |
-| Dart | `flutter test` | `dart fix --dry-run` | `dart analyze` |
+| Language | Test | Lint | Format | Type Check |
+|----------|------|------|--------|------------|
+| Python | `uv run pytest --tb=short` | `uv run ruff check src/ tests/` | `uv run ruff format --check src/ tests/` | `uv run pyright` |
+| TypeScript | `npx vitest run` | `npx eslint src/` | `npx prettier --check src/` | `npx tsc --noEmit` |
+| JavaScript | `npx vitest run` | `npx eslint src/` | `npx prettier --check src/` | — |
+| C# | `dotnet test` | `dotnet format --check` | — | `dotnet build` |
+| Go | `go test ./...` | `golangci-lint run` | `gofmt -l .` | `go vet ./...` |
+| PHP | `vendor/bin/phpunit` | `php-cs-fixer check` | — | `vendor/bin/phpstan` |
+| Dart | `flutter test` | `dart fix --dry-run` | `dart format --set-exit-if-changed .` | `dart analyze` |
 
 The manifest always wins when present. The table is a fallback.
+
+**Run ALL four gates** (test + lint + format + type check) after each task, not just the one mentioned in the plan. The goal is to catch errors locally before they reach CI.
 
 If verification fails: fix and re-verify (max 3 attempts before escalating).
 
@@ -115,7 +117,8 @@ If verification fails: fix and re-verify (max 3 attempts before escalating).
 - [ ] Plan loaded and design intent confirmed (if design exists)
 - [ ] TDD cycle followed for each task (RED → GREEN → REFACTOR)
 - [ ] Each task committed individually (not batched at story end)
-- [ ] All verifications pass (tests, lint, types)
+- [ ] All four gates pass per task: tests, lint, format, type check
+- [ ] NEVER commit without running all four gates — CI will catch what you skip
 - [ ] Progress log updated with actuals
 - [ ] Human acknowledged each task before proceeding
 - [ ] NEVER skip a failing test — fix it or escalate

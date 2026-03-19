@@ -83,14 +83,14 @@ class TestPublicAPIExportsSyncWrappers:
 
 class TestDunderAll:
     def test_all_exports_are_importable(self) -> None:
-        import raise_cli.adapters as adapters
+        from raise_cli import adapters
 
         for name in adapters.__all__:
             assert hasattr(adapters, name), f"{name} in __all__ but not importable"
 
     def test_all_count(self) -> None:
         """Guardrail: __all__ has expected number of exports."""
-        import raise_cli.adapters as adapters
+        from raise_cli import adapters
 
         # 7 protocols + 2 wrappers + 15 models + 5 registry fns + 5 constants = 34
         assert len(adapters.__all__) == 34

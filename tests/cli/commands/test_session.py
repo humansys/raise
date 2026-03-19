@@ -1155,7 +1155,7 @@ class TestSessionStartContextLoadsState:
     """Regression test for RAISE-566: prior session state must survive migration."""
 
     def test_session_start_loads_prior_state(self, tmp_path: Path) -> None:
-        """state passed to assemble_context_bundle is not None when flat state exists.
+        """State passed to assemble_context_bundle is not None when flat state exists.
 
         Before the fix: migrate_flat_to_session moves session-state.yaml to
         SES-{prev}/state.yaml, then load_session_state(session_id=SES-{new})

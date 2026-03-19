@@ -33,7 +33,7 @@ def _override_auth(client: TestClient) -> Generator[None, None, None]:
         client.app.dependency_overrides.clear()  # type: ignore[union-attr]
 
 
-@pytest.fixture()
+@pytest.fixture
 def client() -> TestClient:
     """Create test client with graph routes and mocked session factory."""
     config = ServerConfig(database_url=_DB_URL)

@@ -42,7 +42,7 @@ class GraphNode(BaseModel):
         default_factory=dict, description="Type-specific attributes"
     )
 
-    def __init_subclass__(cls, node_type: str | None = None, **kwargs: Any) -> None:
+    def __init_subclass__(cls, node_type: str | None = None, **kwargs: Any) -> None:  # noqa: D105
         super().__init_subclass__(**kwargs)
         if node_type is not None:
             cls.__node_type__ = node_type  # type: ignore[attr-defined]

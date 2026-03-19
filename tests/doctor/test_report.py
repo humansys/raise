@@ -218,7 +218,7 @@ class TestOpenMailto:
     """Tests for open_mailto."""
 
     def test_builds_correct_mailto_uri(self) -> None:
-        """mailto URI contains subject and body."""
+        """Mailto URI contains subject and body."""
         report = DiagnosticReport(
             timestamp="2026-03-05T00:00:00+00:00",
             rai_version="2.1.0",
@@ -327,20 +327,20 @@ class TestDoctorReportCLI:
     def test_report_command_runs(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """rai doctor report runs without error."""
+        """Rai doctor report runs without error."""
         monkeypatch.chdir(tmp_path)
         result = runner.invoke(app, ["doctor", "report"])
         assert result.exit_code == 0
         assert "Report saved to" in result.output
 
     def test_report_help(self) -> None:
-        """rai doctor report --help works."""
+        """Rai doctor report --help works."""
         result = runner.invoke(app, ["doctor", "report", "--help"])
         assert result.exit_code == 0
         assert "diagnostic report" in result.output.lower()
 
     def test_doctor_help(self) -> None:
-        """rai doctor --help shows report subcommand."""
+        """Rai doctor --help shows report subcommand."""
         result = runner.invoke(app, ["doctor", "--help"])
         assert result.exit_code == 0
         assert "report" in result.output

@@ -37,7 +37,7 @@ def _format_result_line(category: str, message: str, status: CheckStatus) -> str
 
 
 @doctor_app.callback()
-def doctor(
+def doctor(  # noqa: C901 -- complexity 15, refactor deferred
     ctx: typer.Context,
     verbose: Annotated[
         bool,

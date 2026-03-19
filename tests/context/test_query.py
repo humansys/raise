@@ -257,7 +257,6 @@ class TestQueryEngineConceptLookup:
 
     def test_lookup_with_neighbors(self, sample_graph: Graph) -> None:
         """Lookup with depth > 0 includes neighbors."""
-
         # Add relationship
         sample_graph.add_relationship(
             GraphEdge(
@@ -313,7 +312,6 @@ class TestQueryEngineEdgeTypeFilter:
 
     def test_concept_lookup_with_edge_type_filter(self, sample_graph: Graph) -> None:
         """Concept lookup with edge_types only returns neighbors via matching edges."""
-
         # Add two different edge types from PAT-001
         sample_graph.add_relationship(
             GraphEdge(source="PAT-001", target="SES-001", type="learned_from")
@@ -340,7 +338,6 @@ class TestQueryEngineEdgeTypeFilter:
 
     def test_concept_lookup_with_multiple_edge_types(self, sample_graph: Graph) -> None:
         """Multiple edge types returns neighbors matching any of them."""
-
         sample_graph.add_relationship(
             GraphEdge(source="PAT-001", target="SES-001", type="learned_from")
         )
@@ -366,7 +363,6 @@ class TestQueryEngineEdgeTypeFilter:
         self, sample_graph: Graph
     ) -> None:
         """No edge_types filter returns all neighbors (backward compat)."""
-
         sample_graph.add_relationship(
             GraphEdge(source="PAT-001", target="SES-001", type="learned_from")
         )
@@ -449,31 +445,26 @@ class TestWilsonLowerBound:
 
     def test_all_positive_high_score(self) -> None:
         """All positive evaluations gives high Wilson score."""
-
         score = wilson_lower_bound(10, 0)
         assert score > 0.7
 
     def test_all_negative_low_score(self) -> None:
         """All negative evaluations gives low Wilson score."""
-
         score = wilson_lower_bound(0, 10)
         assert score < 0.1
 
     def test_majority_negative_approx(self) -> None:
         """3 pos / 7 neg (design example) gives ~0.10."""
-
         score = wilson_lower_bound(3, 7)
         assert 0.05 < score < 0.20
 
     def test_zero_total_raises(self) -> None:
         """Zero total observations raises ValueError."""
-
         with pytest.raises(ValueError):
             wilson_lower_bound(0, 0)
 
     def test_single_positive_is_conservative(self) -> None:
         """Single positive is conservative — Wilson lower bound < 0.9."""
-
         score = wilson_lower_bound(1, 0)
         assert 0 < score < 0.9
 
@@ -483,7 +474,6 @@ class TestCalculateRelevanceScore:
 
     def test_foundational_true_exempt_from_decay(self) -> None:
         """foundational=True patterns skip decay — score = keyword_relevance only."""
-
         score = calculate_relevance_score(
             content="planning estimation calibration",
             keywords=["planning", "estimation"],
@@ -494,7 +484,6 @@ class TestCalculateRelevanceScore:
 
     def test_base_true_also_exempt(self) -> None:
         """base=True (writer.py legacy key) also skips decay."""
-
         score = calculate_relevance_score(
             content="planning estimation calibration",
             keywords=["planning", "estimation"],
@@ -578,7 +567,6 @@ class TestCalculateRelevanceScore:
 
     def test_invalid_date_defaults_gracefully(self) -> None:
         """Invalid date string does not crash — defaults to age=0."""
-
         score = calculate_relevance_score(
             content="planning",
             keywords=["planning"],

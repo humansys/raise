@@ -38,7 +38,7 @@ class OAuthError(Exception):
 
 # Default OAuth endpoints for Atlassian
 ATLASSIAN_AUTH_URL = "https://auth.atlassian.com/authorize"
-ATLASSIAN_TOKEN_URL = "https://auth.atlassian.com/oauth/token"  # nosec B105
+ATLASSIAN_TOKEN_URL = "https://auth.atlassian.com/oauth/token"  # noqa: S105 -- URL constant, not a password
 DEFAULT_SCOPES = [
     "read:jira-work",
     "write:jira-work",

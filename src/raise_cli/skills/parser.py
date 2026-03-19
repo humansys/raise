@@ -70,7 +70,7 @@ def parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     try:
         raw_yaml = yaml.safe_load(yaml_content)
         if isinstance(raw_yaml, dict):
-            frontmatter = cast(dict[str, Any], raw_yaml)
+            frontmatter = cast("dict[str, Any]", raw_yaml)
     except yaml.YAMLError as e:
         raise ParseError(f"Invalid YAML in frontmatter: {e}") from e
 

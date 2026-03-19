@@ -1,0 +1,14 @@
+type: module
+name: tier
+purpose: "Tier detection and capability registry for open-core architecture"
+status: current
+depends_on: [onboarding]
+depended_by: []
+entry_points: []
+public_api:
+  - "Capability"
+  - "TierLevel"
+  - "TierContext"
+  - "TierCapabilityError"
+layer: domain
+bounded_context: adapters

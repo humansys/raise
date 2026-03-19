@@ -11,7 +11,7 @@ import pytest
 import yaml
 
 
-@pytest.fixture()
+@pytest.fixture
 def mcp_dir(tmp_path: Path) -> Path:
     """Create a temporary .raise/mcp/ directory."""
     d = tmp_path / ".raise" / "mcp"

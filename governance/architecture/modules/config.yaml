@@ -1,0 +1,17 @@
+type: module
+name: config
+purpose: "Settings cascade and XDG-compliant directory resolution for all rai-cli configuration"
+status: current
+depends_on: []
+depended_by: [cli, context, memory, onboarding, telemetry]
+entry_points: []
+public_api:
+  - "RaiseSettings"
+  - "get_cache_dir"
+  - "get_config_dir"
+  - "get_data_dir"
+components: 17
+constraints:
+  - "No internal dependencies — leaf module"
+  - "Settings follow cascade: CLI args > env vars > config file > defaults"
+  - "Paths follow XDG Base Directory spec on Linux/macOS"

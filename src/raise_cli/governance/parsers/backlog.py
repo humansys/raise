@@ -207,6 +207,90 @@ def extract_project(
     )
 
 
+def _should_yield_to_scope_parser(epic_id: str, project_root: Path) -> bool:
+    """Check if this epic has a scope doc and should be parsed there instead.
+
+    The scope doc is the authoritative source (richer data); the backlog
+    row is only an index entry. Without this check, both BacklogParser
+    and EpicScopeParser produce the same node ID, causing duplicate
+    warnings in ``rai graph build``.
+
+    Only applies to local epic IDs (E{N}), never to Jira keys (RAISE-275).
+
+    Args:
+        epic_id: Epic identifier (e.g., 'E8', 'RAISE-275').
+        project_root: Project root directory.
+
+    Returns:
+        True if a scope doc exists for this epic and extraction should be skipped.
+    """
+    e_match = re.match(r"^E0*(\d+)$", epic_id, re.IGNORECASE)
+    if not e_match:
+        return False
+
+    canon = int(e_match.group(1))  # E08 -> 8, E1 -> 1
+    return any(
+        (m := re.search(r"^e0*(\d+)", d.name, re.IGNORECASE))
+        and int(m.group(1)) == canon
+        for d in project_root.glob("work/epics/e*")
+        if (d / "scope.md").exists()
+    )
+
+
+def _build_epic_concept(
+    match: re.Match[str],
+    line_num: int,
+    relative_path: str,
+    project_name: str,
+) -> Concept:
+    """Build an Epic Concept from a regex match on a backlog table row.
+
+    Args:
+        match: Regex match with groups for epic ID, name, status, scope doc, priority.
+        line_num: Line number of the match in the file.
+        relative_path: Relative path to the backlog file.
+        project_name: Project name for metadata.
+
+    Returns:
+        Epic Concept.
+    """
+    epic_id = (match.group(1) or match.group(2)).strip()
+    name = match.group(3).strip()
+    raw_status = match.group(4).strip()
+    scope_doc: str | None = match.group(5).strip()
+    priority: str | None = match.group(6).strip()
+
+    # Clean up scope doc (remove backticks)
+    scope_doc = scope_doc.strip("`").strip() if scope_doc else None
+    if scope_doc in {"—", "-", ""}:
+        scope_doc = None
+
+    # Clean up priority
+    priority = priority.strip("*").strip() if priority else None
+    if priority in {"—", "-", ""}:
+        priority = None
+
+    status = normalize_status(raw_status)
+    content = f"{name} - {raw_status.strip()}"
+
+    return Concept(
+        id=f"epic-{epic_id.lower()}",
+        type=ConceptType.EPIC,
+        file=relative_path,
+        section=f"{epic_id}: {name}",
+        lines=(line_num, line_num),
+        content=content,
+        metadata={
+            "epic_id": epic_id,
+            "name": name,
+            "status": status,
+            "scope_doc": scope_doc,
+            "priority": priority,
+            "project_id": project_name,
+        },
+    )
+
+
 def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Concept]:
     """Extract Epic concepts from backlog.md Epics Overview table.
 
@@ -248,7 +332,6 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
             project_name = h1_match.group(1).strip()
             break
 
-    # Calculate relative file path
     try:
         relative_path = portable_path(file_path, project_root)
     except ValueError:
@@ -256,82 +339,26 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
 
     concepts: list[Concept] = []
 
-    # Parse epic table rows
-    # Supports two ID formats:
-    #   Simple:    | E1 | **Name** | Status | ...
-    #   Jira link: | [RAISE-275](url) | **Name** | Status | ...
     epic_pattern = re.compile(
         r"^\|\s*"
-        r"(?:\[([A-Z]+-\d+)\]\([^)]+\)|(E\d+))"  # Jira link OR simple ID
+        r"(?:\[([A-Z]+-\d+)\]\([^)]+\)|(E\d+))"
         r"\s*\|"
-        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"  # Epic name (with optional bold)
-        r"\s*([^|]+?)\s*\|"  # Status
-        r"\s*([^|]*?)\s*\|"  # Scope doc (optional)
-        r"\s*([^|]*?)\s*\|"  # Priority (optional)
+        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"
+        r"\s*([^|]+?)\s*\|"
+        r"\s*([^|]*?)\s*\|"
+        r"\s*([^|]*?)\s*\|"
     )
 
     for i, line in enumerate(lines, 1):
         match = epic_pattern.match(line)
-        if match:
-            # Group 1 = Jira link ID (e.g., "RAISE-275"), Group 2 = simple ID (e.g., "E1")
-            epic_id = (match.group(1) or match.group(2)).strip()
+        if not match:
+            continue
 
-            # Yield to EpicScopeParser when a scope doc exists for this epic.
-            # The scope doc is the authoritative source (richer data); the backlog
-            # row is only an index entry. Without this check, both BacklogParser
-            # and EpicScopeParser produce the same node ID, causing duplicate
-            # warnings in `rai graph build`.
-            # Only applies to local epic IDs (E{N}), never to Jira keys (RAISE-275).
-            e_match = re.match(r"^E0*(\d+)$", epic_id, re.IGNORECASE)
-            if e_match:
-                canon = int(e_match.group(1))  # E08 -> 8, E1 -> 1
-                scope_hit = any(
-                    (m := re.search(r"^e0*(\d+)", d.name, re.IGNORECASE))
-                    and int(m.group(1)) == canon
-                    for d in project_root.glob("work/epics/e*")
-                    if (d / "scope.md").exists()
-                )
-                if scope_hit:
-                    continue
+        epic_id = (match.group(1) or match.group(2)).strip()
+        if _should_yield_to_scope_parser(epic_id, project_root):
+            continue
 
-            name = match.group(3).strip()
-            raw_status = match.group(4).strip()
-            scope_doc = match.group(5).strip()
-            priority = match.group(6).strip()
-
-            # Clean up scope doc (remove backticks)
-            scope_doc = scope_doc.strip("`").strip()
-            if scope_doc == "—" or scope_doc == "-" or not scope_doc:
-                scope_doc = None
-
-            # Clean up priority
-            priority = priority.strip("*").strip()
-            if priority == "—" or priority == "-" or not priority:
-                priority = None
-
-            # Normalize status
-            status = normalize_status(raw_status)
-
-            # Build content
-            content = f"{name} - {raw_status.strip()}"
-
-            concept = Concept(
-                id=f"epic-{epic_id.lower()}",
-                type=ConceptType.EPIC,
-                file=relative_path,
-                section=f"{epic_id}: {name}",
-                lines=(i, i),
-                content=content,
-                metadata={
-                    "epic_id": epic_id,
-                    "name": name,
-                    "status": status,
-                    "scope_doc": scope_doc,
-                    "priority": priority,
-                    "project_id": project_name,
-                },
-            )
-            concepts.append(concept)
+        concepts.append(_build_epic_concept(match, i, relative_path, project_name))
 
     return concepts
 

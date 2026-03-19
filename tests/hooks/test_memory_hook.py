@@ -24,11 +24,11 @@ class TestMemoryMdSyncHookAttributes:
 class TestMemoryMdSyncHookHandle:
     """MemoryMdSyncHook.handle() behavior."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def hook(self) -> MemoryMdSyncHook:
         return MemoryMdSyncHook()
 
-    @pytest.fixture()
+    @pytest.fixture
     def project_dir(self, tmp_path: Path) -> Path:
         """Create a minimal project directory with manifest and framework files."""
         # .raise/manifest.yaml

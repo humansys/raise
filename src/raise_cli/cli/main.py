@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from enum import StrEnum
+from enum import Enum
 from typing import Annotated, Literal
 
 import typer
+from dotenv import load_dotenv
 from rich.console import Console
 
 from raise_cli import __version__
@@ -56,8 +57,8 @@ app.add_typer(adapters_app, name="adapter")
 app.add_typer(artifact_app, name="artifact")
 app.add_typer(backlog_app, name="backlog")
 app.add_typer(base_app, name="base")
-app.add_typer(docs_app, name="docs")
 app.add_typer(discover_app, name="discover")
+app.add_typer(docs_app, name="docs")
 app.add_typer(doctor_app, name="doctor")
 app.add_typer(gate_app, name="gate")
 app.add_typer(graph_app, name="graph")
@@ -78,7 +79,7 @@ app.command("init")(init_command)
 console = Console()
 
 
-class OutputFormat(StrEnum):
+class OutputFormat(str, Enum):
     """Output format options."""
 
     human = "human"
@@ -86,7 +87,7 @@ class OutputFormat(StrEnum):
     table = "table"
 
 
-def version_callback(value: bool) -> None:
+def version_callback(value: bool) -> None:  # noqa: ARG001
     """Print version and exit."""
     if value:
         console.print(f"raise-cli version {__version__}")
@@ -96,7 +97,7 @@ def version_callback(value: bool) -> None:
 @app.callback()
 def main(
     ctx: typer.Context,
-    version: Annotated[
+    version: Annotated[  # noqa: ARG001
         bool,
         typer.Option(
             "--version",
@@ -136,15 +137,10 @@ def main(
 
     Global options apply to all commands and control output format and verbosity.
     """
+    load_dotenv(override=False)
+
     global _current_output_format  # noqa: PLW0603
     _current_output_format = format.value  # type: ignore[assignment]
-
-    # Check for co-installed legacy packages (rai-cli ↔ raise-cli conflict)
-    from raise_cli.compat import check_legacy_packages
-
-    legacy_warning = check_legacy_packages()
-    if legacy_warning:
-        console.print(f"[yellow]Warning:[/yellow] {legacy_warning}")
 
     # Calculate verbosity from flags
     verbosity = -1 if quiet else min(verbose, 3)

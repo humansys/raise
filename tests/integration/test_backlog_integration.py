@@ -316,7 +316,7 @@ class TestSessionLiveQuery:
             LastSession,
             SessionState,
         )
-        from raise_cli.session.bundle import _fetch_live_status
+        from raise_cli.session.bundle_data import fetch_live_status
 
         # Write YAML items on disk
         write_yaml_item(
@@ -355,7 +355,7 @@ class TestSessionLiveQuery:
         with patch(
             "raise_cli.cli.commands._resolve.resolve_adapter", return_value=adapter
         ):
-            live = _fetch_live_status(state, timeout=10.0)
+            live = fetch_live_status(state, timeout=10.0)
 
         assert live.epic_status == "in_progress"
         assert live.epic_summary == "My Epic"
@@ -365,9 +365,9 @@ class TestSessionLiveQuery:
 
     def test_fetch_live_status_with_no_work_returns_empty(self) -> None:
         """No current work -> empty LiveBacklogStatus without adapter call."""
-        from raise_cli.session.bundle import LiveBacklogStatus, _fetch_live_status
+        from raise_cli.session.bundle_data import LiveBacklogStatus, fetch_live_status
 
-        result = _fetch_live_status(None)
+        result = fetch_live_status(None)
         assert result == LiveBacklogStatus()
 
     def test_manifest_adapter_default_selects_filesystem(

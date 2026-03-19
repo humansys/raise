@@ -8,7 +8,6 @@ Supports Python, TypeScript, JavaScript, PHP, Svelte, and C#.
 Example:
     $ raise discover scan src/
     $ raise discover scan . --language typescript --output json
-    $ raise discover build --input work/discovery/components-validated.json
 """
 
 from __future__ import annotations
@@ -26,7 +25,6 @@ from raise_cli.hooks.emitter import create_emitter
 from raise_cli.hooks.events import DiscoverScanEvent
 from raise_cli.output.formatters.discover import (
     format_analyze_result,
-    format_build_result,
     format_drift_result,
     format_scan_result,
 )
@@ -38,6 +36,22 @@ discover_app = typer.Typer(
 )
 
 console = Console()
+
+
+_SUPPORTED_LANGUAGES = ("python", "typescript", "javascript", "php", "svelte", "csharp")
+
+
+def _validate_language(language: str | None) -> Language | None:
+    """Validate and return typed language, exit on unsupported value."""
+    if not language:
+        return None
+    if language not in _SUPPORTED_LANGUAGES:
+        cli_error(
+            f"Unsupported language: {language}",
+            hint="Supported: python, typescript, javascript, php, svelte, csharp",
+            exit_code=7,
+        )
+    return language  # type: ignore[return-value]
 
 
 @discover_app.command("scan")
@@ -105,25 +119,7 @@ def scan_command(
         # Auto-detect but exclude tests
         raise discover scan . --exclude "**/test_*" --exclude "**/__tests__/**"
     """
-    # Validate language if provided
-    lang: Language | None = None
-    if language:
-        if language not in (
-            "python",
-            "typescript",
-            "javascript",
-            "php",
-            "svelte",
-            "csharp",
-        ):
-            cli_error(
-                f"Unsupported language: {language}",
-                hint="Supported: python, typescript, javascript, php, svelte, csharp",
-                exit_code=7,
-            )
-        lang = language  # type: ignore[assignment]
-
-    # Pass user excludes or None to use DEFAULT_EXCLUDE_PATTERNS from scanner
+    lang = _validate_language(language)
     exclude_patterns = exclude if exclude else None
 
     result = scan_directory(
@@ -133,7 +129,6 @@ def scan_command(
         exclude_patterns=exclude_patterns,
     )
 
-    # Emit discover:scan event
     emitter = create_emitter()
     emitter.emit(
         DiscoverScanEvent(
@@ -144,6 +139,76 @@ def scan_command(
     )
 
     format_scan_result(result, path, output, language=lang)
+
+
+def _read_scan_json(input_file: Path | None) -> str:
+    """Read scan result JSON from file or stdin, exit on missing input."""
+    import sys
+
+    if input_file:
+        if not input_file.exists():
+            cli_error(
+                f"Input file not found: {input_file}",
+                hint="Run 'raise discover scan --output json' first",
+                exit_code=4,
+            )
+        return input_file.read_text(encoding="utf-8")
+
+    if sys.stdin.isatty():
+        cli_error(
+            "No input provided",
+            hint="Pipe from scan: raise discover scan -o json | raise discover analyze\n"
+            "Or use --input: raise discover analyze --input scan-result.json",
+            exit_code=7,
+        )
+    return sys.stdin.read()
+
+
+def _parse_scan_json(scan_json: str) -> ScanResult:
+    """Parse scan result JSON string into ScanResult, exit on invalid JSON."""
+    from raise_cli.discovery.scanner import Symbol
+
+    try:
+        scan_data: dict[str, Any] = json.loads(scan_json)
+        scan_result = ScanResult(
+            symbols=[],
+            files_scanned=scan_data.get("files_scanned", 0),
+            errors=scan_data.get("errors", []),
+        )
+        for sym_data in scan_data.get("symbols", []):
+            scan_result.symbols.append(Symbol.model_validate(sym_data))
+        return scan_result
+    except (json.JSONDecodeError, KeyError, ValueError) as e:
+        cli_error(
+            f"Invalid scan result JSON: {e}",
+            hint="Input must be JSON from 'raise discover scan --output json'",
+            exit_code=7,
+        )
+        raise  # unreachable, satisfies pyright
+
+
+def _load_category_map(category_map_file: Path | None) -> dict[str, str] | None:
+    """Load YAML category map from file, exit on errors."""
+    if not category_map_file:
+        return None
+    if not category_map_file.exists():
+        cli_error(
+            f"Category map file not found: {category_map_file}",
+            exit_code=4,
+        )
+    try:
+        import yaml
+
+        return yaml.safe_load(category_map_file.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
+    except ImportError:
+        cli_error(
+            "PyYAML required for --category-map",
+            hint="Install with: pip install pyyaml",
+            exit_code=6,
+        )
+    except Exception as e:
+        cli_error(f"Error reading category map: {e}", exit_code=7)
+    return None  # unreachable, satisfies pyright
 
 
 @discover_app.command("analyze")
@@ -194,74 +259,12 @@ def analyze_command(
         # Summary only
         raise discover analyze --input scan-result.json --output summary
     """
-    import sys
-
     from raise_cli.discovery.analyzer import analyze
 
-    # Load scan result JSON
-    scan_json: str = ""
-    if input_file:
-        if not input_file.exists():
-            cli_error(
-                f"Input file not found: {input_file}",
-                hint="Run 'raise discover scan --output json' first",
-                exit_code=4,
-            )
-        scan_json = input_file.read_text(encoding="utf-8")
-    else:
-        # Read from stdin
-        if sys.stdin.isatty():
-            cli_error(
-                "No input provided",
-                hint="Pipe from scan: raise discover scan -o json | raise discover analyze\n"
-                "Or use --input: raise discover analyze --input scan-result.json",
-                exit_code=7,
-            )
-        scan_json = sys.stdin.read()
+    scan_json = _read_scan_json(input_file)
+    scan_result = _parse_scan_json(scan_json)
+    category_map = _load_category_map(category_map_file)
 
-    # Parse scan result
-    scan_result = ScanResult(symbols=[], files_scanned=0, errors=[])
-    try:
-        scan_data: dict[str, Any] = json.loads(scan_json)
-        scan_result = ScanResult(
-            symbols=[],
-            files_scanned=scan_data.get("files_scanned", 0),
-            errors=scan_data.get("errors", []),
-        )
-        # Parse symbols from JSON
-        from raise_cli.discovery.scanner import Symbol
-
-        for sym_data in scan_data.get("symbols", []):
-            scan_result.symbols.append(Symbol.model_validate(sym_data))
-    except (KeyError, ValueError) as e:
-        cli_error(
-            f"Invalid scan result JSON: {e}",
-            hint="Input must be JSON from 'raise discover scan --output json'",
-            exit_code=7,
-        )
-
-    # Load custom category map if provided
-    category_map: dict[str, str] | None = None
-    if category_map_file:
-        if not category_map_file.exists():
-            cli_error(
-                f"Category map file not found: {category_map_file}",
-                exit_code=4,
-            )
-        try:
-            import yaml
-
-            category_map = yaml.safe_load(category_map_file.read_text(encoding="utf-8"))
-        except ImportError:
-            cli_error(
-                "PyYAML required for --category-map",
-                hint="Install with: pip install pyyaml",
-                exit_code=6,
-            )
-        except Exception as e:
-            cli_error(f"Error reading category map: {e}", exit_code=7)
-
-    # Run analysis
     result = analyze(scan_result, category_map=category_map)
 
     # Save analysis.json
@@ -273,132 +276,79 @@ def analyze_command(
         encoding="utf-8",
     )
 
-    # Format and print
     format_analyze_result(result, output)
 
     if output != "json":
         console.print(f"\n[dim]Saved: {output_path}[/dim]")
 
 
-@discover_app.command("build")
-def build_command(
-    input_file: Annotated[
-        Path | None,
-        typer.Option(
-            "--input",
-            "-i",
-            help="Path to validated components JSON (default: work/discovery/components-validated.json)",
-        ),
-    ] = None,
-    project_root: Annotated[
-        Path,
-        typer.Option(
-            "--project-root",
-            "-r",
-            help="Project root directory (default: current directory)",
-        ),
-    ] = Path("."),
-    output: Annotated[
-        str,
-        typer.Option(
-            "--output",
-            "-o",
-            help="Output format: human, json, or summary",
-        ),
-    ] = "human",
-) -> None:
-    """Build unified graph with discovered components.
-
-    Reads validated components from JSON and integrates them into the unified
-    context graph. Components become queryable via `raise context query`.
-
-    The graph is rebuilt from all sources (governance, memory, work, skills,
-    and components) and saved to `.raise/graph/unified.json`.
-
-    Examples:
-        # Build with default input file
-        raise discover build
-
-        # Build with custom input
-        raise discover build --input my-components.json
-
-        # Build and show JSON output
-        raise discover build --output json
-    """
-    root = project_root.resolve()
-
-    # Resolve input file path
-    if input_file is None:
-        input_path = root / "work" / "discovery" / "components-validated.json"
+def _drift_early_exit(status: str, message: str, output: str) -> None:
+    """Print a drift early-exit message in the appropriate format and exit."""
+    if output == "json":
+        console.print_json(
+            json.dumps(
+                {
+                    "status": status,
+                    "warnings": [],
+                    "warning_count": 0,
+                    "message": message,
+                }
+            )
+        )
     else:
-        input_path = input_file.resolve()
+        console.print(f"[yellow]{message}[/yellow]")
+    raise typer.Exit(0)
 
-    # Check input file exists
-    if not input_path.exists():
-        cli_error(
-            f"Components file not found: {input_path}",
-            hint="Run /rai-discover-validate to generate validated components",
-            exit_code=4,
-        )
 
-    # Load components to validate and count
-    component_count = 0
+def _load_drift_baseline(baseline_file: Path) -> list[Any]:
+    """Load and parse baseline components from JSON file."""
+    from raise_cli.discovery.drift import BaselineComponent
+
     try:
-        data: dict[str, Any] = json.loads(input_path.read_text(encoding="utf-8"))
-        components: list[dict[str, Any]] = data.get("components", [])
-        component_count = len(components)
+        baseline_data: dict[str, Any] = json.loads(
+            baseline_file.read_text(encoding="utf-8")
+        )
+        baseline_dicts: list[dict[str, Any]] = baseline_data.get("components", [])
+        return [BaselineComponent.model_validate(comp) for comp in baseline_dicts]
     except (json.JSONDecodeError, KeyError) as e:
-        cli_error(f"Invalid JSON in {input_path}: {e}")
+        cli_error(f"Error reading baseline: {e}")
+        return []  # unreachable
 
-    if component_count == 0:
-        cli_error(
-            "No components found in input file",
-            hint="Run /rai-discover-validate to validate components first",
+
+def _load_and_validate_baseline(baseline_file: Path, output: str) -> list[Any]:
+    """Load baseline, validate it exists and has components, or exit early."""
+    if not baseline_file.exists():
+        if output == "json":
+            _drift_early_exit("no_baseline", "No baseline components found", output)
+        else:
+            console.print(
+                "[yellow]No baseline components found.[/yellow]\n"
+                "[dim]Run /rai-discover to create a baseline first.[/dim]"
+            )
+            raise typer.Exit(0)
+
+    baseline = _load_drift_baseline(baseline_file)
+
+    if not baseline:
+        if output == "json":
+            _drift_early_exit("empty_baseline", "Baseline has no components", output)
+        else:
+            console.print(
+                "[yellow]Baseline has no components.[/yellow]\n"
+                "[dim]Run /rai-discover to add components.[/dim]"
+            )
+            raise typer.Exit(0)
+
+    min_baseline_size = 10
+    if len(baseline) < min_baseline_size and output == "human":
+        console.print(
+            f"[yellow]Note: Baseline has only {len(baseline)} component(s).[/yellow]\n"
+            f"[dim]Drift detection works best with {min_baseline_size}+ components "
+            "for meaningful patterns.[/dim]\n"
+            "[dim]Run /rai-discover to expand the baseline.[/dim]\n"
         )
 
-    # Build unified graph (includes components automatically)
-    from raise_cli.context.builder import GraphBuilder
-
-    builder = GraphBuilder(project_root=root)
-    graph = builder.build()
-
-    # Save graph via backend
-    from raise_cli.graph.backends import get_active_backend
-
-    graph_path = root / ".raise" / "graph" / "unified.json"
-    get_active_backend(graph_path).persist(graph)
-
-    # Count component nodes in graph
-    component_nodes = [n for n in graph.iter_concepts() if n.type == "component"]
-    components_in_graph = len(component_nodes)
-
-    # Build categories dict
-    categories: dict[str, int] = {}
-    for comp in component_nodes:
-        category = comp.metadata.get("category", "unknown")
-        categories[category] = categories.get(category, 0) + 1
-
-    # Build sample components list
-    sample_components = [
-        (
-            comp.metadata.get("name", comp.id),
-            comp.metadata.get("kind", ""),
-            comp.content[:60],
-        )
-        for comp in component_nodes[:3]
-    ]
-
-    format_build_result(
-        input_path=input_path,
-        graph_path=graph_path,
-        component_count=component_count,
-        components_in_graph=components_in_graph,
-        node_count=graph.node_count,
-        edge_count=graph.edge_count,
-        categories=categories,
-        sample_components=sample_components,
-        output_format=output,
-    )
+    return baseline
 
 
 @discover_app.command("drift")
@@ -446,99 +396,25 @@ def drift_command(
         # Output as JSON
         raise discover drift --output json
     """
-    from raise_cli.discovery.drift import BaselineComponent, DriftWarning, detect_drift
+    from raise_cli.discovery.drift import DriftWarning, detect_drift
 
     root = project_root.resolve()
     scan_path = path.resolve() if path else root / "src"
 
-    # Load baseline components
     baseline_file = root / "work" / "discovery" / "components-validated.json"
 
-    if not baseline_file.exists():
-        if output == "json":
-            console.print_json(
-                json.dumps(
-                    {
-                        "status": "no_baseline",
-                        "warnings": [],
-                        "warning_count": 0,
-                        "message": "No baseline components found",
-                    }
-                )
-            )
-        else:
-            console.print(
-                "[yellow]No baseline components found.[/yellow]\n"
-                "[dim]Run /rai-discover-validate to create a baseline first.[/dim]"
-            )
-        raise typer.Exit(0)
+    baseline = _load_and_validate_baseline(baseline_file, output)
 
-    # Load baseline
-    baseline: list[BaselineComponent] = []
-    try:
-        baseline_data: dict[str, Any] = json.loads(
-            baseline_file.read_text(encoding="utf-8")
-        )
-        baseline_dicts: list[dict[str, Any]] = baseline_data.get("components", [])
-        baseline = [BaselineComponent.model_validate(comp) for comp in baseline_dicts]
-    except (json.JSONDecodeError, KeyError) as e:
-        cli_error(f"Error reading baseline: {e}")
-
-    if not baseline:
-        if output == "json":
-            console.print_json(
-                json.dumps(
-                    {
-                        "status": "empty_baseline",
-                        "warnings": [],
-                        "warning_count": 0,
-                        "message": "Baseline has no components",
-                    }
-                )
-            )
-        else:
-            console.print(
-                "[yellow]Baseline has no components.[/yellow]\n"
-                "[dim]Run /rai-discover-validate to add components.[/dim]"
-            )
-        raise typer.Exit(0)
-
-    # Warn if baseline is too small for meaningful drift detection
-    min_baseline_size = 10
-    if len(baseline) < min_baseline_size and output == "human":
-        console.print(
-            f"[yellow]Note: Baseline has only {len(baseline)} component(s).[/yellow]\n"
-            f"[dim]Drift detection works best with {min_baseline_size}+ components "
-            "for meaningful patterns.[/dim]\n"
-            "[dim]Run /rai-discover-scan and /rai-discover-validate to expand the baseline.[/dim]\n"
-        )
-
-    # Scan for new symbols
     if not scan_path.exists():
-        if output == "json":
-            console.print_json(
-                json.dumps(
-                    {
-                        "status": "no_source",
-                        "warnings": [],
-                        "warning_count": 0,
-                        "message": f"Scan path not found: {scan_path}",
-                    }
-                )
-            )
-        else:
-            console.print(f"[yellow]Scan path not found: {scan_path}[/yellow]")
-        raise typer.Exit(0)
+        _drift_early_exit("no_source", f"Scan path not found: {scan_path}", output)
 
     scan_result = scan_directory(scan_path)
 
-    # Detect drift
     warnings: list[DriftWarning] = detect_drift(
         baseline=baseline,
         scanned=scan_result.symbols,
     )
 
-    # Output results
     format_drift_result(
         warnings=warnings,
         files_scanned=scan_result.files_scanned,
@@ -546,6 +422,5 @@ def drift_command(
         output_format=output,
     )
 
-    # Exit with 1 if warnings found
     if warnings:
         raise typer.Exit(1)

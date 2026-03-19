@@ -1,0 +1,12 @@
+type: module
+name: graph
+purpose: "Knowledge graph persistence backends"
+status: current
+depends_on: [context, adapters]
+depended_by: [cli, memory]
+entry_points: ["rai.graph.backends"]
+public_api:
+  - "FilesystemGraphBackend"
+  - "get_active_backend"
+layer: domain
+bounded_context: adapters

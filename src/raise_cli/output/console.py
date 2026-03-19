@@ -87,12 +87,11 @@ class OutputConsole:
 
         if self.format == "json":
             self._print_json({"message": message})
+        # Both human and table use plain text for messages
+        elif style and self.color:
+            self._console.print(f"[{style}]{message}[/]")
         else:
-            # Both human and table use plain text for messages
-            if style and self.color:
-                self._console.print(f"[{style}]{message}[/]")
-            else:
-                self._console.print(message)
+            self._console.print(message)
 
     def print_success(
         self, message: str, *, details: dict[str, Any] | None = None
@@ -182,12 +181,11 @@ class OutputConsole:
             self._print_json(data)
         elif self.format == "table":
             self._print_data_as_table(data, title=title)
+        # Human format - use tree for nested, simple for flat
+        elif self._has_nested_values(data):
+            self._print_data_as_tree(data, title=title)
         else:
-            # Human format - use tree for nested, simple for flat
-            if self._has_nested_values(data):
-                self._print_data_as_tree(data, title=title)
-            else:
-                self._print_data_as_kv(data, title=title)
+            self._print_data_as_kv(data, title=title)
 
     def print_list(
         self,
@@ -255,15 +253,15 @@ class OutputConsole:
         for key, value in data.items():
             if isinstance(value, dict):
                 branch = tree.add(f"[bold]{key}[/]")
-                nested = cast(dict[str, Any], value)
+                nested = cast("dict[str, Any]", value)
                 self._add_dict_to_tree(branch, nested)
             elif isinstance(value, list):
                 branch = tree.add(f"[bold]{key}[/]")
-                items = cast(list[Any], value)
+                items = cast("list[Any]", value)
                 for i, item in enumerate(items):
                     if isinstance(item, dict):
                         sub = branch.add(f"[dim][{i}][/]")
-                        nested_item = cast(dict[str, Any], item)
+                        nested_item = cast("dict[str, Any]", item)
                         self._add_dict_to_tree(sub, nested_item)
                     else:
                         branch.add(str(item))

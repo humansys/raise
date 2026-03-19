@@ -1,0 +1,27 @@
+type: module
+name: telemetry
+purpose: "Local signal collection — append-only JSONL telemetry following OpenTelemetry conventions"
+status: current
+depends_on: [config]
+depended_by: [cli]
+entry_points:
+  - "raise memory emit"
+  - "raise memory emit-work"
+public_api:
+  - "CalibrationEvent"
+  - "CommandUsage"
+  - "EmitResult"
+  - "ErrorEvent"
+  - "SessionEvent"
+  - "Signal"
+  - "SkillEvent"
+  - "WorkLifecycle"
+  - "emit"
+  - "emit_command_usage"
+  - "emit_error_event"
+  - "emit_skill_event"
+components: 13
+constraints:
+  - "Signals are local-only — no network transmission"
+  - "Append-only JSONL — never read/modify existing signals"
+  - "Follow OpenTelemetry semantic conventions for future OTLP export"

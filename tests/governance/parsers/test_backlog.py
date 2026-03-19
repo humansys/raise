@@ -407,10 +407,10 @@ class TestScopeDocSkipLogic:
         )
 
     def test_no_skip_for_jira_key_even_if_num_matches(self, tmp_path: Path) -> None:
-        """RAISE-275 should NOT be skipped even if e275-*/scope.md exists.
+        r"""RAISE-275 should NOT be skipped even if e275-*/scope.md exists.
 
         Jira keys produce a different node ID namespace (epic-raise-275 vs epic-e275).
-        The naive re.sub(r'\\D', '', id) approach wrongly extracts '275' and skips.
+        The naive re.sub(r'\D', '', id) approach wrongly extracts '275' and skips.
         """
         backlog = tmp_path / "governance" / "backlog.md"
         backlog.parent.mkdir(parents=True)

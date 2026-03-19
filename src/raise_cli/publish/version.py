@@ -27,6 +27,7 @@ class VersionInfo:
     pre_num: int | None = None
 
     def __str__(self) -> str:
+        """Return semantic version string (e.g. '2.1.0' or '2.1.0rc1')."""
         base = f"{self.major}.{self.minor}.{self.patch}"
         if self.pre_type is not None and self.pre_num is not None:
             return f"{base}{self.pre_type}{self.pre_num}"
@@ -79,7 +80,7 @@ def parse_version(version: str) -> VersionInfo:
     )
 
 
-def bump_version(current: str, bump_type: BumpType) -> str:
+def bump_version(current: str, bump_type: BumpType) -> str:  # noqa: C901 -- complexity 11, refactor deferred
     """Bump a version string according to the bump type.
 
     Args:

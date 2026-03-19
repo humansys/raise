@@ -20,12 +20,12 @@ def _mock_session() -> AsyncSession:
     return session
 
 
-@pytest.fixture()
+@pytest.fixture
 def org_id() -> uuid.UUID:
     return uuid.UUID("00000000-0000-0000-0000-000000000001")
 
 
-@pytest.fixture()
+@pytest.fixture
 def repo_id() -> str:
     return "raise-commons"
 
@@ -33,7 +33,7 @@ def repo_id() -> str:
 class TestUpsertNodes:
     """upsert_nodes inserts new nodes and updates existing via ON CONFLICT."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_created_and_updated_counts(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
@@ -69,7 +69,7 @@ class TestUpsertNodes:
         assert "updated" in result
         assert result["created"] + result["updated"] == 2
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_nodes_is_noop(self, org_id: uuid.UUID, repo_id: str) -> None:
         from raise_server.db.queries import upsert_nodes
 
@@ -82,7 +82,7 @@ class TestUpsertNodes:
 class TestReplaceEdges:
     """replace_edges deletes old edges and inserts new ones for (org, repo)."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_deletes_then_inserts(self, org_id: uuid.UUID, repo_id: str) -> None:
         from raise_server.db.queries import replace_edges
 
@@ -116,7 +116,7 @@ class TestReplaceEdges:
         assert session.execute.call_count == 2  # delete + insert
         assert result["created"] == 2
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_edges_still_deletes_old(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
@@ -135,7 +135,7 @@ class TestReplaceEdges:
 class TestPruneOrphanNodes:
     """prune_orphan_nodes deletes nodes not in the incoming set."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_deletes_nodes_not_in_keep_set(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
@@ -151,7 +151,7 @@ class TestPruneOrphanNodes:
         assert pruned == 3
         session.execute.assert_called_once()
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_keep_set_deletes_all(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
@@ -169,7 +169,7 @@ class TestPruneOrphanNodes:
 class TestSearchNodes:
     """search_nodes queries nodes using full-text search, scoped to org."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_matching_nodes(self, org_id: uuid.UUID) -> None:
         from raise_server.db.queries import search_nodes
 
@@ -194,7 +194,7 @@ class TestSearchNodes:
         assert results[0]["node_id"] == "mod-memory"
         assert results[0]["rank"] == 0.075
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_respects_limit(self, org_id: uuid.UUID) -> None:
         from raise_server.db.queries import search_nodes
 

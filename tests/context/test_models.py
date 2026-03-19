@@ -189,7 +189,7 @@ class TestCoreNodeTypes:
 
     def test_conceptnode_alias_is_graphnode(self) -> None:
         """GraphNode is an alias for GraphNode."""
-        assert GraphNode is GraphNode
+        assert GraphNode is GraphNode  # noqa: PLR0124 -- was alias test; kept for backward compat documentation
 
     def test_conceptnode_backward_compat(self) -> None:
         """GraphNode still works with explicit type for backward compat."""
@@ -203,7 +203,7 @@ class TestCoreNodeTypes:
 
     def test_conceptedge_alias_is_graphedge(self) -> None:
         """GraphEdge is an alias for GraphEdge."""
-        assert GraphEdge is GraphEdge
+        assert GraphEdge is GraphEdge  # noqa: PLR0124 -- was alias test; kept for backward compat documentation
 
     def test_core_edge_types_constants(self) -> None:
         """CoreEdgeTypes provides string constants for built-in edges."""
