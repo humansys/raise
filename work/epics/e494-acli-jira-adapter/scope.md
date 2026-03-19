@@ -4,7 +4,7 @@
 
 Replace the MCP bridge-based Jira adapter with a thin ACLI subprocess wrapper that
 supports multi-instance Jira, simplifies the codebase, and preserves governance and
-observability.
+observability. Remove the MCP adapter entirely.
 
 ## Value
 
@@ -12,14 +12,16 @@ observability.
 - Multi-instance unlocks working across rai-agent + humansys sites from one `rai backlog`
 - Eliminates MCP subprocess + async bridge complexity for basic Jira CRUD
 - ACLI returns raw Jira API JSON — the nested format our parsers already handle
+- Removing MCP adapter reduces dependency surface (`mcp` package no longer needed for Jira)
 
 ## In Scope (MUST)
 
 - `AcliJiraAdapter` implementing `AsyncProjectManagementAdapter` (11 methods)
 - Core `_run_acli()` — subprocess, `--json` parsing, error handling, telemetry
 - Multi-instance: `jira.yaml` with `instances:` section, site switching per call
-- Entry point registration as `jira-acli` (coexist with MCP adapter)
-- Adapter resolution: prefer `jira-acli` when ACLI is available, fall back to MCP
+- Delete `McpJiraAdapter` and its entry point
+- Replace `jira` entry point with ACLI adapter
+- Clear error if ACLI binary not found (`acli` not in PATH)
 
 ## In Scope (SHOULD)
 
@@ -33,7 +35,6 @@ observability.
 - CLI command changes (`rai backlog` interface unchanged)
 - Confluence adapter (separate epic if needed)
 - ACLI installation/auth setup (prerequisite, user responsibility)
-- Removing MCP adapter (kept as fallback)
 
 ## Stories
 
@@ -54,22 +55,21 @@ error handling. Single function that all protocol methods delegate to.
 ### S494.3: Full protocol implementation (M)
 
 All 11 `AsyncProjectManagementAdapter` methods via ACLI commands.
-Reuse existing `_to_jql()`, `_resolve_transition_id()`, response parsers
-where the JSON format matches (it does — ACLI returns nested Jira API format).
+Reuse existing `_to_jql()`, response parsers where the JSON format matches.
 
 **Dependencies:** S494.2
 
 ### S494.4: Multi-instance config and site switching (S)
 
 Extend `jira.yaml` schema with `instances:` section. Adapter resolves
-project → instance → site. ACLI `--site` flag or `auth switch` per call.
+project → instance → site. ACLI `auth switch` before calls when site differs.
 
 **Dependencies:** S494.3
 
-### S494.5: Entry point, resolution, and migration (S)
+### S494.5: Delete MCP adapter and migrate entry point (S)
 
-Register `jira-acli` entry point. Update `resolve_adapter()` to prefer ACLI
-when available. Docs for migration. Keep MCP adapter as `jira-mcp` fallback.
+Remove `McpJiraAdapter`, its tests, and MCP-specific dependencies.
+Register ACLI adapter as the sole `jira` entry point. Error on missing ACLI.
 
 **Dependencies:** S494.4
 
@@ -78,14 +78,15 @@ when available. Docs for migration. Keep MCP adapter as `jira-mcp` fallback.
 - [ ] `rai backlog search/get/create/transition/comment` work via ACLI adapter
 - [ ] Multi-instance tested: query RAISE (humansys) and RAI (rai-agent) in one session
 - [ ] Logfire telemetry spans emitted per ACLI call (command, latency, success)
-- [ ] Existing tests pass or migrated to ACLI adapter
-- [ ] MCP adapter preserved as `jira-mcp` entry point
+- [ ] Tests migrated to ACLI adapter
+- [ ] MCP adapter and MCP Jira dependencies deleted
+- [ ] Clear error message when ACLI not installed
 - [ ] `rai doctor` reports ACLI availability (SHOULD)
 
 ## Risks
 
 | Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| ACLI `--site` switching is slow (re-auth per call) | Medium | Medium | Cache auth state, batch calls per site |
+| ---- | ---------- | ------ | ---------- |
+| ACLI auth switch is slow (global state mutation) | Medium | Medium | Cache current site in adapter, only switch when needed |
 | ACLI JSON output changes between versions | Low | High | Pin minimum ACLI version, test in CI |
-| ACLI not installed on user machine | Medium | Low | Fallback to MCP adapter, clear error message |
+| ACLI not installed on user machine | Medium | High | Clear error with install instructions, `rai doctor` check |

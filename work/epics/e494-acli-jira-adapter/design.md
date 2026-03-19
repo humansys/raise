@@ -33,8 +33,8 @@ existing parsers already handle (`is_flat=False` branch). We can reuse:
 
 ```
 packages/raise-pro/src/rai_pro/adapters/
-├── mcp_jira.py          # existing — kept as jira-mcp entry point
-├── acli_jira.py          # NEW — AcliJiraAdapter
+├── mcp_jira.py          # DELETE — replaced by ACLI adapter
+├── acli_jira.py          # NEW — AcliJiraAdapter (sole jira entry point)
 └── acli_bridge.py        # NEW — _run_acli() subprocess wrapper
 
 .raise/jira.yaml          # EXTENDED — instances section added
@@ -142,15 +142,15 @@ calls are effectively sequential. No benefit from async streaming here.
 
 ### D2: Reuse existing response parsers
 
-ACLI returns nested Jira API format. Reuse `_extract_issue_fields`,
+ACLI returns nested Jira API format. Migrate `_extract_issue_fields`,
 `_parse_issue_detail`, `_parse_search_results`, `_parse_comments` from
-`mcp_jira.py` — extract to shared module or inherit.
+`mcp_jira.py` into the new adapter (nested-only, drop flat/sooperset branch).
 
-### D3: Coexist, don't replace
+### D3: Replace, don't coexist
 
-Register as `jira-acli` entry point alongside `jira` (MCP). Resolution
-preference: if `acli` binary found in PATH → use `jira-acli`, else → `jira`.
-User can force with `-a jira-acli` or `-a jira`.
+Delete `McpJiraAdapter` entirely. Register ACLI adapter as the sole `jira`
+entry point. If `acli` binary is not in PATH, raise clear error with install
+instructions. No fallback — ACLI is a hard prerequisite for Jira operations.
 
 ### D4: Site switching via `auth switch` before calls
 
