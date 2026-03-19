@@ -11,7 +11,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
-from raise_cli.doctor.models import CheckStatus, DoctorContext
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 from raise_cli.doctor.registry import CheckRegistry
 from raise_cli.doctor.runner import PIPELINE_ORDER, run_checks, summarize
 
@@ -34,6 +34,33 @@ def _format_result_line(category: str, message: str, status: CheckStatus) -> str
     """Format a single result line for human output."""
     _, prefix = _STATUS_STYLE[status]
     return f"  {prefix} {category:14s} {message}"
+
+
+def _render_json_output(
+    results: list[CheckResult],
+    passes: int,
+    warns: int,
+    errors: int,
+) -> None:
+    """Render check results as JSON to stdout."""
+    import json
+
+    out = Console()
+    data = {
+        "results": [
+            {
+                "check_id": r.check_id,
+                "category": r.category,
+                "status": r.status.value,
+                "message": r.message,
+                "fix_hint": r.fix_hint,
+                "details": list(r.details),
+            }
+            for r in results
+        ],
+        "summary": {"pass": passes, "warn": warns, "error": errors},
+    }
+    out.print_json(json.dumps(data))
 
 
 @doctor_app.callback()
@@ -85,24 +112,7 @@ def doctor(
     passes, warns, errors = summarize(results)
 
     if json_output:
-        import json
-
-        out = Console()
-        data = {
-            "results": [
-                {
-                    "check_id": r.check_id,
-                    "category": r.category,
-                    "status": r.status.value,
-                    "message": r.message,
-                    "fix_hint": r.fix_hint,
-                    "details": list(r.details),
-                }
-                for r in results
-            ],
-            "summary": {"pass": passes, "warn": warns, "error": errors},
-        }
-        out.print_json(json.dumps(data))
+        _render_json_output(results, passes, warns, errors)
     else:
         out = Console()
         if not results:
