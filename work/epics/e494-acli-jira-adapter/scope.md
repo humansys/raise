@@ -90,3 +90,52 @@ Register ACLI adapter as the sole `jira` entry point. Error on missing ACLI.
 | ACLI auth switch is slow (global state mutation) | Medium | Medium | Cache current site in adapter, only switch when needed |
 | ACLI JSON output changes between versions | Low | High | Pin minimum ACLI version, test in CI |
 | ACLI not installed on user machine | Medium | High | Clear error with install instructions, `rai doctor` check |
+
+---
+
+## Implementation Plan
+
+### Sequencing Strategy: Walking Skeleton
+
+Linear dependency chain. Each story builds on the previous. No parallelism.
+
+| # | Story | Size | Strategy | Rationale |
+| - | ----- | ---- | -------- | --------- |
+| 1 | S494.1: Spike — ACLI JSON mapping | XS | Risk-first | Validates core hypothesis before writing production code |
+| 2 | S494.2: Core subprocess wrapper | S | Walking skeleton | `_run_acli()` is the foundation; telemetry from day 1 |
+| 3 | S494.3: Full protocol implementation | M | Dependency-driven | 11 methods, needs the core wrapper in place |
+| 4 | S494.4: Multi-instance config + switching | S | Incremental | Extend working single-site adapter with site routing |
+| 5 | S494.5: Delete MCP adapter + migrate entry point | S | Cleanup | Only after everything works on ACLI |
+
+### Milestones
+
+#### M1: Walking Skeleton (after S494.2)
+
+- `_run_acli()` executes ACLI commands with JSON parsing
+- Logfire telemetry span emitted per call
+- At least one protocol method works E2E (e.g., `search`)
+- **Demo:** `rai backlog search` works via ACLI wrapper (hardcoded adapter)
+
+#### M2: Feature Complete (after S494.4)
+
+- All 11 protocol methods work via ACLI
+- Multi-instance tested: query RAI (rai-agent) and RAISE (humansys)
+- `rai backlog` commands produce identical results to current MCP adapter
+- **Demo:** `rai backlog search "..." -a jira` works across both Jira instances
+
+#### M3: Epic Complete (after S494.5)
+
+- MCP adapter deleted, ACLI is sole `jira` entry point
+- All tests migrated
+- Clear error on missing ACLI binary
+- Done criteria met → ready for `/rai-epic-close`
+
+### Progress Tracking
+
+| Story | Status | Notes |
+| ----- | ------ | ----- |
+| S494.1 Spike | pending | |
+| S494.2 Core wrapper | pending | |
+| S494.3 Full protocol | pending | |
+| S494.4 Multi-instance | pending | |
+| S494.5 Delete MCP | pending | |
