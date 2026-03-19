@@ -290,7 +290,7 @@ class TestUpdateIssue:
 
 class TestSearch:
     def test_search_passes_jql_and_limit(self, tmp_path: Path) -> None:
-        """search passes JQL and limit to jira_search."""
+        """Search passes JQL and limit to jira_search."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok(
             {
@@ -383,7 +383,7 @@ class TestSearch:
         assert sent_jql == jql, f"JQL was modified unexpectedly: {sent_jql}"
 
     def test_search_wraps_plain_text_to_text_query(self, tmp_path: Path) -> None:
-        """RAISE-552: plain text without operators is wrapped to 'text ~ \"...\"' JQL."""
+        r"""RAISE-552: plain text without operators is wrapped to 'text ~ \"...\"' JQL."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok({"issues": []})
 
@@ -533,7 +533,7 @@ class TestBatchTransition:
 
 class TestHealth:
     def test_health_returns_adapter_health(self, tmp_path: Path) -> None:
-        """health returns AdapterHealth from JQL probe."""
+        """Health returns AdapterHealth from JQL probe."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok(
             {
@@ -551,7 +551,7 @@ class TestHealth:
         assert result.latency_ms is not None
 
     def test_health_returns_unhealthy_on_error(self, tmp_path: Path) -> None:
-        """health returns unhealthy when bridge call fails."""
+        """Health returns unhealthy when bridge call fails."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.side_effect = McpBridgeError("Connection failed")
 
@@ -562,6 +562,62 @@ class TestHealth:
         assert result.name == "jira"
         assert result.healthy is False
         assert "Connection failed" in result.message
+
+
+class TestExtractIssueFields:
+    """Tests for _extract_issue_fields helper — DRY flat/nested field extraction."""
+
+    def test_flat_format_extracts_common_fields(self) -> None:
+        """Flat (sooperset) format: fields at top level, no 'fields' key."""
+        from rai_pro.adapters.mcp_jira import McpJiraAdapter
+
+        data: dict[str, Any] = {
+            "key": "RAISE-1",
+            "summary": "A story",
+            "status": {"name": "In Progress"},
+            "issue_type": {"name": "Story"},
+            "parent": {"key": "RAISE-100"},
+        }
+        result = McpJiraAdapter._extract_issue_fields(data, is_flat=True)
+        assert result["key"] == "RAISE-1"
+        assert result["summary"] == "A story"
+        assert result["status"] == "In Progress"
+        assert result["issue_type"] == "Story"
+        assert result["parent_key"] == "RAISE-100"
+
+    def test_nested_format_extracts_common_fields(self) -> None:
+        """Nested (raw Jira API) format: fields under 'fields' key."""
+        from rai_pro.adapters.mcp_jira import McpJiraAdapter
+
+        data: dict[str, Any] = {
+            "key": "RAISE-2",
+            "fields": {
+                "summary": "A bug",
+                "status": {"name": "Done"},
+                "issuetype": {"name": "Bug"},
+                "parent": {"key": "RAISE-200"},
+            },
+        }
+        result = McpJiraAdapter._extract_issue_fields(data, is_flat=False)
+        assert result["key"] == "RAISE-2"
+        assert result["summary"] == "A bug"
+        assert result["status"] == "Done"
+        assert result["issue_type"] == "Bug"
+        assert result["parent_key"] == "RAISE-200"
+
+    def test_no_parent_returns_none(self) -> None:
+        """parent_key is None when parent is absent or None."""
+        from rai_pro.adapters.mcp_jira import McpJiraAdapter
+
+        data: dict[str, Any] = {
+            "key": "RAISE-3",
+            "summary": "Orphan",
+            "status": {"name": "Backlog"},
+            "issue_type": {"name": "Task"},
+            "parent": None,
+        }
+        result = McpJiraAdapter._extract_issue_fields(data, is_flat=True)
+        assert result["parent_key"] is None
 
 
 class TestIsErrorPropagation:

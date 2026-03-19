@@ -109,8 +109,9 @@ def _read_frontmatter(skill_md: Path) -> dict[str, Any]:
         raw: Any = yaml.safe_load(parts[1])
         if not isinstance(raw, dict):
             return {}
-        return cast(dict[str, Any], raw)
-    except Exception:
+        return cast("dict[str, Any]", raw)
+    except Exception as e:
+        logger.debug("Failed to parse frontmatter from %s: %s", skill_md, e)
         return {}
 
 

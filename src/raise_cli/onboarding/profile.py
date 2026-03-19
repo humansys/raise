@@ -568,7 +568,7 @@ def add_deadline(
     return profile.model_copy(update={"deadlines": deadlines})
 
 
-def update_coaching(
+def update_coaching(  # noqa: C901 -- complexity 11, refactor deferred
     profile: DeveloperProfile,
     strengths: list[str] | None = None,
     growth_edge: str | None = None,

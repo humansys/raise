@@ -139,7 +139,7 @@ def _check_cwd_guard(
 
 
 @session_app.command()
-def start(
+def start(  # noqa: C901
     name: Annotated[
         str | None,
         typer.Option(
@@ -350,7 +350,7 @@ def context(
 
 
 @session_app.command()
-def close(
+def close(  # noqa: C901
     summary: Annotated[
         str | None,
         typer.Option(

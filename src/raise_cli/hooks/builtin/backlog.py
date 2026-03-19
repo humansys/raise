@@ -139,7 +139,7 @@ class BacklogHook:
     def __init__(self, project_root: Path | None = None) -> None:
         self._project_root = project_root or Path(".")
 
-    def handle(self, event: HookEvent) -> HookResult:
+    def handle(self, event: HookEvent) -> HookResult:  # noqa: C901 -- complexity 14, refactor deferred
         """Handle a work lifecycle event by syncing Jira.
 
         Never raises — returns HookResult with status and message.

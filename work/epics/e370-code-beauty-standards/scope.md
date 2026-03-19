@@ -33,14 +33,21 @@ Make raise-commons pass a senior Python developer's architectural review. The st
 | S370.2 | Expand Tooling Gates | M | pyproject.toml + import-linter + all violations fixed | S370.1 |
 | S370.3 | Code Audit Skill | M | `/rai-code-audit` skill | S370.1, S370.2 |
 | S370.4 | Codebase Audit | L | `audit-results.md` — findings per module, 5 dimensions | S370.3 |
-| S370.5 | Refactor Critical | M-L | Code changes resolving critical/must-fix findings | S370.4 |
-| S370.6 | Distill Governance | S | Permanent governance + patterns + skill reconciliation | S370.5 |
+| S370.5a | Quick Wins | S | R1-R4: re-exports, logging, move formatters, remove global | S370.4 |
+| S370.5b | Extract Helpers | M | R5-R10: CLI/governance/discovery helpers, Protocol, ThreadPool, DRY | S370.5a |
+| S370.5c | God Class Decomposition | L | R11: Decompose context/builder.py into loaders + orchestrator | S370.5b |
+| S370.5d | Bundle Split | M | R12: Split session/bundle.py into formatters + data + assembly | S370.5b |
+| S370.5e | Onboarding Cleanup | M | R13-R14: Split scaffold_skills + CLI reference to resource | S370.5b |
+| S370.5f | Migrate Loaders to YAML ✓ | M | Replace markdown regex parsing with YAML sources in identity + architecture loaders | S370.5c |
+| S370.6 | Distill Governance | S | Permanent governance + patterns + skill reconciliation | S370.5a-e |
 
 ```
-S370.1 → S370.2 → S370.3 → S370.4 → S370.5 → S370.6
+S370.1 → S370.2 → S370.3 → S370.4 → S370.5a → S370.5b → S370.5c → S370.5f
+                                                        → S370.5d  → S370.6
+                                                        → S370.5e (deferred → RAISE-501)
 ```
 
-Linear: each story produces the input for the next.
+S370.5a is prerequisite for all. S370.5c/d are independent after S370.5b. S370.5e deferred to RAISE-501. S370.6 closes after remaining refactoring.
 
 ## Done Criteria
 
@@ -94,12 +101,17 @@ No parallelism: intentionally sequential because learning from each step feeds t
 
 | Story | Status | Notes |
 |-------|--------|-------|
-| S370.1 Draft Code Standard | pending | |
-| S370.2 Expand Tooling Gates | pending | |
-| S370.3 Code Audit Skill | pending | |
-| S370.4 Codebase Audit | pending | |
-| S370.5 Refactor Critical | pending | scope TBD after S370.4 |
-| S370.6 Distill Governance | pending | |
+| S370.1 Draft Code Standard | done | Merged to dev |
+| S370.2 Expand Tooling Gates | done | Merged to dev, 11 rule sets + import-linter |
+| S370.3 Code Audit Skill | done | Merged to dev |
+| S370.4 Codebase Audit | done | 28 modules, 1 critical, 24 must-fix, 14 recommendations |
+| S370.5a Quick Wins | done | R1-R3 done, R4 deferred (error handler arch) |
+| S370.5b Extract Helpers | done | R4-R10: 40+ helpers extracted, ContextVar, Protocol, DRY |
+| S370.5c God Class Decomposition | done | R11: builder.py 1,569 → 267 lines, 7 new modules |
+| S370.5d Bundle Split | done | R12: bundle.py 821 → 323 lines, 3 modules |
+| S370.5e Onboarding Cleanup | deferred | R13-R14 — moved to RAISE-501 (onboarding redesign) |
+| S370.5f Migrate Loaders to YAML | done | RAISE-500: YAML source of truth, MD never parsed |
+| S370.6 Distill Governance | done | Standard permanent, skills reconciled, 5 patterns |
 
 ### Sequencing Risks
 

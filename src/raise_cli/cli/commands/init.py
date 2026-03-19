@@ -30,7 +30,11 @@ from raise_cli.hooks.emitter import create_emitter
 from raise_cli.hooks.events import InitCompleteEvent
 from raise_cli.onboarding.bootstrap import BootstrapResult
 from raise_cli.onboarding.conventions import detect_conventions
-from raise_cli.onboarding.detection import ProjectType, detect_project_type
+from raise_cli.onboarding.detection import (
+    DetectionResult,
+    ProjectType,
+    detect_project_type,
+)
 from raise_cli.onboarding.governance import (
     GovernanceScaffoldResult,
     generate_guardrails,
@@ -52,12 +56,11 @@ from raise_cli.onboarding.profile import (
     save_developer_profile,
 )
 from raise_cli.onboarding.skills import SkillScaffoldResult
-from raise_cli.output.symbols import WARN
 
 console = Console()
 
 
-def _print_skill_sync_summary(result: SkillScaffoldResult) -> None:
+def _print_skill_sync_summary(result: SkillScaffoldResult) -> None:  # noqa: C901 -- complexity 12, refactor deferred
     """Print a summary table of skill sync actions."""
     from raise_cli.skills_base import __version__ as cli_version
 
@@ -155,10 +158,9 @@ def _get_welcome_message(profile: DeveloperProfile | None) -> str:
 
     if profile.experience_level == ExperienceLevel.RI:
         return WELCOME_BACK_RI.format(name=profile.name)
-    elif profile.experience_level == ExperienceLevel.HA:
+    if profile.experience_level == ExperienceLevel.HA:
         return f"[cyan]Welcome back, {profile.name}.[/cyan]\n"
-    else:
-        return WELCOME_SHU
+    return WELCOME_SHU
 
 
 def _get_skill_recommendation(project_type: str) -> tuple[str, str]:
@@ -172,6 +174,143 @@ def _get_skill_recommendation(project_type: str) -> tuple[str, str]:
         "/rai-project-create",
         "Fill governance from conversation (new project)",
     )
+
+
+def _build_shu_bootstrap_lines(
+    bootstrap_result: BootstrapResult,
+) -> list[str]:
+    """Build SHU-level status lines for Rai base bootstrap results."""
+    lines: list[str] = []
+    if bootstrap_result.already_existed:
+        if bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0:
+            parts: list[str] = []
+            if bootstrap_result.patterns_added > 0:
+                parts.append(f"{bootstrap_result.patterns_added} new")
+            if bootstrap_result.patterns_updated > 0:
+                parts.append(f"{bootstrap_result.patterns_updated} updated")
+            lines.append(
+                "[bold]Synced:[/bold]  .raise/rai/memory/  "
+                f"[dim]— {', '.join(parts)} base patterns[/dim]"
+            )
+        else:
+            lines.append(
+                "[bold]Loaded:[/bold]  .raise/rai/  "
+                "[dim]— Rai base already present[/dim]"
+            )
+    else:
+        if bootstrap_result.identity_copied:
+            lines.append(
+                "[bold]Created:[/bold] .raise/rai/identity/  "
+                "[dim]— Rai's base identity[/dim]"
+            )
+        if bootstrap_result.patterns_copied:
+            from importlib.resources import files as _res_files
+
+            _base = _res_files("raise_cli.rai_base")
+            _src = _base / "memory" / "patterns-base.jsonl"
+            _count = len(
+                [
+                    ln
+                    for ln in _src.read_text(encoding="utf-8").strip().splitlines()
+                    if ln.strip()
+                ]
+            )
+            lines.append(
+                "[bold]Created:[/bold] .raise/rai/memory/  "
+                f"[dim]— {_count} base patterns[/dim]"
+            )
+        if bootstrap_result.methodology_copied:
+            lines.append(
+                "[bold]Created:[/bold] .raise/rai/framework/  "
+                "[dim]— methodology definition[/dim]"
+            )
+    return lines
+
+
+def _build_shu_files_section(
+    created_profile: bool,
+    bootstrap_result: BootstrapResult | None,
+    skills_result: SkillScaffoldResult | None,
+    governance_result: GovernanceScaffoldResult | None,
+    skills_dir: str | None,
+) -> str:
+    """Build the files-section string for SHU-level project message."""
+    lines = [
+        "[bold]Created:[/bold] .raise/manifest.yaml  [dim]— project metadata[/dim]"
+    ]
+    if created_profile:
+        lines.append(
+            "[bold]Created:[/bold] ~/.rai/developer.yaml  "
+            "[dim]— your preferences (first time)[/dim]"
+        )
+    else:
+        lines.append(
+            "[bold]Loaded:[/bold]  ~/.rai/developer.yaml  [dim]— your preferences[/dim]"
+        )
+
+    if bootstrap_result is not None:
+        lines.extend(_build_shu_bootstrap_lines(bootstrap_result))
+
+    if skills_result is not None:
+        if skills_result.already_existed:
+            lines.append(
+                f"[bold]Loaded:[/bold]  {skills_dir}/  "
+                "[dim]— skills already present[/dim]"
+            )
+        elif skills_result.skills_copied > 0:
+            lines.append(
+                f"[bold]Created:[/bold] {skills_dir}/  "
+                f"[dim]— {skills_result.skills_copied} onboarding skills[/dim]"
+            )
+
+    if governance_result is not None:
+        if governance_result.already_existed:
+            lines.append(
+                "[bold]Loaded:[/bold]  governance/  "
+                "[dim]— governance templates already present[/dim]"
+            )
+        elif governance_result.files_created > 0:
+            lines.append(
+                f"[bold]Created:[/bold] governance/  "
+                f"[dim]— {governance_result.files_created} governance templates[/dim]"
+            )
+
+    return "\n".join(lines)
+
+
+def _build_ri_extra_messages(
+    bootstrap_result: BootstrapResult | None,
+    skills_result: SkillScaffoldResult | None,
+    governance_result: GovernanceScaffoldResult | None,
+    skills_dir: str | None,
+) -> str:
+    """Build extra message lines for RI-level project message."""
+    bootstrap_msg = ""
+    if bootstrap_result is not None:
+        if not bootstrap_result.already_existed:
+            bootstrap_msg = (
+                f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
+            )
+        elif (
+            bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0
+        ):
+            parts_ri: list[str] = []
+            if bootstrap_result.patterns_added > 0:
+                parts_ri.append(f"{bootstrap_result.patterns_added} new")
+            if bootstrap_result.patterns_updated > 0:
+                parts_ri.append(f"{bootstrap_result.patterns_updated} updated")
+            bootstrap_msg = f"  Synced base patterns: {', '.join(parts_ri)}\n"
+    skills_msg = ""
+    if skills_result is not None and not skills_result.already_existed:
+        skills_msg = (
+            f"  Installed {skills_result.skills_copied} skills to {skills_dir}/\n"
+        )
+    governance_msg = ""
+    if governance_result is not None and not governance_result.already_existed:
+        governance_msg = (
+            f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
+        )
+    return bootstrap_msg + skills_msg + governance_msg
 
 
 def _get_project_message(
@@ -189,96 +328,13 @@ def _get_project_message(
     skill_cmd, skill_desc = _get_skill_recommendation(project_type)
 
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
-        lines = [
-            "[bold]Created:[/bold] .raise/manifest.yaml  [dim]— project metadata[/dim]"
-        ]
-        if created_profile:
-            lines.append(
-                "[bold]Created:[/bold] ~/.rai/developer.yaml  "
-                "[dim]— your preferences (first time)[/dim]"
-            )
-        else:
-            lines.append(
-                "[bold]Loaded:[/bold]  ~/.rai/developer.yaml  [dim]— your preferences[/dim]"
-            )
-
-        if bootstrap_result is not None:
-            if bootstrap_result.already_existed:
-                # Check if base patterns were synced even though everything else existed
-                if (
-                    bootstrap_result.patterns_added > 0
-                    or bootstrap_result.patterns_updated > 0
-                ):
-                    parts: list[str] = []
-                    if bootstrap_result.patterns_added > 0:
-                        parts.append(f"{bootstrap_result.patterns_added} new")
-                    if bootstrap_result.patterns_updated > 0:
-                        parts.append(f"{bootstrap_result.patterns_updated} updated")
-                    lines.append(
-                        "[bold]Synced:[/bold]  .raise/rai/memory/  "
-                        f"[dim]— {', '.join(parts)} base patterns[/dim]"
-                    )
-                else:
-                    lines.append(
-                        "[bold]Loaded:[/bold]  .raise/rai/  "
-                        "[dim]— Rai base already present[/dim]"
-                    )
-            else:
-                if bootstrap_result.identity_copied:
-                    lines.append(
-                        "[bold]Created:[/bold] .raise/rai/identity/  "
-                        "[dim]— Rai's base identity[/dim]"
-                    )
-                if bootstrap_result.patterns_copied:
-                    from importlib.resources import files as _res_files
-
-                    _base = _res_files("raise_cli.rai_base")
-                    _src = _base / "memory" / "patterns-base.jsonl"
-                    _count = len(
-                        [
-                            ln
-                            for ln in _src.read_text(encoding="utf-8")
-                            .strip()
-                            .splitlines()
-                            if ln.strip()
-                        ]
-                    )
-                    lines.append(
-                        "[bold]Created:[/bold] .raise/rai/memory/  "
-                        f"[dim]— {_count} base patterns[/dim]"
-                    )
-                if bootstrap_result.methodology_copied:
-                    lines.append(
-                        "[bold]Created:[/bold] .raise/rai/framework/  "
-                        "[dim]— methodology definition[/dim]"
-                    )
-
-        if skills_result is not None:
-            if skills_result.already_existed:
-                lines.append(
-                    f"[bold]Loaded:[/bold]  {skills_dir}/  "
-                    "[dim]— skills already present[/dim]"
-                )
-            elif skills_result.skills_copied > 0:
-                lines.append(
-                    f"[bold]Created:[/bold] {skills_dir}/  "
-                    f"[dim]— {skills_result.skills_copied} onboarding skills[/dim]"
-                )
-
-        if governance_result is not None:
-            if governance_result.already_existed:
-                lines.append(
-                    "[bold]Loaded:[/bold]  governance/  "
-                    "[dim]— governance templates already present[/dim]"
-                )
-            elif governance_result.files_created > 0:
-                lines.append(
-                    f"[bold]Created:[/bold] governance/  "
-                    f"[dim]— {governance_result.files_created} governance templates[/dim]"
-                )
-
-        files_section = "\n".join(lines)
-
+        files_section = _build_shu_files_section(
+            created_profile,
+            bootstrap_result,
+            skills_result,
+            governance_result,
+            skills_dir,
+        )
         return PROJECT_DETECTED_SHU.format(
             project_type=project_type.capitalize(),
             file_count=file_count,
@@ -286,41 +342,18 @@ def _get_project_message(
             skill_recommendation=skill_cmd,
             skill_description=skill_desc,
         )
-    else:
-        bootstrap_msg = ""
-        if bootstrap_result is not None:
-            if not bootstrap_result.already_existed:
-                bootstrap_msg = (
-                    f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
-                )
-            elif (
-                bootstrap_result.patterns_added > 0
-                or bootstrap_result.patterns_updated > 0
-            ):
-                parts_ri: list[str] = []
-                if bootstrap_result.patterns_added > 0:
-                    parts_ri.append(f"{bootstrap_result.patterns_added} new")
-                if bootstrap_result.patterns_updated > 0:
-                    parts_ri.append(f"{bootstrap_result.patterns_updated} updated")
-                bootstrap_msg = f"  Synced base patterns: {', '.join(parts_ri)}\n"
-        skills_msg = ""
-        if skills_result is not None and not skills_result.already_existed:
-            skills_msg = (
-                f"  Installed {skills_result.skills_copied} skills to {skills_dir}/\n"
-            )
-        governance_msg = ""
-        if governance_result is not None and not governance_result.already_existed:
-            governance_msg = f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
-        return (
-            PROJECT_DETECTED_RI.format(
-                project_type=project_type.capitalize(),
-                file_count=file_count,
-                skill_recommendation=skill_cmd,
-            )
-            + bootstrap_msg
-            + skills_msg
-            + governance_msg
+
+    extra = _build_ri_extra_messages(
+        bootstrap_result, skills_result, governance_result, skills_dir
+    )
+    return (
+        PROJECT_DETECTED_RI.format(
+            project_type=project_type.capitalize(),
+            file_count=file_count,
+            skill_recommendation=skill_cmd,
         )
+        + extra
+    )
 
 
 def _create_new_profile(project_path: Path) -> DeveloperProfile:
@@ -434,6 +467,267 @@ def _generate_agents_md(
     agents_md_path.write_text(content, encoding="utf-8")
 
 
+def _load_or_create_profile(
+    project_path: Path,
+) -> tuple[DeveloperProfile, bool]:
+    """Load existing developer profile or create a new one.
+
+    Returns:
+        Tuple of (profile, created_profile) where created_profile is True
+        if a new profile was just created.
+    """
+    profile = load_developer_profile()
+    created_profile = False
+
+    if profile is None:
+        profile = _create_new_profile(project_path)
+        save_developer_profile(profile)
+        created_profile = True
+    else:
+        profile = _update_profile_with_project(profile, project_path)
+        save_developer_profile(profile)
+
+    return profile, created_profile
+
+
+def _validate_agent_types(
+    agent_types: list[str],
+    registry: AgentRegistry,
+) -> list[str]:
+    """Validate agent types against registry, warning on unknowns."""
+    valid: list[str] = []
+    for at in agent_types:
+        try:
+            registry.get_config(at)
+            valid.append(at)
+        except KeyError:
+            console.print(f"[yellow]Warning:[/yellow] Unknown agent '{at}' — skipped.")
+    return valid if valid else ["claude"]
+
+
+def _create_and_save_manifest(
+    project_path: Path,
+    project_name: str,
+    detection: DetectionResult,
+    valid_agent_types: list[str],
+) -> ProjectManifest:
+    """Create project manifest from detection results and save it."""
+    existing_manifest = load_manifest(project_path)
+
+    project_info = ProjectInfo(
+        name=project_name,
+        project_type=detection.project_type,
+        code_file_count=detection.code_file_count,
+        language=detection.language,
+        test_command=detection.toolchain.test_command if detection.toolchain else None,
+        lint_command=detection.toolchain.lint_command if detection.toolchain else None,
+        type_check_command=(
+            detection.toolchain.type_check_command if detection.toolchain else None
+        ),
+    )
+    # Sync ide.type with agents.types[0] (RAISE-218)
+    primary = valid_agent_types[0] if valid_agent_types else "claude"
+    try:
+        ide_manifest = IdeManifest(type=primary)  # type: ignore[arg-type]
+    except Exception:
+        ide_manifest = IdeManifest()  # custom agents outside BuiltinAgentType
+    manifest = ProjectManifest(
+        project=project_info,
+        agents=AgentsManifest(types=valid_agent_types),
+        ide=ide_manifest,
+        branches=existing_manifest.branches if existing_manifest else BranchConfig(),
+        tier=existing_manifest.tier if existing_manifest else None,
+    )
+    save_manifest(manifest, project_path)
+    return manifest
+
+
+def _bootstrap_project_assets(
+    project_path: Path,
+    project_name: str,
+    manifest: ProjectManifest,
+) -> tuple[BootstrapResult, GovernanceScaffoldResult, str]:
+    """Bootstrap Rai base, governance templates, and generate MEMORY.md.
+
+    Returns:
+        Tuple of (bootstrap_result, governance_result, memory_content).
+    """
+    from raise_cli.onboarding.bootstrap import bootstrap_rai_base
+
+    bootstrap_result = bootstrap_rai_base(project_path)
+
+    from raise_cli.onboarding.governance import scaffold_governance
+
+    governance_result = scaffold_governance(project_path, project_name)
+
+    from raise_cli.config.paths import get_framework_dir, get_memory_dir
+    from raise_cli.onboarding.memory_md import generate_memory_md
+
+    methodology_path = get_framework_dir(project_path) / "methodology.yaml"
+    patterns_path = get_memory_dir(project_path) / "patterns.jsonl"
+    memory_content = generate_memory_md(
+        methodology_path=methodology_path,
+        patterns_path=patterns_path,
+        project_name=project_name,
+        development_branch=manifest.branches.development,
+    )
+    canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
+    canonical_memory.parent.mkdir(parents=True, exist_ok=True)
+    canonical_memory.write_text(memory_content, encoding="utf-8")
+
+    return bootstrap_result, governance_result, memory_content
+
+
+def _scaffold_per_agent(
+    project_path: Path,
+    valid_agent_types: list[str],
+    registry: AgentRegistry,
+    memory_content: str,
+    *,
+    force: bool,
+    skip_updates: bool,
+    dry_run: bool,
+    skill_set: str | None,
+) -> SkillScaffoldResult | None:
+    """Run per-agent scaffolding (skills, workflows, memory copy).
+
+    Returns:
+        The SkillScaffoldResult for the first agent, or None.
+    """
+    from raise_cli.onboarding.skills import scaffold_skills
+    from raise_cli.onboarding.workflows import scaffold_workflows
+
+    first_skills_result: SkillScaffoldResult | None = None
+
+    for agent_type in valid_agent_types:
+        config = registry.get_config(agent_type)
+        plugin = registry.get_plugin(agent_type)
+
+        skills_result = scaffold_skills(
+            project_path,
+            agent_config=config,
+            plugin=plugin,
+            force=force,
+            skip_updates=skip_updates,
+            dry_run=dry_run,
+            skill_set=skill_set,
+        )
+        if agent_type == valid_agent_types[0]:
+            first_skills_result = skills_result
+
+        scaffold_workflows(project_path, agent_config=config)
+
+        if config.agent_type == "claude":
+            from raise_cli.config.paths import get_claude_memory_path
+
+            claude_memory = get_claude_memory_path(project_path)
+            claude_memory.parent.mkdir(parents=True, exist_ok=True)
+            claude_memory.write_text(memory_content, encoding="utf-8")
+
+        plugin.post_init(project_path, config)
+
+    return first_skills_result
+
+
+def _output_brownfield_warning(
+    profile: DeveloperProfile,
+    detection: DetectionResult,
+    governance_result: GovernanceScaffoldResult,
+) -> None:
+    """Warn when brownfield governance was just scaffolded (empty templates)."""
+    if not (
+        detection.project_type == ProjectType.BROWNFIELD
+        and not governance_result.already_existed
+        and governance_result.files_created > 0
+    ):
+        return
+
+    skill_cmd, _ = _get_skill_recommendation("brownfield")
+    if profile.experience_level == ExperienceLevel.RI:
+        console.print(
+            f"\n[yellow]⚠ Governance docs are empty templates.[/yellow] "
+            f"Run [bold cyan]{skill_cmd}[/bold cyan] to fill them."
+        )
+    else:
+        console.print(
+            Panel(
+                f"[bold yellow]Governance docs need your input[/bold yellow]\n\n"
+                f"[dim]vision.md, prd.md, backlog.md[/dim] were created as empty templates.\n"
+                f"Any agent that reads them now will get [bold]no context[/bold].\n\n"
+                f"Fill them before starting work:\n"
+                f"  [bold cyan]{skill_cmd}[/bold cyan]",
+                border_style="yellow",
+                title="[yellow]⚠ Next step required[/yellow]",
+            )
+        )
+
+
+def _detect_and_generate_guardrails(
+    project_path: Path,
+    project_name: str,
+    profile: DeveloperProfile,
+    instructions_file: str,
+) -> None:
+    """Detect conventions and generate guardrails for brownfield projects."""
+    conventions = detect_conventions(project_path)
+
+    if conventions.files_analyzed == 0:
+        return
+
+    guardrails_content = generate_guardrails(conventions, project_name=project_name)
+    guardrails_dir = project_path / "governance"
+    guardrails_dir.mkdir(parents=True, exist_ok=True)
+    guardrails_path = guardrails_dir / "guardrails.md"
+    guardrails_path.write_text(guardrails_content, encoding="utf-8")
+
+    instructions_path = project_path / instructions_file
+    conf = conventions.overall_confidence.value.upper()
+    if profile.experience_level == ExperienceLevel.RI:
+        console.print(
+            f"\n[dim]Conventions detected ({conventions.files_analyzed} files, "
+            f"{conf} confidence). Generated guardrails.md and {instructions_file}[/dim]"
+        )
+    else:
+        console.print(
+            f"\n[bold cyan]Convention Detection[/bold cyan]\n"
+            f"Analyzed {conventions.files_analyzed} files with {conf} confidence.\n"
+            f"Generated:\n"
+            f"  - [bold]{guardrails_path}[/bold] (code standards)\n"
+            f"  - [bold]{instructions_path}[/bold] (project context)\n\n"
+            f"[dim]Review and adjust as needed.[/dim]"
+        )
+
+
+def _output_init_messages(
+    profile: DeveloperProfile,
+    created_profile: bool,
+    detection: DetectionResult,
+    bootstrap_result: BootstrapResult,
+    first_skills_result: SkillScaffoldResult | None,
+    governance_result: GovernanceScaffoldResult,
+    first_config: AgentConfig,
+) -> None:
+    """Print welcome and project detection messages."""
+    welcome = _get_welcome_message(profile if not created_profile else None)
+    project_msg = _get_project_message(
+        project_type=detection.project_type.value,
+        file_count=detection.code_file_count,
+        profile=profile,
+        created_profile=created_profile,
+        bootstrap_result=bootstrap_result,
+        skills_result=first_skills_result,
+        governance_result=governance_result,
+        agent_config=first_config,
+    )
+
+    if profile.experience_level == ExperienceLevel.RI and not created_profile:
+        console.print(welcome)
+        console.print(project_msg)
+    else:
+        console.print(Panel(welcome.strip(), border_style="cyan"))
+        console.print(project_msg)
+
+
 def init_command(
     name: Annotated[
         str | None,
@@ -515,142 +809,46 @@ def init_command(
         $ raise init --detect                        # auto-detect agents
         $ raise init --ide antigravity               # (deprecated) alias
     """
-    # Determine project path
-    project_path = path if path is not None else Path.cwd()
-    project_path = project_path.resolve()
-
-    # Determine project name
+    project_path = (path if path is not None else Path.cwd()).resolve()
     project_name = name if name is not None else project_path.name
 
     # Load or create developer profile
-    profile = load_developer_profile()
-    created_profile = False
-
-    if profile is None:
-        profile = _create_new_profile(project_path)
-        save_developer_profile(profile)
-        created_profile = True
-    else:
-        profile = _update_profile_with_project(profile, project_path)
-        save_developer_profile(profile)
+    profile, created_profile = _load_or_create_profile(project_path)
 
     # Detect project type
     detection = detect_project_type(project_path)
 
-    # Load agent registry (3-tier: built-in → .raise/agents/ → ~/.rai/agents/)
+    # Load agent registry and resolve agent types
     registry = load_registry(project_root=project_path)
-
-    # Resolve agent types from flags
     agent_types = _resolve_agent_types(agent, ide, detect, project_path, registry)
 
-    # When --detect is used, confirm selection interactively
     if detect and agent is None and ide is None:
         agent_types = _prompt_agent_selection(agent_types, registry)
 
-    # Validate agent types are in registry; skip unknown with warning
-    valid_agent_types: list[str] = []
-    for at in agent_types:
-        try:
-            registry.get_config(at)
-            valid_agent_types.append(at)
-        except KeyError:
-            console.print(f"[yellow]Warning:[/yellow] Unknown agent '{at}' — skipped.")
-    if not valid_agent_types:
-        valid_agent_types = ["claude"]
+    valid_agent_types = _validate_agent_types(agent_types, registry)
 
-    # Create and save manifest with agent types, preserving existing config
-    existing_manifest = load_manifest(project_path)
-
-    project_info = ProjectInfo(
-        name=project_name,
-        project_type=detection.project_type,
-        code_file_count=detection.code_file_count,
-        language=detection.language,
-        test_command=detection.toolchain.test_command if detection.toolchain else None,
-        lint_command=detection.toolchain.lint_command if detection.toolchain else None,
-        type_check_command=(
-            detection.toolchain.type_check_command if detection.toolchain else None
-        ),
+    # Create and save manifest
+    manifest = _create_and_save_manifest(
+        project_path, project_name, detection, valid_agent_types
     )
-    primary = valid_agent_types[0]
-    try:
-        ide_manifest = IdeManifest(type=primary)  # type: ignore[arg-type]
-    except Exception:
-        ide_manifest = IdeManifest()  # custom agents outside BuiltinAgentType
-    manifest = ProjectManifest(
-        project=project_info,
-        agents=AgentsManifest(types=valid_agent_types),
-        ide=ide_manifest,
-        branches=existing_manifest.branches if existing_manifest else BranchConfig(),
-        tier=existing_manifest.tier if existing_manifest else None,
+
+    # Bootstrap project assets (Rai base, governance, MEMORY.md)
+    bootstrap_result, governance_result, memory_content = _bootstrap_project_assets(
+        project_path, project_name, manifest
     )
-    save_manifest(manifest, project_path)
-
-    # Bootstrap Rai base assets (once, agent-agnostic)
-    from raise_cli.onboarding.bootstrap import bootstrap_rai_base
-
-    bootstrap_result = bootstrap_rai_base(project_path)
-
-    # Scaffold governance templates (once)
-    from raise_cli.onboarding.governance import scaffold_governance
-
-    governance_result = scaffold_governance(project_path, project_name)
-
-    # Generate MEMORY.md canonical copy
-    from raise_cli.config.paths import (
-        get_claude_memory_path,
-        get_framework_dir,
-        get_memory_dir,
-    )
-    from raise_cli.onboarding.memory_md import generate_memory_md
-
-    methodology_path = get_framework_dir(project_path) / "methodology.yaml"
-    patterns_path = get_memory_dir(project_path) / "patterns.jsonl"
-    memory_content = generate_memory_md(
-        methodology_path=methodology_path,
-        patterns_path=patterns_path,
-        project_name=project_name,
-        development_branch=manifest.branches.development,
-    )
-    canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
-    canonical_memory.parent.mkdir(parents=True, exist_ok=True)
-    canonical_memory.write_text(memory_content, encoding="utf-8")
 
     # Per-agent scaffolding
     first_config = registry.get_config(valid_agent_types[0])
-    first_skills_result = None
-
-    from raise_cli.onboarding.skills import scaffold_skills
-    from raise_cli.onboarding.workflows import scaffold_workflows
-
-    for agent_type in valid_agent_types:
-        config = registry.get_config(agent_type)
-        plugin = registry.get_plugin(agent_type)
-
-        # Skills
-        skills_result = scaffold_skills(
-            project_path,
-            agent_config=config,
-            plugin=plugin,
-            force=force,
-            skip_updates=skip_updates,
-            dry_run=dry_run,
-            skill_set=skill_set,
-        )
-        if agent_type == valid_agent_types[0]:
-            first_skills_result = skills_result
-
-        # Workflows
-        scaffold_workflows(project_path, agent_config=config)
-
-        # Claude-specific: copy MEMORY.md to .claude/projects/
-        if config.agent_type == "claude":
-            claude_memory = get_claude_memory_path(project_path)
-            claude_memory.parent.mkdir(parents=True, exist_ok=True)
-            claude_memory.write_text(memory_content, encoding="utf-8")
-
-        # Plugin post_init hook
-        plugin.post_init(project_path, config)
+    first_skills_result = _scaffold_per_agent(
+        project_path,
+        valid_agent_types,
+        registry,
+        memory_content,
+        force=force,
+        skip_updates=skip_updates,
+        dry_run=dry_run,
+        skill_set=skill_set,
+    )
 
     # Dry-run: show skill sync summary and exit
     if dry_run and first_skills_result is not None:
@@ -663,7 +861,6 @@ def init_command(
         raise typer.Exit(code=0 if not has_updates else 1)
 
     # Generate CLAUDE.md (or agent-specific instructions) for RaiSE projects
-    # This runs always (not just on --detect) so CLAUDE.md stays in sync with .raise/
     if (project_path / ".raise").is_dir():
         instructions_content = generate_instructions(
             project_name=project_name,
@@ -687,77 +884,19 @@ def init_command(
     if detect:
         _generate_agents_md(project_path, valid_agent_types, project_name)
 
-    # Output messages
-    welcome = _get_welcome_message(profile if not created_profile else None)
-    project_msg = _get_project_message(
-        project_type=detection.project_type.value,
-        file_count=detection.code_file_count,
-        profile=profile,
-        created_profile=created_profile,
-        bootstrap_result=bootstrap_result,
-        skills_result=first_skills_result,
-        governance_result=governance_result,
-        agent_config=first_config,
+    # Output results and post-init warnings
+    _output_init_messages(
+        profile,
+        created_profile,
+        detection,
+        bootstrap_result,
+        first_skills_result,
+        governance_result,
+        first_config,
     )
+    _output_brownfield_warning(profile, detection, governance_result)
 
-    if profile.experience_level == ExperienceLevel.RI and not created_profile:
-        console.print(welcome)
-        console.print(project_msg)
-    else:
-        console.print(Panel(welcome.strip(), border_style="cyan"))
-        console.print(project_msg)
-
-    # Warn when brownfield governance was just scaffolded (docs are empty templates)
-    if (
-        detection.project_type == ProjectType.BROWNFIELD
-        and not governance_result.already_existed
-        and governance_result.files_created > 0
-    ):
-        skill_cmd, _ = _get_skill_recommendation("brownfield")
-        if profile.experience_level == ExperienceLevel.RI:
-            console.print(
-                f"\n[yellow]{WARN} Governance docs are empty templates.[/yellow] "
-                f"Run [bold cyan]{skill_cmd}[/bold cyan] to fill them."
-            )
-        else:
-            console.print(
-                Panel(
-                    f"[bold yellow]Governance docs need your input[/bold yellow]\n\n"
-                    f"[dim]vision.md, prd.md, backlog.md[/dim] were created as empty templates.\n"
-                    f"Any agent that reads them now will get [bold]no context[/bold].\n\n"
-                    f"Fill them before starting work:\n"
-                    f"  [bold cyan]{skill_cmd}[/bold cyan]",
-                    border_style="yellow",
-                    title="[yellow]{WARN} Next step required[/yellow]",
-                )
-            )
-
-    # Convention detection and guardrails generation (--detect only)
-    instructions_path = project_path / first_config.instructions_file
     if detect and detection.project_type == ProjectType.BROWNFIELD:
-        conventions = detect_conventions(project_path)
-
-        if conventions.files_analyzed > 0:
-            guardrails_content = generate_guardrails(
-                conventions, project_name=project_name
-            )
-            guardrails_dir = project_path / "governance"
-            guardrails_dir.mkdir(parents=True, exist_ok=True)
-            guardrails_path = guardrails_dir / "guardrails.md"
-            guardrails_path.write_text(guardrails_content, encoding="utf-8")
-
-            conf = conventions.overall_confidence.value.upper()
-            if profile.experience_level == ExperienceLevel.RI:
-                console.print(
-                    f"\n[dim]Conventions detected ({conventions.files_analyzed} files, "
-                    f"{conf} confidence). Generated guardrails.md and {first_config.instructions_file}[/dim]"
-                )
-            else:
-                console.print(
-                    f"\n[bold cyan]Convention Detection[/bold cyan]\n"
-                    f"Analyzed {conventions.files_analyzed} files with {conf} confidence.\n"
-                    f"Generated:\n"
-                    f"  - [bold]{guardrails_path}[/bold] (code standards)\n"
-                    f"  - [bold]{instructions_path}[/bold] (project context)\n\n"
-                    f"[dim]Review and adjust as needed.[/dim]"
-                )
+        _detect_and_generate_guardrails(
+            project_path, project_name, profile, first_config.instructions_file
+        )

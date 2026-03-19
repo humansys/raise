@@ -5,7 +5,7 @@ that ship with raise-cli. On `raise init`, these files are copied
 to the project's `.raise/rai/` directory.
 
 Contents:
-    identity/       Base identity files (core.md, perspective.md)
+    identity/       Base identity files (core.yaml, core.md, perspective.md)
     memory/         Base patterns (patterns-base.jsonl) [F14.2]
     framework/      Methodology definition (methodology.yaml) [F14.3]
 
@@ -14,7 +14,7 @@ Usage:
 
     base_files = files("raise_cli.rai_base")
     identity_dir = base_files / "identity"
-    core_md = (identity_dir / "core.md").read_text(encoding="utf-8")
+    core_yaml = (identity_dir / "core.yaml").read_text(encoding="utf-8")
 """
 
 from __future__ import annotations

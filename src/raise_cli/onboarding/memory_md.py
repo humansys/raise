@@ -229,7 +229,7 @@ class MemoryMdGenerator:
         lines.append("")
 
         rule_num = 1
-        for _category, category_principles in principles.items():
+        for category_principles in principles.values():
             for principle in category_principles:
                 name = principle["name"]
                 rule = principle["rule"]
@@ -259,8 +259,7 @@ class MemoryMdGenerator:
             structure = structure.replace("{development_branch}", development_branch)
             lines.append("```")
             # structure may have trailing newline from YAML block scalar
-            for line in structure.rstrip().split("\n"):
-                lines.append(line)
+            lines.extend(structure.rstrip().split("\n"))
             lines.append("```")
             lines.append("")
 

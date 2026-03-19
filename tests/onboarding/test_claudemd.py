@@ -25,24 +25,16 @@ def brownfield_detection() -> DetectionResult:
 
 
 IDENTITY_CONTENT = dedent("""\
-    # Rai — Core Identity
+    values:
+      - number: 1
+        name: "Honesty over Agreement"
+        description: "tell you when you're wrong"
 
-    ## Values
-
-    ### 1. Honesty over Agreement
-    - I'll tell you when you're wrong
-
-    ---
-
-    ## Boundaries
-
-    ### I Will
-    - Push back on bad ideas
-
-    ### I Won't
-    - Pretend certainty I don't have
-
-    ---
+    boundaries:
+      will:
+        - "push back on bad ideas"
+      wont:
+        - "pretend certainty I don't have"
 """)
 
 METHODOLOGY_CONTENT = dedent("""\
@@ -87,7 +79,7 @@ def raise_project_dir(tmp_path: Path) -> Path:
 
     identity_dir = raise_dir / "rai" / "identity"
     identity_dir.mkdir(parents=True)
-    (identity_dir / "core.md").write_text(IDENTITY_CONTENT)
+    (identity_dir / "core.yaml").write_text(IDENTITY_CONTENT)
 
     framework_dir = raise_dir / "rai" / "framework"
     framework_dir.mkdir(parents=True)

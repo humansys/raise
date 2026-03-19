@@ -102,6 +102,19 @@ Derived from Solution Vision:
 | `SHOULD-INF-002` | SHOULD | Cache research results | Evidence catalogs prevent re-querying | Lean §7 |
 | `SHOULD-INF-003` | SHOULD | Reserve inference for synthesis | Gathering is deterministic, thinking is inference | Lean §7 |
 
+### Coding Craft
+
+| ID | Level | Guardrail | Verificación | Derivado de |
+|----|-------|-----------|--------------|-------------|
+| `MUST-CRAFT-001` | MUST | Single Responsibility — each module/class has one reason to change | Manual review: if docstring needs "and", it does too much. Classes <7 public methods, modules <15 public functions | E370 audit (D4.4) |
+| `MUST-CRAFT-002` | MUST | Exception handlers must log — every `except Exception` logs at minimum debug level | Manual review + grep for bare `except Exception` without logger call | E370 audit (D1.1) |
+| `MUST-CRAFT-003` | MUST | Domain purity — domain logic contains no I/O (no file reads, no network, no logging side effects) | import-linter + manual review for I/O via function calls in domain modules | E370 audit (D4.2), ADR-001 |
+| `SHOULD-CRAFT-001` | SHOULD | Domain naming — no generic names (data, handler, processor, manager, item, result) unless genuinely generic utility | Manual review: "could this name appear in any codebase?" | E370 audit (D2.6) |
+| `SHOULD-CRAFT-002` | SHOULD | Comments explain WHY, not WHAT — no comments that restate the next line of code | Manual review: flag any comment that restates code | E370 audit (D2.7) |
+| `SHOULD-CRAFT-003` | SHOULD | Function size — at most 40 lines of logic (excluding docstrings, blank lines, type annotations) | Manual review for functions under complexity threshold but over 40 lines | E370 audit (D2.4) |
+| `SHOULD-CRAFT-004` | SHOULD | Nesting depth — maximum 3 levels of indentation within a function body; use early returns and guard clauses | Manual review for if/for/if/for patterns | E370 audit (D2.5) |
+| `SHOULD-CRAFT-005` | SHOULD | Abstract params, concrete returns — function parameters accept abstract types (Sequence, Mapping), returns are concrete (list, dict) | Manual review of function signatures | E370 audit (D3.2) |
+
 ---
 
 ## Guardrail Details
@@ -576,6 +589,7 @@ repos:
 | 2026-01-31 | 1.2.0 | Added `cast()` pattern for pyright strict mode (F1.5 retro) |
 | 2026-01-31 | 1.3.0 | Added Python naming best practices (SHOULD-CODE-002, F2.3 retro) |
 | 2026-02-05 | 1.4.0 | Added SHOULD-DEV-002 (tests after ruff fix) and SHOULD-CLI-001 (path params), F7.1 retro |
+| 2026-03-06 | 2.0.0 | Added Coding Craft section (3 MUST + 5 SHOULD) from E370 code standards audit |
 
 ---
 

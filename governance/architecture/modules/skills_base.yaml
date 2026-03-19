@@ -1,0 +1,15 @@
+type: module
+name: skills_base
+purpose: "Distributable skill collection — the 21 SKILL.md files that ship with rai-cli"
+status: current
+depends_on: []
+depended_by: [onboarding]
+entry_points: []
+public_api:
+  - "DISTRIBUTABLE_SKILLS"
+  - "__version__"
+components: 0
+constraints:
+  - "No internal dependencies — distribution package"
+  - "Skills are copied to .claude/skills/ on raise init, not imported at runtime"
+  - "Adding a skill here makes it available to all new projects"

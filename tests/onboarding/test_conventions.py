@@ -270,7 +270,7 @@ class TestClassifyName:
         assert classify_name("X1") == "UPPER_SNAKE_CASE"
 
     def test_camel_case(self) -> None:
-        """camelCase names are classified correctly."""
+        """CamelCase names are classified correctly."""
         assert classify_name("myFunction") == "camelCase"
         assert classify_name("getUserById") == "camelCase"
 

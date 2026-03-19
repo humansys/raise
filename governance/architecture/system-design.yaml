@@ -1,0 +1,28 @@
+type: architecture_design
+project: rai-cli
+status: current
+layers:
+  - name: leaf
+    modules: [core, config, schemas]
+    description: "Zero internal dependencies — foundation utilities"
+  - name: domain
+    modules: [governance, discovery, skills, telemetry, rai_pro]
+    description: "Independent domain logic — no cross-domain imports"
+  - name: integration
+    modules: [context, memory, onboarding, output]
+    description: "Combines domains into unified capabilities"
+  - name: orchestration
+    modules: [cli]
+    description: "User-facing entry points — depends on everything, nothing depends on it"
+distribution:
+  - name: rai_base
+    description: "Base identity and patterns for pip distribution"
+  - name: skills_base
+    description: "18 distributable SKILL.md files"
+architectural_decisions:
+  - "ADR-012: Skills + Toolkit (no monolithic engines)"
+  - "ADR-019: Unified graph with NetworkX"
+  - "ADR-020: Extended node types (module, component, depends_on)"
+  - "ADR-022: Distribution architecture (rai_base + skills_base)"
+guardrails_reference: "governance/guardrails.md"
+constitution_reference: "framework/reference/constitution.md"

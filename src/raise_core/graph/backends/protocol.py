@@ -20,8 +20,8 @@ class KnowledgeGraphBackend(Protocol):
     Implementations: FilesystemGraphBackend (built-in), ApiGraphBackend (PRO).
     """
 
-    def persist(self, graph: Graph) -> None: ...
+    def persist(self, graph: Graph) -> None: ...  # noqa: D102
 
-    def load(self) -> Graph: ...
+    def load(self) -> Graph: ...  # noqa: D102
 
-    def health(self) -> BackendHealth: ...
+    def health(self) -> BackendHealth: ...  # noqa: D102

@@ -45,7 +45,7 @@ def scaffold_workflows(
 
     Args:
         project_root: Project root directory.
-        ide_config: IDE configuration. Defaults to Claude.
+        agent_config: Agent configuration. Defaults to Claude.
 
     Returns:
         WorkflowScaffoldResult with details of what was created or skipped.

@@ -1,27 +1,25 @@
 """Built-in CoverageGate — validates test coverage collection succeeds.
 
-Runs ``pytest --cov --cov-report=term-missing -q`` and reports pass/fail.
-Per PAT-E-444, coverage is diagnostic — this gate checks that coverage
-collection succeeds, not a specific percentage threshold.
+Reads ``test_command`` from ``.raise/manifest.yaml``, appends coverage flags,
+and reports pass/fail. Per PAT-E-444, coverage is diagnostic — this gate
+checks that coverage collection succeeds, not a specific percentage threshold.
 
-Architecture: ADR-039 §5 (Built-in gates), S248.6
+Architecture: ADR-039 §5 (Built-in gates), S248.6, S474.2
 """
 
 from __future__ import annotations
 
-import shlex
 import subprocess
 from typing import ClassVar
 
 from raise_cli.gates.models import GateContext, GateResult
 from raise_cli.onboarding.manifest import load_manifest
 
-_DEFAULT_TEST_CMD = ["pytest"]
-_COV_FLAGS = ["--cov", "--cov-report=term-missing", "-q"]
+_COVERAGE_FLAGS: list[str] = ["--cov", "--cov-report=term-missing", "-q"]
 
 
 class CoverageGate:
-    """Quality gate that runs pytest with coverage.
+    """Quality gate that runs the test command with coverage flags.
 
     Registered via ``rai.gates`` entry point in pyproject.toml.
     """
@@ -30,19 +28,29 @@ class CoverageGate:
     description: ClassVar[str] = "Coverage collection succeeds"
     workflow_point: ClassVar[str] = "before:release:publish"
 
-    def _get_command(self, context: GateContext) -> list[str]:
-        manifest = load_manifest(context.working_dir)
-        if manifest and manifest.project.test_command:
-            base = shlex.split(manifest.project.test_command)
-        else:
-            base = list(_DEFAULT_TEST_CMD)
-        return [*base, *_COV_FLAGS]
-
     def evaluate(self, context: GateContext) -> GateResult:
-        """Run test command with coverage flags and return pass/fail result."""
+        """Run test command + coverage flags and return pass/fail result."""
+        manifest = load_manifest(context.working_dir)
+        if manifest is None:
+            return GateResult(
+                passed=False,
+                gate_id=self.gate_id,
+                message="No .raise/manifest.yaml found",
+            )
+
+        test_command = manifest.project.test_command
+        if test_command is None:
+            return GateResult(
+                passed=True,
+                gate_id=self.gate_id,
+                message="Skipped — test_command not configured",
+            )
+
+        cmd = test_command.split() + _COVERAGE_FLAGS
+
         try:
             result = subprocess.run(
-                self._get_command(context),
+                cmd,
                 capture_output=True,
                 text=True,
                 cwd=str(context.working_dir),
@@ -58,8 +66,8 @@ class CoverageGate:
         return GateResult(
             passed=passed,
             gate_id=self.gate_id,
-            message="Coverage collection succeeds"
-            if passed
-            else "Coverage check failed",
-            details=(result.stdout,) if not passed else (),
+            message=self.description if passed else "Coverage check failed",
+            details=tuple(s for s in (result.stdout, result.stderr) if s)
+            if not passed
+            else (),
         )

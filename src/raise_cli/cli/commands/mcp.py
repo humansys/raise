@@ -403,7 +403,7 @@ def _build_server_config(
 ) -> tuple[str, list[str]]:
     """Return (command, args) for the given package type."""
     if pkg_type == "pip":
-        assert module is not None  # validated before calling
+        assert module is not None  # noqa: S101 -- validated before calling
         return "python", ["-m", module]
     base_cmd, base_args = _TYPE_STRATEGIES[pkg_type]
     return base_cmd, [*base_args, package]

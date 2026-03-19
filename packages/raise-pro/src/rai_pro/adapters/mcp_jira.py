@@ -305,6 +305,41 @@ class McpJiraAdapter:
         return str(raw) if raw else ""
 
     @staticmethod
+    def _extract_issue_fields(data: dict[str, Any], *, is_flat: bool) -> dict[str, Any]:
+        """Extract common issue fields from flat (sooperset) or nested (raw Jira) format.
+
+        Shared by ``_parse_issue_detail`` and ``_parse_search_results`` to avoid
+        duplicating the flat/nested branching logic.
+
+        Args:
+            data: Raw issue data dict (single issue, not the search wrapper).
+            is_flat: True for sooperset format (top-level fields),
+                False for raw Jira API format (nested under ``fields``).
+
+        Returns:
+            Dict with normalized keys: key, summary, status, issue_type, parent_key.
+        """
+        if is_flat:
+            parent = data.get("parent")
+            return {
+                "key": data.get("key", ""),
+                "summary": data.get("summary", ""),
+                "status": data.get("status", {}).get("name", ""),
+                "issue_type": McpJiraAdapter._extract_type_name(data.get("issue_type")),
+                "parent_key": parent.get("key") if parent else None,
+            }
+
+        fields = data.get("fields", {})
+        parent = fields.get("parent")
+        return {
+            "key": data.get("key", ""),
+            "summary": fields.get("summary", ""),
+            "status": fields.get("status", {}).get("name", ""),
+            "issue_type": fields.get("issuetype", {}).get("name", ""),
+            "parent_key": parent.get("key") if parent else None,
+        }
+
+    @staticmethod
     def _parse_issue_ref(result: McpToolResult) -> IssueRef:
         """Parse McpToolResult into IssueRef.
 
@@ -314,7 +349,7 @@ class McpJiraAdapter:
         data = result.data
         # Wrapped format: {"message": "...", "issue": {"key": "..."}}
         if "issue" in data and isinstance(data["issue"], dict):
-            data = cast(dict[str, Any], data["issue"])
+            data = cast("dict[str, Any]", data["issue"])
         key = data.get("key", "")
         url = data.get("url", data.get("self", ""))
         return IssueRef(key=key, url=str(url))
@@ -328,50 +363,33 @@ class McpJiraAdapter:
         (nested ``fields``, ``issuetype``, ``displayName``).
         """
         data = result.data
-        fields = data.get("fields", {})
-        # Sooperset: top-level; raw Jira API: nested under fields
         is_flat = "summary" in data and "fields" not in data
+        common = McpJiraAdapter._extract_issue_fields(data, is_flat=is_flat)
 
+        # Detail-specific fields differ by format
         if is_flat:
+            src = data
             assignee = data.get("assignee")
-            priority = data.get("priority")
-            parent = data.get("parent")
-            type_name = McpJiraAdapter._extract_type_name(data.get("issue_type"))
-            return IssueDetail(
-                key=data.get("key", ""),
-                url=data.get("url", ""),
-                summary=data.get("summary", ""),
-                description=data.get("description", ""),
-                status=data.get("status", {}).get("name", ""),
-                issue_type=type_name,
-                parent_key=parent.get("key") if parent else None,
-                labels=data.get("labels", []),
-                assignee=str(
-                    assignee.get("display_name", assignee.get("displayName", ""))
-                )
+            assignee_name = (
+                str(assignee.get("display_name", assignee.get("displayName", "")))
                 if assignee
-                else None,
-                priority=priority.get("name") if priority else None,
-                created=data.get("created", ""),
-                updated=data.get("updated", ""),
+                else None
             )
+        else:
+            src = data.get("fields", {})
+            assignee = src.get("assignee")
+            assignee_name = assignee.get("displayName") if assignee else None
 
-        # Raw Jira API format (nested fields)
-        parent = fields.get("parent")
-        assignee = fields.get("assignee")
-        priority = fields.get("priority")
+        priority = src.get("priority")
         return IssueDetail(
-            key=data.get("key", ""),
-            summary=fields.get("summary", ""),
-            description=fields.get("description", ""),
-            status=fields.get("status", {}).get("name", ""),
-            issue_type=fields.get("issuetype", {}).get("name", ""),
-            parent_key=parent.get("key") if parent else None,
-            labels=fields.get("labels", []),
-            assignee=assignee.get("displayName") if assignee else None,
+            **common,
+            url=data.get("url", ""),
+            description=src.get("description", ""),
+            labels=src.get("labels", []),
+            assignee=assignee_name,
             priority=priority.get("name") if priority else None,
-            created=fields.get("created", ""),
-            updated=fields.get("updated", ""),
+            created=src.get("created", ""),
+            updated=src.get("updated", ""),
         )
 
     @staticmethod
@@ -412,30 +430,7 @@ class McpJiraAdapter:
         issues = result.data.get("issues", [])
         summaries: list[IssueSummary] = []
         for issue in issues:
-            fields = issue.get("fields", {})
             is_flat = "summary" in issue and "fields" not in issue
-
-            if is_flat:
-                type_name = McpJiraAdapter._extract_type_name(issue.get("issue_type"))
-                parent = issue.get("parent")
-                summaries.append(
-                    IssueSummary(
-                        key=issue.get("key", ""),
-                        summary=issue.get("summary", ""),
-                        status=issue.get("status", {}).get("name", ""),
-                        issue_type=type_name,
-                        parent_key=parent.get("key") if parent else None,
-                    )
-                )
-            else:
-                parent = fields.get("parent")
-                summaries.append(
-                    IssueSummary(
-                        key=issue.get("key", ""),
-                        summary=fields.get("summary", ""),
-                        status=fields.get("status", {}).get("name", ""),
-                        issue_type=fields.get("issuetype", {}).get("name", ""),
-                        parent_key=parent.get("key") if parent else None,
-                    )
-                )
+            common = McpJiraAdapter._extract_issue_fields(issue, is_flat=is_flat)
+            summaries.append(IssueSummary(**common))
         return summaries

@@ -264,7 +264,7 @@ def match_path_category(
     return best_match
 
 
-def compute_confidence(
+def compute_confidence(  # noqa: C901 -- multi-factor confidence scoring; inherent complexity
     symbol: Symbol,
     path_category: str | None,
 ) -> ConfidenceResult:
@@ -316,10 +316,9 @@ def compute_confidence(
         if ": " in symbol.signature or "<" in symbol.signature:
             signals.has_type_annotations = True
             score += 10
-    else:
-        if "->" in symbol.signature or ": " in symbol.signature:
-            signals.has_type_annotations = True
-            score += 10
+    elif "->" in symbol.signature or ": " in symbol.signature:
+        signals.has_type_annotations = True
+        score += 10
 
     # Signal 3: Path matches a known convention (+20)
     if path_category:

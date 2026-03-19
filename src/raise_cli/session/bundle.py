@@ -12,521 +12,48 @@ They live in CLAUDE.md as always-on content (ADR-012).
 
 from __future__ import annotations
 
-import json
-import logging
 from collections.abc import Callable
-from datetime import date
 from pathlib import Path
 
-from pydantic import BaseModel
-
-from raise_cli.graph.backends import get_active_backend
 from raise_cli.onboarding.profile import DeveloperProfile
-from raise_cli.output.symbols import WARN
 from raise_cli.schemas.session_state import SessionState
 from raise_core.graph.models import GraphNode
 
-logger = logging.getLogger(__name__)
-
-
-class LiveBacklogStatus(BaseModel):
-    """Live status fetched from backlog adapter during session-start."""
-
-    epic_status: str = ""
-    epic_summary: str = ""
-    story_status: str = ""
-    story_summary: str = ""
-    warning: str = ""
-
-
-def _fetch_live_status(
-    state: SessionState | None,
-    timeout: float = 5.0,
-) -> LiveBacklogStatus:
-    """Query backlog adapter for live epic/story status.
-
-    Returns LiveBacklogStatus with warning on any failure.
-    Never raises — all errors are caught and surfaced as warnings.
-    """
-    if state is None:
-        return LiveBacklogStatus()
-
-    epic_key = state.current_work.epic
-    story_key = state.current_work.story
-
-    if not epic_key and not story_key:
-        return LiveBacklogStatus()
-
-    return _query_adapter(epic_key, story_key, timeout)
-
-
-def _query_adapter(
-    epic_key: str,
-    story_key: str,
-    timeout: float,
-) -> LiveBacklogStatus:
-    """Resolve adapter and run queries with timeout. Never raises.
-
-    The entire operation (adapter resolution + issue fetches) runs inside
-    the ThreadPoolExecutor so that the timeout covers everything, including
-    slow adapter startup (e.g., MCP bridge initialization).
-    """
-    from concurrent.futures import ThreadPoolExecutor
-    from concurrent.futures import TimeoutError as FuturesTimeoutError
-
-    from raise_cli.adapters.models import IssueDetail
-    from raise_cli.adapters.protocols import ProjectManagementAdapter
-    from raise_cli.cli.commands._resolve import resolve_adapter
-
-    def _do_fetch() -> LiveBacklogStatus:
-        adapter: ProjectManagementAdapter = resolve_adapter(None)
-        result = LiveBacklogStatus()
-        if epic_key:
-            detail: IssueDetail = adapter.get_issue(epic_key)
-            result.epic_status = detail.status
-            result.epic_summary = detail.summary
-        if story_key:
-            detail = adapter.get_issue(story_key)
-            result.story_status = detail.status
-            result.story_summary = detail.summary
-        return result
-
-    try:
-        with ThreadPoolExecutor(max_workers=1) as pool:
-            future = pool.submit(_do_fetch)
-            return future.result(timeout=timeout)
-    except FuturesTimeoutError:
-        logger.debug("Live status fetch timed out after %.1fs", timeout)
-        return LiveBacklogStatus(
-            warning=f"Backlog query timeout ({timeout:.0f}s) — showing cached state"
-        )
-    except (
-        SystemExit
-    ):  # NOSONAR — intentional: degrade gracefully when adapter unavailable
-        # resolve_adapter() uses sys.exit() on failure; SystemExit is
-        # BaseException, not Exception, so we catch it explicitly.
-        logger.debug("Adapter unavailable (SystemExit)")
-        return LiveBacklogStatus(
-            warning="Backlog adapter unavailable — showing cached state"
-        )
-    except Exception as exc:
-        logger.debug("Live status fetch failed: %s", exc)
-        return LiveBacklogStatus(
-            warning=f"Backlog query error: {exc} — showing cached state"
-        )
-
-
-# Graph path relative to project root
-GRAPH_REL_PATH = Path(".raise") / "rai" / "memory" / "index.json"
-# Sessions index path relative to project root (personal = developer-specific)
-SESSIONS_INDEX_REL_PATH = (
-    Path(".raise") / "rai" / "personal" / "sessions" / "index.jsonl"
+from .bundle_data import (
+    SectionManifest,
+    fetch_live_status,
+    find_release_for_current_epic,
+    get_always_on_primes,
+    get_foundational_patterns,
 )
-
-
-def get_foundational_patterns(project_path: Path) -> list[GraphNode]:
-    """Query memory graph for foundational patterns.
-
-    Args:
-        project_path: Absolute path to the project root.
-
-    Returns:
-        List of pattern GraphNodes with foundational=true metadata.
-    """
-    graph_path = project_path / GRAPH_REL_PATH
-    if not graph_path.exists():
-        logger.debug("Graph not found: %s", graph_path)
-        return []
-
-    try:
-        graph = get_active_backend(graph_path).load()
-    except Exception:
-        logger.warning("Failed to load graph: %s", graph_path)
-        return []
-
-    return [
-        node
-        for node in graph.iter_concepts()
-        if node.type == "pattern" and node.metadata.get("foundational") is True
-    ]
-
-
-def get_always_on_primes(project_path: Path) -> list[GraphNode]:
-    """Query memory graph for all always_on nodes (governance + identity).
-
-    Args:
-        project_path: Absolute path to the project root.
-
-    Returns:
-        List of GraphNodes with always_on=true metadata.
-    """
-    graph_path = project_path / GRAPH_REL_PATH
-    if not graph_path.exists():
-        logger.debug("Graph not found: %s", graph_path)
-        return []
-
-    try:
-        graph = get_active_backend(graph_path).load()
-    except Exception:
-        logger.warning("Failed to load graph: %s", graph_path)
-        return []
-
-    return [
-        node for node in graph.iter_concepts() if node.metadata.get("always_on") is True
-    ]
-
-
-def _format_developer_section(profile: DeveloperProfile) -> str:
-    """Format developer identity line with non-default communication prefs."""
-    line = f"Developer: {profile.name} ({profile.experience_level.value})"
-
-    # Surface communication preferences that deviate from defaults
-    comm = profile.communication
-    prefs: list[str] = []
-    if comm.language != "en":
-        prefs.append(f"language: {comm.language}")
-    if comm.style.value != "balanced":
-        prefs.append(f"style: {comm.style.value}")
-    if comm.skip_praise:
-        prefs.append("skip_praise")
-    if comm.redirect_when_dispersing:
-        prefs.append("redirect_when_dispersing")
-
-    if prefs:
-        line += f"\nCommunication: {', '.join(prefs)}"
-
-    return line
-
-
-def _find_release_for_current_epic(
-    project_path: Path, epic_id: str
-) -> GraphNode | None:
-    """Find release node for the current epic from the memory graph.
-
-    Args:
-        project_path: Absolute path to the project root.
-        epic_id: Epic identifier (e.g., "E19").
-
-    Returns:
-        The release GraphNode, or None if not found or graph unavailable.
-    """
-    if not epic_id:
-        return None
-
-    graph_path = project_path / GRAPH_REL_PATH
-    if not graph_path.exists():
-        return None
-
-    try:
-        from raise_cli.graph.backends import get_active_backend
-        from raise_core.graph.query import QueryEngine
-
-        graph = get_active_backend(graph_path).load()
-        engine = QueryEngine(graph)
-        return engine.find_release_for(f"epic-{epic_id.lower()}")
-    except Exception:
-        logger.debug("Failed to query release for epic %s", epic_id)
-        return None
-
-
-def _format_work_section(
-    state: SessionState | None,
-    release_node: GraphNode | None = None,
-    live: LiveBacklogStatus | None = None,
-) -> str:
-    """Format current work state with optional live backlog annotations."""
-    if state is None:
-        return "Work: (no previous session state)"
-
-    lines: list[str] = []
-
-    if release_node:
-        release_id = release_node.metadata.get("release_id", release_node.id)
-        name = release_node.metadata.get("name", "")
-        target = release_node.metadata.get("target", "")
-        release_parts = [f"Release: {release_id}"]
-        if name:
-            release_parts.append(f"({name})")
-        if target:
-            release_parts.append(f"— Target: {target}")
-        lines.append(" ".join(release_parts))
-
-    # Story line with optional live annotation
-    story_line = f"Story: {state.current_work.story} [{state.current_work.phase}]"
-    if live and live.story_status:
-        story_line += f" — {live.story_status} (live)"
-    lines.append(story_line)
-
-    # Epic line with optional live annotation
-    epic_line = f"Epic: {state.current_work.epic}"
-    if live and live.epic_status:
-        epic_line += f" — {live.epic_status} (live)"
-    lines.append(epic_line)
-
-    lines.append(f"Branch: {state.current_work.branch}")
-
-    # Warning line for degraded live status
-    if live and live.warning:
-        lines.append(f"{WARN} {live.warning}")
-
-    return "\n".join(lines)
-
-
-def _format_last_session(state: SessionState | None) -> str:
-    """Format last session summary."""
-    if state is None:
-        return ""
-    s = state.last_session
-    return f"Last: {s.id} ({s.date}, {s.developer}) — {s.summary}"
-
-
-def _format_deadlines(profile: DeveloperProfile) -> str:
-    """Format deadlines with days remaining."""
-    if not profile.deadlines:
-        return ""
-
-    today = date.today()
-    lines = ["# Deadlines"]
-    for d in profile.deadlines:
-        days = (d.date - today).days
-        if days < 0:
-            suffix = f"({abs(days)}d overdue)"
-        elif days == 0:
-            suffix = "(today)"
-        elif days == 1:
-            suffix = "(1 day)"
-        else:
-            suffix = f"({days} days)"
-        line = f"{d.name}: {d.date.strftime('%b %d')} {suffix}"
-        if d.notes:
-            line += f" — {d.notes}"
-        lines.append(line)
-    return "\n".join(lines)
-
-
-def _format_governance_primes(always_on_nodes: list[GraphNode]) -> str:
-    """Format governance primes (guardrails + non-identity principles).
-
-    Args:
-        always_on_nodes: All always_on nodes from the graph.
-
-    Returns:
-        Formatted governance primes section, or empty string if none.
-    """
-    governance = [
-        n
-        for n in always_on_nodes
-        if not n.id.startswith("RAI-VAL-") and not n.id.startswith("RAI-BND-")
-    ]
-    if not governance:
-        return ""
-
-    lines = ["# Governance Primes"]
-    for n in governance:
-        content = n.content
-        if len(content) > 80:
-            content = content[:77] + "..."
-        lines.append(f"- {n.id}: {content}")
-    return "\n".join(lines)
-
-
-def _format_progress(state: SessionState | None) -> str:
-    """Format epic progress section.
-
-    Args:
-        state: Session state (may be None).
-
-    Returns:
-        Formatted progress section, or empty string if no progress.
-    """
-    if state is None or state.progress is None:
-        return ""
-
-    p = state.progress
-    pct = round(p.sp_done / p.sp_total * 100) if p.sp_total > 0 else 0
-    lines = [
-        f"Progress: {p.epic} — {p.stories_done}/{p.stories_total} stories, {p.sp_done}/{p.sp_total} SP ({pct}%)"
-    ]
-
-    if state.completed_epics:
-        lines.append(f"Completed: {', '.join(state.completed_epics)}")
-
-    return "\n".join(lines)
-
-
-def _format_recent_sessions(project_path: Path, limit: int = 3) -> str:
-    """Format recent sessions from sessions/index.jsonl.
-
-    Args:
-        project_path: Absolute path to the project root.
-        limit: Number of recent sessions to include.
-
-    Returns:
-        Formatted recent sessions section, or empty string if none.
-    """
-    index_path = project_path / SESSIONS_INDEX_REL_PATH
-    if not index_path.exists():
-        return ""
-
-    try:
-        text = index_path.read_text(encoding="utf-8").strip()
-        if not text:
-            return ""
-        sessions = [json.loads(line) for line in text.splitlines() if line.strip()]
-    except Exception:
-        logger.warning("Failed to read sessions index: %s", index_path)
-        return ""
-
-    if not sessions:
-        return ""
-
-    recent = sessions[-limit:]
-    recent.reverse()  # Most recent first
-
-    lines = ["Recent:"]
-    for s in recent:
-        topic = s.get("topic", "")
-        if len(topic) > 80:
-            topic = topic[:77] + "..."
-        lines.append(f"- {s['id']}: {topic}")
-    return "\n".join(lines)
-
-
-def _format_narrative(state: SessionState | None) -> str:
-    """Format session narrative for cross-session continuity.
-
-    Narrative is loaded verbatim — no truncation. It contains structured
-    context (decisions, research, artifacts, branch state) that makes the
-    next session immediately resumable.
-
-    Adds a staleness caveat so the reader knows to verify volatile
-    state (git status, branch, uncommitted files) before acting on it.
-
-    Args:
-        state: Session state (may be None).
-
-    Returns:
-        Formatted narrative section, or empty string if no narrative.
-    """
-    if state is None or not state.narrative:
-        return ""
-
-    captured_date = state.last_session.date
-    caveat = (
-        f"(Captured at session close on {captured_date}. "
-        "Git/branch state may be stale — verify before acting.)"
-    )
-    return f"# Session Narrative\n{caveat}\n{state.narrative}"
-
-
-def _format_next_session_prompt(state: SessionState | None) -> str:
-    """Format next session prompt for cross-session continuity.
-
-    This is forward-looking guidance from Rai to her future self,
-    written during session-close and presented at session-start.
-
-    Adds a staleness caveat so the reader knows to verify volatile
-    state (git status, branch, uncommitted files) before acting on it.
-
-    Args:
-        state: Session state (may be None).
-
-    Returns:
-        Formatted prompt section, or empty string if no prompt.
-    """
-    if state is None or not state.next_session_prompt:
-        return ""
-
-    captured_date = state.last_session.date
-    caveat = (
-        f"(Captured at session close on {captured_date}. "
-        "Git/branch state may be stale — verify before acting.)"
-    )
-    return f"# Next Session Prompt\n{caveat}\n{state.next_session_prompt}"
-
-
-def _format_primes(patterns: list[GraphNode]) -> str:
-    """Format foundational patterns as behavioral primes."""
-    if not patterns:
-        return ""
-
-    lines = ["# Behavioral Primes"]
-    for p in patterns:
-        # Compact: PAT-ID: first sentence
-        content = p.content.split("—")[0].strip() if "—" in p.content else p.content
-        # Truncate long content
-        if len(content) > 80:
-            content = content[:77] + "..."
-        lines.append(f"- {p.id}: {content}")
-    return "\n".join(lines)
-
-
-def _format_coaching(profile: DeveloperProfile) -> str:
-    """Format coaching context."""
-    coaching = profile.coaching
-    has_content = (
-        coaching.strengths
-        or coaching.growth_edge
-        or coaching.trust_level != "new"
-        or coaching.autonomy
-        or coaching.relationship.quality != "new"
-    )
-    if not has_content:
-        return ""
-
-    lines = ["# Coaching"]
-    if coaching.trust_level != "new":
-        lines.append(f"Trust: {coaching.trust_level}")
-    if coaching.strengths:
-        lines.append(f"Strengths: {', '.join(coaching.strengths)}")
-    if coaching.growth_edge:
-        lines.append(f"Growth edge: {coaching.growth_edge}")
-    if coaching.autonomy:
-        lines.append(f"Autonomy: {coaching.autonomy}")
-    if coaching.relationship.quality != "new":
-        rel = coaching.relationship
-        lines.append(f"Relationship: {rel.quality} ({rel.trajectory})")
-    # Corrections suppressed from session context — noise without specific
-    # consumption point. Revisit when /rai-story-review integrates them.
-    return "\n".join(lines)
-
-
-def _format_pending(state: SessionState | None) -> str:
-    """Format pending items."""
-    if state is None:
-        return ""
-
-    pending = state.pending
-    if not pending.decisions and not pending.blockers and not pending.next_actions:
-        return ""
-
-    lines = ["# Pending"]
-    if pending.decisions:
-        lines.append("Decisions:")
-        for d in pending.decisions:
-            lines.append(f"- {d}")
-    if pending.blockers:
-        lines.append("Blockers:")
-        for b in pending.blockers:
-            lines.append(f"- {b}")
-    if pending.next_actions:
-        lines.append("Next:")
-        for n in pending.next_actions:
-            lines.append(f"- {n}")
-    return "\n".join(lines)
-
+from .bundle_formatters import (
+    format_coaching,
+    format_deadlines,
+    format_developer_section,
+    format_governance_primes,
+    format_last_session,
+    format_manifest,
+    format_narrative,
+    format_next_session_prompt,
+    format_pending,
+    format_primes,
+    format_progress,
+    format_recent_sessions,
+    format_work_section,
+)
 
 # ---------------------------------------------------------------------------
 # Section registry and manifest
 # ---------------------------------------------------------------------------
 
-
-class SectionManifest(BaseModel):
-    """Manifest entry for a queryable context section."""
-
-    name: str
-    count: int
-    token_estimate: int
+# Average tokens per item, estimated from real data
+_TOKENS_PER_ITEM: dict[str, int] = {
+    "governance": 25,
+    "behavioral": 20,
+    "coaching": 80,
+    "deadlines": 30,
+    "progress": 40,
+}
 
 
 def _count_governance(project_path: Path) -> int:
@@ -571,13 +98,15 @@ def _count_progress(state: SessionState | None) -> int:
     return 1
 
 
-# Average tokens per item, estimated from real data
-_TOKENS_PER_ITEM: dict[str, int] = {
-    "governance": 25,
-    "behavioral": 20,
-    "coaching": 80,
-    "deadlines": 30,
-    "progress": 40,
+# Registry: section name → format function
+# Format functions have heterogeneous signatures; the registry maps names
+# for validation and dispatch. Actual calling happens in assemble_sections().
+SECTION_REGISTRY: dict[str, Callable[..., str]] = {
+    "governance": format_governance_primes,
+    "behavioral": format_primes,
+    "coaching": format_coaching,
+    "deadlines": format_deadlines,
+    "progress": format_progress,
 }
 
 
@@ -620,16 +149,24 @@ def count_section_items(
     return 0  # unreachable but satisfies pyright
 
 
-# Registry: section name → format function
-# Format functions have heterogeneous signatures; the registry maps names
-# for validation and dispatch. Actual calling happens in assemble_sections().
-SECTION_REGISTRY: dict[str, Callable[..., str]] = {
-    "governance": _format_governance_primes,
-    "behavioral": _format_primes,
-    "coaching": _format_coaching,
-    "deadlines": _format_deadlines,
-    "progress": _format_progress,
-}
+def _format_section(
+    name: str,
+    project_path: Path,
+    profile: DeveloperProfile,
+    state: SessionState | None,
+) -> str:
+    """Format a single section by name. Assumes name is valid."""
+    if name == "governance":
+        return format_governance_primes(get_always_on_primes(project_path))
+    if name == "behavioral":
+        return format_primes(get_foundational_patterns(project_path))
+    if name == "coaching":
+        return format_coaching(profile)
+    if name == "deadlines":
+        return format_deadlines(profile)
+    if name == "progress":
+        return format_progress(state)
+    return ""
 
 
 def assemble_sections(
@@ -658,55 +195,18 @@ def assemble_sections(
     if not sections:
         return ""
 
-    # Validate all section names first
     for name in sections:
         if name not in SECTION_REGISTRY:
             raise ValueError(
                 f"Unknown section: '{name}'. Valid: {sorted(SECTION_REGISTRY.keys())}"
             )
 
-    parts: list[str] = []
-    for name in sections:
-        if name == "governance":
-            always_on = get_always_on_primes(project_path)
-            part = _format_governance_primes(always_on)
-        elif name == "behavioral":
-            patterns = get_foundational_patterns(project_path)
-            part = _format_primes(patterns)
-        elif name == "coaching":
-            part = _format_coaching(profile)
-        elif name == "deadlines":
-            part = _format_deadlines(profile)
-        elif name == "progress":
-            part = _format_progress(state)
-        else:
-            continue  # unreachable due to validation above
-
-        if part:
-            parts.append(part)
-
+    parts = [
+        part
+        for name in sections
+        if (part := _format_section(name, project_path, profile, state))
+    ]
     return "\n\n".join(parts)
-
-
-def _format_manifest(manifests: list[SectionManifest]) -> str:
-    """Format manifest of available context sections.
-
-    Args:
-        manifests: List of section manifest entries.
-
-    Returns:
-        Formatted manifest section, or empty string if no manifests.
-    """
-    if not manifests:
-        return ""
-
-    lines = ["# Available Context"]
-    for m in manifests:
-        if m.count == 0:
-            lines.append(f"- {m.name}: 0 items")
-        else:
-            lines.append(f"- {m.name}: {m.count} items (~{m.token_estimate} tokens)")
-    return "\n".join(lines)
 
 
 def assemble_orientation(
@@ -733,48 +233,48 @@ def assemble_orientation(
     # Resolve release context for current epic
     release_node: GraphNode | None = None
     if state and state.current_work.epic:
-        release_node = _find_release_for_current_epic(
+        release_node = find_release_for_current_epic(
             project_path, state.current_work.epic
         )
 
     # Session Context header
-    sections: list[str] = [
+    parts: list[str] = [
         "# Session Context",
-        _format_developer_section(profile),
+        format_developer_section(profile),
     ]
 
     # Add session ID if provided
     if session_id:
-        sections.append(f"Session: {session_id}")
+        parts.append(f"Session: {session_id}")
 
     # Fetch live backlog status (never blocks — degrades gracefully)
-    live = _fetch_live_status(state)
+    live = fetch_live_status(state)
 
-    sections.append(_format_work_section(state, release_node=release_node, live=live))
+    parts.append(format_work_section(state, release_node=release_node, live=live))
 
     # Last session + recent sessions
-    sections.append(_format_last_session(state))
-    recent = _format_recent_sessions(project_path)
+    parts.append(format_last_session(state))
+    recent = format_recent_sessions(project_path)
     if recent:
-        sections.append(recent)
+        parts.append(recent)
 
     # Session narrative (cross-session continuity — not truncated)
-    narrative = _format_narrative(state)
+    narrative = format_narrative(state)
     if narrative:
-        sections.append(narrative)
+        parts.append(narrative)
 
     # Next session prompt (forward-looking guidance from Rai to future self)
-    next_prompt = _format_next_session_prompt(state)
+    next_prompt = format_next_session_prompt(state)
     if next_prompt:
-        sections.append(next_prompt)
+        parts.append(next_prompt)
 
     # Pending
-    pending = _format_pending(state)
+    pending = format_pending(state)
     if pending:
-        sections.append(pending)
+        parts.append(pending)
 
     # Filter empty sections, join with blank lines
-    return "\n\n".join(s for s in sections if s)
+    return "\n\n".join(s for s in parts if s)
 
 
 def assemble_context_bundle(
@@ -814,7 +314,7 @@ def assemble_context_bundle(
             )
         )
 
-    manifest = _format_manifest(manifests)
+    manifest = format_manifest(manifests)
 
     parts = [orientation]
     if manifest:

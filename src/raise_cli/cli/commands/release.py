@@ -5,7 +5,7 @@ Provides commands for:
 - Running pre-publish quality checks
 - Orchestrating full releases (bump, changelog, commit, tag, push)
 
-The check and publish commands were absorbed from the `publish` group during CLI restructuring.
+The check and publish commands were absorbed from the `publish` group (RAISE-247/S5).
 """
 
 from __future__ import annotations
@@ -22,7 +22,6 @@ from rich.table import Table
 
 from raise_cli.cli.error_handler import cli_error
 from raise_cli.graph.backends import get_active_backend
-from raise_cli.output.symbols import CHECK
 from raise_cli.publish.check import CheckResult, run_checks
 from raise_cli.publish.version import (
     BumpType,
@@ -72,7 +71,7 @@ def _display_results(results: list[CheckResult]) -> bool:
 
     passed_count = 0
     for r in results:
-        icon = "[green]{CHECK}[/green]" if r.passed else "[red]{CROSS}[/red]"
+        icon = "[green]✓[/green]" if r.passed else "[red]✗[/red]"
         console.print(f"  {icon} {r.gate}: {r.message}")
         if r.passed:
             passed_count += 1
@@ -195,6 +194,95 @@ def check_command(
         raise typer.Exit(1)
 
 
+def _resolve_new_version(
+    current: str, bump: BumpType | None, version: str | None
+) -> str:
+    """Determine new version from bump type or explicit version string."""
+    if version:
+        if not is_pep440(version):
+            console.print(f"[red]'{version}' is not valid PEP 440[/red]")
+            raise typer.Exit(1)
+        return version
+    assert bump is not None  # noqa: S101 -- validated by caller
+    return bump_version(current, bump)
+
+
+def _display_release_plan(current: str, new_version: str, today: str) -> None:
+    """Print the release plan summary."""
+    console.print("[bold]Release Plan[/bold]")
+    console.print(f"  Current version: {current}")
+    console.print(f"  New version:     {new_version}")
+    console.print(f"  Date:            {today}")
+    console.print()
+    console.print("  Steps:")
+    console.print(f"    1. Update pyproject.toml: {current} → {new_version}")
+    console.print(f"    2. Update __init__.py: {current} → {new_version}")
+    console.print(
+        f"    3. Update CHANGELOG.md: [Unreleased] → [{new_version}] - {today}"
+    )
+    console.print(f"    4. Commit: release: v{new_version}")
+    console.print(f"    5. Tag: v{new_version}")
+    console.print("    6. Push commit + tag → triggers GitHub Actions release")
+
+
+def _execute_release(
+    new_version: str,
+    today: str,
+    pyproject_path: Path,
+    init_path: Path,
+    changelog_path: Path,
+    project: Path,
+) -> None:
+    """Execute version bump, changelog update, commit, tag, and push."""
+    # 1-2: Bump version files
+    sync_version_files(new_version, pyproject_path=pyproject_path, init_path=init_path)
+    console.print("[green]✓ Version bumped[/green]")
+
+    # 3: Update changelog
+    if changelog_path.exists():
+        from raise_cli.publish.changelog import promote_unreleased
+
+        content = changelog_path.read_text(encoding="utf-8")
+        try:
+            content = promote_unreleased(content, new_version, today)
+            changelog_path.write_text(content, encoding="utf-8")
+            console.print("[green]✓ Changelog updated[/green]")
+        except ValueError:
+            console.print("[yellow]⚠ No unreleased entries to promote[/yellow]")
+
+    # 4: Commit
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
+        ["git", "add", str(pyproject_path), str(init_path), str(changelog_path)],
+        cwd=project,
+        check=True,
+    )
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
+        ["git", "commit", "-m", f"release: v{new_version}"],
+        cwd=project,
+        check=True,
+    )
+    console.print(f"[green]✓ Committed: release: v{new_version}[/green]")
+
+    # 5: Tag
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
+        ["git", "tag", f"v{new_version}"],
+        cwd=project,
+        check=True,
+    )
+    console.print(f"[green]✓ Tagged: v{new_version}[/green]")
+
+    # 6: Push
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
+        ["git", "push", "--follow-tags"],
+        cwd=project,
+        check=True,
+    )
+    console.print("[green]✓ Pushed to origin[/green]")
+
+    console.print(f"\n[bold green]Release v{new_version} published.[/bold green]")
+    console.print("GitHub Actions will handle PyPI upload.")
+
+
 @release_app.command("publish")
 def publish_command(
     bump: Annotated[
@@ -233,7 +321,6 @@ def publish_command(
 
     pyproject_path, init_path, changelog_path = _find_project_paths(project)
 
-    # Run checks unless skipped
     if not skip_check:
         results = run_checks(
             project_root=project,
@@ -249,91 +336,21 @@ def publish_command(
             raise typer.Exit(1)
         console.print()
 
-    # Determine new version
     current = _read_current_version(pyproject_path)
-
-    if version:
-        if not is_pep440(version):
-            console.print(f"[red]'{version}' is not valid PEP 440[/red]")
-            raise typer.Exit(1)
-        new_version = version
-    else:
-        assert bump is not None  # nosec B101 - validated at line above
-        new_version = bump_version(current, bump)
-
+    new_version = _resolve_new_version(current, bump, version)
     today = date.today().isoformat()
 
-    # Display plan
-    console.print("[bold]Release Plan[/bold]")
-    console.print(f"  Current version: {current}")
-    console.print(f"  New version:     {new_version}")
-    console.print(f"  Date:            {today}")
-    console.print()
-    console.print("  Steps:")
-    console.print(f"    1. Update pyproject.toml: {current} → {new_version}")
-    console.print(f"    2. Update __init__.py: {current} → {new_version}")
-    console.print(
-        f"    3. Update CHANGELOG.md: [Unreleased] → [{new_version}] - {today}"
-    )
-    console.print(f"    4. Commit: release: v{new_version}")
-    console.print(f"    5. Tag: v{new_version}")
-    console.print("    6. Push commit + tag → triggers GitHub Actions release")
+    _display_release_plan(current, new_version, today)
 
     if dry_run:
         console.print("\n[yellow]Dry run — no changes made[/yellow]")
         return
 
-    # Confirm
     console.print()
     if not typer.confirm("Proceed?"):
         console.print("[yellow]Aborted[/yellow]")
         raise typer.Exit(0)
 
-    # Execute
-    # 1-2: Bump version files
-    sync_version_files(new_version, pyproject_path=pyproject_path, init_path=init_path)
-    console.print("[green]{CHECK} Version bumped[/green]")
-
-    # 3: Update changelog
-    if changelog_path.exists():
-        from raise_cli.publish.changelog import promote_unreleased
-
-        content = changelog_path.read_text(encoding="utf-8")
-        try:
-            content = promote_unreleased(content, new_version, today)
-            changelog_path.write_text(content, encoding="utf-8")
-            console.print("[green]{CHECK} Changelog updated[/green]")
-        except ValueError:
-            console.print("[yellow]{WARN} No unreleased entries to promote[/yellow]")
-
-    # 4: Commit
-    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
-        ["git", "add", str(pyproject_path), str(init_path), str(changelog_path)],
-        cwd=project,
-        check=True,
+    _execute_release(
+        new_version, today, pyproject_path, init_path, changelog_path, project
     )
-    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
-        ["git", "commit", "-m", f"release: v{new_version}"],
-        cwd=project,
-        check=True,
-    )
-    console.print(f"[green]{CHECK} Committed: release: v{new_version}[/green]")
-
-    # 5: Tag
-    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
-        ["git", "tag", f"v{new_version}"],
-        cwd=project,
-        check=True,
-    )
-    console.print(f"[green]{CHECK} Tagged: v{new_version}[/green]")
-
-    # 6: Push (with confirmation already given)
-    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
-        ["git", "push", "--follow-tags"],
-        cwd=project,
-        check=True,
-    )
-    console.print("[green]{CHECK} Pushed to origin[/green]")
-
-    console.print(f"\n[bold green]Release v{new_version} published.[/bold green]")
-    console.print("GitHub Actions will handle PyPI upload.")

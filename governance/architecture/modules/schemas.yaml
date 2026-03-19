@@ -1,0 +1,18 @@
+type: module
+name: schemas
+purpose: "Shared Pydantic models for cross-module data structures — currently contains SessionState for session continuity"
+status: current
+depends_on: []
+depended_by: [session]
+entry_points: []
+public_api:
+  - "SessionState"
+  - "CurrentWork"
+  - "LastSession"
+  - "PendingItems"
+  - "EpicProgress"
+components: 5
+constraints:
+  - "No internal dependencies — leaf module"
+  - "Only types needed by 3+ modules should live here"
+  - "Module-specific types stay in their owning module"

@@ -39,7 +39,7 @@ JIRA_YAML_CONTENT: dict[str, Any] = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def jira_yaml(tmp_path: Path) -> Path:
     """Create a .raise/jira.yaml in tmp_path."""
     raise_dir = tmp_path / ".raise"
@@ -49,7 +49,7 @@ def jira_yaml(tmp_path: Path) -> Path:
     return yaml_path
 
 
-@pytest.fixture()
+@pytest.fixture
 def jira_yaml_no_lifecycle(tmp_path: Path) -> Path:
     """Create a .raise/jira.yaml without lifecycle_mapping."""
     raise_dir = tmp_path / ".raise"

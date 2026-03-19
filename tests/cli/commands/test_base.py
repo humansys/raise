@@ -35,7 +35,7 @@ class TestInfo:
         """Should show installed status when .raise/rai/identity/ exists."""
         identity_dir = tmp_path / ".raise" / "rai" / "identity"
         identity_dir.mkdir(parents=True)
-        (identity_dir / "core.md").write_text("# Rai")
+        (identity_dir / "core.yaml").write_text("values: []")
 
         with patch(
             "raise_cli.cli.commands.info._get_project_root", return_value=tmp_path

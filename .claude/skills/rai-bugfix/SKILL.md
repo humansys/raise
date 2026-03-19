@@ -112,10 +112,10 @@ Resolve verification commands using this priority chain:
 2. **Detect language** from `project.project_type` in manifest, or scan file extensions
 3. **Map language to default** (see `/rai-story-implement` Step 3 for the full table)
 
-The manifest always wins when present.
+The manifest always wins when present. **Run ALL four gates** (test + lint + format + type check) after each task — not just the one mentioned in the plan.
 
 <verification>
-All tasks committed. All gates pass. Bug no longer reproduces.
+All tasks committed. All four gates pass (test, lint, format, types). Bug no longer reproduces.
 </verification>
 
 <if-blocked>
@@ -180,15 +180,27 @@ Retro written. Checkpoint answered. Patterns added/reinforced. All gates green.
 
 ### Step 6: Close *(mirrors `rai-story-close`)*
 
+**Never merge locally to `{dev_branch}`.** Push the bug branch and create a merge request.
+
 ```bash
-git checkout {dev_branch}
-git merge --no-ff bug/raise-{N}/{slug} -m "fix(RAISE-{N}): {summary}
+# Push bug branch to origin
+git push origin bug/raise-{N}/{slug} -u
 
-Root cause: {one line}
+# Create merge request via glab
+glab mr create \
+  --source-branch bug/raise-{N}/{slug} \
+  --target-branch {dev_branch} \
+  --title "fix(RAISE-{N}): {summary}" \
+  --description "Root cause: {one line}
 
-Co-Authored-By: Rai <rai@humansys.ai>"
+Co-Authored-By: Rai <rai@humansys.ai>" \
+  --no-editor
+
+# Delete local branch
 git branch -D bug/raise-{N}/{slug}
 ```
+
+If `glab` is not available, provide the GitLab URL from `git push` output for manual MR creation.
 
 Update tracker:
 
@@ -197,7 +209,7 @@ rai backlog transition RAISE-{N} "Done" -a jira
 ```
 
 <verification>
-Merged to `{dev_branch}`. Branch deleted. Jira transitioned to Done.
+MR created in GitLab targeting `{dev_branch}`. Local branch deleted. Jira transitioned to Done.
 </verification>
 
 ## Output
@@ -209,7 +221,7 @@ Merged to `{dev_branch}`. Branch deleted. Jira transitioned to Done.
 | `work/bugs/RAISE-{N}/plan.md` | 3 | Atomic tasks + test plan |
 | Code + commits | 4 | Fix + regression tests |
 | `work/bugs/RAISE-{N}/retro.md` | 5 | Learnings + optional pattern |
-| Merge commit | 6 | Traceability in `{dev_branch}` |
+| Merge request | 6 | GitLab MR: bug branch → `{dev_branch}` |
 
 ## Quality Checklist
 
@@ -221,8 +233,10 @@ Merged to `{dev_branch}`. Branch deleted. Jira transitioned to Done.
 - [ ] Fix verified against root cause — not symptom (Step 5)
 - [ ] Heutagogical checkpoint answered with specific examples (Step 5)
 - [ ] Patterns added with `--scope project` if applicable (Step 5)
-- [ ] Branch deleted after merge (Step 6)
+- [ ] MR created in GitLab targeting `{dev_branch}` (Step 6)
+- [ ] Local branch deleted after MR creation (Step 6)
 - [ ] Jira transitioned to Done (Step 6)
+- [ ] NEVER merge locally to `{dev_branch}` — always via MR
 - [ ] NEVER fix before analysing — symptoms recur without root cause
 - [ ] NEVER merge without retro — learnings compound
 - [ ] NEVER skip pattern reinforce — scoring system depends on it

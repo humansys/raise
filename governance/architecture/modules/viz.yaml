@@ -1,0 +1,15 @@
+type: module
+name: viz
+purpose: "Interactive HTML visualization of the memory graph — self-contained D3.js force-directed graph"
+status: current
+depends_on: []
+depended_by: [cli]
+entry_points:
+  - "raise memory viz"
+public_api:
+  - "generate_viz_html"
+components: 2
+constraints:
+  - "Output must be a single self-contained HTML file"
+  - "All sizes viewport-relative for UHD compatibility"
+  - "Edge sampling for graphs with >3000 edges"

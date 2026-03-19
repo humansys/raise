@@ -15,7 +15,7 @@ import yaml
 from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
 
-@pytest.fixture()
+@pytest.fixture
 def backlog_dir(tmp_path: Path) -> Path:
     """Create the YAML store directory structure and return it."""
     items_dir = tmp_path / ".raise" / "backlog" / "items"
@@ -23,7 +23,7 @@ def backlog_dir(tmp_path: Path) -> Path:
     return items_dir
 
 
-@pytest.fixture()
+@pytest.fixture
 def file_adapter(backlog_dir: Path) -> FilesystemPMAdapter:
     """Return a FilesystemPMAdapter rooted at the tmp_path with YAML store."""
     # backlog_dir parent chain: tmp_path / .raise / backlog / items
@@ -31,7 +31,7 @@ def file_adapter(backlog_dir: Path) -> FilesystemPMAdapter:
     return FilesystemPMAdapter(project_root=project_root)
 
 
-@pytest.fixture()
+@pytest.fixture
 def jira_yaml_setup(tmp_path: Path) -> Path:
     """Write a minimal .raise/jira.yaml for BacklogHook tests."""
     raise_dir = tmp_path / ".raise"
@@ -66,7 +66,7 @@ def _write_yaml_item(path: Path, **fields: Any) -> None:
     path.write_text(yaml.safe_dump(defaults, sort_keys=False), encoding="utf-8")
 
 
-@pytest.fixture()
+@pytest.fixture
 def write_yaml_item() -> Callable[..., None]:
     """Fixture providing a helper to write BacklogItem YAML files to disk."""
     return _write_yaml_item

@@ -1,9 +1,9 @@
 ---
 name: rai-story-close
 description: >
-  Complete a story with retrospective verification, merge to dev,
-  cleanup, and tracking update. Use after review to formally close
-  the story lifecycle.
+  Complete a story with retrospective verification, push to origin,
+  create merge request, and update tracking. Use after review to
+  formally close the story lifecycle.
 
 license: MIT
 
@@ -29,12 +29,12 @@ metadata:
 
 ## Purpose
 
-Complete a story by verifying the retrospective, merging to the development branch, cleaning up the story branch, and updating epic tracking.
+Complete a story by verifying the retrospective, pushing the story branch to origin, creating a merge request to the development branch, and updating epic tracking.
 
 ## Mastery Levels (ShuHaRi)
 
-- **Shu**: Follow all steps, verify retrospective, merge with --no-ff, update epic
-- **Ha**: Adjust merge strategy for small fixes, skip epic update for standalone
+- **Shu**: Follow all steps, verify retrospective, push + create MR, update epic
+- **Ha**: Adjust MR description for small fixes, skip epic update for standalone
 - **Ri**: Integrate with CI/CD pipelines, automate cleanup workflows
 
 ## Context
@@ -49,42 +49,30 @@ Complete a story by verifying the retrospective, merging to the development bran
 
 ## Steps
 
-### Step 1: Verify Retrospective & Tests
+### Step 1: Verify Retrospective & All Gates
 
 ```bash
 RETRO="work/epics/e{N}-{name}/stories/{story_id}-retrospective.md"
 [ -f "$RETRO" ] && echo "✓ Retrospective" || echo "ERROR: Run /rai-story-review first"
 ```
 
-Determine which test command to run using this priority chain:
+Run **all four gates** before pushing. Resolve commands from `.raise/manifest.yaml` or use defaults (see `/rai-story-implement` Step 3 for the full table):
 
-1. **Check `.raise/manifest.yaml`** for `project.test_command` — if set, use it directly (configuration over convention)
-2. **Detect language** from `project.project_type` in manifest, or scan file extensions of changed files (`git diff --name-only`)
-3. **Map language to default** using the table below
-
-| Language | Extensions | Default Test Command |
-|----------|-----------|----------------------|
-| Python | `.py`, `.pyi` | `uv run pytest --tb=short` |
-| TypeScript | `.ts`, `.tsx` | `npx vitest run` or `npm test` |
-| JavaScript | `.js`, `.jsx` | `npx vitest run` or `npm test` |
-| C# | `.cs` | `dotnet test --verbosity quiet` |
-| Go | `.go` | `go test ./...` |
-| PHP | `.php` | `vendor/bin/phpunit` |
-| Dart | `.dart` | `flutter test` |
-| Unknown | — | Ask developer |
-
-The table is a **fallback** — `project.test_command` always wins when present.
+1. **Tests** — `project.test_command` or language default
+2. **Lint** — `project.lint_command` or language default
+3. **Format** — `project.format_command` or language default (e.g. `uv run ruff format --check src/ tests/`)
+4. **Type check** — `project.type_check_command` or language default (e.g. `uv run pyright`)
 
 | Condition | Action |
 |-----------|--------|
-| Retro exists + tests green | Continue |
+| Retro exists + all 4 gates green | Continue |
 | Retro missing | Run `/rai-story-review` first — no exceptions |
-| Tests failing | Fix before merge |
+| Any gate failing | Fix before push — CI will reject the same errors |
 
 Check for structural drift: if this story added modules or changed directory structure, update module docs in `governance/architecture/modules/` before closing.
 
 <verification>
-Retrospective exists. Tests pass. No undocumented structural changes.
+Retrospective exists. All four gates pass (test, lint, format, types). No undocumented structural changes.
 </verification>
 
 ### Step 2: Verify Clean Working Tree
@@ -105,27 +93,40 @@ git status --short
 `git status` shows clean working tree (or only unrelated files explicitly acknowledged).
 </verification>
 
-### Step 3: Merge to Development Branch
+### Step 3: Push and Create Merge Request
 
-Always merge to `{dev_branch}`:
+**Never merge locally to `{dev_branch}`.** Push the story branch and create a merge request in GitLab.
 
 ```bash
-git checkout {dev_branch}
-git pull origin {dev_branch}
-git merge --no-ff {story_branch} -m "feat(s{N}.{M}): merge {story-name}
+# Push story branch to origin
+git push origin {story_branch} -u
 
-Completed:
+# Create merge request via glab
+glab mr create \
+  --source-branch {story_branch} \
+  --target-branch {dev_branch} \
+  --title "feat(s{N}.{M}): {story-name}" \
+  --description "## Completed
 - [summary of deliverables]
 
-Co-Authored-By: Rai <rai@humansys.ai>"
+Co-Authored-By: Rai <rai@humansys.ai>" \
+  --no-editor
 ```
 
+Present the MR URL to the developer for review.
+
+| Condition | Action |
+|-----------|--------|
+| MR created | Continue to Step 4 |
+| `glab` not available | Provide the GitLab URL from `git push` output for manual MR creation |
+| Push rejected (branch behind) | `git pull --rebase origin {dev_branch}` on story branch, resolve conflicts, push again |
+
 <verification>
-Merge commit created on `{dev_branch}`.
+MR created in GitLab targeting `{dev_branch}`. MR URL presented to developer.
 </verification>
 
 <if-blocked>
-Merge conflicts → resolve preserving story work.
+Push fails → check remote permissions or network. Never fall back to local merge.
 </if-blocked>
 
 ### Step 4: Update Epic Scope
@@ -138,15 +139,16 @@ Mark story complete in `work/epics/e{N}-{name}/scope.md`:
 Epic scope reflects story completion.
 </verification>
 
-### Step 5: Delete Story Branch
+### Step 5: Local Cleanup
+
+Delete the local story branch. The remote branch will be deleted by GitLab when the MR is merged (configure "Delete source branch" in MR settings).
 
 ```bash
 git branch -D story/s{N}.{M}/{slug}
-git push origin --delete story/s{N}.{M}/{slug} 2>/dev/null || true
 ```
 
 <verification>
-Story branch deleted (local and remote).
+Local story branch deleted. Remote branch managed by GitLab MR.
 </verification>
 
 ### Step 6: Update Context & Emit
@@ -173,23 +175,24 @@ Adapter not configured or transition fails → log and continue. Backlog sync is
 
 | Item | Destination |
 |------|-------------|
-| Merge commit | `{dev_branch}` with `--no-ff` |
+| Merge request | GitLab MR: `{story_branch}` → `{dev_branch}` |
 | Epic update | `work/epics/e{N}-{name}/scope.md` |
-| Branch cleanup | Story branch deleted |
+| Branch cleanup | Local branch deleted; remote via MR merge |
 | Backlog update | via `rai backlog transition` (best-effort) |
 | Context update | `CLAUDE.local.md` |
 
 ## Quality Checklist
 
-- [ ] Retrospective complete before merge (gate)
-- [ ] Tests pass before merge
-- [ ] Merge uses `--no-ff` to preserve story history
-- [ ] Story branch deleted after merge
+- [ ] Retrospective complete before push (gate)
+- [ ] Tests pass before push
+- [ ] Story branch pushed to origin — never merge locally to `{dev_branch}`
+- [ ] Merge request created in GitLab targeting `{dev_branch}`
+- [ ] Local story branch deleted after MR creation
 - [ ] Epic scope updated with completion status
-- [ ] Working tree clean before merge — no orphaned artifacts
-- [ ] Always merge to `{dev_branch}` — never to an epic branch
+- [ ] Working tree clean before push — no orphaned artifacts
+- [ ] NEVER merge locally to `{dev_branch}` — always via MR
 - [ ] NEVER merge without retrospective — learnings compound
-- [ ] NEVER leave stale branches — clean as you go
+- [ ] NEVER leave stale local branches — clean as you go
 
 ## References
 

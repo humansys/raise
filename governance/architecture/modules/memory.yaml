@@ -1,0 +1,36 @@
+type: module
+name: memory
+purpose: "Manage Rai's persistent memory — patterns, calibration, and sessions stored as JSONL"
+status: current
+depends_on: [config]
+depended_by: [cli, context, session]
+entry_points:
+  - "rai pattern add"
+  - "rai pattern reinforce"
+  - "rai memory emit"
+  - "rai memory emit-work"
+  - "rai memory add-pattern (deprecated → rai pattern add)"
+  - "rai memory reinforce (deprecated → rai pattern reinforce)"
+public_api:
+  - "CalibrationInput"
+  - "MemoryConcept"
+  - "MemoryConceptType"
+  - "MemoryRelationship"
+  - "MemoryRelationshipType"
+  - "MemoryScope"
+  - "MigrationResult"
+  - "PatternInput"
+  - "PatternSubType"
+  - "SessionInput"
+  - "WriteResult"
+  - "append_calibration"
+  - "append_pattern"
+  - "append_session"
+  - "get_memory_dir_for_scope"
+  - "migrate_to_personal"
+  - "needs_migration"
+components: 34
+constraints:
+  - "JSONL files are append-only — no in-place edits"
+  - "Three-tier architecture: global > project > personal"
+  - "Backward compatibility: reader handles both old and new schemas (PAT-153)"

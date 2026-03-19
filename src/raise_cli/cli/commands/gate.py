@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import json
 import logging
+import stat
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -221,3 +223,98 @@ def _check_all(registry: GateRegistry, fmt: str) -> None:
             )
 
     raise typer.Exit(1 if failed else 0)
+
+
+# ---------------------------------------------------------------------------
+# Hook management constants
+# ---------------------------------------------------------------------------
+
+_HOOK_MARKER = "# Installed by: rai gate install-hook"
+
+_HOOK_SHIM = (
+    "#!/usr/bin/env bash\n"
+    "# Installed by: rai gate install-hook\n"
+    "# Remove with:  rai gate uninstall-hook\n"
+    "uv run python -m raise_cli.gates.hook\n"
+)
+
+
+def _find_hook_path() -> Path:
+    """Resolve .git/hooks/pre-commit from cwd."""
+    return Path.cwd() / ".git" / "hooks" / "pre-commit"
+
+
+# ---------------------------------------------------------------------------
+# install-hook
+# ---------------------------------------------------------------------------
+
+
+@gate_app.command("install-hook")
+def install_hook_command(
+    force: Annotated[
+        bool,
+        typer.Option("--force", help="Overwrite existing non-rai hook"),
+    ] = False,
+) -> None:
+    """Install a pre-commit hook that runs lint, format, and type-check.
+
+    The hook is a thin bash shim that invokes the Python hook module via
+    ``uv run python -m raise_cli.gates.hook``.
+
+    Refuses to overwrite an existing hook unless it was installed by rai
+    (detected via marker comment) or ``--force`` is used.
+
+    Examples:
+        $ rai gate install-hook
+        $ rai gate install-hook --force
+    """
+    hook_path = _find_hook_path()
+
+    if hook_path.exists():
+        content = hook_path.read_text(encoding="utf-8")
+        if _HOOK_MARKER not in content and not force:
+            console.print(
+                "[red]Error:[/red] Pre-commit hook already exists and was not "
+                "installed by rai. Use --force to overwrite."
+            )
+            raise typer.Exit(1)
+
+    hook_path.write_text(_HOOK_SHIM, encoding="utf-8")
+    hook_path.chmod(
+        hook_path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+    )
+    console.print("[green]Installed[/green] pre-commit hook.")
+    raise typer.Exit(0)
+
+
+# ---------------------------------------------------------------------------
+# uninstall-hook
+# ---------------------------------------------------------------------------
+
+
+@gate_app.command("uninstall-hook")
+def uninstall_hook_command() -> None:
+    """Remove the rai-installed pre-commit hook.
+
+    Only removes the hook if it contains the rai marker comment.
+    Refuses to remove hooks installed by other tools.
+
+    Examples:
+        $ rai gate uninstall-hook
+    """
+    hook_path = _find_hook_path()
+
+    if not hook_path.exists():
+        console.print("[red]Error:[/red] No pre-commit hook found.")
+        raise typer.Exit(1)
+
+    content = hook_path.read_text(encoding="utf-8")
+    if _HOOK_MARKER not in content:
+        console.print(
+            "[red]Error:[/red] Pre-commit hook was not installed by rai. Not removing."
+        )
+        raise typer.Exit(1)
+
+    hook_path.unlink()
+    console.print("[green]Removed[/green] pre-commit hook.")
+    raise typer.Exit(0)

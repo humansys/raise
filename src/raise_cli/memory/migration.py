@@ -165,7 +165,7 @@ def _migrate_file(
     return count
 
 
-def migrate_to_personal(
+def migrate_to_personal(  # noqa: C901 -- complexity 11, refactor deferred
     memory_dir: Path,
     personal_dir: Path,
     rai_dir: Path | None = None,

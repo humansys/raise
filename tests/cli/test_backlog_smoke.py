@@ -23,7 +23,7 @@ EXPECTED_COMMANDS = [
 
 class TestBacklogSmoke:
     def test_help_lists_all_commands(self) -> None:
-        """rai backlog --help shows all 9 commands."""
+        """Rai backlog --help shows all 9 commands."""
         result = runner.invoke(app, ["backlog", "--help"])
         assert result.exit_code == 0
         for cmd in EXPECTED_COMMANDS:

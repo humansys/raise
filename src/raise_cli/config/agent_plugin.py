@@ -16,7 +16,7 @@ from raise_cli.config.agents import AgentConfig
 
 @runtime_checkable
 class AgentPlugin(Protocol):
-    """Protocol for custom agent connectors.
+    r"""Protocol for custom agent connectors.
 
     Implementors add agent-specific transformation logic without modifying
     the raise-cli engine. A plugin only needs to implement the methods it uses —
@@ -25,7 +25,7 @@ class AgentPlugin(Protocol):
     Example (minimal plugin):
         class MyPlugin:
             def transform_instructions(self, content, config):
-                return f"<!-- {config.name} -->\\n{content}"
+                return f"<!-- {config.name} -->\n{content}"
 
             def transform_skill(self, frontmatter, body, config):
                 return frontmatter, body

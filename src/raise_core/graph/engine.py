@@ -119,7 +119,7 @@ class Graph:
                 concepts.append(self._reconstruct_node(node_id, data))
         return concepts
 
-    def get_neighbors(
+    def get_neighbors(  # noqa: C901
         self,
         concept_id: str,
         depth: int = 1,

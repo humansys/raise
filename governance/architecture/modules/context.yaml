@@ -1,0 +1,30 @@
+type: module
+name: context
+purpose: "Unified knowledge graph — merges governance, memory, discovery, work, and code structure into a single queryable structure"
+status: current
+depends_on: [config, core, governance, memory]
+depended_by: [cli, session]
+entry_points:
+  - "raise memory build"
+  - "raise memory query"
+public_api:
+  - "ConceptEdge"
+  - "ConceptNode"
+  - "EdgeType"
+  - "GraphDiff"
+  - "NodeChange"
+  - "NodeType"
+  - "UnifiedGraph"
+  - "UnifiedGraphBuilder"
+  - "UnifiedQuery"
+  - "UnifiedQueryEngine"
+  - "UnifiedQueryMetadata"
+  - "UnifiedQueryResult"
+  - "UnifiedQueryStrategy"
+  - "diff_graphs"
+components: 25
+constraints:
+  - "Graph is rebuilt from scratch on each 'raise memory build' — no incremental updates"
+  - "Queries use BFS traversal, not full-text search"
+  - "Node types are a closed set (Literal type) — adding new types requires schema change"
+  - "Code analyzers enrich existing mod-* nodes, they do not create new nodes"

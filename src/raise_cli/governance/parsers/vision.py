@@ -95,7 +95,7 @@ def extract_outcomes(
             if line.strip() == "" or (line.startswith("|") and "---" in line):
                 continue
             # Non-table line: exit table mode
-            elif not line.startswith("|"):
+            if not line.startswith("|"):
                 in_outcomes_table = False
 
     return concepts

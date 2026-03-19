@@ -34,6 +34,7 @@ class EnvironmentCheck:
     requires_online: ClassVar[bool] = False
 
     def evaluate(self, context: DoctorContext) -> list[CheckResult]:
+        """Run environment checks: Python version, rai version, OS, extras."""
         results: list[CheckResult] = []
         results.append(self._check_python_version())
         results.append(self._check_rai_version())

@@ -137,12 +137,14 @@ class ToolchainInfo:
         test_command: Suggested test runner command.
         lint_command: Suggested linter command, if known.
         type_check_command: Suggested type checker command, if known.
+        format_command: Suggested formatter check command, if known.
     """
 
     language: str
     test_command: str | None = None
     lint_command: str | None = None
     type_check_command: str | None = None
+    format_command: str | None = None
 
 
 # Default toolchain commands per language
@@ -152,73 +154,86 @@ LANGUAGE_TOOLCHAIN: dict[str, ToolchainInfo] = {
         test_command="uv run pytest --tb=short",
         lint_command="uv run ruff check",
         type_check_command="uv run pyright",
+        format_command="uv run ruff format --check",
     ),
     "typescript": ToolchainInfo(
         language="typescript",
         test_command="npx vitest run",
         lint_command="npx eslint .",
         type_check_command="npx tsc --noEmit",
+        format_command="npx prettier --check .",
     ),
     "javascript": ToolchainInfo(
         language="javascript",
         test_command="npx vitest run",
         lint_command="npx eslint .",
+        format_command="npx prettier --check .",
     ),
     "csharp": ToolchainInfo(
         language="csharp",
         test_command="dotnet test --verbosity quiet",
         lint_command="dotnet format --verify-no-changes",
         type_check_command="dotnet build --no-restore",
+        format_command="dotnet format --verify-no-changes",
     ),
     "java": ToolchainInfo(
         language="java",
         test_command="mvn test",
         lint_command="mvn checkstyle:check",
+        format_command="mvn spotless:check",
     ),
     "go": ToolchainInfo(
         language="go",
         test_command="go test ./...",
         lint_command="golangci-lint run",
         type_check_command="go vet ./...",
+        format_command="gofmt -l .",
     ),
     "rust": ToolchainInfo(
         language="rust",
         test_command="cargo test",
         lint_command="cargo clippy",
         type_check_command="cargo check",
+        format_command="cargo fmt --check",
     ),
     "php": ToolchainInfo(
         language="php",
         test_command="vendor/bin/phpunit",
         lint_command="vendor/bin/php-cs-fixer fix --dry-run",
         type_check_command="vendor/bin/phpstan analyse",
+        format_command="vendor/bin/php-cs-fixer fix --dry-run",
     ),
     "dart": ToolchainInfo(
         language="dart",
         test_command="flutter test",
         lint_command="dart fix --dry-run",
         type_check_command="dart analyze",
+        format_command="dart format --set-exit-if-changed .",
     ),
     "ruby": ToolchainInfo(
         language="ruby",
         test_command="bundle exec rspec",
         lint_command="bundle exec rubocop",
+        format_command="bundle exec rubocop --auto-correct-all --dry-run",
     ),
     "kotlin": ToolchainInfo(
         language="kotlin",
         test_command="./gradlew test",
         lint_command="./gradlew ktlintCheck",
+        format_command="./gradlew ktlintCheck",
     ),
     "swift": ToolchainInfo(
         language="swift",
         test_command="swift test",
         lint_command="swiftlint",
+        format_command="swiftformat --lint .",
     ),
     "elixir": ToolchainInfo(
         language="elixir",
         test_command="mix test",
         lint_command="mix credo",
         type_check_command="mix dialyzer",
+        format_command="mix format --check-formatted",
     ),
 }
 

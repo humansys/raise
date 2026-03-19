@@ -43,7 +43,7 @@ def _parse_frontmatter(content: str) -> dict[str, Any]:
 
     if not isinstance(result, dict):
         return {}
-    return cast(dict[str, Any], result)
+    return cast("dict[str, Any]", result)
 
 
 def _strip_frontmatter(content: str) -> str:
@@ -193,7 +193,7 @@ def _find_section_tables(content: str) -> list[tuple[str, str]]:
     return sections
 
 
-def extract_guardrails(
+def extract_guardrails(  # noqa: C901 -- complexity 13, refactor deferred
     file_path: Path, project_root: Path | None = None
 ) -> list[Concept]:
     """Extract guardrails from a guardrails markdown file.

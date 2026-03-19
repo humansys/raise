@@ -150,7 +150,7 @@ class TestCanPublish:
 
 class TestPublish:
     def test_publish_creates_new_page(self, tmp_path: Path) -> None:
-        """publish calls confluence_create_page when no page_id cached."""
+        """Publish calls confluence_create_page when no page_id cached."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok(
             {
@@ -189,7 +189,7 @@ class TestPublish:
         assert pages["roadmap"] == "3087892481"
 
     def test_publish_updates_existing_page(self, tmp_path: Path) -> None:
-        """publish calls confluence_update_page when page_id is cached."""
+        """Publish calls confluence_update_page when page_id is cached."""
         adapter = _make_adapter(tmp_path)
         # Pre-populate pages yaml
         import yaml
@@ -224,7 +224,7 @@ class TestPublish:
         assert args["page_id"] == "3087892481"
 
     def test_publish_reraises_non_notfound_errors(self, tmp_path: Path) -> None:
-        """publish re-raises errors that are not page-not-found (QR-1)."""
+        """Publish re-raises errors that are not page-not-found (QR-1)."""
         adapter = _make_adapter(tmp_path)
         import yaml
 
@@ -243,7 +243,7 @@ class TestPublish:
         assert pages["roadmap"] == "SOME_ID"
 
     def test_publish_auto_heals_on_deleted_page(self, tmp_path: Path) -> None:
-        """publish auto-heals when cached page was deleted — removes entry, creates new."""
+        """Publish auto-heals when cached page was deleted — removes entry, creates new."""
         adapter = _make_adapter(tmp_path)
         import yaml
 
@@ -279,7 +279,7 @@ class TestPublish:
         assert pages["roadmap"] == "NEW_PAGE_ID"
 
     def test_publish_returns_failure_on_is_error(self, tmp_path: Path) -> None:
-        """publish returns success=False when bridge result has is_error (QR-3)."""
+        """Publish returns success=False when bridge result has is_error (QR-3)."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = McpToolResult(
             is_error=True, error_message="Permission denied"
@@ -341,7 +341,7 @@ class TestGetPage:
 
 class TestSearch:
     def test_search_parses_array_results(self, tmp_path: Path) -> None:
-        """search parses bridge-wrapped array into list[PageSummary]."""
+        """Search parses bridge-wrapped array into list[PageSummary]."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok_items(
             [
@@ -378,7 +378,7 @@ class TestSearch:
         assert call_args[0][1]["limit"] == 5
 
     def test_search_empty_results(self, tmp_path: Path) -> None:
-        """search returns empty list when no results."""
+        """Search returns empty list when no results."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok_items([])
 
@@ -396,7 +396,7 @@ class TestSearch:
 
 class TestHealth:
     def test_health_returns_healthy(self, tmp_path: Path) -> None:
-        """health returns AdapterHealth with healthy=True when search succeeds."""
+        """Health returns AdapterHealth with healthy=True when search succeeds."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok_items(
             [{"id": "1", "title": "Any page", "url": "", "space": {"key": "X"}}]
@@ -412,7 +412,7 @@ class TestHealth:
         assert result.latency_ms >= 0
 
     def test_health_returns_unhealthy_on_error(self, tmp_path: Path) -> None:
-        """health returns unhealthy when bridge call fails."""
+        """Health returns unhealthy when bridge call fails."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.side_effect = McpBridgeError("Connection failed")
 

@@ -1,0 +1,21 @@
+type: module
+name: rai_pro
+purpose: "Enterprise features package — contains provider integrations and premium functionality separated from core CLI"
+status: current
+depends_on: []
+depended_by: [cli]
+entry_points:
+  - "rai backlog auth|pull|push|status"
+public_api:
+  - "providers.BacklogProvider (ABC)"
+  - "providers.jira.JiraClient"
+  - "providers.jira.oauth.authenticate"
+  - "providers.jira.sync.pull_epic"
+  - "providers.jira.sync.push_stories"
+  - "providers.jira.sync.check_authorization"
+components: 30
+constraints:
+  - "rai_pro never imports from raise_cli — it is an independent package"
+  - "CLI wires rai_pro adapters; rai_pro knows nothing about CLI"
+  - "Credentials are encrypted at rest with Fernet (0600 permissions)"
+last_validated: "2026-02-15"

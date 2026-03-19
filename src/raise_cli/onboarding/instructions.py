@@ -7,9 +7,8 @@ must exist before generation — ``rai init`` always creates it first.
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -42,7 +41,7 @@ class InstructionsGenerator:
         self,
         project_name: str,
         detection: DetectionResult,
-        conventions: ConventionResult | None = None,  # NOSONAR
+        conventions: ConventionResult | None = None,
         *,
         project_path: Path,
     ) -> str:
@@ -51,7 +50,8 @@ class InstructionsGenerator:
         Args:
             project_name: Name of the project.
             detection: Project detection result (type, file count).
-            conventions: Unused; kept for backward compatibility.
+            conventions: Optional convention detection result (unused, kept
+                for backward compatibility).
             project_path: Project root path containing .raise/ directory.
 
         Returns:
@@ -66,7 +66,7 @@ class InstructionsGenerator:
 
     def _generate_raise_project(
         self,
-        _project_name: str,
+        project_name: str,
         raise_dir: Path,
     ) -> str:
         """Generate CLAUDE.md for a RaiSE project from .raise/ sources.
@@ -93,7 +93,7 @@ class InstructionsGenerator:
         lines.append("")
 
         # Load sources
-        identity_path = raise_dir / "rai" / "identity" / "core.md"
+        identity_path = raise_dir / "rai" / "identity" / "core.yaml"
         methodology_path = raise_dir / "rai" / "framework" / "methodology.yaml"
         manifest_path = raise_dir / "manifest.yaml"
         jira_path = raise_dir / "jira.yaml"
@@ -110,8 +110,16 @@ class InstructionsGenerator:
 
         # Identity section
         if identity_path.is_file():
-            identity_text = identity_path.read_text(encoding="utf-8")
-            self._add_identity_section(lines, identity_text)
+            try:
+                identity_data: Any = yaml.safe_load(
+                    identity_path.read_text(encoding="utf-8")
+                )
+            except yaml.YAMLError:
+                identity_data = None
+            if isinstance(identity_data, dict):
+                self._add_identity_section_from_yaml(
+                    lines, cast("dict[str, Any]", identity_data)
+                )
 
         # Process Rules section
         if methodology:
@@ -136,134 +144,44 @@ class InstructionsGenerator:
 
         return "\n".join(lines)
 
-    def _add_identity_section(self, lines: list[str], identity_text: str) -> None:
-        """Extract and add Rai Identity section from core.md."""
+    def _add_identity_section_from_yaml(
+        self, lines: list[str], data: dict[str, Any]
+    ) -> None:
+        """Add Rai Identity section from structured core.yaml data."""
         lines.append("## Rai Identity")
         lines.append("")
 
-        # Extract Values
-        values = self._extract_values(identity_text)
+        # Values
+        values: list[dict[str, Any]] = data.get("values", [])
         if values:
             lines.append("### Values")
-            for i, (name, summary) in enumerate(values, 1):
-                lines.append(f"{i}. {name} \u2014 {summary}")
+            for v in values:
+                name: str = v.get("name", "")
+                desc: str = v.get("description", "")
+                lines.append(f"{v.get('number', '?')}. {name} — {desc}")
             lines.append("")
 
-        # Extract Boundaries
-        i_will, i_wont = self._extract_boundaries(identity_text)
-        if i_will or i_wont:
+        # Boundaries
+        boundaries: dict[str, Any] = data.get("boundaries", {})
+        will_items: list[str] = boundaries.get("will", [])
+        wont_items: list[str] = boundaries.get("wont", [])
+        if will_items or wont_items:
             lines.append("### Boundaries")
-            if i_will:
-                lines.append("I Will: " + ", ".join(i_will))
-            if i_wont:
-                lines.append("I Won't: " + ", ".join(i_wont))
+            if will_items:
+                lines.append("I Will: " + ", ".join(will_items))
+            if wont_items:
+                lines.append("I Won't: " + ", ".join(wont_items))
             lines.append("")
 
-        # Extract Principles (from the Internalized Philosophy table if present)
-        principles = self._extract_principles_from_identity(identity_text)
+        # Principles
+        principles: list[dict[str, str]] = data.get("principles", [])
         if principles:
             lines.append("### Principles")
-            for i, (name, summary) in enumerate(principles, 1):
-                lines.append(f"{i}. {name} \u2014 {summary}")
+            for i, p in enumerate(principles, 1):
+                lines.append(f"{i}. {p.get('name', '')} — {p.get('embodiment', '')}")
             lines.append("")
 
-    def _extract_values(self, text: str) -> list[tuple[str, str]]:
-        """Extract value name + summary pairs from identity core.md.
-
-        Looks for ### N. Name headings followed by bullet points.
-        Condenses all bullets into a comma-separated summary.
-        """
-        values: list[tuple[str, str]] = []
-        # Match ### N. Name followed by bullet list (within Values section)
-        pattern = r"###\s+\d+\.\s+(.+)\n((?:- .+\n)*)"
-        for match in re.finditer(pattern, text):
-            name = match.group(1).strip()
-            bullets = match.group(2).strip()
-            # Condense ALL bullets into a comma-separated short summary
-            bullet_texts = [
-                b.lstrip("- ").strip() for b in bullets.split("\n") if b.strip()
-            ]
-            if bullet_texts:
-                # Strip leading pronouns and clean up each bullet
-                cleaned: list[str] = []
-                for bt in bullet_texts:
-                    # Remove "I'll " / "I'm " prefix for conciseness
-                    bt = re.sub(r"^I'll\s+", "", bt)
-                    bt = re.sub(r"^I'm not .+ — I'm ", "", bt)
-                    bt = bt.rstrip(".")
-                    # Remove surrounding quotes (only if both present)
-                    if bt.startswith('"') and bt.endswith('"'):
-                        bt = bt[1:-1]
-                    # Lower-case the first char for inline style
-                    if bt and bt[0].isupper():
-                        bt = bt[0].lower() + bt[1:]
-                    cleaned.append(bt)
-                summary = ", ".join(cleaned)
-            else:
-                summary = name
-            values.append((name, summary))
-        return values
-
-    def _extract_boundaries(self, text: str) -> tuple[list[str], list[str]]:
-        """Extract I Will / I Won't lists from identity core.md."""
-        i_will: list[str] = []
-        i_wont: list[str] = []
-
-        # Find "### I Will" section
-        will_match = re.search(r"###\s+I Will\s*\n((?:- .+\n)*)", text, re.IGNORECASE)
-        if will_match:
-            for line in will_match.group(1).strip().split("\n"):
-                item = line.lstrip("- ").strip()
-                if item:
-                    # Lower-case and remove trailing periods for compact format
-                    item = item[0].lower() + item[1:] if item else item
-                    item = item.rstrip(".")
-                    i_will.append(item)
-
-        # Find "### I Won't" section
-        wont_match = re.search(r"###\s+I Won't\s*\n((?:- .+\n)*)", text, re.IGNORECASE)
-        if wont_match:
-            for line in wont_match.group(1).strip().split("\n"):
-                item = line.lstrip("- ").strip()
-                if item:
-                    item = item[0].lower() + item[1:] if item else item
-                    item = item.rstrip(".")
-                    i_wont.append(item)
-
-        return i_will, i_wont
-
-    def _extract_principles_from_identity(self, text: str) -> list[tuple[str, str]]:
-        """Extract principles from the Internalized Philosophy table."""
-        principles: list[tuple[str, str]] = []
-        # Find the "Internalized Philosophy" section first to avoid
-        # matching other tables (e.g. comparison tables) in the file
-        philosophy_match = re.search(
-            r"##\s+Internalized Philosophy\s*\n(.*?)(?=\n---|\n##|\Z)",  # NOSONAR — lazy required: greedy would consume to \Z
-            text,
-            re.DOTALL,
-        )
-        if not philosophy_match:
-            return principles
-
-        section_text = philosophy_match.group(1)
-
-        # Look for table rows with | **Name** | description |
-        pattern = r"\|\s*\*\*(.+?)\*\*\s*\|\s*(.+?)\s*\|"
-        for match in re.finditer(pattern, section_text):
-            name = match.group(1).strip()
-            desc = match.group(2).strip()
-            # Skip table header separators
-            if name.startswith("-"):
-                continue
-            # Clean up description
-            desc = desc.rstrip(".")
-            if desc.startswith("I "):
-                # Condense: "I push back on over-engineering..." -> short form
-                desc = desc[0].lower() + desc[1:]
-            principles.append((name, desc))
-        return principles
-
-    def _add_process_rules_section(
+    def _add_process_rules_section(  # noqa: C901 -- complexity 15, refactor deferred
         self, lines: list[str], methodology: dict[str, Any]
     ) -> None:
         """Add Process Rules section from methodology.yaml."""
@@ -370,7 +288,7 @@ class InstructionsGenerator:
         )
         lines.append(
             "- cmd: rai session journal add | sig: TEXT [--type TYPE] "
-            "| notes: types: decision, insight, task_done, note (default: note)"
+            "| notes: add decision/insight/task to session"
         )
         lines.append(
             "- cmd: rai session journal show | sig: [--compact] [--project TEXT] "
@@ -624,7 +542,7 @@ def generate_instructions(
     detection: DetectionResult,
     conventions: ConventionResult | None = None,
     *,
-    agent_config: AgentConfig | None = None,
+    agent_config: AgentConfig | None = None,  # noqa: ARG001 -- reserved for future agent-specific instructions
     project_path: Path,
 ) -> str:
     """Convenience function to generate agent instructions file content.

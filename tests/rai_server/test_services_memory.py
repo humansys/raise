@@ -32,13 +32,13 @@ def _mock_session_factory() -> async_sessionmaker[AsyncSession]:
     return factory  # type: ignore[return-value]
 
 
-@pytest.fixture()
+@pytest.fixture
 def org_id() -> uuid.UUID:
     return uuid.UUID("00000000-0000-0000-0000-000000000001")
 
 
 class TestAddPattern:
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_pattern_id(self, org_id: uuid.UUID) -> None:
         from raise_server.services.memory import add_pattern
 
@@ -60,7 +60,7 @@ class TestAddPattern:
 
 
 class TestGetPatterns:
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_list(self, org_id: uuid.UUID) -> None:
         from raise_server.services.memory import get_patterns
 
@@ -85,7 +85,7 @@ class TestGetPatterns:
         assert result.count == 1
         assert result.patterns[0].content == "pat"
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_list(self, org_id: uuid.UUID) -> None:
         from raise_server.services.memory import get_patterns
 

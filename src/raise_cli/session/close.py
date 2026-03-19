@@ -103,7 +103,7 @@ def load_state_file(path: Path) -> CloseInput:
         msg = f"State file must be a YAML mapping, got {type(data).__name__}"
         raise ValueError(msg)
 
-    d = cast(dict[str, object], data)
+    d = cast("dict[str, object]", data)
 
     return CloseInput(
         session_id=str(d.get("session_id", "")),
@@ -135,6 +135,7 @@ def process_session_close(
         close_input: Structured session close data.
         profile: Current developer profile.
         project_path: Absolute path to the project root.
+        session_id: Optional session identifier for logging.
 
     Returns:
         CloseResult with operation summary.

@@ -162,7 +162,7 @@ class TestBacklogHookMapping:
     """Tests for BacklogHook event-to-backlog mapping."""
 
     def test_story_start_creates_and_transitions(self, tmp_path: Path) -> None:
-        """story start → search, create if missing, transition in-progress."""
+        """Story start → search, create if missing, transition in-progress."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
@@ -226,7 +226,7 @@ class TestBacklogHookMapping:
         assert "rai:E417" in spec.labels
 
     def test_story_start_existing_issue_transitions_only(self, tmp_path: Path) -> None:
-        """story start with existing issue → transition only, no create."""
+        """Story start with existing issue → transition only, no create."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
@@ -253,7 +253,7 @@ class TestBacklogHookMapping:
         adapter.transition_issue.assert_called_once_with("RAISE-333", "in-progress")
 
     def test_story_complete_transitions_done(self, tmp_path: Path) -> None:
-        """story complete → transition to done."""
+        """Story complete → transition to done."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
@@ -279,7 +279,7 @@ class TestBacklogHookMapping:
         adapter.transition_issue.assert_called_once_with("RAISE-333", "done")
 
     def test_epic_start_creates_and_transitions(self, tmp_path: Path) -> None:
-        """epic start → search, create if missing, transition in-progress."""
+        """Epic start → search, create if missing, transition in-progress."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
@@ -301,7 +301,7 @@ class TestBacklogHookMapping:
         adapter.transition_issue.assert_called_once_with("RAISE-50", "in-progress")
 
     def test_epic_complete_transitions_done(self, tmp_path: Path) -> None:
-        """epic complete → transition to done."""
+        """Epic complete → transition to done."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
@@ -324,7 +324,7 @@ class TestBacklogHookMapping:
         adapter.transition_issue.assert_called_once_with("RAISE-50", "done")
 
     def test_blocked_event_is_noop(self, tmp_path: Path) -> None:
-        """blocked event → no backlog action."""
+        """Blocked event → no backlog action."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
 
@@ -338,7 +338,7 @@ class TestBacklogHookMapping:
         mock_resolve.assert_not_called()
 
     def test_unblocked_event_is_noop(self, tmp_path: Path) -> None:
-        """unblocked event → no backlog action."""
+        """Unblocked event → no backlog action."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
 
@@ -402,7 +402,7 @@ class TestBacklogHookGracefulDegradation:
         assert result.status == "error"
 
     def test_complete_without_existing_issue_warns(self, tmp_path: Path) -> None:
-        """complete event but no issue found → error (can't transition nothing)."""
+        """Complete event but no issue found → error (can't transition nothing)."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
