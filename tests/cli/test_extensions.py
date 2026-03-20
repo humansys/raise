@@ -156,3 +156,32 @@ class TestNoExtensions:
             results = discover_cli_extensions(app)
 
         assert results == []
+
+
+class TestMainIntegration:
+    """Tests for extension discovery wired into the main CLI app."""
+
+    def test_help_works_with_no_extensions(self) -> None:
+        """rai --help should work normally when no extensions are installed."""
+        from typer.testing import CliRunner
+
+        from raise_cli.cli.main import app as main_app
+
+        runner = CliRunner()
+        result = runner.invoke(main_app, ["--help"])
+        assert result.exit_code == 0
+        assert "session" in result.output
+        assert "backlog" in result.output
+
+    def test_existing_commands_unaffected(self) -> None:
+        """Built-in commands should still be present after extension wiring."""
+        from typer.testing import CliRunner
+
+        from raise_cli.cli.main import app as main_app
+
+        runner = CliRunner()
+        result = runner.invoke(main_app, ["--help"])
+        assert result.exit_code == 0
+        # Verify a sampling of built-in commands
+        for cmd in ("adapter", "graph", "release", "skill"):
+            assert cmd in result.output

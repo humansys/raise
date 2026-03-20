@@ -30,6 +30,7 @@ from raise_cli.cli.commands.release import release_app
 from raise_cli.cli.commands.session import session_app
 from raise_cli.cli.commands.signal import signal_app
 from raise_cli.cli.commands.skill import skill_app
+from raise_cli.cli.extensions import discover_cli_extensions
 from raise_cli.config import RaiSettings
 
 # Module-level state for error handling
@@ -75,6 +76,9 @@ app.add_typer(skill_app, name="skill")
 # Register standalone commands
 app.command("info")(info_command)
 app.command("init")(init_command)
+
+# Register CLI extensions from external packages
+discover_cli_extensions(app)
 
 console = Console()
 
