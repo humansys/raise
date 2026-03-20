@@ -28,8 +28,15 @@ class TestBaseIdentityPackage:
         identity = base / "identity"
         assert identity.is_dir()
 
+    def test_core_yaml_exists(self) -> None:
+        """core.yaml file exists and is readable."""
+        base = files("raise_cli.rai_base")
+        core_file = base / "identity" / "core.yaml"
+        content = core_file.read_text(encoding="utf-8")
+        assert len(content) > 0
+
     def test_core_md_exists(self) -> None:
-        """core.md file exists and is readable."""
+        """core.md file exists (human-readable identity doc)."""
         base = files("raise_cli.rai_base")
         core_file = base / "identity" / "core.md"
         content = core_file.read_text(encoding="utf-8")

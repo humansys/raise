@@ -42,7 +42,7 @@ def _mock_discover(self: object) -> None:
 class TestDoctorCLI:
     @patch("raise_cli.doctor.registry.CheckRegistry.discover", _mock_discover)
     def test_doctor_runs_without_error(self) -> None:
-        """rai doctor should run without crashing."""
+        """Rai doctor should run without crashing."""
         result = runner.invoke(app, ["doctor"])
         assert result.exit_code == 0
 

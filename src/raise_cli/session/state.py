@@ -102,9 +102,9 @@ def migrate_flat_to_session(project_path: Path, session_id: str) -> bool:
         try:
             content = yaml.safe_load(flat_state.read_text(encoding="utf-8"))
             if isinstance(content, dict) and "last_session" in content:
-                last = cast(object, content["last_session"])
+                last = cast("object", content["last_session"])
                 if isinstance(last, dict) and "id" in last:
-                    last_id = cast(object, last["id"])
+                    last_id = cast("object", last["id"])
                     if isinstance(last_id, str) and last_id:
                         target_id = last_id
         except (yaml.YAMLError, OSError):

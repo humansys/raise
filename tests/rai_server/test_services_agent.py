@@ -32,13 +32,13 @@ def _mock_session_factory() -> async_sessionmaker[AsyncSession]:
     return factory  # type: ignore[return-value]
 
 
-@pytest.fixture()
+@pytest.fixture
 def org_id() -> uuid.UUID:
     return uuid.UUID("00000000-0000-0000-0000-000000000001")
 
 
 class TestRecordEvent:
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_event_id(self, org_id: uuid.UUID) -> None:
         from raise_server.services.agent import record_event
 
@@ -60,7 +60,7 @@ class TestRecordEvent:
 
 
 class TestGetEvents:
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_list(self, org_id: uuid.UUID) -> None:
         from raise_server.services.agent import get_events
 
@@ -84,7 +84,7 @@ class TestGetEvents:
         assert result.count == 1
         assert result.events[0].event_type == "ping"
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_list(self, org_id: uuid.UUID) -> None:
         from raise_server.services.agent import get_events
 

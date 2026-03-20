@@ -29,13 +29,13 @@ from raise_cli.hooks.events import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def captured_events() -> list[HookEvent]:
     """List to capture emitted events."""
     return []
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_emitter(captured_events: list[HookEvent]) -> EventEmitter:
     """EventEmitter that captures events instead of dispatching."""
     emitter = EventEmitter()

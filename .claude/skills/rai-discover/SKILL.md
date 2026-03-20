@@ -164,4 +164,3 @@ Graph built. Module nodes present.
 - Graph: `rai graph build`, `rai graph query`
 - Categories: service, model, utility, handler, parser, builder, schema, command, test
 - Confidence tiers: high ≥70, medium 40-69, low <40
-- Replaces: `/rai-discover-start`, `/rai-discover-scan`, `/rai-discover-validate`, `/rai-discover-document`

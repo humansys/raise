@@ -88,20 +88,10 @@ skills:
       creates: Merged code, deleted branch
 
   discovery:
-    - name: /rai-discover-start
-      purpose: Initialize codebase discovery
-      when: Setting up discovery for a codebase
-      creates: Discovery context file
-
-    - name: /rai-discover-scan
-      purpose: Extract symbols and synthesize descriptions
-      when: After discovery initialized
-      creates: Draft component catalog (YAML)
-
-    - name: /rai-discover-validate
-      purpose: Human review of synthesized descriptions, then export to graph format
-      when: After scan complete
-      creates: Validated component catalog + JSON for graph integration
+    - name: /rai-discover
+      purpose: Full discovery pipeline — detect, extract, describe, document, build graph
+      when: After rai init --detect on an existing codebase
+      creates: Component catalog, module docs, system docs, knowledge graph
 
   meta:
     - name: /rai-skill-create

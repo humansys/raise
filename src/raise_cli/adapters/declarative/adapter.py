@@ -70,7 +70,7 @@ class DeclarativeMcpAdapter:
                 raise McpBridgeError(msg)
             conn = registry[server.ref].server
         else:
-            assert server.command is not None  # guaranteed by ServerRef validator
+            assert server.command is not None  # noqa: S101 -- guaranteed by ServerRef validator
             conn = ServerConnection(
                 command=server.command,
                 args=server.args,
@@ -134,13 +134,13 @@ class DeclarativeMcpAdapter:
         if mapping.response.items_path:
             for part in mapping.response.items_path.split("."):
                 if isinstance(items, dict):
-                    items = cast(Any, items.get(part, []))
+                    items = cast("Any", items.get(part, []))
 
         if not isinstance(items, list):
             items = []
 
         parsed: list[dict[str, Any]] = []
-        for raw_item in cast(list[Any], items):
+        for raw_item in cast("list[Any]", items):
             item_ctx: dict[str, Any] = {"item": raw_item}
             row = {
                 field: self._evaluator.evaluate(tmpl, item_ctx)

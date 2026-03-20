@@ -31,6 +31,7 @@ class ProjectInfo(BaseModel):
         test_command: Command to run tests (configuration over convention).
         lint_command: Command to run linter (configuration over convention).
         type_check_command: Command to run type checker (configuration over convention).
+        format_command: Command to run formatter check (configuration over convention).
         code_file_count: Number of code files detected.
         detected_at: When the project was initialized.
     """
@@ -41,6 +42,7 @@ class ProjectInfo(BaseModel):
     test_command: str | None = None
     lint_command: str | None = None
     type_check_command: str | None = None
+    format_command: str | None = None
     code_file_count: int = 0
     detected_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -132,12 +134,12 @@ class ProjectManifest(BaseModel):
         agents.types from ide.type for backward compat.
         """
         if not isinstance(data, dict):
-            return cast(dict[str, Any], data)
-        typed: dict[str, Any] = cast(dict[str, Any], data)
+            return cast("dict[str, Any]", data)
+        typed: dict[str, Any] = cast("dict[str, Any]", data)
         if "agents" not in typed and "ide" in typed:
             raw_ide: object = typed["ide"]
             if isinstance(raw_ide, dict):
-                raw_type: object = cast(dict[str, object], raw_ide).get(
+                raw_type: object = cast("dict[str, object]", raw_ide).get(
                     "type", "claude"
                 )
                 ide_type: str = str(raw_type) if raw_type is not None else "claude"

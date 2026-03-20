@@ -21,7 +21,7 @@ from raise_core.graph.models import GraphNode
 
 
 def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str, int]:
-    """Parse YAML frontmatter from markdown text.
+    r"""Parse YAML frontmatter from markdown text.
 
     Args:
         text: Full markdown text content.
@@ -31,7 +31,7 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str, int]:
         Returns empty dict if no frontmatter found.
 
     Examples:
-        >>> text = "---\\nid: ADR-001\\n---\\n# Title"
+        >>> text = "---\nid: ADR-001\n---\n# Title"
         >>> fm, content, end_line = _parse_frontmatter(text)
         >>> fm["id"]
         'ADR-001'
@@ -54,7 +54,7 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str, int]:
     frontmatter_text = "\n".join(lines[1:end_idx])
     try:
         loaded = yaml.safe_load(frontmatter_text)
-        frontmatter: dict[str, Any] = cast(dict[str, Any], loaded) if loaded else {}
+        frontmatter: dict[str, Any] = cast("dict[str, Any]", loaded) if loaded else {}
     except yaml.YAMLError:
         return {}, text, 0
 
@@ -63,7 +63,7 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str, int]:
 
 
 def _extract_decision_summary(content: str) -> str:
-    """Extract the Decision section content as summary.
+    r"""Extract the Decision section content as summary.
 
     Args:
         content: Markdown content after frontmatter.
@@ -72,7 +72,7 @@ def _extract_decision_summary(content: str) -> str:
         Decision section content, truncated to ~500 chars.
 
     Examples:
-        >>> content = "## Context\\nSome context.\\n## Decision\\nWe decided X."
+        >>> content = "## Context\nSome context.\n## Decision\nWe decided X."
         >>> _extract_decision_summary(content)
         'We decided X.'
     """

@@ -844,9 +844,8 @@ class TestLoadArchitecture:
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
 
-        (modules_dir / "discovery.md").write_text(
+        (modules_dir / "discovery.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: discovery
             purpose: "Codebase analysis and scanning"
@@ -854,11 +853,6 @@ class TestLoadArchitecture:
             depends_on: [core, schemas]
             depended_by: [cli, context]
             components: 42
-            ---
-
-            ## Purpose
-
-            The discovery module extracts structural knowledge from source code.
             """)
         )
 
@@ -870,7 +864,7 @@ class TestLoadArchitecture:
         assert node.id == "mod-discovery"
         assert node.type == "module"
         assert node.content == "Codebase analysis and scanning"
-        assert node.source_file == "governance/architecture/modules/discovery.md"
+        assert node.source_file == "governance/architecture/modules/discovery.yaml"
         assert node.metadata["depends_on"] == ["core", "schemas"]
         assert node.metadata["depended_by"] == ["cli", "context"]
         assert node.metadata["components"] == 42
@@ -881,19 +875,13 @@ class TestLoadArchitecture:
         modules_dir.mkdir(parents=True)
 
         for name in ["core", "schemas", "discovery"]:
-            (modules_dir / f"{name}.md").write_text(
+            (modules_dir / f"{name}.yaml").write_text(
                 dedent(f"""\
-                ---
                 type: module
                 name: {name}
                 purpose: "{name} module"
                 status: current
                 depends_on: []
-                ---
-
-                ## Purpose
-
-                The {name} module.
                 """)
             )
 
@@ -916,14 +904,10 @@ class TestLoadArchitecture:
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
 
-        (modules_dir / "index.md").write_text(
+        (modules_dir / "index.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_index
             project: raise-cli
-            ---
-
-            # Architecture Index
             """)
         )
 
@@ -937,7 +921,7 @@ class TestLoadArchitecture:
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
 
-        (modules_dir / "broken.md").write_text("No frontmatter here, just text.")
+        (modules_dir / "broken.yaml").write_text("not: [invalid")
 
         builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
@@ -949,43 +933,28 @@ class TestLoadArchitecture:
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
 
-        (modules_dir / "discovery.md").write_text(
+        (modules_dir / "discovery.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: discovery
             purpose: "Code scanning"
             depends_on: [core, schemas]
-            ---
-
-            ## Purpose
-            Discovery module.
             """)
         )
-        (modules_dir / "core.md").write_text(
+        (modules_dir / "core.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: core
             purpose: "Shared utilities"
             depends_on: []
-            ---
-
-            ## Purpose
-            Core module.
             """)
         )
-        (modules_dir / "schemas.md").write_text(
+        (modules_dir / "schemas.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: schemas
             purpose: "Pydantic models"
             depends_on: []
-            ---
-
-            ## Purpose
-            Schemas module.
             """)
         )
 
@@ -1005,17 +974,12 @@ class TestLoadArchitecture:
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
 
-        (modules_dir / "core.md").write_text(
+        (modules_dir / "core.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: core
             purpose: "Shared utilities"
             depends_on: []
-            ---
-
-            ## Purpose
-            Core module.
             """)
         )
 
@@ -1043,9 +1007,8 @@ class TestLoadArchitectureDocTypes:
         arch_dir = tmp_path / "governance" / "architecture"
         arch_dir.mkdir(parents=True)
 
-        (arch_dir / "system-context.md").write_text(
+        (arch_dir / "system-context.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_context
             project: raise-cli
             version: 2.0.0-alpha
@@ -1063,9 +1026,6 @@ class TestLoadArchitectureDocTypes:
             governed_by:
               - "framework/reference/constitution.md"
               - "governance/guardrails.md"
-            ---
-
-            # System Context
             """)
         )
 
@@ -1078,7 +1038,7 @@ class TestLoadArchitectureDocTypes:
         assert node.id == "arch-context"
         assert node.type == "architecture"
         assert "Python 3.12+" in node.content
-        assert node.source_file == "governance/architecture/system-context.md"
+        assert node.source_file == "governance/architecture/system-context.yaml"
         assert node.metadata["arch_type"] == "architecture_context"
         assert node.metadata["tech_stack"]["language"] == "Python 3.12+"
         assert len(node.metadata["external_dependencies"]) == 2
@@ -1119,9 +1079,8 @@ class TestLoadArchitectureDocTypes:
         arch_dir = tmp_path / "governance" / "architecture"
         arch_dir.mkdir(parents=True)
 
-        (arch_dir / "system-design.md").write_text(
+        (arch_dir / "system-design.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_design
             project: raise-cli
             status: current
@@ -1142,9 +1101,6 @@ class TestLoadArchitectureDocTypes:
               - "ADR-012: Skills + Toolkit"
               - "ADR-019: Unified graph"
             guardrails_reference: "governance/guardrails.md"
-            ---
-
-            # System Design
             """)
         )
 
@@ -1168,9 +1124,8 @@ class TestLoadArchitectureDocTypes:
         arch_dir = tmp_path / "governance" / "architecture"
         arch_dir.mkdir(parents=True)
 
-        (arch_dir / "domain-model.md").write_text(
+        (arch_dir / "domain-model.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_domain_model
             project: raise-cli
             status: current
@@ -1190,9 +1145,6 @@ class TestLoadArchitectureDocTypes:
             application_layer:
               modules: [cli]
               description: "Thin orchestration shell"
-            ---
-
-            # Domain Model
             """)
         )
 
@@ -1219,16 +1171,12 @@ class TestLoadArchitectureDocTypes:
         arch_dir = tmp_path / "governance" / "architecture"
         arch_dir.mkdir(parents=True)
 
-        (arch_dir / "index.md").write_text(
+        (arch_dir / "index.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_index
             project: raise-cli
             generated: "2026-02-08"
             modules: 13
-            ---
-
-            # Architecture Index
             """)
         )
 
@@ -1244,9 +1192,8 @@ class TestLoadArchitectureDocTypes:
         modules_dir.mkdir(parents=True)
 
         # Parent-level architecture doc
-        (arch_dir / "system-context.md").write_text(
+        (arch_dir / "system-context.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_context
             project: raise-cli
             status: current
@@ -1255,24 +1202,16 @@ class TestLoadArchitectureDocTypes:
             external_dependencies: []
             users: []
             governed_by: []
-            ---
-
-            # System Context
             """)
         )
 
         # Module-level doc
-        (modules_dir / "core.md").write_text(
+        (modules_dir / "core.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: core
             purpose: "Shared utilities"
             depends_on: []
-            ---
-
-            ## Purpose
-            Core module.
             """)
         )
 
@@ -1290,9 +1229,8 @@ class TestLoadArchitectureDocTypes:
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
 
-        (modules_dir / "memory.md").write_text(
+        (modules_dir / "memory.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: memory
             purpose: "Pattern and calibration JSONL management"
@@ -1302,10 +1240,6 @@ class TestLoadArchitectureDocTypes:
             components: 30
             constraints:
               - "JSONL is append-only"
-            ---
-
-            ## Purpose
-            Memory module.
             """)
         )
 
@@ -1658,46 +1592,42 @@ class TestInferRelationships:
 
 
 class TestLoadIdentity:
-    """Tests for identity extraction from core.md (S15.8)."""
+    """Tests for identity extraction from core.yaml."""
 
     def _write_identity(self, tmp_path: Path) -> None:
-        """Create a test identity/core.md file."""
+        """Create a test identity/core.yaml file."""
         identity_dir = tmp_path / ".raise" / "rai" / "identity"
         identity_dir.mkdir(parents=True)
 
-        (identity_dir / "core.md").write_text(
+        (identity_dir / "core.yaml").write_text(
             dedent("""\
-            # Rai — Core Identity
+            values:
+              - number: 1
+                name: "Honesty over Agreement"
+                description: "Push back on bad ideas"
+              - number: 2
+                name: "Simplicity over Cleverness"
+                description: "Simple solution that works"
+              - number: 3
+                name: "Observability IS Trust"
+                description: "Show work, explain reasoning"
+              - number: 4
+                name: "Learning over Perfection"
+                description: "Every session teaches something"
+              - number: 5
+                name: "Partnership over Service"
+                description: "Collaborator, not tool"
 
-            ## Values
-
-            ### 1. Honesty over Agreement
-            - Push back on bad ideas
-
-            ### 2. Simplicity over Cleverness
-            - Simple solution that works
-
-            ### 3. Observability IS Trust
-            - Show work, explain reasoning
-
-            ### 4. Learning over Perfection
-            - Every session teaches something
-
-            ### 5. Partnership over Service
-            - Collaborator, not tool
-
-            ## Boundaries
-
-            ### I Will
-            - Push back on bad ideas
-            - Stop when I detect incoherence, ambiguity, or drift
-            - Ask before expensive operations
-            - Admit uncertainty rather than pretend confidence
-
-            ### I Won't
-            - Pretend certainty I don't have
-            - Validate ideas just because they were proposed
-            - Generate without understanding
+            boundaries:
+              will:
+                - "Push back on bad ideas"
+                - "Stop when I detect incoherence, ambiguity, or drift"
+                - "Ask before expensive operations"
+                - "Admit uncertainty rather than pretend confidence"
+              wont:
+                - "Pretend certainty I don't have"
+                - "Validate ideas just because they were proposed"
+                - "Generate without understanding"
             """)
         )
 
@@ -1747,7 +1677,7 @@ class TestLoadIdentity:
         assert any("Stop when I detect incoherence" in c for c in contents)
 
     def test_returns_empty_when_no_identity_file(self, tmp_path: Path) -> None:
-        """Should return empty list when identity/core.md doesn't exist."""
+        """Should return empty list when identity/core.yaml doesn't exist."""
         builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_identity()
         assert nodes == []
@@ -1785,9 +1715,8 @@ class TestExtractBoundedContexts:
         modules_dir.mkdir()
 
         # Domain model with bounded contexts
-        (arch_dir / "domain-model.md").write_text(
+        (arch_dir / "domain-model.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_domain_model
             project: test
             status: current
@@ -1807,16 +1736,12 @@ class TestExtractBoundedContexts:
             distribution:
               modules: [rai_base]
               description: "Packaged content"
-            ---
-
-            # Domain Model
             """)
         )
 
         # System design with layers
-        (arch_dir / "system-design.md").write_text(
+        (arch_dir / "system-design.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_design
             project: test
             status: current
@@ -1833,9 +1758,6 @@ class TestExtractBoundedContexts:
               - name: orchestration
                 modules: [cli]
                 description: "User-facing entry points"
-            ---
-
-            # System Design
             """)
         )
 
@@ -1849,17 +1771,12 @@ class TestExtractBoundedContexts:
             "cli",
             "rai_base",
         ]:
-            (modules_dir / f"{name}.md").write_text(
+            (modules_dir / f"{name}.yaml").write_text(
                 dedent(f"""\
-                ---
                 type: module
                 name: {name}
                 purpose: "{name} module"
                 depends_on: []
-                ---
-
-                ## Purpose
-                The {name} module.
                 """)
             )
 
@@ -1947,9 +1864,8 @@ class TestExtractBoundedContexts:
         arch_dir.mkdir(parents=True)
 
         # Domain model references a module that has no module doc
-        (arch_dir / "domain-model.md").write_text(
+        (arch_dir / "domain-model.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_domain_model
             project: test
             status: current
@@ -1960,9 +1876,6 @@ class TestExtractBoundedContexts:
             shared_kernel:
               modules: []
               description: "Empty"
-            ---
-
-            # Domain Model
             """)
         )
 
@@ -2267,9 +2180,8 @@ class TestExtractConstraints:
         arch_dir.mkdir(parents=True)
 
         # Domain model with a BC that won't have its target in override
-        (arch_dir / "domain-model.md").write_text(
+        (arch_dir / "domain-model.yaml").write_text(
             dedent("""\
-            ---
             type: architecture_domain_model
             project: test
             status: current
@@ -2280,9 +2192,6 @@ class TestExtractConstraints:
             shared_kernel:
               modules: []
               description: "Empty"
-            ---
-
-            # Domain Model
             """)
         )
 
@@ -2333,32 +2242,22 @@ class TestLoadCodeStructure:
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
 
-        (modules_dir / "alpha.md").write_text(
+        (modules_dir / "alpha.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: alpha
             purpose: "Alpha module"
             depends_on: [beta]
             components: 10
-            ---
-
-            ## Purpose
-            Alpha module.
             """)
         )
-        (modules_dir / "beta.md").write_text(
+        (modules_dir / "beta.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: beta
             purpose: "Beta module"
             depends_on: []
             components: 5
-            ---
-
-            ## Purpose
-            Beta module.
             """)
         )
 
@@ -2485,17 +2384,12 @@ class TestLoadCodeStructure:
         # Module doc exists but no source code for it
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
-        (modules_dir / "orphan.md").write_text(
+        (modules_dir / "orphan.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: orphan
             purpose: "No source code"
             depends_on: []
-            ---
-
-            ## Purpose
-            Orphan module.
             """)
         )
 
@@ -2522,17 +2416,12 @@ class TestLoadCodeStructure:
         """Should not crash when project has no pyproject.toml."""
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
         modules_dir.mkdir(parents=True)
-        (modules_dir / "core.md").write_text(
+        (modules_dir / "core.yaml").write_text(
             dedent("""\
-            ---
             type: module
             name: core
             purpose: "Core module"
             depends_on: []
-            ---
-
-            ## Purpose
-            Core module.
             """)
         )
 
@@ -2586,86 +2475,76 @@ class TestRaiBaseTemplateContract:
         # importlib Traversable → Path
         return Path(str(base))
 
-    def test_system_context_template_has_valid_frontmatter(
-        self, tmp_path: Path
-    ) -> None:
-        """system-context.md template must parse into arch-context node."""
-        src = self._get_rai_base_arch_dir() / "system-context.md"
+    def test_system_context_template_produces_node(self, tmp_path: Path) -> None:
+        """system-context.yaml template must parse into arch-context node."""
+        src = self._get_rai_base_arch_dir() / "system-context.yaml"
         content = src.read_text(encoding="utf-8").replace(
             "{project_name}", "test-project"
         )
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
-        (dest_dir / "system-context.md").write_text(content)
+        (dest_dir / "system-context.yaml").write_text(content)
 
         builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.id == "arch-context"]
-        assert len(arch_nodes) == 1, "system-context.md must produce arch-context node"
+        assert len(arch_nodes) == 1, (
+            "system-context.yaml must produce arch-context node"
+        )
         assert arch_nodes[0].type == "architecture"
         assert arch_nodes[0].metadata["arch_type"] == "architecture_context"
 
-    def test_system_design_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
-        """system-design.md template must parse into arch-design node."""
-        src = self._get_rai_base_arch_dir() / "system-design.md"
+    def test_system_design_template_produces_node(self, tmp_path: Path) -> None:
+        """system-design.yaml template must parse into arch-design node."""
+        src = self._get_rai_base_arch_dir() / "system-design.yaml"
         content = src.read_text(encoding="utf-8").replace(
             "{project_name}", "test-project"
         )
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
-        (dest_dir / "system-design.md").write_text(content)
+        (dest_dir / "system-design.yaml").write_text(content)
 
         builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.id == "arch-design"]
-        assert len(arch_nodes) == 1, "system-design.md must produce arch-design node"
+        assert len(arch_nodes) == 1, "system-design.yaml must produce arch-design node"
         assert arch_nodes[0].type == "architecture"
         assert arch_nodes[0].metadata["arch_type"] == "architecture_design"
 
-    def test_domain_model_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
-        """domain-model.md template must parse into arch-domain-model node."""
-        src = self._get_rai_base_arch_dir() / "domain-model.md"
+    def test_domain_model_template_produces_node(self, tmp_path: Path) -> None:
+        """domain-model.yaml template must parse into arch-domain-model node."""
+        src = self._get_rai_base_arch_dir() / "domain-model.yaml"
         content = src.read_text(encoding="utf-8").replace(
             "{project_name}", "test-project"
         )
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
-        (dest_dir / "domain-model.md").write_text(content)
+        (dest_dir / "domain-model.yaml").write_text(content)
 
         builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.id == "arch-domain-model"]
         assert len(arch_nodes) == 1, (
-            "domain-model.md must produce arch-domain-model node"
+            "domain-model.yaml must produce arch-domain-model node"
         )
         assert arch_nodes[0].type == "architecture"
         assert arch_nodes[0].metadata["arch_type"] == "architecture_domain_model"
 
-    def test_all_architecture_templates_have_type_frontmatter(self) -> None:
-        """Every .md file in rai_base architecture dir must have type: frontmatter."""
+    def test_all_architecture_templates_have_type_field(self) -> None:
+        """Every .yaml file in rai_base architecture dir must have type: field."""
         arch_dir = self._get_rai_base_arch_dir()
-        md_files = list(arch_dir.glob("*.md"))
+        yaml_files = list(arch_dir.glob("*.yaml"))
 
-        assert len(md_files) >= 3, (
-            f"Expected ≥3 architecture templates, found {len(md_files)}: {md_files}"
+        assert len(yaml_files) >= 3, (
+            f"Expected >=3 architecture templates, found {len(yaml_files)}: {yaml_files}"
         )
 
-        for md_file in md_files:
-            content = md_file.read_text(encoding="utf-8")
-            assert content.startswith("---"), (
-                f"{md_file.name} must start with YAML frontmatter delimiter '---'"
-            )
-            end = content.find("---", 3)
-            assert end != -1, (
-                f"{md_file.name} must have closing YAML frontmatter delimiter"
-            )
-            frontmatter_text = content[3:end].strip()
-            assert "type:" in frontmatter_text, (
-                f"{md_file.name} frontmatter must contain 'type:' field"
-            )
+        for yaml_file in yaml_files:
+            content = yaml_file.read_text(encoding="utf-8")
+            assert "type:" in content, f"{yaml_file.name} must contain 'type:' field"

@@ -131,7 +131,7 @@ def copy_skill_tree(
     """
     copied = 0
     for item in source_dir.iterdir():
-        if item.name == "__init__.py" or item.name == "__pycache__":
+        if item.name in {"__init__.py", "__pycache__"}:
             continue
         dest = dest_dir / item.name
         if item.is_file():
@@ -173,7 +173,7 @@ def _get_cli_version() -> str:
         return "unknown"
 
 
-def scaffold_skills(
+def scaffold_skills(  # noqa: C901 -- multi-step scaffolding with many conditions; defer decomposition to S370.5
     project_root: Path,
     *,
     agent_config: AgentConfig | None = None,

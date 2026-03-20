@@ -14,7 +14,7 @@ from raise_cli.onboarding.memory_md import MemoryMdGenerator, generate_memory_md
 # =============================================================================
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_methodology_yaml(tmp_path: Path) -> Path:
     """Create a minimal methodology.yaml for testing."""
     content = dedent("""\
@@ -234,7 +234,7 @@ class TestMemoryMdGeneratorPart1:
 # =============================================================================
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_patterns_jsonl(tmp_path: Path) -> Path:
     """Create a sample patterns.jsonl for testing."""
     import json

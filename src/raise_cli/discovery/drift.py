@@ -173,8 +173,7 @@ def _normalize_path(path: str) -> str:
     """Normalize path for comparison (remove leading src/, trailing slashes)."""
     normalized = path.strip("/")
     # Handle both "src/module" and "module" as equivalent
-    if normalized.startswith("src/"):
-        normalized = normalized[4:]
+    normalized = normalized.removeprefix("src/")
     return normalized
 
 

@@ -12,17 +12,17 @@ from fastapi.testclient import TestClient
 from raise_server.auth import OrgContext, verify_api_key
 
 
-@pytest.fixture()
+@pytest.fixture
 def org_id() -> uuid.UUID:
     return uuid.UUID("12345678-1234-1234-1234-123456789abc")
 
 
-@pytest.fixture()
+@pytest.fixture
 def raw_key() -> str:
     return "rsk_testkey123456"
 
 
-@pytest.fixture()
+@pytest.fixture
 def key_hash(raw_key: str) -> str:
     return hashlib.sha256(raw_key.encode()).hexdigest()
 

@@ -1,0 +1,25 @@
+type: module
+name: session
+purpose: "Session lifecycle — state persistence, context bundle assembly, and close orchestration for deterministic session continuity"
+status: current
+depends_on: [context, memory, onboarding, schemas]
+depended_by: [cli]
+entry_points:
+  - "rai session start"
+  - "rai session close"
+public_api:
+  - "assemble_context_bundle"
+  - "get_foundational_patterns"
+  - "get_always_on_primes"
+  - "process_session_close"
+  - "load_state_file"
+  - "CloseInput"
+  - "CloseResult"
+  - "load_session_state"
+  - "save_session_state"
+components: 21
+constraints:
+  - "Session records are always personal-scoped (developer-specific, gitignored)"
+  - "Session state is personal-scoped (per-developer, gitignored in .raise/rai/personal/)"
+  - "Context bundle is deterministic — same inputs produce same output"
+  - "Close writes are atomic — all-or-nothing via single orchestrator"

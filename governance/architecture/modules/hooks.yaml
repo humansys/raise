@@ -1,0 +1,26 @@
+type: module
+name: hooks
+purpose: "Typed lifecycle event infrastructure for cross-cutting concerns (telemetry, notifications, compliance)"
+status: current
+depends_on: []
+depended_by: []
+entry_points: []
+public_api:
+  - "HookEvent"
+  - "HookResult"
+  - "EmitResult"
+  - "EventEmitter"
+  - "SessionStartEvent"
+  - "SessionCloseEvent"
+  - "GraphBuildEvent"
+  - "PatternAddedEvent"
+  - "DiscoverScanEvent"
+  - "InitCompleteEvent"
+  - "AdapterLoadedEvent"
+  - "AdapterFailedEvent"
+  - "ReleasePublishEvent"
+  - "BeforeSessionCloseEvent"
+  - "BeforeReleasePublishEvent"
+architecture_decision: "ADR-039"
+layer: leaf
+bounded_context: infrastructure

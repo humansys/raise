@@ -1,0 +1,33 @@
+type: module
+name: discovery
+purpose: "Scan codebases to extract structural knowledge — symbols, components, modules, and drift detection"
+status: current
+depends_on: []
+depended_by: [cli]
+entry_points:
+  - "raise discover scan"
+  - "raise discover analyze"
+  - "raise discover drift"
+  - "raise discover build"
+public_api:
+  - "DriftSeverity"
+  - "DriftWarning"
+  - "EXTENSION_TO_LANGUAGE"
+  - "Language"
+  - "ScanResult"
+  - "Symbol"
+  - "SymbolKind"
+  - "detect_drift"
+  - "detect_language"
+  - "extract_javascript_symbols"
+  - "extract_python_symbols"
+  - "extract_symbols"
+  - "extract_php_symbols"
+  - "extract_svelte_symbols"
+  - "extract_typescript_symbols"
+  - "scan_directory"
+components: 52
+constraints:
+  - "Independent of governance module — no cross-imports"
+  - "All analysis is deterministic — no AI inference in CLI"
+  - "Scanner uses Python AST for Python files, tree-sitter for TS/TSX/JS/PHP/Svelte"

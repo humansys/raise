@@ -10,6 +10,7 @@ Implements configuration cascade with proper precedence:
 
 from __future__ import annotations
 
+import logging
 import sys
 from pathlib import Path
 from typing import Any, Literal
@@ -28,6 +29,8 @@ else:
 
 from raise_cli.config.paths import get_config_dir
 
+logger = logging.getLogger(__name__)
+
 
 class TomlConfigSource(PydanticBaseSettingsSource):
     """Custom settings source for TOML configuration files."""
@@ -37,7 +40,7 @@ class TomlConfigSource(PydanticBaseSettingsSource):
         settings_cls: type[BaseSettings],
         toml_file: Path | None = None,
         toml_table: str = "rai",
-    ):
+    ) -> None:
         """Initialize TOML config source.
 
         Args:
@@ -67,10 +70,9 @@ class TomlConfigSource(PydanticBaseSettingsSource):
             if self.toml_file.name == "pyproject.toml":
                 return data.get("tool", {}).get(self.toml_table, {})
             # Handle user config with [rai] section
-            else:
-                return data.get(self.toml_table, {})
-        except Exception:
-            # Silently ignore TOML parsing errors (graceful degradation)
+            return data.get(self.toml_table, {})
+        except Exception as e:
+            logger.debug("Failed to parse TOML config %s: %s", self.toml_file, e)
             return {}
 
 
@@ -148,8 +150,8 @@ class RaiSettings(BaseSettings):
         settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,
-        file_secret_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,  # noqa: ARG003 -- required by Pydantic BaseSettings override
+        file_secret_settings: PydanticBaseSettingsSource,  # noqa: ARG003 -- required by Pydantic BaseSettings override
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Customize settings sources to include TOML files.
 

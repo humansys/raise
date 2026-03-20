@@ -125,7 +125,7 @@ class TestExtractDecisionSummary:
         assert summary.endswith("...")
 
     def test_decision_as_last_section(self) -> None:
-        """Decision is the last section — hits \\Z branch (RAISE-537)."""
+        r"""Decision is the last section — hits \\Z branch (RAISE-537)."""
         content = "## Context\nSome context.\n\n## Decision\nWe chose Y.\n"
         summary = _extract_decision_summary(content)
         assert "We chose Y." in summary

@@ -97,8 +97,7 @@ class SkillLocator:
             try:
                 skill = parse_skill(skill_path)
                 skills.append(skill)
-            except Exception:
-                # Skip skills that fail to parse
+            except Exception:  # noqa: S112 -- best-effort skill loading, skip unparseable
                 continue
 
         return skills

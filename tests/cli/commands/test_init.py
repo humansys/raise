@@ -475,7 +475,7 @@ class TestInitBootstrap:
 
         assert result.exit_code == 0
         identity_dir = greenfield_project / ".raise" / "rai" / "identity"
-        assert (identity_dir / "core.md").exists()
+        assert (identity_dir / "core.yaml").exists()
         assert (identity_dir / "perspective.md").exists()
 
     def test_init_creates_patterns_file(
@@ -525,8 +525,8 @@ class TestInitBootstrap:
             )
 
         # Modify identity
-        core_path = greenfield_project / ".raise" / "rai" / "identity" / "core.md"
-        core_path.write_text("# Custom identity")
+        core_path = greenfield_project / ".raise" / "rai" / "identity" / "core.yaml"
+        core_path.write_text("values: []")
 
         # Second init
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
@@ -535,7 +535,7 @@ class TestInitBootstrap:
             )
 
         assert result.exit_code == 0
-        assert core_path.read_text(encoding="utf-8") == "# Custom identity"
+        assert core_path.read_text(encoding="utf-8") == "values: []"
 
     def test_shu_output_includes_bootstrap_info(
         self, greenfield_project: Path, mock_home: Path
@@ -687,10 +687,7 @@ class TestInitSkillScaffolding:
         assert result.exit_code == 0
         skills_dir = greenfield_project / ".claude" / "skills"
         assert (skills_dir / "rai-session-start" / "SKILL.md").exists()
-        assert (skills_dir / "rai-discover-start" / "SKILL.md").exists()
-        assert (skills_dir / "rai-discover-scan" / "SKILL.md").exists()
-        assert (skills_dir / "rai-discover-validate" / "SKILL.md").exists()
-        assert (skills_dir / "rai-discover-document" / "SKILL.md").exists()
+        assert (skills_dir / "rai-discover" / "SKILL.md").exists()
 
     def test_init_does_not_overwrite_existing_skills(
         self, greenfield_project: Path, mock_home: Path
@@ -1311,7 +1308,7 @@ class TestInitPreservesExistingManifest:
     def test_preserves_branches_development(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """rai init preserves existing branches.development value."""
+        """Rai init preserves existing branches.development value."""
         from raise_cli.onboarding.manifest import (
             AgentsManifest,
             ProjectInfo,
@@ -1341,7 +1338,7 @@ class TestInitPreservesExistingManifest:
     def test_preserves_tier_config(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """rai init preserves existing tier value."""
+        """Rai init preserves existing tier value."""
         from raise_cli.onboarding.manifest import (
             AgentsManifest,
             ProjectInfo,

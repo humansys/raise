@@ -20,7 +20,7 @@ from raise_cli.doctor.fix import (
 from raise_cli.doctor.models import CheckResult, CheckStatus
 
 
-@pytest.fixture()
+@pytest.fixture
 def project_dir(tmp_path: Path) -> Path:
     """Minimal project directory."""
     return tmp_path
@@ -157,7 +157,9 @@ class TestRunFixes:
         self, project_dir: Path
     ) -> None:
         """run_fixes runs all results with fix_id, regardless of status.
-        Filtering is the caller's responsibility."""
+
+        Filtering is the caller's responsibility.
+        """
         gitignore = project_dir / ".gitignore"
         gitignore.write_text(".raise/rai/personal/\n")
         results = [

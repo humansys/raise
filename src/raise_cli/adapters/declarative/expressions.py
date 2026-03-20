@@ -98,7 +98,7 @@ class ExpressionEvaluator:
             if isinstance(current, dict):
                 if part not in current:
                     raise KeyError(part)
-                current = cast(Any, current[part])
+                current = cast("Any", current[part])
             else:
                 raise KeyError(part)
 
@@ -133,7 +133,7 @@ class ExpressionEvaluator:
                 msg = "pluck requires a field argument"
                 raise ValueError(msg)
             return [
-                self._pluck_item(item, filter_arg) for item in cast(list[Any], value)
+                self._pluck_item(item, filter_arg) for item in cast("list[Any]", value)
             ]
 
         msg = f"Unknown filter: {filter_name}"
@@ -145,6 +145,6 @@ class ExpressionEvaluator:
         if isinstance(item, dict):
             if field not in item:
                 raise KeyError(field)
-            return cast(Any, item[field])
+            return cast("Any", item[field])
         msg = f"pluck expects dict items, got {type(item).__name__}"
         raise TypeError(msg)

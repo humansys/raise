@@ -311,13 +311,13 @@ def get_memory_dir_for_scope(
     """
     if scope == MemoryScope.GLOBAL:
         return get_global_rai_dir()
-    elif scope == MemoryScope.PERSONAL:
+    if scope == MemoryScope.PERSONAL:
         return get_personal_dir(project_root)
-    else:  # PROJECT
-        return get_memory_dir(project_root)
+    # PROJECT
+    return get_memory_dir(project_root)
 
 
-def get_next_id(
+def get_next_id(  # noqa: C901
     file_path: Path, prefix: str, developer_prefix: str | None = None
 ) -> str:
     """Get next available ID for a JSONL file.

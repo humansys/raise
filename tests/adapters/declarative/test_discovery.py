@@ -16,7 +16,7 @@ from raise_cli.adapters.declarative.discovery import discover_yaml_adapters
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
-@pytest.fixture()
+@pytest.fixture
 def adapters_dir(tmp_path: Path) -> Path:
     """Create a .raise/adapters/ dir with test YAML files."""
     d = tmp_path / ".raise" / "adapters"

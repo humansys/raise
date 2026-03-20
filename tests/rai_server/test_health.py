@@ -10,7 +10,7 @@ from raise_server.app import create_app
 from raise_server.config import ServerConfig
 
 
-@pytest.fixture()
+@pytest.fixture
 def client() -> TestClient:
     """Create test client with explicit config (no env vars needed)."""
     config = ServerConfig(database_url="postgresql+asyncpg://u:p@h/db")

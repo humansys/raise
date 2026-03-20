@@ -37,12 +37,12 @@ def _mock_session_factory() -> async_sessionmaker[AsyncSession]:
     return factory  # type: ignore[return-value]
 
 
-@pytest.fixture()
+@pytest.fixture
 def org_id() -> uuid.UUID:
     return uuid.UUID("00000000-0000-0000-0000-000000000001")
 
 
-@pytest.fixture()
+@pytest.fixture
 def sync_request() -> GraphSyncRequest:
     return GraphSyncRequest(
         project_id="raise-commons",
@@ -61,7 +61,7 @@ def sync_request() -> GraphSyncRequest:
 class TestSyncGraph:
     """sync_graph orchestrates upsert, edge replace, and orphan pruning."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_calls_all_db_operations(
         self, org_id: uuid.UUID, sync_request: GraphSyncRequest
     ) -> None:
@@ -102,7 +102,7 @@ class TestSyncGraph:
             assert result.nodes_pruned == 0
             assert result.project_id == "raise-commons"
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_graph_sync(self, org_id: uuid.UUID) -> None:
         from raise_server.services.graph import sync_graph
 
@@ -129,7 +129,7 @@ class TestSyncGraph:
             assert result.edges_created == 0
             assert result.edges_skipped == 0
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_edges_skipped_when_node_missing(self, org_id: uuid.UUID) -> None:
         """Edges referencing nodes not in the payload are skipped, not silently lost."""
         from raise_server.services.graph import sync_graph
@@ -175,7 +175,7 @@ class TestSyncGraph:
 class TestQueryGraph:
     """query_graph delegates to search_nodes and wraps results."""
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_returns_query_response(self, org_id: uuid.UUID) -> None:
         from raise_server.services.graph import query_graph
 
@@ -203,7 +203,7 @@ class TestQueryGraph:
             assert result.query == "memory"
             assert result.limit == 10
 
-    @pytest.mark.anyio()
+    @pytest.mark.anyio
     async def test_empty_results(self, org_id: uuid.UUID) -> None:
         from raise_server.services.graph import query_graph
 

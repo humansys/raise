@@ -69,7 +69,7 @@ class TestScaffoldSkills:
         result = scaffold_skills(tmp_path)
 
         assert "rai-session-start" in result.skills_installed
-        assert "rai-discover-document" in result.skills_installed
+        assert "rai-discover" in result.skills_installed
         assert "rai-story-implement" in result.skills_installed
         assert "rai-epic-design" in result.skills_installed
         assert "rai-debug" in result.skills_installed
@@ -127,9 +127,7 @@ class TestScaffoldSkillsIdempotency:
         assert "rai-session-start" in result.skills_skipped_names
         # Others should be copied
         assert result.skills_copied == TOTAL_SKILLS - 1
-        assert (
-            tmp_path / ".claude" / "skills" / "rai-discover-start" / "SKILL.md"
-        ).exists()
+        assert (tmp_path / ".claude" / "skills" / "rai-discover" / "SKILL.md").exists()
         assert (
             tmp_path / ".claude" / "skills" / "rai-story-implement" / "SKILL.md"
         ).exists()

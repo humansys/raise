@@ -98,7 +98,7 @@ class TestReleaseList:
     def test_lists_releases_from_graph(
         self, tmp_path: Path, monkeypatch: object
     ) -> None:
-        """rai release list shows releases from graph."""
+        """Rai release list shows releases from graph."""
         import pytest
 
         mp = pytest.MonkeyPatch()
@@ -115,7 +115,7 @@ class TestReleaseList:
         mp.undo()
 
     def test_shows_error_when_no_graph(self, tmp_path: Path) -> None:
-        """rai release list shows error when graph doesn't exist."""
+        """Rai release list shows error when graph doesn't exist."""
         from raise_cli.cli.error_handler import set_error_console
 
         set_error_console(None)  # Reset singleton to avoid test ordering leaks
@@ -126,7 +126,7 @@ class TestReleaseList:
         )
 
     def test_shows_empty_message_when_no_releases(self, tmp_path: Path) -> None:
-        """rai release list shows message when graph has no release nodes."""
+        """Rai release list shows message when graph has no release nodes."""
         graph = Graph()
         graph.add_concept(
             GraphNode(
@@ -149,7 +149,7 @@ class TestReleasePublish:
     """Tests for rai release publish command (absorbed from publish group)."""
 
     def test_publish_requires_bump_or_version(self) -> None:
-        """rai release publish without --bump or --version exits non-zero with message."""
+        """Rai release publish without --bump or --version exits non-zero with message."""
         result = runner.invoke(app, ["release", "publish"])
         assert result.exit_code != 0
         assert "bump" in result.output.lower() or "version" in result.output.lower()

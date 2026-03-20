@@ -14,12 +14,12 @@ from raise_cli.doctor.checks.project import ProjectCheck
 from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 
-@pytest.fixture()
+@pytest.fixture
 def check() -> ProjectCheck:
     return ProjectCheck()
 
 
-@pytest.fixture()
+@pytest.fixture
 def ctx(tmp_path: Path) -> DoctorContext:
     return DoctorContext(working_dir=tmp_path)
 

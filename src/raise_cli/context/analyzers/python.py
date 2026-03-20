@@ -140,7 +140,7 @@ class PythonAnalyzer:
         visitor.visit(tree)
         return visitor.imports
 
-    def _extract_exports(self, module_dir: Path) -> list[str]:
+    def _extract_exports(self, module_dir: Path) -> list[str]:  # noqa: C901 -- complexity 11, refactor deferred
         """Extract public API from __init__.py.
 
         Uses __all__ if present, otherwise imported names.

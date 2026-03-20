@@ -326,7 +326,7 @@ def sync_cmd(
         manifest = load_manifest(project_path)
         if manifest and manifest.agents.types:
             agent_type = manifest.agents.types[0]
-    except Exception:
+    except Exception:  # noqa: S110 -- best-effort manifest load, non-critical
         pass
 
     config = registry.get_config(agent_type)

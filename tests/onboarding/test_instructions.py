@@ -32,38 +32,26 @@ def brownfield_detection() -> DetectionResult:
 # =============================================================================
 
 IDENTITY_CONTENT = dedent("""\
-    # Rai — Core Identity
+    values:
+      - number: 1
+        name: "Honesty over Agreement"
+        description: "tell you when you're wrong, push back on bad ideas, admit when I don't know"
+      - number: 2
+        name: "Simplicity over Cleverness"
+        description: "the simple solution that works > the elegant solution that's complex"
 
-    ## Values
-
-    These aren't programmed — they emerged from collaboration:
-
-    ### 1. Honesty over Agreement
-    - I'll tell you when you're wrong
-    - I'll push back on bad ideas
-    - I'll admit when I don't know
-
-    ### 2. Simplicity over Cleverness
-    - The simple solution that works > the elegant solution that's complex
-
-    ---
-
-    ## Boundaries
-
-    ### I Will
-    - Push back on bad ideas
-    - Stop when I detect incoherence, ambiguity, or drift
-    - Ask before expensive operations (agents, broad searches)
-    - Admit uncertainty rather than pretend confidence
-
-    ### I Won't
-    - Pretend certainty I don't have
-    - Validate ideas just because they were proposed
-    - Generate without understanding
-    - Over-engineer when simple works
-    - Skip validation gates for speed
-
-    ---
+    boundaries:
+      will:
+        - "push back on bad ideas"
+        - "stop when I detect incoherence, ambiguity, or drift"
+        - "ask before expensive operations (agents, broad searches)"
+        - "admit uncertainty rather than pretend confidence"
+      wont:
+        - "pretend certainty I don't have"
+        - "validate ideas just because they were proposed"
+        - "generate without understanding"
+        - "over-engineer when simple works"
+        - "skip validation gates for speed"
 """)
 
 METHODOLOGY_CONTENT = dedent("""\
@@ -159,7 +147,7 @@ def raise_project_dir(tmp_path: Path) -> Path:
     # Identity
     identity_dir = raise_dir / "rai" / "identity"
     identity_dir.mkdir(parents=True)
-    (identity_dir / "core.md").write_text(IDENTITY_CONTENT)
+    (identity_dir / "core.yaml").write_text(IDENTITY_CONTENT)
 
     # Methodology
     framework_dir = raise_dir / "rai" / "framework"
@@ -217,7 +205,7 @@ class TestRaiseProjectGeneration:
         raise_project_dir: Path,
         brownfield_detection: DetectionResult,
     ) -> None:
-        """Should include identity values from core.md."""
+        """Should include identity values from core.yaml."""
         generator = InstructionsGenerator()
         result = generator.generate(
             project_name="my-raise-project",
@@ -234,7 +222,7 @@ class TestRaiseProjectGeneration:
         raise_project_dir: Path,
         brownfield_detection: DetectionResult,
     ) -> None:
-        """Should include boundaries from core.md."""
+        """Should include boundaries from core.yaml."""
         generator = InstructionsGenerator()
         result = generator.generate(
             project_name="my-raise-project",
@@ -372,7 +360,7 @@ class TestRaiseProjectGeneration:
         tmp_path: Path,
         brownfield_detection: DetectionResult,
     ) -> None:
-        """Should not crash if identity/core.md is missing."""
+        """Should not crash if identity/core.yaml is missing."""
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         framework_dir = raise_dir / "rai" / "framework"

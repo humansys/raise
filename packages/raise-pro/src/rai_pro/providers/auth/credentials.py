@@ -116,7 +116,7 @@ def _save_credentials_file(
     json_data: bytes = json.dumps(credentials).encode()
     # Fernet.encrypt() always returns bytes
     encrypted_data = cast(
-        bytes,
+        "bytes",
         fernet.encrypt(json_data),  # type: ignore[no-untyped-call]
     )
 

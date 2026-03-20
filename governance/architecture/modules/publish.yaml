@@ -1,0 +1,22 @@
+module: publish
+bounded_context: tooling
+layer: domain
+status: active
+maintainer: rai-cli-team
+dependencies:
+  - config
+  - subprocess
+constraints:
+  - "MUST: All version strings are PEP 440 compliant"
+  - "MUST: Changelog follows Keep a Changelog format"
+  - "MUST: Quality gates run before any destructive operation"
+  - "SHOULD: Use Rich for CLI output formatting"
+code_imports:
+  - re
+  - subprocess
+  - dataclasses
+  - pathlib
+  - datetime
+  - typing
+code_exports: []
+code_components: 3

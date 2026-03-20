@@ -9,8 +9,9 @@ Supports two paths:
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 from raise_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from raise_cli.governance.models import Concept, ConceptType, ExtractionResult
@@ -29,7 +30,70 @@ from raise_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
-_EPIC_SCOPE_GLOB = "work/epics/*/scope.md"
+# Type aliases for extraction functions
+_ExtractFn = Callable[[Path, Path], list[Concept]]
+_RootExtractFn = Callable[[Path], list[Concept]]
+
+
+class _SingleFileResult(NamedTuple):
+    """Result from extracting concepts from a single file."""
+
+    concepts: list[Concept]
+    file_count: int
+    errors: list[str]
+
+
+def _extract_from_single_file(
+    file_path: Path, extractor_fn: _ExtractFn, project_root: Path
+) -> _SingleFileResult:
+    """Extract concepts from a single governance file with error isolation.
+
+    Args:
+        file_path: Path to the governance file.
+        extractor_fn: Function taking (file_path, project_root) -> list[Concept].
+        project_root: Project root directory.
+
+    Returns:
+        Extraction result with concepts, file count, and any errors.
+    """
+    if not file_path.exists():
+        return _SingleFileResult(concepts=[], file_count=0, errors=[])
+    try:
+        concepts = extractor_fn(file_path, project_root)
+        return _SingleFileResult(concepts=concepts, file_count=1, errors=[])
+    except Exception as e:  # noqa: BLE001 — error isolation: single file failure doesn't block others
+        return _SingleFileResult(
+            concepts=[],
+            file_count=0,
+            errors=[f"Error extracting from {file_path}: {e}"],
+        )
+
+
+def _extract_from_root_source(
+    file_path: Path, extractor_fn: _RootExtractFn, project_root: Path
+) -> _SingleFileResult:
+    """Extract concepts using a root-based extractor with error isolation.
+
+    For extractors that take project_root instead of file_path (e.g., guardrails, glossary).
+
+    Args:
+        file_path: Path to check for existence.
+        extractor_fn: Function taking (project_root) -> list[Concept].
+        project_root: Project root directory.
+
+    Returns:
+        Extraction result with concepts, file count, and any errors.
+    """
+    if not file_path.exists():
+        return _SingleFileResult(concepts=[], file_count=0, errors=[])
+    try:
+        concepts = extractor_fn(project_root)
+        return _SingleFileResult(concepts=concepts, file_count=1, errors=[])
+    except Exception as e:  # noqa: BLE001 — error isolation: single file failure doesn't block others
+        label = file_path.stem  # e.g., "guardrails", "glossary"
+        return _SingleFileResult(
+            concepts=[], file_count=0, errors=[f"Error extracting {label}: {e}"]
+        )
 
 
 class GovernanceExtractor:
@@ -85,7 +149,7 @@ class GovernanceExtractor:
         for name, cls in parser_classes.items():
             try:
                 parsers.append(cls())
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:  # noqa: BLE001 — error isolation: skip broken parser, continue with others
                 logger.warning("Failed to instantiate parser '%s': %s", name, exc)
 
         nodes: list[GraphNode] = []
@@ -101,7 +165,7 @@ class GovernanceExtractor:
             try:
                 result = parser.parse(locator)
                 nodes.extend(result)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:  # noqa: BLE001 — error isolation: malformed file skipped, other artifacts still extracted
                 logger.warning(
                     "Error parsing '%s' with %s: %s",
                     locator.path,
@@ -146,7 +210,7 @@ class GovernanceExtractor:
                 )
 
         # ADR files — one locator per file (two directories)
-        for adr_dir in ["governance/adrs", "governance/adrs/v2"]:
+        for adr_dir in ["dev/decisions", "dev/decisions/v2"]:
             full_dir = root / adr_dir
             if full_dir.exists():
                 for adr_file in sorted(full_dir.glob("adr-*.md")):
@@ -160,7 +224,7 @@ class GovernanceExtractor:
                     )
 
         # Epic scope files — one locator per scope.md
-        for scope_file in sorted(root.glob(_EPIC_SCOPE_GLOB)):
+        for scope_file in sorted(root.glob("work/epics/*/scope.md")):
             rel = str(scope_file.relative_to(root))
             locators.append(
                 ArtifactLocator(
@@ -214,13 +278,12 @@ class GovernanceExtractor:
 
         if concept_type == ConceptType.REQUIREMENT:
             return extract_requirements(file_path, self.project_root)
-        elif concept_type == ConceptType.OUTCOME:
+        if concept_type == ConceptType.OUTCOME:
             return extract_outcomes(file_path, self.project_root)
-        elif concept_type == ConceptType.PRINCIPLE:
+        if concept_type == ConceptType.PRINCIPLE:
             return extract_principles(file_path, self.project_root)
-        else:
-            logger.warning(f"Unsupported concept type: {concept_type}")
-            return []
+        logger.warning(f"Unsupported concept type: {concept_type}")
+        return []
 
     def extract_with_result(self) -> ExtractionResult:
         """Extract all concepts and return detailed result.
@@ -236,91 +299,62 @@ class GovernanceExtractor:
         errors: list[str] = []
         files_processed = 0
 
-        # Extract from PRD
-        prd_file = self.project_root / "governance" / "prd.md"
-        if prd_file.exists():
-            try:
-                prd_concepts = extract_requirements(prd_file, self.project_root)
-                concepts.extend(prd_concepts)
-                files_processed += 1
-            except Exception as e:
-                errors.append(f"Error extracting from {prd_file}: {e}")
-
-        # Extract from Vision
-        vision_file = self.project_root / "governance" / "vision.md"
-        if vision_file.exists():
-            try:
-                vision_concepts = extract_outcomes(vision_file, self.project_root)
-                concepts.extend(vision_concepts)
-                files_processed += 1
-            except Exception as e:
-                errors.append(f"Error extracting from {vision_file}: {e}")
-
-        # Extract from Constitution
-        constitution_file = (
-            self.project_root / "framework" / "reference" / "constitution.md"
-        )
-        if constitution_file.exists():
-            try:
-                constitution_concepts = extract_principles(
-                    constitution_file, self.project_root
-                )
-                concepts.extend(constitution_concepts)
-                files_processed += 1
-            except Exception as e:
-                errors.append(f"Error extracting from {constitution_file}: {e}")
+        # Single-file extractions (PRD, Vision, Constitution, Roadmap)
+        single_file_sources: list[tuple[Path, _ExtractFn]] = [
+            (self.project_root / "governance" / "prd.md", extract_requirements),
+            (self.project_root / "governance" / "vision.md", extract_outcomes),
+            (
+                self.project_root / "framework" / "reference" / "constitution.md",
+                extract_principles,
+            ),
+            (self.project_root / "governance" / "roadmap.md", extract_releases),
+        ]
+        for file_path, extractor_fn in single_file_sources:
+            result = _extract_from_single_file(
+                file_path, extractor_fn, self.project_root
+            )
+            concepts.extend(result.concepts)
+            files_processed += result.file_count
+            errors.extend(result.errors)
 
         # Extract work concepts (E8)
         work_concepts = self._extract_work_concepts()
         concepts.extend(work_concepts)
         backlog_file = self.project_root / "governance" / "backlog.md"
         backlog_count = 1 if backlog_file.exists() else 0
-        epic_count = len(list(self.project_root.glob(_EPIC_SCOPE_GLOB)))
+        epic_count = len(list(self.project_root.glob("work/epics/*/scope.md")))
         files_processed += backlog_count + epic_count
 
         # Extract ADR decisions (E12)
         try:
             adr_concepts = extract_all_decisions(self.project_root)
             concepts.extend(adr_concepts)
-            adr_root_count = len(
-                list(self.project_root.glob("governance/adrs/adr-*.md"))
-            )
+            adr_root_count = len(list(self.project_root.glob("dev/decisions/adr-*.md")))
             adr_v2_count = len(
-                list(self.project_root.glob("governance/adrs/v2/adr-*.md"))
+                list(self.project_root.glob("dev/decisions/v2/adr-*.md"))
             )
             files_processed += adr_root_count + adr_v2_count
-        except Exception as e:
+        except (
+            Exception
+        ) as e:  # error isolation: ADR parse failure doesn't block other extractions
             errors.append(f"Error extracting ADRs: {e}")
 
-        # Extract Guardrails (E12 F12.2)
-        guardrails_file = self.project_root / "governance" / "guardrails.md"
-        if guardrails_file.exists():
-            try:
-                guardrail_concepts = extract_all_guardrails(self.project_root)
-                concepts.extend(guardrail_concepts)
-                files_processed += 1
-            except Exception as e:
-                errors.append(f"Error extracting guardrails: {e}")
-
-        # Extract Glossary terms (E12 F12.3)
-        glossary_file = self.project_root / "framework" / "reference" / "glossary.md"
-        if glossary_file.exists():
-            try:
-                term_concepts = extract_all_terms(self.project_root)
-                concepts.extend(term_concepts)
-                files_processed += 1
-            except Exception as e:
-                errors.append(f"Error extracting glossary terms: {e}")
-
-        # Extract Releases from roadmap
-        roadmap_file = self.project_root / "governance" / "roadmap.md"
-        if roadmap_file.exists():
-            try:
-                release_concepts = extract_releases(roadmap_file, self.project_root)
-                concepts.extend(release_concepts)
-                files_processed += 1
-            except Exception as e:
-                errors.append(f"Error extracting from {roadmap_file}: {e}")
+        # Root-based extractions (Guardrails, Glossary)
+        root_sources: list[tuple[Path, _RootExtractFn]] = [
+            (
+                self.project_root / "governance" / "guardrails.md",
+                extract_all_guardrails,
+            ),
+            (
+                self.project_root / "framework" / "reference" / "glossary.md",
+                extract_all_terms,
+            ),
+        ]
+        for file_path, root_fn in root_sources:
+            result = _extract_from_root_source(file_path, root_fn, self.project_root)
+            concepts.extend(result.concepts)
+            files_processed += result.file_count
+            errors.extend(result.errors)
 
         return ExtractionResult(
             concepts=concepts,
@@ -354,10 +388,10 @@ class GovernanceExtractor:
                 logger.info(
                     f"Extracted {len(epic_index)} epics from {backlog_file.name}"
                 )
-            except Exception as e:
+            except Exception as e:  # error isolation: backlog parse failure doesn't block epic/story extraction
                 logger.error(f"Error extracting from {backlog_file}: {e}")
 
-        for scope_file in self.project_root.glob(_EPIC_SCOPE_GLOB):
+        for scope_file in self.project_root.glob("work/epics/*/scope.md"):
             try:
                 epic_detail = extract_epic_details(scope_file, self.project_root)
                 if epic_detail:
@@ -374,7 +408,9 @@ class GovernanceExtractor:
                 stories = extract_stories(scope_file, self.project_root)
                 concepts.extend(stories)
                 logger.info(f"Extracted {len(stories)} stories from {scope_file.name}")
-            except Exception as e:
+            except (
+                Exception
+            ) as e:  # error isolation: one broken scope.md doesn't block other epics
                 logger.error(f"Error extracting from {scope_file}: {e}")
 
         return concepts
@@ -395,22 +431,21 @@ class GovernanceExtractor:
 
         if "prd" in file_name or "requirements" in file_name:
             return ConceptType.REQUIREMENT
-        elif "vision" in file_name:
+        if "vision" in file_name:
             return ConceptType.OUTCOME
-        elif "constitution" in file_name:
+        if "constitution" in file_name:
             return ConceptType.PRINCIPLE
-        elif "backlog" in file_name:
+        if "backlog" in file_name:
             return ConceptType.PROJECT
-        elif "epic" in file_name and "scope" in file_name:
+        if "epic" in file_name and "scope" in file_name:
             return ConceptType.EPIC
-        elif "guardrails" in file_name:
+        if "guardrails" in file_name:
             return ConceptType.GUARDRAIL
-        elif "glossary" in file_name:
+        if "glossary" in file_name:
             return ConceptType.TERM
-        elif "roadmap" in file_name:
+        if "roadmap" in file_name:
             return ConceptType.RELEASE
-        else:
-            raise ValueError(
-                f"Cannot infer concept type from file path: {file_path}. "
-                f"Specify concept_type explicitly."
-            )
+        raise ValueError(
+            f"Cannot infer concept type from file path: {file_path}. "
+            f"Specify concept_type explicitly."
+        )

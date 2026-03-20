@@ -81,7 +81,7 @@ class TestBacklogModels:
 # ── T2: YAML store fixtures ─────────────────────────────────────────────
 
 
-@pytest.fixture()
+@pytest.fixture
 def yaml_store(tmp_path: Path) -> Path:
     """Create a temp project with .raise/backlog/items/ YAML files."""
     items = tmp_path / ".raise" / "backlog" / "items"
@@ -117,7 +117,7 @@ def yaml_store(tmp_path: Path) -> Path:
     return tmp_path
 
 
-@pytest.fixture()
+@pytest.fixture
 def yaml_adapter(yaml_store: Path) -> FilesystemPMAdapter:
     return FilesystemPMAdapter(project_root=yaml_store)
 
@@ -510,7 +510,7 @@ class TestYamlIntegration:
     """T7: End-to-end scenario over YAML store."""
 
     def test_full_lifecycle(self, tmp_path: Path) -> None:
-        """create epic -> create story -> transition -> comment -> search."""
+        """Create epic -> create story -> transition -> comment -> search."""
         items = tmp_path / ".raise" / "backlog" / "items"
         items.mkdir(parents=True)
         a = FilesystemPMAdapter(project_root=tmp_path)

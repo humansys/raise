@@ -552,7 +552,6 @@ class TestMemoryDirPathTraversal:
         self, tmp_path: Path
     ) -> None:
         """append_pattern resolves ../ traversal — WriteResult.file_path is canonical."""
-
         sub = tmp_path / "sub"
         sub.mkdir()
         target = tmp_path / "memory"
@@ -573,7 +572,6 @@ class TestMemoryDirPathTraversal:
         self, tmp_path: Path
     ) -> None:
         """File is written to the resolved canonical path, not the traversal path."""
-
         sub = tmp_path / "sub"
         sub.mkdir()
         target = tmp_path / "memory"
