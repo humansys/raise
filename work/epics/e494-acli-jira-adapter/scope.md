@@ -67,12 +67,13 @@ project → instance → site. ACLI `auth switch` before calls when site differs
 
 **Dependencies:** S494.3 | **Completed:** 2026-03-19
 
-### S494.5: Delete MCP adapter and migrate entry point (S)
+### S494.5: Delete MCP adapter and migrate entry point (S) ✓
 
 Remove `McpJiraAdapter`, its tests, and MCP-specific dependencies.
 Register ACLI adapter as the sole `jira` entry point. Error on missing ACLI.
+-1115 LOC, quality review clean.
 
-**Dependencies:** S494.4
+**Dependencies:** S494.4 | **Completed:** 2026-03-20
 
 ## Done Criteria
 
@@ -135,8 +136,8 @@ Linear dependency chain. Each story builds on the previous. No parallelism.
 
 | Story | Status | Notes |
 | ----- | ------ | ----- |
-| S494.1 Spike | pending | |
-| S494.2 Core wrapper | pending | |
-| S494.3 Full protocol | pending | |
+| S494.1 Spike | ✓ done | ACLI JSON mapping validated |
+| S494.2 Core wrapper | ✓ done | _run_acli() + telemetry |
+| S494.3 Full protocol | ✓ done | 11 methods, 31 tests |
 | S494.4 Multi-instance | ✓ done | 85 est / 80 actual, 1.06x |
-| S494.5 Delete MCP | pending | |
+| S494.5 Delete MCP | ✓ done | 15 est / 20 actual, 1.33x, -1115 LOC |
