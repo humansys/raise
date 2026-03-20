@@ -59,12 +59,13 @@ All 11 `AsyncProjectManagementAdapter` methods via ACLI commands.
 
 **Dependencies:** S494.2 | **Completed:** 2026-03-19
 
-### S494.4: Multi-instance config and site switching (S)
+### S494.4: Multi-instance config and site switching (S) ✓
 
 Extend `jira.yaml` schema with `instances:` section. Adapter resolves
 project → instance → site. ACLI `auth switch` before calls when site differs.
+61 tests, 5 design decisions, research grounding (7 tools analyzed).
 
-**Dependencies:** S494.3
+**Dependencies:** S494.3 | **Completed:** 2026-03-19
 
 ### S494.5: Delete MCP adapter and migrate entry point (S)
 
@@ -137,5 +138,5 @@ Linear dependency chain. Each story builds on the previous. No parallelism.
 | S494.1 Spike | pending | |
 | S494.2 Core wrapper | pending | |
 | S494.3 Full protocol | pending | |
-| S494.4 Multi-instance | pending | |
+| S494.4 Multi-instance | ✓ done | 85 est / 80 actual, 1.06x |
 | S494.5 Delete MCP | pending | |
