@@ -549,7 +549,7 @@ class TestSearch:
         _run(adapter.search("project = RAISE ORDER BY created", limit=5))
 
         _, flags = _get_bridge_call_args(adapter)
-        assert flags["--jql"] == "project = RAISE ORDER BY created"
+        assert flags["--jql"] == 'project = "RAISE" ORDER BY created'
         assert flags["--limit"] == "5"
 
 
@@ -562,7 +562,7 @@ class TestToJql:
     def test_jql_passthrough(self) -> None:
         assert (
             to_jql("project = RAISE AND status = Done")
-            == "project = RAISE AND status = Done"
+            == 'project = "RAISE" AND status = Done'
         )
 
     def test_text_search(self) -> None:
@@ -571,7 +571,26 @@ class TestToJql:
     def test_escaped_operators(self) -> None:
         assert (
             to_jql("project = RAISE AND status \\!= Done")
-            == "project = RAISE AND status != Done"
+            == 'project = "RAISE" AND status != Done'
+        )
+
+    def test_reserved_word_project_value_quoted(self) -> None:
+        assert (
+            to_jql("project = RAISE AND status = Done")
+            == 'project = "RAISE" AND status = Done'
+        )
+
+    def test_already_quoted_project_unchanged(self) -> None:
+        assert (
+            to_jql('project = "RAISE" AND status = Done')
+            == 'project = "RAISE" AND status = Done'
+        )
+
+    def test_non_reserved_project_also_quoted(self) -> None:
+        """Quoting non-reserved words is safe and consistent."""
+        assert (
+            to_jql("project = MYPROJ AND status = Done")
+            == 'project = "MYPROJ" AND status = Done'
         )
 
 

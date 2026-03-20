@@ -44,6 +44,12 @@ _JQL_OPERATORS = re.compile(
     re.IGNORECASE,
 )
 _ISSUE_KEY = re.compile(r"^[A-Z][A-Z0-9_]+-\d+$")
+_UNQUOTED_PROJECT = re.compile(r"(project\s*=\s*)(?![\"'])(\w+)", re.IGNORECASE)
+
+
+def _quote_project_values(jql: str) -> str:
+    """Quote unquoted project values to avoid JQL reserved word errors."""
+    return _UNQUOTED_PROJECT.sub(r'\1"\2"', jql)
 
 
 def to_jql(query: str) -> str:
@@ -51,7 +57,7 @@ def to_jql(query: str) -> str:
 
     Rules (RAISE-552):
     - ``PROJECT-NNN`` issue key → ``issue = PROJECT-NNN``
-    - Query already containing JQL operators → pass through unchanged
+    - Query already containing JQL operators → pass through with project quoting
     - Plain text → ``text ~ "query"``
     - Escaped operators (``\!``) are unescaped before processing
     """
@@ -59,7 +65,7 @@ def to_jql(query: str) -> str:
     if _ISSUE_KEY.match(clean):
         return f"issue = {clean}"
     if _JQL_OPERATORS.search(clean):
-        return clean
+        return _quote_project_values(clean)
     return f'text ~ "{clean}"'
 
 
@@ -156,7 +162,7 @@ class AcliJiraAdapter:
 
     # ----- Site resolution -----
 
-    _PROJECT_IN_JQL = re.compile(r"project\s*=\s*[\"']?(\w+)")
+    _PROJECT_IN_JQL = re.compile(r"project\s*=\s*[\"']?(\w+)[\"']?")
 
     def _resolve_site(self, project_key: str) -> str:
         """Resolve project key → instance → site. Default on unknown."""
