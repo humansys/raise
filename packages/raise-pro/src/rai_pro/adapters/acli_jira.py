@@ -245,7 +245,9 @@ class AcliJiraAdapter:
             flags["--label"] = ",".join(issue.labels)
 
         result = await self._bridge.call(["workitem", "create"], flags, site=site)
-        return self._parse_result_envelope(result)
+        # ACLI create returns the full issue ({key, fields}), not an envelope
+        key = result.get("key", "")
+        return IssueRef(key=key, url=self.build_url(key))
 
     async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
         """Update issue fields via ``acli jira workitem edit``."""
@@ -331,6 +333,7 @@ class AcliJiraAdapter:
             ["workitem", "link", "create"],
             {"--out": source, "--in": target, "--type": link_type},
             site=site,
+            json_output=False,
         )
 
     # ----- Comments -----

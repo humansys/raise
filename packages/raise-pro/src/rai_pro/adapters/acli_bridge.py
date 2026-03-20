@@ -72,16 +72,21 @@ class AcliJiraBridge:
         flags: dict[str, str],
         *,
         site: str | None = None,
+        json_output: bool = True,
     ) -> Any:
-        """Execute ``acli jira <subcommand> <flags> --json`` and return parsed JSON.
+        """Execute ``acli jira <subcommand> <flags>`` and return parsed output.
 
         Args:
             subcommand: Command parts, e.g. ``["workitem", "search"]``.
             flags: Flag name → value mapping, e.g. ``{"--jql": "...", "--limit": "5"}``.
             site: Optional site for multi-instance. Triggers auth switch if needed.
+            json_output: Append ``--json`` flag and parse stdout as JSON.
+                Set to False for commands that don't support ``--json``
+                (e.g. ``workitem link create``).
 
         Returns:
-            Parsed JSON from stdout (dict or list).
+            Parsed JSON from stdout (dict or list), or raw stdout string
+            when ``json_output=False``.
 
         Raises:
             AcliBridgeError: On missing binary, non-zero exit, or JSON parse failure.
@@ -92,7 +97,8 @@ class AcliJiraBridge:
         cmd = [self._binary, "jira", *subcommand]
         for flag, value in flags.items():
             cmd.extend([flag, value])
-        cmd.append("--json")
+        if json_output:
+            cmd.append("--json")
 
         start = time.monotonic()
         success = False
@@ -111,6 +117,10 @@ class AcliJiraBridge:
                     or f"acli exited with code {proc.returncode}"
                 )
                 raise AcliBridgeError(err_msg)
+
+            if not json_output:
+                success = True
+                return stdout.decode().strip()
 
             try:
                 result: Any = json.loads(stdout)

@@ -309,16 +309,23 @@ RESULT_ENVELOPE = {
     "successCount": 1,
 }
 
+# ACLI create returns the full issue, not an envelope
+CREATE_RESPONSE: dict[str, Any] = {
+    "key": "RAISE-99",
+    "id": "12345",
+    "fields": {"summary": "Test issue", "status": {"name": "Backlog"}},
+}
+
 
 # ── Write ops ───────────────────────────────────────────────────────────────
 
 
 class TestCreateIssue:
-    """create_issue maps IssueSpec → ACLI flags, parses envelope → IssueRef."""
+    """create_issue maps IssueSpec → ACLI flags, parses full issue → IssueRef."""
 
     def test_creates_issue_with_correct_flags(self, tmp_path: Path) -> None:
         adapter = _adapter_with_mock_bridge(tmp_path)
-        _set_bridge_response(adapter, RESULT_ENVELOPE)
+        _set_bridge_response(adapter, CREATE_RESPONSE)
 
         spec = IssueSpec(summary="Test issue", issue_type="Story", labels=["backend"])
         result = _run(adapter.create_issue("RAISE", spec))
@@ -335,7 +342,7 @@ class TestCreateIssue:
 
     def test_passes_site_to_bridge(self, tmp_path: Path) -> None:
         adapter = _adapter_with_mock_bridge(tmp_path)
-        _set_bridge_response(adapter, RESULT_ENVELOPE)
+        _set_bridge_response(adapter, CREATE_RESPONSE)
 
         spec = IssueSpec(summary="Test", issue_type="Story")
         _run(adapter.create_issue("RAISE", spec))
@@ -346,7 +353,7 @@ class TestCreateIssue:
 
     def test_passes_rai_site_to_bridge(self, tmp_path: Path) -> None:
         adapter = _adapter_with_mock_bridge(tmp_path)
-        _set_bridge_response(adapter, RESULT_ENVELOPE)
+        _set_bridge_response(adapter, CREATE_RESPONSE)
 
         spec = IssueSpec(summary="Test", issue_type="Story")
         _run(adapter.create_issue("RAI", spec))
@@ -357,7 +364,7 @@ class TestCreateIssue:
 
     def test_creates_issue_with_description(self, tmp_path: Path) -> None:
         adapter = _adapter_with_mock_bridge(tmp_path)
-        _set_bridge_response(adapter, RESULT_ENVELOPE)
+        _set_bridge_response(adapter, CREATE_RESPONSE)
 
         spec = IssueSpec(summary="Test", description="Body text")
         _run(adapter.create_issue("RAISE", spec))
