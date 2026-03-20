@@ -162,7 +162,7 @@ class TestMainIntegration:
     """Tests for extension discovery wired into the main CLI app."""
 
     def test_help_works_with_no_extensions(self) -> None:
-        """rai --help should work normally when no extensions are installed."""
+        """Rai --help should work normally when no extensions are installed."""
         from typer.testing import CliRunner
 
         from raise_cli.cli.main import app as main_app
