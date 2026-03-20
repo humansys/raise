@@ -17,6 +17,7 @@ PIPELINE_ORDER: list[str] = [
     "environment",
     "developer",
     "project",
+    "acli",
     "adapters",
     "skills",
     "mcp",

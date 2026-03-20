@@ -33,5 +33,8 @@ jira = "rai_pro.adapters.acli_jira:AcliJiraAdapter"
 [project.entry-points."rai.docs.targets"]
 confluence = "rai_pro.adapters.mcp_confluence:McpConfluenceAdapter"
 
+[project.entry-points."rai.doctor.checks"]
+acli = "rai_pro.doctor.acli:AcliCheck"
+
 [project.entry-points."rai.hooks"]
 jira-sync = "rai_pro.hooks.jira_sync:JiraSyncHook"
