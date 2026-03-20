@@ -28,7 +28,7 @@ build-backend = "hatchling.build"
 packages = ["src/rai_pro"]
 
 [project.entry-points."rai.adapters.pm"]
-jira = "rai_pro.adapters.mcp_jira:McpJiraAdapter"
+jira = "rai_pro.adapters.acli_jira:AcliJiraAdapter"
 
 [project.entry-points."rai.docs.targets"]
 confluence = "rai_pro.adapters.mcp_confluence:McpConfluenceAdapter"
