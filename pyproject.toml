@@ -248,6 +248,7 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
+    "-m", "not integration",
     "--strict-markers",
     "--strict-config",
     "--cov=src/raise_cli",
