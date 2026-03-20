@@ -107,3 +107,65 @@ S609.4 (Integration run)  ← requiere S609.1 + S609.2 + S609.3
 - Bitbucket adapter → RAISE-610 si hay demanda post-piloto
 - Onboarding de segundo equipo → después de cerrar este
 - Guía de facilitación completa → no necesaria; el equipo ya sabe RaiSE
+
+---
+
+## Implementation Plan
+
+> Agregado por `/rai-epic-plan` — 2026-03-20
+
+### Story Sequence
+
+| Orden | Story | Tamaño | Dependencias | Milestone | Rationale |
+|:-----:|-------|:------:|--------------|-----------|-----------|
+| 1 | S609.1 Jira Adapter | S | Ninguna (RAISE-594 ✓) | M1 | Risk-first: el adapter de Jira es la pieza más crítica y ya está disponible. Si hay problemas de entorno en CuryGage, queremos saberlo el lunes, no el jueves |
+| 2 | S609.3 Skillset Scaffold | M | Ninguna (no necesita env de CuryGage) | M2 | Puede arrancar en paralelo con S609.1 o inmediatamente después. El scaffold se construye localmente y se lleva al env de ellos en S4 |
+| 3 | S609.2 Confluence Adapter | S | Emilio (externo) | M2 | Depende de que Emilio termine el adapter. Va en paralelo con S609.3. Si se retrasa, no bloquea el skillset |
+| 4 | S609.4 Integration Run | S | S609.1 + S609.2 + S609.3 | M3 | Requiere todo. Es la sesión 5 — la prueba de autonomía |
+
+### Milestones
+
+| Milestone | Stories | Target | Criterio de éxito |
+|-----------|---------|--------|-------------------|
+| **M1: Jira Live** | S609.1 | 2026-03-25 (martes) | `rai backlog search` retorna issues reales del Jira de CuryGage. Equipo corre ciclo completo sin ayuda de Fer |
+| **M2: Full Stack Ready** | +S609.2, +S609.3 | 2026-03-27 (jueves) | `rai docs publish` sube a Confluence. Skillset scaffold en su repo. Equipo modificó un skill autónomamente |
+| **M3: Autonomy Proven** | +S609.4 | 2026-03-28 (viernes) | Historia real cerrada end-to-end. Done criteria del epic todos verdes |
+
+### Streams de trabajo
+
+```
+Semana del 2026-03-24
+
+Lun 03-24   Mar 03-25   Mié 03-26   Jue 03-27   Vie 03-28
+────────────────────────────────────────────────────────────
+S609.1 ──────────────► M1
+(Jira adapter)         ↓
+                  S609.3 ──────────────►┐
+                  (Skillset)            │ M2
+                  S609.2 ──────────────►┤
+                  (Confluence*)         │
+                                        └──► S609.4 ──► M3
+                                             (Integration)
+* S609.2 depende de Emilio — si se retrasa, el stream de skillset no se bloquea
+```
+
+**Punto de merge crítico:** antes de S609.4 (viernes), verificar que S609.1 + S609.2 + S609.3
+están todos verdes. Si S609.2 no llegó, S609.4 se hace sin Confluence y se agenda una sesión
+adicional cuando el adapter esté listo.
+
+### Progress Tracking
+
+| Story | Tamaño | Estado | Sesiones | Actual | Notas |
+|-------|:------:|:------:|----------|:------:|-------|
+| S609.1 Jira Adapter | S | Pending | S1 + S2 | — | |
+| S609.2 Confluence Adapter | S | Pending | S3 | — | Depende de Emilio |
+| S609.3 Skillset Scaffold | M | Pending | S4 | — | |
+| S609.4 Integration Run | S | Pending | S5 | — | Requiere M2 completo |
+
+### Sequencing Risks
+
+| Riesgo | L/I | Mitigación |
+|--------|:---:|------------|
+| Confluence adapter no llega para S3 (lunes-martes) | M/H | S609.3 avanza igual; S609.2 se hace al final de la semana o semana siguiente |
+| Problemas de acceso/permisos en el Jira de CuryGage en S1 | M/M | Tener sandbox environment listo como fallback para validar el flujo técnico |
+| S609.3 tarda más (equipo indeciso sobre qué customizar) | L/M | Scope mínimo definido: 2 overrides (story-start, story-close). El resto es post-epic |
