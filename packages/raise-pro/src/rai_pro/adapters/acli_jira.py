@@ -225,6 +225,7 @@ class AcliJiraAdapter:
 
     async def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
         """Create a Jira issue via ``acli jira workitem create``."""
+        site = self._resolve_site(project_key)
         flags: dict[str, str] = {
             "--project": project_key,
             "--summary": issue.summary,
@@ -235,31 +236,33 @@ class AcliJiraAdapter:
         if issue.labels:
             flags["--label"] = ",".join(issue.labels)
 
-        result = await self._bridge.call(["workitem", "create"], flags)
+        result = await self._bridge.call(["workitem", "create"], flags, site=site)
         return self._parse_result_envelope(result)
 
     async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
         """Update issue fields via ``acli jira workitem edit``."""
+        site = self._resolve_site_from_key(key)
         flags: dict[str, str] = {"--key": key}
         for field, value in fields.items():
             flags[f"--{field}"] = str(value)
 
-        result = await self._bridge.call(["workitem", "edit"], flags)
+        result = await self._bridge.call(["workitem", "edit"], flags, site=site)
         return self._parse_result_envelope(result)
 
     async def transition_issue(self, key: str, status: str) -> IssueRef:
         """Transition issue status via ``acli jira workitem transition``."""
+        site = self._resolve_site_from_key(key)
         jira_status = normalize_status(status)
         flags = {"--key": key, "--status": jira_status}
 
-        result = await self._bridge.call(["workitem", "transition"], flags)
+        result = await self._bridge.call(["workitem", "transition"], flags, site=site)
         return self._parse_result_envelope(result)
 
     async def get_issue(self, key: str) -> IssueDetail:
         """Get full issue detail via ``acli jira workitem view``."""
-        # Key is positional for view: acli jira workitem view KEY --json
+        site = self._resolve_site_from_key(key)
         result = await self._bridge.call(
-            ["workitem", "view", key], {"--fields": "*all"}
+            ["workitem", "view", key], {"--fields": "*all"}, site=site
         )
         return self._parse_issue_detail(result)
 
@@ -269,9 +272,11 @@ class AcliJiraAdapter:
         ACLI returns a top-level array, not ``{issues: [...]}``.
         """
         jql = to_jql(query)
+        site = self._resolve_site_from_jql(jql)
         result = await self._bridge.call(
             ["workitem", "search"],
             {"--jql": jql, "--limit": str(limit)},
+            site=site,
         )
         issues = (
             cast("list[dict[str, Any]]", result) if isinstance(result, list) else []
@@ -287,10 +292,12 @@ class AcliJiraAdapter:
         failed: list[FailureDetail] = []
 
         for key in keys:
+            site = self._resolve_site_from_key(key)
             try:
                 result = await self._bridge.call(
                     ["workitem", "transition"],
                     {"--key": key, "--status": jira_status},
+                    site=site,
                 )
                 succeeded.append(self._parse_result_envelope(result))
             except Exception as exc:
@@ -302,25 +309,31 @@ class AcliJiraAdapter:
 
     async def link_to_parent(self, child_key: str, parent_key: str) -> None:
         """Set parent via ``acli jira workitem edit``."""
+        site = self._resolve_site_from_key(child_key)
         await self._bridge.call(
             ["workitem", "edit"],
             {"--key": child_key, "--parent": parent_key},
+            site=site,
         )
 
     async def link_issues(self, source: str, target: str, link_type: str) -> None:
         """Create link via ``acli jira workitem link create``."""
+        site = self._resolve_site_from_key(source)
         await self._bridge.call(
             ["workitem", "link", "create"],
             {"--out": source, "--in": target, "--type": link_type},
+            site=site,
         )
 
     # ----- Comments -----
 
     async def add_comment(self, key: str, body: str) -> CommentRef:
         """Add comment via ``acli jira workitem comment create``."""
+        site = self._resolve_site_from_key(key)
         result = await self._bridge.call(
             ["workitem", "comment", "create"],
             {"--key": key, "--body": body},
+            site=site,
         )
         envelope = self._parse_result_envelope(result)
         return CommentRef(id=envelope.key, url="")
@@ -331,9 +344,11 @@ class AcliJiraAdapter:
         ACLI comment format: ``{comments: [{id, author, body}]}``.
         ``created`` is missing — set to empty string (D3).
         """
+        site = self._resolve_site_from_key(key)
         result = await self._bridge.call(
             ["workitem", "comment", "list"],
             {"--key": key, "--limit": str(limit)},
+            site=site,
         )
         comments_data: list[dict[str, Any]] = result.get("comments", [])
         return [
@@ -350,4 +365,4 @@ class AcliJiraAdapter:
 
     async def health(self) -> AdapterHealth:
         """Delegate health check to AcliJiraBridge."""
-        return await self._bridge.health()
+        return await self._bridge.health(site=self._default_site)

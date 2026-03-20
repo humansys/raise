@@ -33,10 +33,12 @@ class TestCallSuccess:
             mock_asyncio.create_subprocess_exec = AsyncMock(return_value=proc)
 
             bridge = AcliJiraBridge(binary="acli")
-            result = _run(bridge.call(
-                ["workitem", "search"],
-                {"--jql": "project = RAI", "--limit": "1"},
-            ))
+            result = _run(
+                bridge.call(
+                    ["workitem", "search"],
+                    {"--jql": "project = RAI", "--limit": "1"},
+                )
+            )
 
         assert result == expected
 
@@ -128,3 +130,129 @@ class TestHealth:
             health = _run(bridge.health())
 
         assert health.healthy is False
+
+
+# ── Auth switching ─────────────────────────────────────────────────────────
+
+
+def _make_success_proc() -> AsyncMock:
+    """Create a mock subprocess that succeeds with empty JSON."""
+    proc = AsyncMock()
+    proc.communicate.return_value = (b"[]", b"")
+    proc.returncode = 0
+    return proc
+
+
+class TestAuthSwitching:
+    """call() runs acli jira auth switch when site differs from cached."""
+
+    def test_switches_site_on_first_call(self) -> None:
+        with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
+            switch_proc = _make_success_proc()
+            cmd_proc = _make_success_proc()
+            mock_asyncio.create_subprocess_exec = AsyncMock(
+                side_effect=[switch_proc, cmd_proc]
+            )
+
+            bridge = AcliJiraBridge(binary="acli")
+            _run(
+                bridge.call(
+                    ["workitem", "search"],
+                    {"--jql": "x"},
+                    site="humansys.atlassian.net",
+                )
+            )
+
+            calls = mock_asyncio.create_subprocess_exec.call_args_list
+            assert len(calls) == 2
+            # First call: auth switch
+            switch_args = calls[0][0]
+            assert "auth" in switch_args
+            assert "switch" in switch_args
+            assert "humansys.atlassian.net" in switch_args
+            # Second call: actual command
+            cmd_args = calls[1][0]
+            assert "workitem" in cmd_args
+
+    def test_skips_switch_when_same_site(self) -> None:
+        with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
+            switch_proc = _make_success_proc()
+            cmd_proc1 = _make_success_proc()
+            cmd_proc2 = _make_success_proc()
+            mock_asyncio.create_subprocess_exec = AsyncMock(
+                side_effect=[switch_proc, cmd_proc1, cmd_proc2]
+            )
+
+            bridge = AcliJiraBridge(binary="acli")
+            _run(
+                bridge.call(
+                    ["workitem", "search"],
+                    {"--jql": "x"},
+                    site="humansys.atlassian.net",
+                )
+            )
+            _run(
+                bridge.call(
+                    ["workitem", "view", "RAISE-1"],
+                    {},
+                    site="humansys.atlassian.net",
+                )
+            )
+
+            # 3 calls total: switch + cmd1 + cmd2 (no second switch)
+            assert mock_asyncio.create_subprocess_exec.call_count == 3
+
+    def test_switches_when_site_changes(self) -> None:
+        with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
+            procs = [_make_success_proc() for _ in range(4)]
+            mock_asyncio.create_subprocess_exec = AsyncMock(side_effect=procs)
+
+            bridge = AcliJiraBridge(binary="acli")
+            _run(
+                bridge.call(
+                    ["workitem", "search"],
+                    {"--jql": "x"},
+                    site="humansys.atlassian.net",
+                )
+            )
+            _run(
+                bridge.call(
+                    ["workitem", "search"],
+                    {"--jql": "y"},
+                    site="rai-agent.atlassian.net",
+                )
+            )
+
+            # 4 calls: switch1 + cmd1 + switch2 + cmd2
+            assert mock_asyncio.create_subprocess_exec.call_count == 4
+            calls = mock_asyncio.create_subprocess_exec.call_args_list
+            switch2_args = calls[2][0]
+            assert "rai-agent.atlassian.net" in switch2_args
+
+    def test_no_switch_without_site(self) -> None:
+        with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
+            cmd_proc = _make_success_proc()
+            mock_asyncio.create_subprocess_exec = AsyncMock(return_value=cmd_proc)
+
+            bridge = AcliJiraBridge(binary="acli")
+            _run(bridge.call(["workitem", "search"], {"--jql": "x"}))
+
+            # Only 1 call: the command itself (no switch)
+            assert mock_asyncio.create_subprocess_exec.call_count == 1
+
+    def test_switch_failure_raises(self) -> None:
+        with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
+            switch_proc = AsyncMock()
+            switch_proc.communicate.return_value = (b"", b"switch failed")
+            switch_proc.returncode = 1
+            mock_asyncio.create_subprocess_exec = AsyncMock(return_value=switch_proc)
+
+            bridge = AcliJiraBridge(binary="acli")
+            with pytest.raises(AcliBridgeError, match="switch failed"):
+                _run(
+                    bridge.call(
+                        ["workitem", "search"],
+                        {"--jql": "x"},
+                        site="bad.atlassian.net",
+                    )
+                )

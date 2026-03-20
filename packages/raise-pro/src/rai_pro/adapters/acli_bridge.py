@@ -37,6 +37,28 @@ class AcliJiraBridge:
 
     def __init__(self, binary: str = "acli") -> None:
         self._binary = binary
+        self._current_site: str | None = None
+
+    async def _switch_site(self, site: str) -> None:
+        """Run ``acli jira auth switch --site <site>`` if needed.
+
+        Raises:
+            AcliBridgeError: If the switch command fails.
+        """
+        if site == self._current_site:
+            return
+        cmd = [self._binary, "jira", "auth", "switch", "--site", site]
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        _, stderr = await proc.communicate()
+        if proc.returncode != 0:
+            err_msg = stderr.decode().strip() or f"auth switch to {site} failed"
+            raise AcliBridgeError(err_msg)
+        self._current_site = site
+        logger.debug("acli auth switched to %s", site)
 
     async def call(
         self,
@@ -50,7 +72,7 @@ class AcliJiraBridge:
         Args:
             subcommand: Command parts, e.g. ``["workitem", "search"]``.
             flags: Flag name → value mapping, e.g. ``{"--jql": "...", "--limit": "5"}``.
-            site: Optional site for multi-instance (reserved for S494.4).
+            site: Optional site for multi-instance. Triggers auth switch if needed.
 
         Returns:
             Parsed JSON from stdout (dict or list).
@@ -58,6 +80,9 @@ class AcliJiraBridge:
         Raises:
             AcliBridgeError: On missing binary, non-zero exit, or JSON parse failure.
         """
+        if site:
+            await self._switch_site(site)
+
         cmd = [self._binary, "jira", *subcommand]
         for flag, value in flags.items():
             cmd.extend([flag, value])
@@ -75,13 +100,18 @@ class AcliJiraBridge:
             stdout, stderr = await proc.communicate()
 
             if proc.returncode != 0:
-                err_msg = stderr.decode().strip() or f"acli exited with code {proc.returncode}"
+                err_msg = (
+                    stderr.decode().strip()
+                    or f"acli exited with code {proc.returncode}"
+                )
                 raise AcliBridgeError(err_msg)
 
             try:
                 result: Any = json.loads(stdout)
             except json.JSONDecodeError as exc:
-                raise AcliBridgeError(f"Failed to parse ACLI JSON output: {exc}") from exc
+                raise AcliBridgeError(
+                    f"Failed to parse ACLI JSON output: {exc}"
+                ) from exc
 
             success = True
             return result
@@ -105,20 +135,25 @@ class AcliJiraBridge:
                 )
             logger.debug(
                 "acli.call %s site=%s latency=%dms success=%s",
-                cmd_str, site, elapsed_ms, success,
+                cmd_str,
+                site,
+                elapsed_ms,
+                success,
             )
 
     async def health(self, site: str | None = None) -> AdapterHealth:
         """Check ACLI authentication status.
 
         Args:
-            site: Optional site to check (reserved for S494.4).
+            site: Optional site to switch to before checking.
 
         Returns:
             AdapterHealth with connectivity status.
         """
         start = time.monotonic()
         try:
+            if site:
+                await self._switch_site(site)
             cmd = [self._binary, "jira", "auth", "status"]
             proc = await asyncio.create_subprocess_exec(
                 *cmd,
