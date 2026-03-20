@@ -1,4 +1,4 @@
-# Epic RAISE-609: CuryGage RaiSE Onboarding — Scope
+# Epic RAISE-609: CuryGage RaiSE Integration — Scope
 
 > **Status:** IN PROGRESS
 > **Created:** 2026-03-20
@@ -7,83 +7,76 @@
 
 ## Objetivo
 
-Habilitar a un equipo de CuryGage para correr una historia de usuario completa
-(requerimiento → producción) usando RaiSE, con su propio stack (Jira, Confluence, Bitbucket)
-y un skillset tuneado a sus convenciones, en 5 sesiones facilitadas.
+Conectar el entorno de trabajo de CuryGage (Jira + Confluence) a RaiSE vía adapters,
+y entregarles un skillset scaffold propio que puedan evolucionar de forma autónoma.
 
-**Valor desbloqueado:** CuryGage ve RaiSE como metodología end-to-end, no solo como herramienta de
-coding. Jorge (stakeholder) puede evidenciar mejora en todo el proceso, desde cómo llega un
-requerimiento hasta cómo se entrega.
+**Contexto clave:** CuryGage ya lleva ~1 mes con RaiSE. Saben el flujo. No necesitan intro.
+Lo que necesitan es dejar de usar workarounds para Jira/Confluence y tener skills que
+reflejen sus propias convenciones.
+
+**Valor desbloqueado:** El equipo trabaja con sus herramientas reales desde `rai backlog` y
+`rai docs`, y puede agregar o modificar sus propios skills sin depender de HumanSys.
 
 ## Stories
 
 | ID | Historia | Tamaño | Estado | Descripción |
 |----|----------|:------:|:------:|-------------|
-| S609.1 | Session Plan | S | Pending | Plan de 5 sesiones: objetivos, agenda y outputs por sesión |
-| S609.2 | Repo Bootstrap | S | Pending | `rai init --detect` + bootstrap de governance en su repo |
-| S609.3 | Adapter Validation | S | Pending | Jira (ACLI) + Confluence funcionando en su entorno |
-| S609.4 | Custom Skillset | M | Pending | Skillset CuryGage: skills genéricos tuneados a sus convenciones |
-| S609.5 | Demo Story + Facilitation Guide | S | Pending | Historia demo real + guía de facilitación para Fer |
+| S609.1 | Adapter Setup | S | Pending | Jira (ACLI) + Confluence validados en su entorno |
+| S609.2 | Skillset Scaffold | M | Pending | Fork del skillset base con estructura para que ellos customicen |
+| S609.3 | Integration Validation | S | Pending | Historia corrida end-to-end con sus adapters + su skillset |
 
-**Total:** 5 stories
+**Total:** 3 stories
 
 ## Dependencias
 
 ```
-S609.1 (session plan — paralelo, es solo un doc)
-
-S609.2 (repo bootstrap — fundación técnica)
+S609.1 (adapters — fundación técnica)
     ↓
-S609.3 (adapters)   S609.4 (skillset)   ← ambas dependen de S609.2
-         ↓                ↓
-              S609.5 (demo + guía)
+S609.2 (skillset — puede avanzar en paralelo)
+    ↓
+S609.3 (validación — requiere S609.1 + S609.2)
 ```
 
 **Externos:**
-- Emilio entrega: ACLI backlog adapter (RAISE-594 ✓) + Confluence adapter (en progreso)
-- CuryGage facilita: acceso a su repo + instancias de Jira/Confluence
+- Emilio: Confluence adapter (en progreso, RAISE-594 ya tiene ACLI/Jira ✓)
+- CuryGage: acceso a su Jira, Confluence, y al menos un repo donde hacer el init
 
 ## Scope
 
 **In scope (MUST):**
-- Plan de 5 sesiones con objetivos medibles por sesión
-- `rai init --detect` funcionando en su repo
-- Jira y Confluence conectados vía adapters
-- Skillset base CuryGage en su repo
-- Una historia corrida de punta a punta como demostración en sesión 5
-- Guía de facilitación para que Fer pueda correr las sesiones solo
+- `rai backlog search/get/transition` funcionando con su Jira
+- `rai docs publish` funcionando con su Confluence
+- Skillset scaffold en su repo: estructura de directorios + 2-3 skills base overrideados
+- Guía corta: cómo agregar/modificar un skill en su repo
 
 **In scope (SHOULD):**
-- Awareness de Bitbucket como delivery pipeline (no integración profunda)
-- Handoff doc para autonomía post-programa
+- Sesión de trabajo conjunto para validar adapters en vivo
+- Historia end-to-end con sus herramientas como prueba de integración
 
 **Out of scope:**
-- Nuevas features en el CLI — usar 2.2.4 existente
-- Onboarding de múltiples equipos — piloto primero, luego escalar
-- Adaptadores más allá de Jira/Confluence — fuera del v1
-- Integración CI/CD con Bitbucket — es el delivery pipeline de ellos, no RaiSE
+- Introducción a RaiSE — ya la saben
+- Nuevas features en el CLI — usar 2.2.4
+- Adapters adicionales (Bitbucket, Slack, etc.) — post-piloto si hay demanda
 
 ## Done Criteria
 
-**Epic completo:**
-- [ ] Plan de sesiones revisado y aprobado por Emilio
-- [ ] `rai init` corre sin errores en el repo de CuryGage
-- [ ] `rai backlog search` retorna issues de su Jira
-- [ ] `rai docs publish` sube a su Confluence
-- [ ] Skillset CuryGage commiteado en su repo
-- [ ] Sesión 5 completada: equipo corre historia autónomamente
+- [ ] `rai backlog search` retorna issues del Jira de CuryGage
+- [ ] `rai docs publish` sube documento al Confluence de CuryGage
+- [ ] Skillset scaffold commiteado en su repo con al menos un skill customizado
+- [ ] Guía de "cómo modificar un skill" entregada
+- [ ] Una historia corrida end-to-end con sus adapters + skillset (S609.3)
 - [ ] Retrospectiva del epic completada
 
 ## Riesgos
 
 | Riesgo | L/I | Mitigación |
 |--------|:---:|------------|
-| Confluence adapter no listo a tiempo (Emilio lo está haciendo) | M/H | Sesión 3 puede hacer read-only; publicar a Confluence en sesión 4-5 |
-| Acceso al entorno de CuryGage lento de conseguir | M/H | Hacer S609.2-3 en entorno staging/sandbox primero |
-| Equipo CuryGage resiste el proceso ("muy ceremonioso") | L/H | Enfatizar: el proceso es lo que hace predecible la IA, no burocracia |
+| Confluence adapter no listo para la fecha | M/H | Arrancar con Jira solo; Confluence se agrega cuando esté |
+| Acceso al entorno de CuryGage tarda en gestionarse | M/M | Preparar skillset scaffold sin acceso; adapters se validan cuando llegue el acceso |
+| Equipo quiere customizar todo de golpe | L/M | Dar el scaffold mínimo; dejar que sus propias necesidades guíen la evolución |
 
 ## Parking Lot
 
-- Bitbucket adapter (integración con su pipeline) → RAISE-610 si hay demanda post-piloto
-- Onboarding de segundo equipo → después de validar el piloto
-- Ontology extractor para el método de CuryGage → fuera de scope, es iniciativa de Emilio
+- Bitbucket adapter → RAISE-610 si hay demanda post-piloto
+- Onboarding de segundo equipo de CuryGage → después de validar este
+- Guía de facilitación para sesiones → no necesaria si el equipo ya sabe RaiSE

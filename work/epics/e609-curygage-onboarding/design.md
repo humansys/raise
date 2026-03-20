@@ -1,154 +1,128 @@
 ---
 epic_id: "RAISE-609"
 grounded_in: "Transcript daily 2026-03-20, brief.md, RAISE-594 (ACLI adapter)"
+corrected: "2026-03-20 — CuryGage ya sabe RaiSE, scope reducido a integración"
 ---
 
-# Epic Design: CuryGage RaiSE Onboarding
+# Epic Design: CuryGage RaiSE Integration
 
-## ¿Por qué este diseño existe?
+## Contexto que cambia todo
 
-Este no es un epic de desarrollo de software — es un epic de **habilitación metodológica**.
-El output principal no es código nuevo en raise-commons, sino un equipo de CuryGage que puede
-correr RaiSE de forma autónoma con su propio toolstack.
+CuryGage lleva ~1 mes usando RaiSE. Ya corren historias. Ya conocen los skills.
+El diseño original asumía un onboarding desde cero — eso era incorrecto.
 
-La pregunta central de diseño no es "¿cómo construimos X?" sino
-**"¿cómo enseñamos RaiSE de forma que quede?"**
+**El problema real no es enseñar RaiSE. Es conectar sus herramientas.**
 
----
-
-## Gemba — Lo que existe para construir encima
-
-| Componente | Estado actual | Rol en este epic |
-|------------|---------------|-----------------|
-| `rai init --detect` | ✓ En 2.2.4 | Detecta convenciones del repo de CuryGage automáticamente |
-| ACLI backlog adapter (RAISE-594) | ✓ Mergeado en dev | Conecta `rai backlog` con el Jira de ellos |
-| Confluence adapter | 🔄 Emilio lo está haciendo | Permite `rai docs publish` a su Confluence |
-| Skillset ecosystem (RAISE-242/476) | ✓ En 2.2.4 | Base para crear el skillset personalizado de CuryGage |
-| `/rai-story-run` skill chain | ✓ Existente | El flujo que correremos en sesión 5 |
-| `.raise/templates/` | ✓ En 2.2.4 | Governance templates que se populan en el init |
-
-**Conclusión:** No necesitamos construir nada nuevo. El epic es conectar las piezas existentes
-al contexto de CuryGage y enseñar a usarlas.
+Hoy trabajan con workarounds: sus issues de Jira los manejan fuera del flujo de RaiSE,
+su documentación va a Confluence manualmente. El epic resuelve esa fricción.
 
 ---
 
-## Decisión de Diseño #1: Secuencia de las sesiones
+## Gemba — Lo que existe
 
-**El principio de aprendizaje que aplica aquí se llama "desafío con soporte".**
-Si empezamos con customización, el equipo no tiene contexto para decidir qué customizar.
-Si empezamos solo con teoría, se aburren antes de ver valor.
+| Componente | Estado | Rol en este epic |
+|------------|--------|-----------------|
+| ACLI backlog adapter (RAISE-594) | ✓ En dev/2.2.4 | Conecta `rai backlog` con Jira de CuryGage |
+| Confluence adapter | 🔄 Emilio en progreso | Conecta `rai docs publish` con su Confluence |
+| Skillset ecosystem (`rai skill set`) | ✓ En 2.2.4 | Mecanismo para crear y distribuir skillsets |
+| Skills base en `.claude/skills/` | ✓ Existentes | Punto de partida para el fork de CuryGage |
+| `rai init --detect` | ✓ En 2.2.4 | Detecta convenciones existentes del repo |
 
-La secuencia correcta es: **experiencia primero, abstracción después**.
+**Lo que NO necesitamos construir:** lógica nueva en el CLI. Todo existe.
+Este epic es configuración + scaffold + validación.
+
+---
+
+## S609.1 — Adapter Setup: ¿qué implica realmente?
+
+El ACLI Jira adapter requiere que el entorno de CuryGage tenga:
+- `atlassian-plugin-sdk` o ACLI instalado y autenticado con su instancia
+- Variables de entorno o `.raise/jira.yaml` apuntando a su Jira
+
+El flujo de validación es secuencial:
 
 ```
-Sesión 1 — Orientación: ¿Qué es RaiSE y por qué?
-    ↓
-    Aquí entendemos el "por qué" — la metodología lean, el flujo completo.
-    Sin herramientas aún. Solo conversación y tour.
-
-Sesión 2 — Primera historia: correr el flujo con skills genéricos
-    ↓
-    Aquí sienten el ciclo. /rai-story-run con una historia pequeña.
-    Ven el output: scope, plan, commits, retrospectiva.
-
-Sesión 3 — Integración: conectar su Jira y Confluence
-    ↓
-    Ahora que saben qué hace el flujo, conectamos sus herramientas.
-    rai backlog muestra sus issues reales. rai docs publica a su Confluence.
-
-Sesión 4 — Customización: crear su propio skillset
-    ↓
-    Solo hasta aquí customizamos. Ya saben qué cambiar y por qué.
-    Workshop: revisar skills genéricos, identificar gaps, crear CuryGage skillset.
-
-Sesión 5 — Prueba autónoma: historia real de su backlog
-    ↓
-    Con sus skills, sus adapters, su repo. Fer observa, no facilita.
-    Jorge (stakeholder) puede estar presente para ver el output.
+1. rai adapter list              → confirmar que jira aparece
+2. rai adapter check             → validar que el adapter pasa protocol checks
+3. rai backlog search "type = Story" -a jira   → retorna issues reales
+4. rai backlog get <KEY>         → detalle de un issue
+5. rai backlog transition <KEY> in-progress    → write test
 ```
 
-**Por qué este orden y no otro:**
-- Customizar antes de experimentar → decisiones sin contexto
-- Integrar antes de entender el flujo → confusión sobre qué integra con qué
-- Sesión 5 autónoma → la prueba real de que aprendieron, no solo siguieron instrucciones
+Si Confluence está listo: mismo patrón con `rai docs publish`.
+Si no: documentar el estado, no bloquear S609.2.
 
 ---
 
-## Decisión de Diseño #2: Un equipo piloto, no todos
+## S609.2 — Skillset Scaffold: ¿qué es lo mínimo útil?
 
-**Tentación:** onboardear varios equipos simultáneamente para ir más rápido.
+El objetivo no es darles un skillset completo — es darles la **estructura correcta**
+para que ellos lo evolucionen. Un skillset sobreingenierado que no entienden es peor
+que uno mínimo que pueden mantener.
 
-**Por qué no:** El skillset y las convenciones de governance se definen durante el onboarding.
-Si múltiples equipos lo hacen en paralelo, convergen en convenciones distintas y después
-hay que hacer un trabajo de normalización costoso.
-
-**Regla:** Piloto con un equipo → validar → escalar. El segundo equipo llega con un
-skillset ya probado y una facilitation guide ya escrita.
-
----
-
-## Decisión de Diseño #3: Skills genéricos primero, customización al final
-
-**Rabbit hole a evitar:** crear el skillset perfecto de CuryGage antes de que hayan
-usado los skills genéricos.
-
-**Por qué importa:** Los skills genéricos representan años de iteración sobre qué funciona.
-CuryGage solo necesita customizar lo que *genuinamente* choca con su contexto — no todo.
-Si customizamos primero, terminamos manteniendo una divergencia innecesaria.
-
-**Criterio de customización en sesión 4:**
-> "¿Esto choca con algo específico de CuryGage, o solo se siente diferente?"
-> Solo customizar lo que choca.
-
----
-
-## Artifacts del epic — ¿qué producimos?
-
-| Artifact | Quién lo usa | Cuándo |
-|----------|-------------|--------|
-| Plan de sesiones (`S609.1`) | Emilio para aprobar, Fer para facilitar | Antes de la semana de onboarding |
-| Repo bootstrappeado (`S609.2`) | Equipo CuryGage | Desde sesión 1 |
-| Adapters validados (`S609.3`) | Equipo CuryGage en sesión 3+ | Sesión 3 en adelante |
-| Skillset CuryGage (`S609.4`) | Equipo CuryGage en sesión 4+ | Sesión 4 en adelante |
-| Demo story + facilitation guide (`S609.5`) | Fer (guía), equipo CuryGage (la corre) | Sesión 5 |
-
----
-
-## Estructura del skillset CuryGage (S609.4)
-
-El skillset no se crea desde cero — se crea como **fork del skillset base** de RaiSE
-con overrides específicos para CuryGage. La estructura esperada:
+**Scaffold mínimo útil:**
 
 ```
 .claude/skills/
-  rai-story-start/     ← override: título en formato CuryGage
-  rai-story-run/       ← override: incluye paso de Jira/Confluence automático
-  curygage-story-start/  ← skill nuevo si tienen proceso específico de inicio
+  curygage-story-start/
+    SKILL.md          ← override con su convención de nombres de branch
+  curygage-story-close/
+    SKILL.md          ← override con su política de merge (PR a Bitbucket)
+  rai-session-start/  ← override opcional si tienen contexto propio
+    SKILL.md
 ```
 
-**Criterio de inclusión:** un skill entra al skillset de CuryGage solo si tiene
-una diferencia observable con el genérico. Si la única diferencia es el nombre de la empresa
-en algún template, no merece un override.
+**Por qué solo story-start y story-close:**
+Son los dos puntos donde sus convenciones divergen más de los genéricos:
+- `story-start`: naming de branches, convención de Jira keys
+- `story-close`: merge policy, PR a Bitbucket en lugar de GitLab
+
+El resto de los skills (design, plan, implement, review) es suficientemente genérico
+para usarlos sin cambios. Si necesitan overrides adicionales, ellos mismos los agregarán.
+
+**La guía de "cómo modificar un skill" debe responder:**
+1. ¿Dónde va el archivo?
+2. ¿Qué estructura tiene un SKILL.md?
+3. ¿Cómo sabe RaiSE cuál skill usar (lookup order)?
+4. ¿Cómo valido que mi skill funciona? (`rai skill validate`)
 
 ---
 
-## Facilitación (para Fer)
+## S609.3 — Integration Validation: la prueba real
 
-Este epic tiene un actor clave que no es el usuario típico: **Fer como facilitador**.
-El facilitation guide (S609.5) debe responder:
+No es una demo preparada — es correr una historia real de su backlog con:
+- `rai backlog get <KEY>` para leer el issue
+- `/rai-story-run` completo con sus skills
+- `rai docs publish` al final hacia Confluence
 
-1. **¿Qué hace Fer si el ambiente falla en sesión 2?** → fallback: correr en repo sandbox
-2. **¿Qué hace Fer si el equipo se dispersa?** → redirigir al parking lot, igual que Rai hace con Fer
-3. **¿Cómo maneja Fer preguntas sobre features que no existen?** → parking lot para post-piloto
-4. **¿Cómo sabe Fer que sesión 5 fue exitosa?** → equipo corrió la historia sin intervención de Fer
+Si algo falla aquí, es un bug real que hay que resolver antes de considerar el epic cerrado.
 
 ---
 
-## Sin ADRs formales
+## Decisión: ¿cuántas sesiones de trabajo conjunto?
 
-Este epic no requiere ADRs. Las tres decisiones de diseño arriba (secuencia, piloto único,
-customización al final) son decisiones de metodología pedagógica, no de arquitectura de software.
-Son reversibles con bajo costo y no tienen dependencias con otros epics técnicos.
+Con el scope corregido, no necesitamos 5 sesiones. El esquema realista:
 
-Si en S609.4 descubrimos que el skillset de CuryGage requiere cambios en el CLI,
-**ese hallazgo se convierte en un ticket nuevo**, no en scope de este epic.
+```
+Sesión A (½ día) — Adapter Setup
+  Objetivo: rai backlog + rai docs funcionando en su entorno
+  Quién: Fer + un dev de CuryGage con acceso admin a Jira/Confluence
+
+Sesión B (½ día) — Skillset Workshop
+  Objetivo: revisar scaffold juntos, ellos hacen el primer ajuste
+  Quién: Fer + el equipo que mantendrá el skillset
+
+Sesión C (opcional, 1-2h) — Integration Run
+  Objetivo: historia real end-to-end como validación
+  Quién: el equipo de CuryGage, Fer observando
+```
+
+**Sesión C es opcional** si A y B salen bien y el equipo ya tiene confianza.
+La autonomía es el objetivo, no la supervisión.
+
+---
+
+## Sin ADRs
+
+No hay decisiones de arquitectura de software en este epic.
+Las decisiones de diseño arriba son de alcance y de entrega — no requieren ADR formal.

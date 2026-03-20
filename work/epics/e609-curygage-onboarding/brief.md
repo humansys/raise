@@ -1,46 +1,46 @@
 ---
 epic_id: "RAISE-609"
-title: "CuryGage RaiSE Onboarding — lean delivery from requirement to production"
+title: "CuryGage RaiSE Integration — Jira, Confluence y custom skillset"
 status: "active"
 created: "2026-03-20"
 ---
 
 # Epic Brief: CuryGage RaiSE Onboarding
 
+## Contexto
+CuryGage lleva ~1 mes usando RaiSE. Ya conocen el flujo, ya han desarrollado con los skills
+genéricos. No necesitan intro a la metodología. Lo que falta es conectar sus herramientas
+corporativas y darles un skillset propio que puedan mantener ellos mismos.
+
 ## Hypothesis
-For CuryGage technical leaders who need to deliver software predictably and transparently,
-a guided RaiSE onboarding is a structured enablement program
-that takes them from business requirement to production using lean methodology.
-Unlike generic AI-assisted development, our solution gives them a custom skillset tuned
-to their tools (Jira, Confluence, Bitbucket) and their own process conventions.
+Para un equipo de CuryGage que ya usa RaiSE con skills genéricos,
+integrar Jira y Confluence como adapters y entregarles un skillset scaffold propio
+les permite trabajar con sus herramientas reales en lugar de workarounds,
+y evolucionar sus skills sin depender de HumanSys.
 
 ## Success Metrics
-- **Leading:** One team runs a complete user story end-to-end (requirement → production) using RaiSE within session 5
-- **Lagging:** Team can autonomously run `/rai-story-run` with their custom skillset without facilitation after the program
+- **Leading:** `rai backlog search` retorna issues de su Jira; `rai docs publish` sube a su Confluence
+- **Lagging:** Equipo ajusta y hace commit de un skill propio sin ayuda de Fer en los 7 días siguientes
 
 ## Appetite
-M — 5 sessions + prep work. Target: 1 week with one pilot team.
+S — prep + 2-3 sesiones de trabajo conjunto. El equipo ya sabe usar RaiSE.
 
 ## Scope Boundaries
 ### In (MUST)
-- RaiSE onboarding plan: 5 structured sessions with objectives, agenda, and expected outputs
-- Jira adapter working in their environment (ACLI-based, just completed by Emilio)
-- Confluence adapter working for their documentation
-- Custom skillset scaffold tuned to CuryGage conventions
-- `rai init --detect` on their repo + governance bootstrap
-- One complete story run as live demo in sessions
+- Jira adapter validado en su entorno (ACLI-based, ya disponible en 2.2.4)
+- Confluence adapter validado en su entorno (Emilio lo está terminando)
+- Custom skillset scaffold: fork del skillset base, listo para que ellos lo ajusten
+- Guía de cómo agregar/modificar skills en su propio repo
 
 ### In (SHOULD)
-- Bitbucket integration awareness (delivery pipeline)
-- Session facilitation guide for Fer to run the onboarding solo
-- Handoff docs so team can continue autonomously post-program
+- Una sesión de trabajo conjunto para validar que los adapters funcionen en su env
+- Una historia corrida con sus adapters + su skillset para confirmar integración end-to-end
 
 ### No-Gos
-- Building new CLI features during onboarding — use what exists
-- Onboarding all teams simultaneously — pilot one team first
-- Custom adapters beyond Jira/Confluence — out of scope for v1
+- Introducir RaiSE desde cero — ya lo saben, no repetir
+- Nuevas features en el CLI — usar 2.2.4 existente
+- Adapters más allá de Jira/Confluence en esta fase
 
 ### Rabbit Holes
-- Perfecting Bitbucket integration before validating Jira/Confluence basics
-- Over-customizing skillset before team has used the generic ones
-- Spending time on Telegram/ontology extractor work (Emilio's lane, not this epic)
+- Customizar demasiado el skillset antes de que ellos mismos identifiquen sus necesidades
+- Esperar a que el Confluence adapter esté perfecto — se puede arrancar con Jira solo
