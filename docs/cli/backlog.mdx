@@ -9,43 +9,36 @@ Manage backlog items via `ProjectManagementAdapter`. The adapter (Jira, filesyst
 
 ### Machine Requirements
 
-The Jira adapter requires [`uv`](https://docs.astral.sh/uv/) on the system PATH. When `rai backlog` runs against Jira, it spawns `mcp-atlassian` via `uvx` — no manual install of `mcp-atlassian` needed, but `uv`/`uvx` must be available.
+The Jira adapter requires [Atlassian CLI (ACLI)](https://developer.atlassian.com/cli) installed and authenticated.
 
 ```bash
-# Verify uv is installed
-uvx --version
+# Verify ACLI is installed
+acli --version
+
+# Authenticate (opens browser for OAuth)
+acli jira auth login --site your-org.atlassian.net
 ```
 
-### Environment Variables
-
-Set these before running any `rai backlog` command that targets Jira:
-
-| Variable | Description |
-|----------|-------------|
-| `JIRA_URL` | Your Jira instance URL, e.g. `https://your-org.atlassian.net` |
-| `JIRA_USERNAME` | Your Jira account email |
-| `JIRA_API_TOKEN` | Jira API token (also accepted as `JIRA_TOKEN`) |
-
-```bash
-export JIRA_URL=https://your-org.atlassian.net
-export JIRA_USERNAME=you@example.com
-export JIRA_API_TOKEN=your-api-token
-```
-
-Generate an API token at **Atlassian Account → Security → API tokens**.
+For detailed setup, multi-instance configuration, and troubleshooting, see the **[Jira Adapter Guide](/docs/guides/jira-adapter)**.
 
 ### Project Configuration
 
-**`.raise/jira.yaml`** — Required for `rai backlog transition`. The adapter reads `workflow.status_mapping` to resolve status names to Jira transition IDs.
+**`.raise/jira.yaml`** — Required. Defines Jira instances and project routing.
 
 ```yaml
-# .raise/jira.yaml
-workflow:
-  status_mapping:
-    backlog: 11
-    selected: 21
-    in-progress: 31
-    done: 41
+# .raise/jira.yaml (minimal)
+default_instance: myorg
+
+instances:
+  myorg:
+    site: myorg.atlassian.net
+    email: you@myorg.com
+    projects: [PROJ]
+
+projects:
+  PROJ:
+    instance: myorg
+    name: My Project
 ```
 
 **`.raise/manifest.yaml`** — Set the default adapter so you don't need `-a jira` on every command:
@@ -89,12 +82,12 @@ If your project key is a reserved JQL keyword, quote it: `project = "MYPROJECT"`
 
 ### Status names for `transition`
 
-Use the lowercase keys from your `jira.yaml` `status_mapping`:
+Status names are converted by convention: `in-progress` → `In Progress`, `done` → `Done`. Use lowercase with hyphens:
 
 | Status name | Jira state |
 |-------------|-----------|
 | `backlog` | Backlog |
-| `selected` | Selected for Development |
+| `selected` | Selected For Development |
 | `in-progress` | In Progress |
 | `done` | Done |
 
