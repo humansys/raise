@@ -109,6 +109,21 @@ projects:
         with pytest.raises(ValueError, match="default_instance"):
             _make_adapter(tmp_path, yaml_no_default)
 
+    def test_raises_on_invalid_default_instance(self, tmp_path: Path) -> None:
+        yaml_bad_default = """\
+default_instance: nonexistent
+instances:
+  humansys:
+    site: humansys.atlassian.net
+    projects: [RAISE]
+projects:
+  RAISE:
+    instance: humansys
+    name: RAISE
+"""
+        with pytest.raises(ValueError, match="nonexistent.*not found.*instances"):
+            _make_adapter(tmp_path, yaml_bad_default)
+
     def test_raises_on_project_without_instance(self, tmp_path: Path) -> None:
         yaml_no_proj_instance = """\
 default_instance: humansys
@@ -191,6 +206,11 @@ class TestSiteResolution:
             adapter._resolve_site_from_jql('text ~ "something"')
             == "humansys.atlassian.net"
         )  # pyright: ignore[reportPrivateUsage]
+
+    def test_malformed_key_returns_default_silently(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        # No dash → no project extraction → default, no warning
+        assert adapter._resolve_site_from_key("malformed") == "humansys.atlassian.net"  # pyright: ignore[reportPrivateUsage]
 
     def test_resolve_from_jql_quoted_project(self, tmp_path: Path) -> None:
         adapter = _make_adapter(tmp_path)
@@ -312,6 +332,28 @@ class TestCreateIssue:
         assert flags["--project"] == "RAISE"
         assert flags["--summary"] == "Test issue"
         assert flags["--type"] == "Story"
+
+    def test_passes_site_to_bridge(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, RESULT_ENVELOPE)
+
+        spec = IssueSpec(summary="Test", issue_type="Story")
+        _run(adapter.create_issue("RAISE", spec))
+
+        call: AsyncMock = adapter._bridge.call  # pyright: ignore[reportPrivateUsage, reportAssignmentType]
+        _, kwargs = call.call_args[0], call.call_args[1]
+        assert kwargs["site"] == "humansys.atlassian.net"
+
+    def test_passes_rai_site_to_bridge(self, tmp_path: Path) -> None:
+        adapter = _adapter_with_mock_bridge(tmp_path)
+        _set_bridge_response(adapter, RESULT_ENVELOPE)
+
+        spec = IssueSpec(summary="Test", issue_type="Story")
+        _run(adapter.create_issue("RAI", spec))
+
+        call: AsyncMock = adapter._bridge.call  # pyright: ignore[reportPrivateUsage, reportAssignmentType]
+        _, kwargs = call.call_args[0], call.call_args[1]
+        assert kwargs["site"] == "rai-agent.atlassian.net"
 
     def test_creates_issue_with_description(self, tmp_path: Path) -> None:
         adapter = _adapter_with_mock_bridge(tmp_path)

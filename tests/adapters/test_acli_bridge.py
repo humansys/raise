@@ -119,6 +119,19 @@ class TestHealth:
         assert health.name == "jira-acli"
         assert health.latency_ms is not None
 
+    def test_unhealthy_when_switch_fails(self) -> None:
+        with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
+            switch_proc = AsyncMock()
+            switch_proc.communicate.return_value = (b"", b"switch failed")
+            switch_proc.returncode = 1
+            mock_asyncio.create_subprocess_exec = AsyncMock(return_value=switch_proc)
+
+            bridge = AcliJiraBridge(binary="acli")
+            health = _run(bridge.health(site="bad.atlassian.net"))
+
+        assert health.healthy is False
+        assert "switch failed" in health.message
+
     def test_unhealthy_when_not_authenticated(self) -> None:
         with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
             proc = AsyncMock()
@@ -239,6 +252,22 @@ class TestAuthSwitching:
 
             # Only 1 call: the command itself (no switch)
             assert mock_asyncio.create_subprocess_exec.call_count == 1
+
+    def test_switch_binary_not_found_raises_bridge_error(self) -> None:
+        with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:
+            mock_asyncio.create_subprocess_exec = AsyncMock(
+                side_effect=FileNotFoundError("No such file")
+            )
+
+            bridge = AcliJiraBridge(binary="nonexistent-acli")
+            with pytest.raises(AcliBridgeError, match="not found"):
+                _run(
+                    bridge.call(
+                        ["workitem", "search"],
+                        {"--jql": "x"},
+                        site="any.atlassian.net",
+                    )
+                )
 
     def test_switch_failure_raises(self) -> None:
         with patch("rai_pro.adapters.acli_bridge.asyncio") as mock_asyncio:

@@ -48,11 +48,17 @@ class AcliJiraBridge:
         if site == self._current_site:
             return
         cmd = [self._binary, "jira", "auth", "switch", "--site", site]
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+        except FileNotFoundError:
+            raise AcliBridgeError(
+                f"ACLI binary '{self._binary}' not found in PATH. "
+                "Install it from https://developer.atlassian.com/cli"
+            ) from None
         _, stderr = await proc.communicate()
         if proc.returncode != 0:
             err_msg = stderr.decode().strip() or f"auth switch to {site} failed"
@@ -174,6 +180,14 @@ class AcliJiraBridge:
                 name="jira-acli",
                 healthy=False,
                 message=stderr.decode().strip() or "Not authenticated",
+                latency_ms=elapsed_ms,
+            )
+        except AcliBridgeError as exc:
+            elapsed_ms = int((time.monotonic() - start) * 1000)
+            return AdapterHealth(
+                name="jira-acli",
+                healthy=False,
+                message=str(exc),
                 latency_ms=elapsed_ms,
             )
         except FileNotFoundError:

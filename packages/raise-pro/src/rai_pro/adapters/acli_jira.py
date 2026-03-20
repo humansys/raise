@@ -90,6 +90,12 @@ class AcliJiraAdapter:
         default_name: str = self._require(
             config, "default_instance", "jira.yaml missing required 'default_instance'"
         )
+        if default_name not in self._instances:
+            msg = (
+                f"default_instance '{default_name}' not found in instances "
+                f"(available: {', '.join(self._instances)})"
+            )
+            raise ValueError(msg)
         self._default_site: str = self._instances[default_name]["site"]
         self._projects: dict[str, dict[str, Any]] = config.get("projects", {})
         self._validate_projects()
@@ -164,7 +170,9 @@ class AcliJiraAdapter:
 
     def _resolve_site_from_key(self, issue_key: str) -> str:
         """Extract project key from issue key and resolve site."""
-        project_key = issue_key.split("-")[0] if "-" in issue_key else ""
+        if "-" not in issue_key:
+            return self._default_site
+        project_key = issue_key.split("-")[0]
         return self._resolve_site(project_key)
 
     def _resolve_site_from_jql(self, jql: str) -> str:
