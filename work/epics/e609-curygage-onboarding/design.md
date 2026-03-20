@@ -99,26 +99,41 @@ Si algo falla aquí, es un bug real que hay que resolver antes de considerar el 
 
 ---
 
-## Decisión: ¿cuántas sesiones de trabajo conjunto?
+## Decisión: 5 sesiones — ¿por qué no menos?
 
-Con el scope corregido, no necesitamos 5 sesiones. El esquema realista:
+Las integraciones siempre tardan más de lo esperado. 3 sesiones son suficientes si
+todo sale a la primera; 5 sesiones son lo correcto porque permiten que *algo* falle
+sin que eso rompa el programa.
 
 ```
-Sesión A (½ día) — Adapter Setup
-  Objetivo: rai backlog + rai docs funcionando en su entorno
-  Quién: Fer + un dev de CuryGage con acceso admin a Jira/Confluence
+S1 — Repo + Jira básico (½ día)
+  rai init en su repo. Jira adapter configurado. rai backlog search funciona.
+  Quién: Fer + dev de CuryGage con acceso admin a Jira
 
-Sesión B (½ día) — Skillset Workshop
-  Objetivo: revisar scaffold juntos, ellos hacen el primer ajuste
-  Quién: Fer + el equipo que mantendrá el skillset
+S2 — Jira profundo (½ día)
+  Flujo completo de backlog: get, transition, comment.
+  El equipo corre un ciclo sin que Fer les diga cada paso.
+  Por qué una sesión entera: Jira tiene edge cases (permisos, workflows customizados,
+  campos obligatorios en transitions) que no se ven hasta que se usan.
 
-Sesión C (opcional, 1-2h) — Integration Run
-  Objetivo: historia real end-to-end como validación
-  Quién: el equipo de CuryGage, Fer observando
+S3 — Confluence (½ día)
+  Adapter de docs + rai docs publish. Flujo de documentación.
+  Puede moverse al final de la semana si el adapter de Emilio no está listo.
+
+S4 — Skillset workshop (½ día)
+  Revisión conjunta del scaffold. Ellos hacen el primer override solos.
+  Por qué tarda: no es que sea difícil — es que tienen que decidir qué customizar.
+  Esa conversación ("¿cambiamos esto o dejamos el genérico?") lleva tiempo.
+
+S5 — Historia end-to-end (½ día)
+  Historia real de su backlog. Fer observa, no facilita.
+  Por qué existe aunque todo haya salido bien: la autonomía se prueba, no se asume.
+  Si algo falló en S1-S4, S5 lo absorbe.
 ```
 
-**Sesión C es opcional** si A y B salen bien y el equipo ya tiene confianza.
-La autonomía es el objetivo, no la supervisión.
+**La sesión 5 no es relleno** — es el momento donde el equipo demuestra (y siente)
+que pueden hacerlo solos. Sin ese cierre, el programa queda como "nos ayudaron a configurar",
+no como "ahora somos autónomos".
 
 ---
 
