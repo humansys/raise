@@ -1,0 +1,94 @@
+# Jira Configuration for raise-commons
+# Multi-instance: humansys (primary), rai-agent (secondary)
+# Schema: S494.4 — named instances with project→instance routing
+
+# ─── Default Instance ──────────────────────────────────────────────────────
+
+default_instance: humansys
+
+# ─── Instances ─────────────────────────────────────────────────────────────
+
+instances:
+  humansys:
+    site: humansys.atlassian.net
+    email: emilio@humansys.ai
+    projects: [RAISE]
+
+# ─── Projects ────────────────────────────────────────────────────────────────
+
+projects:
+  RAISE:
+    instance: humansys
+    name: RAISE
+    category: Development
+    description: RaiSE framework development — epics, stories, bugs, CI
+    board_type: scrum
+
+# ─── Workflow (matches Software Simplified Workflow) ─────────────────────────
+
+workflow:
+  states:
+    - name: Backlog
+      id: 11
+      category: To Do
+      description: Not yet prioritized
+
+    - name: Selected for Development
+      id: 21
+      category: To Do
+      description: Prioritized, ready to start
+
+    - name: In Progress
+      id: 31
+      category: In Progress
+      description: Actively being worked on
+
+    - name: Done
+      id: 41
+      category: Done
+      description: Completed and verified
+
+  status_mapping:
+    backlog: 11
+    selected: 21
+    in-progress: 31
+    done: 41
+
+  lifecycle_mapping:
+    story_start: 31
+    story_close: 41
+    epic_start: 31
+    epic_close: 41
+    selected: 21
+    backlog: 11
+
+# ─── Team ────────────────────────────────────────────────────────────────────
+
+team:
+  - name: Emilio Osorio
+    identifier: emilio@humansys.ai
+    role: owner
+    focus: product, architecture
+
+# ─── Issue Types ─────────────────────────────────────────────────────────────
+
+issue_types:
+  - name: Epic
+    description: "Rolling or bounded body of work. Contains Stories, Improvements, Spikes."
+    when_to_use: "When work spans multiple deliverables or requires architectural direction."
+
+  - name: Story
+    description: "Delivers direct user or developer value — new capability, feature, UX."
+    when_to_use: "When the output is something a stakeholder can use or observe."
+
+  - name: Task
+    description: "Technical work with no direct user value. Infrastructure, CI, config, maintenance."
+    when_to_use: "When the work is necessary but doesn't fit Story, Improvement, or Spike."
+
+  - name: Bug
+    description: "Something that worked and broke, or never worked as specified."
+    when_to_use: "Defect. Use priority field for severity (Critical/Major/Minor)."
+
+  - name: Sub-task
+    description: "Child of any issue type. For breaking down complex work within a single issue."
+    note: "Use 'Sub-task' NOT 'Subtask' — Jira API is case-sensitive."
