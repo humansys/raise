@@ -124,3 +124,6 @@ dev/issues/**/*.png
 dev/issues/**/*.jpg
 dev/issues/**/*.txt
 dev/transcripts/
+
+# Prevent symlink artifacts from being tracked at root
+/es/

@@ -11,17 +11,17 @@
 # temporarily removed during sync.
 #
 # Excluded (internal):
-#   Dirs:  work/, dev/, archive/, blog/, .claude/, .agent/,
-#          scripts/, htmlcov/, dist/, packages/, site/, src/rai_pro/
-#   (docs/ is now included — plain .mdx files, public documentation)
+#   Dirs:  work/, dev/, .raise/, archive/, blog/, governance/, .claude/,
+#          .agent/, scripts/, htmlcov/, dist/, packages/, site/
 #   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md,
 #          .gitlab-ci.yml, .coverage, .envrc, .pre-commit-config.yaml,
-#          .secrets.baseline, DEMO-STRATEGY.md, AGENTS.md, sonar-project.properties,
-#          scope.md, docker-compose.yml, bug-*-*.md
+#          .secrets.baseline, DEMO-STRATEGY.md, AGENTS.md,
+#          sonar-project.properties, scope.md, docker-compose.yml, bug-*-*.md
 #
 # Included (public):
-#   src/, tests/, framework/, governance/, .raise/, .github/, pyproject.toml, uv.lock,
-#   README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, NOTICE, CHANGELOG.md, .gitignore
+#   src/, tests/, framework/, docs/, .github/, pyproject.toml, uv.lock,
+#   README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, NOTICE,
+#   CHANGELOG.md, SECURITY.md, llms.txt, .gitignore
 #
 # Usage:
 #   ./scripts/sync-github.sh [source-branch] [target-branch]
@@ -40,7 +40,7 @@ set -euo pipefail
 
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
-EXCLUDED_DIRS=("work" "dev" "archive" "blog" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages" "site")
+EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages" "site")
 EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml" ".coverage" ".envrc" ".pre-commit-config.yaml" ".secrets.baseline" "DEMO-STRATEGY.md" "AGENTS.md" "sonar-project.properties" "scope.md" "docker-compose.yml" "bug-396-retro.md" "bug-396-scope.md" "bug-397-retro.md" "bug-397-scope.md" "bug-398-retro.md" "bug-398-scope.md" ".github/workflows/deploy-site.yml")
 
 # Colors for output
