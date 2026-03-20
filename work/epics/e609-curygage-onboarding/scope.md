@@ -25,18 +25,21 @@ tardan más de lo esperado, y la sesión 5 es deliberadamente para que *ellos* t
 
 | Sesión | Objetivo | Output concreto |
 |--------|----------|-----------------|
-| **S1** — Repo + Jira | `rai init` en su repo + Jira adapter validado | `rai backlog search` retorna sus issues |
-| **S2** — Jira profundo | Flujo backlog completo: get, transition, comment | El equipo corre un ciclo de backlog sin ayuda |
-| **S3** — Confluence | Confluence adapter + flujo de documentación | `rai docs publish` sube a su Confluence |
-| **S4** — Skillset | Skillset scaffold: revisión conjunta + primer override | Skill customizado commiteado por ellos |
+| **S1** — Jira | `rai init` en su repo + Jira adapter validado en Windows | `rai backlog search` retorna sus issues |
+| **S2** — Confluence | Confluence adapter + flujo de documentación | `rai docs publish` sube a su Confluence |
+| **S3** — Skillset I | Skillset scaffold: presentación + primer override guiado | Skill customizado commiteado con ayuda de Fer |
+| **S4** — Skillset II | El equipo ajusta skills adicionales autónomamente | 2+ skills propios, sin instrucciones de Fer |
 | **S5** — Historia completa | Historia real de su backlog, end-to-end | Historia cerrada con sus adapters + skills |
 
-**Por qué 5 y no 3:**
-- S1-S2: Jira tiene más superficie que "funciona/no funciona" — necesita un día completo
-- S3: Confluence puede estar en progreso cuando empieza el epic; sesión dedicada da margen
-- S4: El skillset lo hacen *ellos*, no Fer — eso tarda más de lo que parece
-- S5: Buffer real + prueba de autonomía. Si S1-S4 salen perfecto, S5 es la historia limpia.
-  Si algo quedó pendiente, S5 lo absorbe.
+**Lógica del orden:**
+- S1-S2: Integrar herramientas primero — sin Jira y Confluence conectados, el skillset no tiene contexto real
+- S3-S4: Dos sesiones completas de skillset — la primera guiada, la segunda autónoma. Así el aprendizaje queda
+- S5: Historia real como prueba. Si algo de S1-S4 quedó pendiente, esta sesión lo absorbe
+
+**Prep para el lunes (antes de S1):**
+- Instalar y configurar raise-cli 2.2.4 en Windows en el entorno de CuryGage
+- Configurar ACLI apuntando a su instancia de Jira
+- Tener `.raise/jira.yaml` o variables de entorno listas para validar en sesión
 
 ## Stories
 
@@ -118,35 +121,34 @@ S609.4 (Integration run)  ← requiere S609.1 + S609.2 + S609.3
 
 | Orden | Story | Tamaño | Dependencias | Milestone | Rationale |
 |:-----:|-------|:------:|--------------|-----------|-----------|
-| 1 | S609.1 Jira Adapter | S | Ninguna (RAISE-594 ✓) | M1 | Risk-first: el adapter de Jira es la pieza más crítica y ya está disponible. Si hay problemas de entorno en CuryGage, queremos saberlo el lunes, no el jueves |
-| 2 | S609.3 Skillset Scaffold | M | Ninguna (no necesita env de CuryGage) | M2 | Puede arrancar en paralelo con S609.1 o inmediatamente después. El scaffold se construye localmente y se lleva al env de ellos en S4 |
-| 3 | S609.2 Confluence Adapter | S | Emilio (externo) | M2 | Depende de que Emilio termine el adapter. Va en paralelo con S609.3. Si se retrasa, no bloquea el skillset |
-| 4 | S609.4 Integration Run | S | S609.1 + S609.2 + S609.3 | M3 | Requiere todo. Es la sesión 5 — la prueba de autonomía |
+| 1 | S609.1 Jira Adapter | S | Ninguna (RAISE-594 ✓) | M1 | Risk-first + Windows: si hay problemas de instalación/permisos en su entorno, queremos saberlo el lunes |
+| 2 | S609.2 Confluence Adapter | S | Emilio (externo) | M1 | Va en S2 — integraciones juntas antes del skillset. Si Emilio no entrega, S2 se swapea con S609.3 |
+| 3 | S609.3 Skillset Scaffold | M | Ninguna (se construye local) | M2 | S3-S4 dedicadas al skillset. Dos sesiones permiten guiada + autónoma |
+| 4 | S609.4 Integration Run | S | S609.1 + S609.2 + S609.3 | M3 | Requiere todo. Sesión 5, prueba de autonomía real |
 
 ### Milestones
 
 | Milestone | Stories | Target | Criterio de éxito |
 |-----------|---------|--------|-------------------|
-| **M1: Jira Live** | S609.1 | 2026-03-25 (martes) | `rai backlog search` retorna issues reales del Jira de CuryGage. Equipo corre ciclo completo sin ayuda de Fer |
-| **M2: Full Stack Ready** | +S609.2, +S609.3 | 2026-03-27 (jueves) | `rai docs publish` sube a Confluence. Skillset scaffold en su repo. Equipo modificó un skill autónomamente |
-| **M3: Autonomy Proven** | +S609.4 | 2026-03-28 (viernes) | Historia real cerrada end-to-end. Done criteria del epic todos verdes |
+| **M1: Tools Connected** | S609.1 + S609.2 | 2026-03-25 (mar) | `rai backlog` y `rai docs` operativos en su entorno Windows |
+| **M2: Skillset Ready** | +S609.3 | 2026-03-27 (jue) | Skillset scaffold en su repo + equipo modificó un skill autónomamente en S4 |
+| **M3: Autonomy Proven** | +S609.4 | 2026-03-28 (vie) | Historia real cerrada end-to-end sin intervención de Fer |
 
 ### Streams de trabajo
 
 ```
 Semana del 2026-03-24
 
-Lun 03-24   Mar 03-25   Mié 03-26   Jue 03-27   Vie 03-28
-────────────────────────────────────────────────────────────
-S609.1 ──────────────► M1
-(Jira adapter)         ↓
-                  S609.3 ──────────────►┐
-                  (Skillset)            │ M2
-                  S609.2 ──────────────►┤
-                  (Confluence*)         │
-                                        └──► S609.4 ──► M3
-                                             (Integration)
-* S609.2 depende de Emilio — si se retrasa, el stream de skillset no se bloquea
+Lun 03-24      Mar 03-25       Mié 03-26   Jue 03-27      Vie 03-28
+──────────────────────────────────────────────────────────────────────
+S609.1 (Jira) ──► S609.2 (Confluence) ──► M1
+                                           ↓
+                               S609.3 (Skillset I+II) ──────► M2
+                                                               ↓
+                                                          S609.4 ──► M3
+                                                          (Historia)
+
+Si S609.2 se retrasa (Emilio): swap S2↔S3 — skillset adelanta, Confluence va al final
 ```
 
 **Punto de merge crítico:** antes de S609.4 (viernes), verificar que S609.1 + S609.2 + S609.3
