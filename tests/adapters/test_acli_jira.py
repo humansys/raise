@@ -24,15 +24,25 @@ from raise_cli.adapters.models import (
 # ── Fixtures ────────────────────────────────────────────────────────────────
 
 JIRA_YAML = """\
+default_instance: humansys
+
+instances:
+  humansys:
+    site: humansys.atlassian.net
+    email: emilio@humansys.ai
+    projects: [RAISE]
+  rai-agent:
+    site: rai-agent.atlassian.net
+    email: emilio@humansys.ai
+    projects: [RAI]
+
 projects:
   RAISE:
+    instance: humansys
     name: RAISE
-    site: humansys.atlassian.net
-workflow:
-  status_mapping:
-    backlog: 11
-    in-progress: 31
-    done: 41
+  RAI:
+    instance: rai-agent
+    name: Rai Dev
 """
 
 
@@ -53,19 +63,86 @@ def _make_adapter(tmp_path: Path, yaml_content: str = JIRA_YAML) -> AcliJiraAdap
 
 
 class TestConfigLoading:
-    """__init__ loads jira.yaml and creates bridge."""
+    """__init__ loads jira.yaml with instances and cross-validation."""
 
-    def test_loads_config_successfully(self, tmp_path: Path) -> None:
+    def test_loads_instances(self, tmp_path: Path) -> None:
         adapter = _make_adapter(tmp_path)
-        # Verify via public behavior: build_url works (needs project config)
-        assert (
-            adapter.build_url("RAISE-99")
-            == "https://humansys.atlassian.net/browse/RAISE-99"
-        )
+        assert "humansys" in adapter._instances  # pyright: ignore[reportPrivateUsage]
+        assert "rai-agent" in adapter._instances  # pyright: ignore[reportPrivateUsage]
+        assert adapter._instances["humansys"]["site"] == "humansys.atlassian.net"  # pyright: ignore[reportPrivateUsage]
+
+    def test_loads_default_instance(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        assert adapter._default_site == "humansys.atlassian.net"  # pyright: ignore[reportPrivateUsage]
+
+    def test_loads_project_instance_mapping(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        assert adapter._projects["RAISE"]["instance"] == "humansys"  # pyright: ignore[reportPrivateUsage]
+        assert adapter._projects["RAI"]["instance"] == "rai-agent"  # pyright: ignore[reportPrivateUsage]
 
     def test_raises_on_missing_jira_yaml(self, tmp_path: Path) -> None:
         with pytest.raises(FileNotFoundError, match="jira.yaml"):
             AcliJiraAdapter(project_root=tmp_path)
+
+    def test_raises_on_missing_instances(self, tmp_path: Path) -> None:
+        yaml_no_instances = """\
+default_instance: humansys
+projects:
+  RAISE:
+    instance: humansys
+    name: RAISE
+"""
+        with pytest.raises(ValueError, match="instances"):
+            _make_adapter(tmp_path, yaml_no_instances)
+
+    def test_raises_on_missing_default_instance(self, tmp_path: Path) -> None:
+        yaml_no_default = """\
+instances:
+  humansys:
+    site: humansys.atlassian.net
+    projects: [RAISE]
+projects:
+  RAISE:
+    instance: humansys
+    name: RAISE
+"""
+        with pytest.raises(ValueError, match="default_instance"):
+            _make_adapter(tmp_path, yaml_no_default)
+
+    def test_raises_on_project_without_instance(self, tmp_path: Path) -> None:
+        yaml_no_proj_instance = """\
+default_instance: humansys
+instances:
+  humansys:
+    site: humansys.atlassian.net
+    projects: [RAISE]
+projects:
+  RAISE:
+    name: RAISE
+"""
+        with pytest.raises(ValueError, match="RAISE.*instance"):
+            _make_adapter(tmp_path, yaml_no_proj_instance)
+
+    def test_cross_validation_warns_on_mismatch(
+        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        yaml_mismatch = """\
+default_instance: humansys
+instances:
+  humansys:
+    site: humansys.atlassian.net
+    projects: [OTHER]
+projects:
+  RAISE:
+    instance: humansys
+    name: RAISE
+"""
+        import logging
+
+        with caplog.at_level(logging.WARNING):
+            _make_adapter(tmp_path, yaml_mismatch)
+        assert "RAISE" in caplog.text
+        assert "humansys" in caplog.text
 
 
 # ── Status normalization ────────────────────────────────────────────────────

@@ -12,6 +12,7 @@ Architecture: E494 design (D1-D4), S494.3
 
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 from typing import Any, cast
@@ -31,6 +32,8 @@ from raise_cli.adapters.models import (
 )
 
 from .acli_bridge import AcliJiraBridge
+
+logger = logging.getLogger(__name__)
 
 # Module-level config path as test seam (PAT-E-589)
 _JIRA_YAML_PATH = Path(".raise") / "jira.yaml"
@@ -81,8 +84,42 @@ class AcliJiraAdapter:
     def __init__(self, project_root: Path | None = None) -> None:
         root = project_root or Path.cwd()
         config = self._load_config(root)
+        self._instances: dict[str, dict[str, Any]] = self._require(
+            config, "instances", "jira.yaml missing required 'instances' section"
+        )
+        default_name: str = self._require(
+            config, "default_instance", "jira.yaml missing required 'default_instance'"
+        )
+        self._default_site: str = self._instances[default_name]["site"]
         self._projects: dict[str, dict[str, Any]] = config.get("projects", {})
+        self._validate_projects()
         self._bridge = AcliJiraBridge()
+
+    @staticmethod
+    def _require(config: dict[str, Any], key: str, msg: str) -> Any:
+        """Return config[key] or raise ValueError."""
+        value = config.get(key)
+        if not value:
+            raise ValueError(msg)
+        return value
+
+    def _validate_projects(self) -> None:
+        """Validate project→instance mapping and cross-check instance.projects."""
+        for project_key, project in self._projects.items():
+            instance_name = project.get("instance")
+            if not instance_name:
+                msg = f"Project '{project_key}' missing required 'instance' field"
+                raise ValueError(msg)
+            instance = self._instances.get(instance_name, {})
+            instance_projects: list[str] = instance.get("projects", [])
+            if project_key not in instance_projects:
+                logger.warning(
+                    "Project %s declares instance '%s' but is not in "
+                    "instances.%s.projects",
+                    project_key,
+                    instance_name,
+                    instance_name,
+                )
 
     @staticmethod
     def _load_config(root: Path) -> dict[str, Any]:
@@ -96,13 +133,17 @@ class AcliJiraAdapter:
         return data
 
     def build_url(self, key: str) -> str:
-        """Construct web browse URL from project site + issue key.
+        """Construct web browse URL from project instance site + issue key.
 
-        Returns empty string if project is unknown (no site configured).
+        Returns empty string if project is unknown (no instance configured).
         """
         project_key = key.split("-")[0] if "-" in key else ""
         project = self._projects.get(project_key, {})
-        site = project.get("site", "")
+        instance_name = project.get("instance", "")
+        if not instance_name:
+            return ""
+        instance = self._instances.get(instance_name, {})
+        site = instance.get("site", "")
         if not site:
             return ""
         return f"https://{site}/browse/{key}"
