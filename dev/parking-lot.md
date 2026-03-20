@@ -6,6 +6,41 @@
 
 ---
 
+## raise-pro Distribution & Licensing — 2026-03-20
+
+**Context:** E494 delivered the ACLI Jira adapter as the first raise-pro feature. Need secure distribution to clients before more pro features land.
+
+**Problem:** raise-pro is an installable Python package with no access control. Anyone who gets the .whl can install and use it. Need a distribution mechanism that:
+- Restricts installation to paying/registered clients
+- Is simple enough to ship ASAP (days, not weeks)
+- Can evolve toward a SaaS license model
+
+**Options explored (ranked by time-to-ship):**
+
+| Approach | Effort | Protection | Evolution path |
+|----------|--------|------------|----------------|
+| GitLab Package Registry + deploy tokens | Hours | Medium (token = access) | Tokens → license keys → SaaS |
+| License file (signed JWT, offline) | Days | High (per-client, offline) | Add server validation later |
+| License server (phone-home) | Weeks | High (revocable, metrics) | Full SaaS licensing |
+| Legal only (BSL/ELv2 license) | Hours | Low (honor system) | Baseline for all options |
+
+**Recommended path:**
+1. **Now:** GitLab Package Registry — deploy token per client, `uv pip install` with `--index-url`
+2. **Next:** License file in `.raise/license.key` — signed JWT verified at adapter `__init__()`, offline
+3. **Later:** License server — phone-home on first use per session, revocable, usage metrics, SaaS billing
+
+**Open questions:**
+- Token lifecycle: expiry, rotation, revocation per client?
+- Offline vs phone-home: what if client has no internet?
+- Per-client vs per-org licensing?
+- Versionado: raise-pro follows raise-cli version or independent?
+- What happens when license expires? Graceful degrade or hard block?
+- Legal: which source-available license for the pro code? (BSL, ELv2, proprietary)
+
+**Promote to:** `/rai-problem-shape` → epic when ready to implement.
+
+---
+
 ## SES-059 Deferred Items — 2026-03-06
 
 - [ ] **`rai backlog --help` sin credenciales** — el CLI no documenta JIRA_URL, JIRA_USERNAME, JIRA_API_TOKEN requeridas. Agregar texto de ayuda o `rai backlog doctor`. Promote cuando se trabaje UX del backlog.
