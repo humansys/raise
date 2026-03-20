@@ -207,7 +207,6 @@ ignore = [
 "src/raise_cli/adapters/protocols.py" = ["D102"]
 "src/raise_cli/adapters/sync.py" = ["D102"]
 "src/raise_cli/adapters/declarative/adapter.py" = ["D102"]
-"src/raise_cli/adapters/mcp_jira.py" = ["D102"]
 "src/raise_cli/doctor/protocol.py" = ["D102"]
 "src/raise_cli/gates/protocol.py" = ["D102"]
 "src/raise_cli/hooks/protocol.py" = ["D102"]
