@@ -148,4 +148,4 @@ Linear dependency chain. Each story builds on the previous. No parallelism.
 | S494.3 Full protocol | ✓ done | 11 methods, 31 tests |
 | S494.4 Multi-instance | ✓ done | 85 est / 80 actual, 1.06x |
 | S494.5 Delete MCP | ✓ done | 15 est / 20 actual, 1.33x, -1115 LOC |
-| S494.6 Integration tests | pending | Enabler — validates epic done criteria |
+| S494.6 Integration tests | ✓ done | 45 est / 60 actual, 1.33x, 3 bugs fixed |
