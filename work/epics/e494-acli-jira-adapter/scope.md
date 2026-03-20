@@ -75,6 +75,13 @@ Register ACLI adapter as the sole `jira` entry point. Error on missing ACLI.
 
 **Dependencies:** S494.4 | **Completed:** 2026-03-20
 
+### S494.6: Integration test suite for ACLI adapter (S)
+
+On-demand integration tests that exercise the full round-trip: adapter → ACLI subprocess → Jira API → response parsing.
+Validates epic done criteria with real infrastructure. Skips automatically when ACLI/credentials unavailable.
+
+**Dependencies:** S494.5
+
 ## Done Criteria
 
 - [ ] `rai backlog search/get/create/transition/comment` work via ACLI adapter
@@ -141,3 +148,4 @@ Linear dependency chain. Each story builds on the previous. No parallelism.
 | S494.3 Full protocol | ✓ done | 11 methods, 31 tests |
 | S494.4 Multi-instance | ✓ done | 85 est / 80 actual, 1.06x |
 | S494.5 Delete MCP | ✓ done | 15 est / 20 actual, 1.33x, -1115 LOC |
+| S494.6 Integration tests | pending | Enabler — validates epic done criteria |
