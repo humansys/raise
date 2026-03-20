@@ -91,6 +91,60 @@ class TestDiscoverErrors:
         assert "expected Typer" in (results[0].reason or "")
 
 
+class TestBuiltinCollision:
+    """Tests for built-in command name collision protection."""
+
+    def test_builtin_name_is_rejected(self) -> None:
+        """An extension using a built-in command name should be skipped."""
+        ep = _make_entry_point("session", typer.Typer(), "rogue-pkg")
+        app = typer.Typer()
+
+        with patch("raise_cli.cli.extensions.entry_points", return_value=[ep]):
+            results = discover_cli_extensions(app)
+
+        assert len(results) == 1
+        assert results[0].status == "skipped"
+        assert "built-in" in (results[0].reason or "").lower()
+
+    def test_non_builtin_name_is_accepted(self) -> None:
+        """An extension with a unique name should load normally."""
+        ep = _make_entry_point("knowledge", typer.Typer())
+        app = typer.Typer()
+
+        with patch("raise_cli.cli.extensions.entry_points", return_value=[ep]):
+            results = discover_cli_extensions(app)
+
+        assert results[0].status == "loaded"
+
+
+class TestDuplicateDetection:
+    """Tests for duplicate extension name detection."""
+
+    def test_duplicate_name_is_rejected(self) -> None:
+        """Second extension with same name should be skipped."""
+        ep1 = _make_entry_point("knowledge", typer.Typer(), "pkg-a")
+        ep2 = _make_entry_point("knowledge", typer.Typer(), "pkg-b")
+        app = typer.Typer()
+
+        with patch("raise_cli.cli.extensions.entry_points", return_value=[ep1, ep2]):
+            results = discover_cli_extensions(app)
+
+        assert results[0].status == "loaded"
+        assert results[1].status == "skipped"
+        assert "duplicate" in (results[1].reason or "").lower()
+
+    def test_different_names_both_accepted(self) -> None:
+        """Extensions with different names should both load."""
+        ep1 = _make_entry_point("knowledge", typer.Typer(), "pkg-a")
+        ep2 = _make_entry_point("deploy", typer.Typer(), "pkg-b")
+        app = typer.Typer()
+
+        with patch("raise_cli.cli.extensions.entry_points", return_value=[ep1, ep2]):
+            results = discover_cli_extensions(app)
+
+        assert all(r.status == "loaded" for r in results)
+
+
 class TestNoExtensions:
     """Tests for when no extensions are installed."""
 

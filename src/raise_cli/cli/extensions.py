@@ -24,6 +24,31 @@ logger = logging.getLogger(__name__)
 
 EP_CLI_COMMANDS: str = "rai.cli.commands"
 
+BUILTIN_COMMANDS: frozenset[str] = frozenset(
+    {
+        "adapter",
+        "artifact",
+        "backlog",
+        "base",
+        "discover",
+        "docs",
+        "doctor",
+        "gate",
+        "graph",
+        "info",
+        "init",
+        "mcp",
+        "memory",
+        "pattern",
+        "profile",
+        "publish",
+        "release",
+        "session",
+        "signal",
+        "skill",
+    }
+)
+
 
 @dataclass(frozen=True)
 class ExtensionInfo:
@@ -54,9 +79,38 @@ def discover_cli_extensions(app: typer.Typer) -> list[ExtensionInfo]:
         List of :class:`ExtensionInfo` describing what was found.
     """
     results: list[ExtensionInfo] = []
+    registered: dict[str, str] = {}
 
     for ep in entry_points(group=EP_CLI_COMMANDS):
         dist = _dist_name(ep)
+
+        # Check built-in name collision
+        if ep.name in BUILTIN_COMMANDS:
+            reason = f"conflicts with built-in command '{ep.name}'"
+            logger.warning(
+                "Skipping CLI extension '%s' from '%s': %s",
+                ep.name,
+                dist,
+                reason,
+            )
+            results.append(
+                ExtensionInfo(name=ep.name, dist=dist, status="skipped", reason=reason)
+            )
+            continue
+
+        # Check duplicate extension name
+        if ep.name in registered:
+            reason = f"duplicate name (already loaded from '{registered[ep.name]}')"
+            logger.warning(
+                "Skipping CLI extension '%s' from '%s': %s",
+                ep.name,
+                dist,
+                reason,
+            )
+            results.append(
+                ExtensionInfo(name=ep.name, dist=dist, status="skipped", reason=reason)
+            )
+            continue
 
         # Load the entry point
         try:
@@ -89,6 +143,7 @@ def discover_cli_extensions(app: typer.Typer) -> list[ExtensionInfo]:
 
         # Register
         app.add_typer(ext_app, name=ep.name)
+        registered[ep.name] = dist
         logger.debug("Loaded CLI extension '%s' from '%s'", ep.name, dist)
         results.append(ExtensionInfo(name=ep.name, dist=dist, status="loaded"))
 
