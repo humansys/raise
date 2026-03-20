@@ -1,11 +1,11 @@
-# CuryGage — Plan de Integración RaiSE
+# Kurigage — Plan de Integración RaiSE
 **Interno HumanSys** · RAISE-609 · 2026-03-20
 
 ---
 
 ## Contexto
 
-CuryGage lleva ~1 mes usando RaiSE con skills genéricos. Ya conocen el flujo y han
+Kurigage lleva ~1 mes usando RaiSE con skills genéricos. Ya conocen el flujo y han
 desarrollado con él. Esta semana los integramos con sus herramientas corporativas (Jira,
 Confluence) y les entregamos un skillset propio que puedan mantener sin depender de nosotros.
 
@@ -45,7 +45,7 @@ Lo que hacemos:
 **Objetivo:** Equipo entiende cómo funciona un skillset y hace su primer override
 
 Lo que hacemos:
-- Fer presenta el scaffold base de CuryGage (ya preparado)
+- Fer presenta el scaffold base de Kurigage (ya preparado)
 - Revisamos juntos: ¿qué skill cambian primero y por qué?
 - Ellos hacen el override — Fer acompaña pero no escribe el código
 
@@ -104,7 +104,7 @@ y "somos autónomos con RaiSE". Sin esa sesión el programa cierra en setup, no 
 
 ## Prep antes del lunes
 
-- [ ] Instalar raise-cli 2.2.4 en el entorno Windows de CuryGage
+- [ ] Instalar raise-cli 2.2.4 en el entorno Windows de Kurigage
 - [ ] Configurar ACLI con su instancia de Jira
 - [ ] Preparar skillset scaffold base (puede hacerse antes sin acceso a su entorno)
-- [ ] Confirmar con CuryGage: quién tiene acceso admin a Jira y Confluence
+- [ ] Confirmar con Kurigage: quién tiene acceso admin a Jira y Confluence

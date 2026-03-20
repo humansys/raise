@@ -1,4 +1,4 @@
-# Epic RAISE-609: CuryGage RaiSE Integration — Scope
+# Epic RAISE-609: Kurigage RaiSE Integration — Scope
 
 > **Status:** IN PROGRESS
 > **Created:** 2026-03-20
@@ -7,11 +7,11 @@
 
 ## Objetivo
 
-Conectar el entorno de trabajo de CuryGage (Jira + Confluence) a RaiSE vía adapters,
+Conectar el entorno de trabajo de Kurigage (Jira + Confluence) a RaiSE vía adapters,
 y entregarles un skillset scaffold propio que sean capaces de ajustar y evolucionar
 sin depender de HumanSys.
 
-**Contexto clave:** CuryGage ya lleva ~1 mes con RaiSE. Conocen el flujo y los skills genéricos.
+**Contexto clave:** Kurigage ya lleva ~1 mes con RaiSE. Conocen el flujo y los skills genéricos.
 No necesitan intro a la metodología. Lo que falta es sus herramientas reales integradas
 y skills que reflejen sus propias convenciones.
 
@@ -37,7 +37,7 @@ tardan más de lo esperado, y la sesión 5 es deliberadamente para que *ellos* t
 - S5: Historia real como prueba. Si algo de S1-S4 quedó pendiente, esta sesión lo absorbe
 
 **Prep para el lunes (antes de S1):**
-- Instalar y configurar raise-cli 2.2.4 en Windows en el entorno de CuryGage
+- Instalar y configurar raise-cli 2.2.4 en Windows en el entorno de Kurigage
 - Configurar ACLI apuntando a su instancia de Jira
 - Tener `.raise/jira.yaml` o variables de entorno listas para validar en sesión
 
@@ -66,7 +66,7 @@ S609.4 (Integration run)  ← requiere S609.1 + S609.2 + S609.3
 
 **Externos:**
 - Emilio: Confluence adapter (en progreso) — si no está para S3, S3 se mueve, no se cancela
-- CuryGage: acceso admin a Jira + Confluence + su repo
+- Kurigage: acceso admin a Jira + Confluence + su repo
 
 ## Scope
 
@@ -85,11 +85,11 @@ S609.4 (Integration run)  ← requiere S609.1 + S609.2 + S609.3
 - Intro a RaiSE — ya la saben
 - Nuevas features en el CLI — usar 2.2.4
 - Bitbucket adapter — post-piloto si hay demanda
-- Onboarding de otros equipos de CuryGage — este es el piloto
+- Onboarding de otros equipos de Kurigage — este es el piloto
 
 ## Done Criteria
 
-- [ ] `rai backlog search` retorna issues del Jira de CuryGage
+- [ ] `rai backlog search` retorna issues del Jira de Kurigage
 - [ ] `rai backlog transition` actualiza un issue en su Jira
 - [ ] `rai docs publish` sube documento a su Confluence
 - [ ] Skillset scaffold commiteado en su repo
@@ -102,7 +102,7 @@ S609.4 (Integration run)  ← requiere S609.1 + S609.2 + S609.3
 | Riesgo | L/I | Mitigación |
 |--------|:---:|------------|
 | Confluence adapter no listo para S3 | M/H | Mover S3 al final de la semana; arrancar con Jira primero |
-| Acceso al entorno de CuryGage tarda | M/M | Preparar scaffold sin acceso; adapters se validan cuando llegue el acceso |
+| Acceso al entorno de Kurigage tarda | M/M | Preparar scaffold sin acceso; adapters se validan cuando llegue el acceso |
 | El equipo quiere customizar todo en S4 | L/M | Scope mínimo: 2 overrides. El resto lo agregan ellos después |
 
 ## Parking Lot
@@ -169,5 +169,5 @@ adicional cuando el adapter esté listo.
 | Riesgo | L/I | Mitigación |
 |--------|:---:|------------|
 | Confluence adapter no llega para S3 (lunes-martes) | M/H | S609.3 avanza igual; S609.2 se hace al final de la semana o semana siguiente |
-| Problemas de acceso/permisos en el Jira de CuryGage en S1 | M/M | Tener sandbox environment listo como fallback para validar el flujo técnico |
+| Problemas de acceso/permisos en el Jira de Kurigage en S1 | M/M | Tener sandbox environment listo como fallback para validar el flujo técnico |
 | S609.3 tarda más (equipo indeciso sobre qué customizar) | L/M | Scope mínimo definido: 2 overrides (story-start, story-close). El resto es post-epic |

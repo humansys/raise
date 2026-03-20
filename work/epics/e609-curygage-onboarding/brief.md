@@ -1,19 +1,19 @@
 ---
 epic_id: "RAISE-609"
-title: "CuryGage RaiSE Integration — Jira, Confluence y custom skillset"
+title: "Kurigage RaiSE Integration — Jira, Confluence y custom skillset"
 status: "active"
 created: "2026-03-20"
 ---
 
-# Epic Brief: CuryGage RaiSE Onboarding
+# Epic Brief: Kurigage RaiSE Onboarding
 
 ## Contexto
-CuryGage lleva ~1 mes usando RaiSE. Ya conocen el flujo, ya han desarrollado con los skills
+Kurigage lleva ~1 mes usando RaiSE. Ya conocen el flujo, ya han desarrollado con los skills
 genéricos. No necesitan intro a la metodología. Lo que falta es conectar sus herramientas
 corporativas y darles un skillset propio que puedan mantener ellos mismos.
 
 ## Hypothesis
-Para un equipo de CuryGage que ya usa RaiSE con skills genéricos,
+Para un equipo de Kurigage que ya usa RaiSE con skills genéricos,
 integrar Jira y Confluence como adapters y entregarles un skillset scaffold propio
 les permite trabajar con sus herramientas reales en lugar de workarounds,
 y evolucionar sus skills sin depender de HumanSys.

@@ -1,14 +1,14 @@
 ---
 epic_id: "RAISE-609"
 grounded_in: "Transcript daily 2026-03-20, brief.md, RAISE-594 (ACLI adapter)"
-corrected: "2026-03-20 — CuryGage ya sabe RaiSE, scope reducido a integración"
+corrected: "2026-03-20 — Kurigage ya sabe RaiSE, scope reducido a integración"
 ---
 
-# Epic Design: CuryGage RaiSE Integration
+# Epic Design: Kurigage RaiSE Integration
 
 ## Contexto que cambia todo
 
-CuryGage lleva ~1 mes usando RaiSE. Ya corren historias. Ya conocen los skills.
+Kurigage lleva ~1 mes usando RaiSE. Ya corren historias. Ya conocen los skills.
 El diseño original asumía un onboarding desde cero — eso era incorrecto.
 
 **El problema real no es enseñar RaiSE. Es conectar sus herramientas.**
@@ -22,10 +22,10 @@ su documentación va a Confluence manualmente. El epic resuelve esa fricción.
 
 | Componente | Estado | Rol en este epic |
 |------------|--------|-----------------|
-| ACLI backlog adapter (RAISE-594) | ✓ En dev/2.2.4 | Conecta `rai backlog` con Jira de CuryGage |
+| ACLI backlog adapter (RAISE-594) | ✓ En dev/2.2.4 | Conecta `rai backlog` con Jira de Kurigage |
 | Confluence adapter | 🔄 Emilio en progreso | Conecta `rai docs publish` con su Confluence |
 | Skillset ecosystem (`rai skill set`) | ✓ En 2.2.4 | Mecanismo para crear y distribuir skillsets |
-| Skills base en `.claude/skills/` | ✓ Existentes | Punto de partida para el fork de CuryGage |
+| Skills base en `.claude/skills/` | ✓ Existentes | Punto de partida para el fork de Kurigage |
 | `rai init --detect` | ✓ En 2.2.4 | Detecta convenciones existentes del repo |
 
 **Lo que NO necesitamos construir:** lógica nueva en el CLI. Todo existe.
@@ -35,7 +35,7 @@ Este epic es configuración + scaffold + validación.
 
 ## S609.1 — Adapter Setup: ¿qué implica realmente?
 
-El ACLI Jira adapter requiere que el entorno de CuryGage tenga:
+El ACLI Jira adapter requiere que el entorno de Kurigage tenga:
 - `atlassian-plugin-sdk` o ACLI instalado y autenticado con su instancia
 - Variables de entorno o `.raise/jira.yaml` apuntando a su Jira
 
@@ -108,7 +108,7 @@ sin que eso rompa el programa.
 ```
 S1 — Repo + Jira básico (½ día)
   rai init en su repo. Jira adapter configurado. rai backlog search funciona.
-  Quién: Fer + dev de CuryGage con acceso admin a Jira
+  Quién: Fer + dev de Kurigage con acceso admin a Jira
 
 S2 — Jira profundo (½ día)
   Flujo completo de backlog: get, transition, comment.
