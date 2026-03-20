@@ -148,6 +148,32 @@ class AcliJiraAdapter:
             return ""
         return f"https://{site}/browse/{key}"
 
+    # ----- Site resolution -----
+
+    _PROJECT_IN_JQL = re.compile(r"project\s*=\s*[\"']?(\w+)")
+
+    def _resolve_site(self, project_key: str) -> str:
+        """Resolve project key → instance → site. Default on unknown."""
+        project = self._projects.get(project_key)
+        if not project:
+            logger.warning("Unknown project '%s', using default instance", project_key)
+            return self._default_site
+        instance_name = project.get("instance", "")
+        instance = self._instances.get(instance_name, {})
+        return instance.get("site", self._default_site)
+
+    def _resolve_site_from_key(self, issue_key: str) -> str:
+        """Extract project key from issue key and resolve site."""
+        project_key = issue_key.split("-")[0] if "-" in issue_key else ""
+        return self._resolve_site(project_key)
+
+    def _resolve_site_from_jql(self, jql: str) -> str:
+        """Extract project from JQL query and resolve site. Default on miss."""
+        match = self._PROJECT_IN_JQL.search(jql)
+        if match:
+            return self._resolve_site(match.group(1))
+        return self._default_site
+
     # ----- Response parsers -----
 
     @staticmethod

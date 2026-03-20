@@ -145,6 +145,61 @@ projects:
         assert "humansys" in caplog.text
 
 
+# ── Site resolution ─────────────────────────────────────────────────────────
+
+
+class TestSiteResolution:
+    """_resolve_site maps project key → instance → site."""
+
+    def test_resolve_from_project_key(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        assert adapter._resolve_site("RAISE") == "humansys.atlassian.net"  # pyright: ignore[reportPrivateUsage]
+        assert adapter._resolve_site("RAI") == "rai-agent.atlassian.net"  # pyright: ignore[reportPrivateUsage]
+
+    def test_unknown_project_returns_default(
+        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        import logging
+
+        adapter = _make_adapter(tmp_path)
+        with caplog.at_level(logging.WARNING):
+            site = adapter._resolve_site("UNKNOWN")  # pyright: ignore[reportPrivateUsage]
+        assert site == "humansys.atlassian.net"
+        assert "UNKNOWN" in caplog.text
+
+    def test_resolve_from_issue_key(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        assert adapter._resolve_site_from_key("RAISE-123") == "humansys.atlassian.net"  # pyright: ignore[reportPrivateUsage]
+        assert adapter._resolve_site_from_key("RAI-45") == "rai-agent.atlassian.net"  # pyright: ignore[reportPrivateUsage]
+
+    def test_resolve_from_jql_with_project(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        assert (
+            adapter._resolve_site_from_jql("project = RAISE AND status = Done")
+            == "humansys.atlassian.net"
+        )  # pyright: ignore[reportPrivateUsage]
+        assert (
+            adapter._resolve_site_from_jql("project = RAI ORDER BY created")
+            == "rai-agent.atlassian.net"
+        )  # pyright: ignore[reportPrivateUsage]
+
+    def test_resolve_from_jql_without_project_uses_default(
+        self, tmp_path: Path
+    ) -> None:
+        adapter = _make_adapter(tmp_path)
+        assert (
+            adapter._resolve_site_from_jql('text ~ "something"')
+            == "humansys.atlassian.net"
+        )  # pyright: ignore[reportPrivateUsage]
+
+    def test_resolve_from_jql_quoted_project(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        assert (
+            adapter._resolve_site_from_jql('project = "RAISE"')
+            == "humansys.atlassian.net"
+        )  # pyright: ignore[reportPrivateUsage]
+
+
 # ── Status normalization ────────────────────────────────────────────────────
 
 
