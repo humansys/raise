@@ -109,3 +109,36 @@ class TestNormalizeSessionIdPathTraversal:
         assert _normalize_session_id("SES-177") == "SES-177"
         assert _normalize_session_id("177") == "SES-177"
         assert _normalize_session_id("ses-42") == "SES-42"
+
+
+class TestNormalizeNewFormat:
+    """Tests for new timestamp-based session ID format."""
+
+    def test_new_format_passthrough(self) -> None:
+        """New format SES-{prefix}-{timestamp} should pass through uppercased."""
+        result = _normalize_session_id("SES-E-20260322T1430")
+        assert result == "SES-E-20260322T1430"
+
+    def test_new_format_lowercase_passthrough(self) -> None:
+        """Lowercase new format should be uppercased."""
+        result = _normalize_session_id("ses-e-20260322T1430")
+        assert result == "SES-E-20260322T1430"
+
+    def test_new_format_multi_char_prefix(self) -> None:
+        """Multi-character prefix should work."""
+        result = _normalize_session_id("SES-EO-20260322T1430")
+        assert result == "SES-EO-20260322T1430"
+
+    def test_new_format_via_resolve(self) -> None:
+        """New format should work through resolve_session_id."""
+        result = resolve_session_id(
+            session_flag="SES-E-20260322T1430", env_var=None
+        )
+        assert result == "SES-E-20260322T1430"
+
+    def test_new_format_via_env_var(self) -> None:
+        """New format should work via RAI_SESSION_ID env var."""
+        result = resolve_session_id(
+            session_flag=None, env_var="SES-E-20260322T1430"
+        )
+        assert result == "SES-E-20260322T1430"
