@@ -14,6 +14,12 @@ instances:
     email: emilio@humansys.ai
     projects: [RAISE, RTEST]
 
+  # TODO(RAISE-636): validate multi-instance routing before enabling
+  # rai-agent:
+  #   site: rai-agent.atlassian.net
+  #   email: emilio@humansys.ai
+  #   projects: [RAI]
+
 # ─── Projects ────────────────────────────────────────────────────────────────
 
 projects:
