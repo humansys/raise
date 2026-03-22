@@ -47,6 +47,11 @@ CALIBRATION_FILE = "calibration.jsonl"
 SESSIONS_DIR = "sessions"
 SIGNALS_FILE = "signals.jsonl"
 
+# Shared session index (committed to git, per-developer subdirectories)
+SHARED_SESSIONS_DIR = "sessions"
+PREFIXES_FILE = "prefixes.yaml"
+ACTIVE_SESSION_FILE = "active-session"
+
 
 def get_raise_dir(project_root: Path | None = None) -> Path:
     """Get the .raise/ directory for a project.
@@ -249,6 +254,49 @@ def get_credentials_path() -> Path:
         >>> # Use with rai_pro.providers.auth.credentials.store_token()
     """
     return get_global_rai_dir() / "credentials.json"
+
+
+def get_shared_sessions_dir(project_root: Path | None = None) -> Path:
+    """Get the shared sessions directory (committed to git).
+
+    This directory contains per-developer session indexes that travel
+    with the repository, enabling cross-environment session continuity.
+
+    Structure:
+        .raise/rai/sessions/
+        ├── prefixes.yaml
+        └── {prefix}/
+            └── index.jsonl
+
+    Args:
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to .raise/rai/sessions/ directory.
+    """
+    return get_rai_dir(project_root) / SHARED_SESSIONS_DIR
+
+
+def get_developer_sessions_dir(
+    prefix: str, project_root: Path | None = None
+) -> Path:
+    """Get the per-developer session index directory (committed to git).
+
+    Args:
+        prefix: Developer prefix (e.g., "E", "EO").
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to .raise/rai/sessions/{prefix}/ directory.
+
+    Raises:
+        ValueError: If prefix contains path traversal characters.
+    """
+    if ".." in prefix or "/" in prefix or "\\" in prefix:
+        raise ValueError(
+            f"Invalid developer prefix — path traversal detected: {prefix!r}"
+        )
+    return get_shared_sessions_dir(project_root) / prefix
 
 
 def get_session_dir(session_id: str, project_root: Path | None = None) -> Path:
