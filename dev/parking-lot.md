@@ -41,6 +41,12 @@
 
 ---
 
+## E654 Deferred Items — 2026-03-22
+
+- [ ] **Session cleanup command** — `rai session cleanup` to remove old local working state directories. Promote when disk usage is a complaint.
+- [ ] **Session search/filter** — `rai session list --filter "gemba"` fuzzy search by name. Promote after new format stabilizes.
+- [ ] **Git auto-commit on session close** — automatically commit the index update instead of requiring manual commit. Promote if manual commit is friction.
+
 ## SES-059 Deferred Items — 2026-03-06
 
 - [ ] **`rai backlog --help` sin credenciales** — el CLI no documenta JIRA_URL, JIRA_USERNAME, JIRA_API_TOKEN requeridas. Agregar texto de ayuda o `rai backlog doctor`. Promote cuando se trabaje UX del backlog.

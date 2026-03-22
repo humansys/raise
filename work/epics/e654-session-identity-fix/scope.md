@@ -43,9 +43,15 @@ Fix session identity so that sessions are scoped to developer+repository (not en
 - Changes to session context bundle format
 - Cross-session memory or learning (beyond what patterns.jsonl already does)
 
-## Planned Stories
+## Stories
 
-*To be defined in `/rai-epic-design`*
+| ID | Name | Size | Dependencies |
+|----|------|------|-------------|
+| S654.1 | Session ID Model & Prefix Registry | S | None |
+| S654.2 | Shared Session Index | M | S654.1 |
+| S654.3 | CLI Adaptation | M | S654.1, S654.2 |
+| S654.4 | Context Bundle & Orientation | S | S654.2, S654.3 |
+| S654.5 | Migration | S | S654.1, S654.2 |
 
 ## Done Criteria
 
