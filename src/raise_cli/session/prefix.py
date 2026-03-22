@@ -26,7 +26,9 @@ class PrefixRegistry(BaseModel):
 
     prefixes: dict[str, PrefixEntry]
 
-    def register(self, prefix: str, name: str) -> str:
+    def register(
+        self, prefix: str, name: str, *, registered_on: date | None = None
+    ) -> str:
         """Register a developer prefix.
 
         If the prefix is already registered to the same developer (by name),
@@ -36,6 +38,7 @@ class PrefixRegistry(BaseModel):
         Args:
             prefix: Developer prefix (e.g., "E").
             name: Developer full name (e.g., "Emilio Osorio").
+            registered_on: Registration date. Defaults to today.
 
         Returns:
             The registered prefix (same as input on success).
@@ -51,7 +54,9 @@ class PrefixRegistry(BaseModel):
                 f"Prefix {prefix!r} already registered to {existing.name!r}. "
                 f"Use {self.resolve_collision(prefix, name)!r} instead."
             )
-        self.prefixes[prefix] = PrefixEntry(name=name, registered=date.today())
+        self.prefixes[prefix] = PrefixEntry(
+            name=name, registered=registered_on or date.today()
+        )
         return prefix
 
     def resolve_collision(self, prefix: str, name: str) -> str:
@@ -91,7 +96,7 @@ class PrefixRegistry(BaseModel):
             return cls(prefixes={})
         entries: dict[str, PrefixEntry] = {}
         for key, value in raw.items():
-            entries[str(key)] = PrefixEntry(**value)
+            entries[str(key)] = PrefixEntry.model_validate(value)
         return cls(prefixes=entries)
 
     def save(self, path: Path) -> None:

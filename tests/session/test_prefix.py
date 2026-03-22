@@ -36,10 +36,11 @@ class TestPrefixRegistryRegister:
         assert registry.prefixes["E"].name == "Emilio Osorio"
 
     def test_register_sets_date(self) -> None:
-        """Registration date should be today."""
+        """Registration date should use provided date or default to today."""
         registry = PrefixRegistry(prefixes={})
-        registry.register("E", "Emilio Osorio")
-        assert registry.prefixes["E"].registered == date.today()
+        fixed_date = date(2026, 3, 22)
+        registry.register("E", "Emilio Osorio", registered_on=fixed_date)
+        assert registry.prefixes["E"].registered == fixed_date
 
     def test_register_existing_same_name_is_idempotent(self) -> None:
         """Registering the same prefix+name should be idempotent."""

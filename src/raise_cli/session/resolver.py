@@ -13,15 +13,16 @@ def _normalize_session_id(session_id: str) -> str:
     """Normalize session ID to standard format.
 
     Accepts:
-    - "SES-177" (already normalized)
+    - "SES-E-20260322T1430" (new timestamp-based format)
+    - "SES-177" (legacy sequential format)
     - "ses-177" (lowercase prefix)
-    - "177" (numeric only)
+    - "177" (numeric only — legacy shorthand)
 
     Rejects values containing path traversal components (CWE-23) since
     session IDs are used to construct file paths.
 
     Returns:
-        Normalized session ID in format "SES-NNN".
+        Normalized session ID (uppercased if starts with SES-).
 
     Raises:
         ValueError: If session_id contains '..' or path separator characters.
