@@ -150,9 +150,9 @@ RelationshipType = Literal[
 
 ---
 
-## Features
+## Delivered Work
 
-| ID | Feature | Size | SP | Description |
+| ID | Name | Size | SP | Description |
 |----|---------|:----:|:--:|-------------|
 | F8.1 | **Backlog Parser** | S | 2 | Parse `governance/projects/*/backlog.md` → Project + Epic index |
 | F8.2 | **Epic Parser** | S | 2 | Parse `dev/epic-*-scope.md` → Epic + Features |
@@ -409,9 +409,9 @@ Epic scope docs should have parseable feature table:
 > **Status:** DRAFT | IN PROGRESS | COMPLETE
 > **Target:** YYYY-MM-DD
 
-## Features
+## Delivered Work
 
-| ID | Feature | Size | SP | Description |
+| ID | Name | Size | SP | Description |
 |----|---------|:----:|:--:|-------------|
 | F8.1 | Backlog Parser | S | 2 | Parse backlog.md |
 ```
