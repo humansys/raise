@@ -44,7 +44,7 @@ MANIFEST_FILE = "manifest.yaml"
 CONFIG_FILE = "config.yaml"
 PATTERNS_FILE = "patterns.jsonl"
 CALIBRATION_FILE = "calibration.jsonl"
-SESSIONS_DIR = "sessions"
+PERSONAL_SESSIONS_DIR = "sessions"
 SIGNALS_FILE = "signals.jsonl"
 
 # Shared session index (committed to git, per-developer subdirectories)
@@ -313,7 +313,7 @@ def get_session_dir(session_id: str, project_root: Path | None = None) -> Path:
     Returns:
         Path to per-session directory (e.g., .raise/rai/personal/sessions/SES-177/)
     """
-    sessions_base = (get_personal_dir(project_root) / SESSIONS_DIR).resolve()
+    sessions_base = (get_personal_dir(project_root) / PERSONAL_SESSIONS_DIR).resolve()
     session_path = (sessions_base / session_id).resolve()
     if not session_path.is_relative_to(sessions_base):
         raise ValueError(
