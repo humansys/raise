@@ -32,7 +32,7 @@ from raise_cli.hooks.events import (
     SessionCloseEvent,
     SessionStartEvent,
 )
-from raise_cli.memory.writer import get_next_id, validate_session_index
+from raise_cli.memory.writer import validate_session_index
 from raise_cli.onboarding.profile import (
     DeveloperProfile,
     end_session,
@@ -273,9 +273,9 @@ def start(  # noqa: C901
         project_path_obj = Path(project)
 
         # Auto-register developer prefix
-        from raise_cli.config.paths import PREFIXES_FILE, get_shared_sessions_dir
+        from raise_cli.config.paths import get_prefixes_path
 
-        prefixes_path = get_shared_sessions_dir(project_path_obj) / PREFIXES_FILE
+        prefixes_path = get_prefixes_path(project_path_obj)
         registry = PrefixRegistry.load(prefixes_path)
         dev_prefix = profile.get_pattern_prefix()
         try:
@@ -301,18 +301,13 @@ def start(  # noqa: C901
         )
         write_active_session(pointer, project_root=project_path_obj)
 
-        # Legacy: also generate old-format ID for dual-write
-        personal_dir = project_path_obj / _DOT_RAISE / "rai" / "personal"
-        sessions_index = personal_dir / "sessions" / "index.jsonl"
-        legacy_session_id = get_next_id(sessions_index, "SES")
-
-        # Load prior state before migration moves the flat file to SES-{prev}/
+        # Load prior state before migration moves the flat file
         prev_state = load_session_state(Path(project))
 
         # Migrate flat files if they exist (before creating dir)
-        migrate_flat_to_session(project_path_obj, legacy_session_id)
+        migrate_flat_to_session(project_path_obj, session_id)
 
-        # Ensure per-session directory exists (use new ID for local dir)
+        # Ensure per-session directory exists
         from raise_cli.config.paths import get_session_dir
 
         session_dir = get_session_dir(session_id, project_path_obj)

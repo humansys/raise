@@ -113,7 +113,6 @@ class TestSessionStartEvent:
             patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("raise_cli.cli.commands.session.save_developer_profile"),
             patch("raise_cli.cli.commands.session.increment_session") as mock_inc,
-            patch("raise_cli.cli.commands.session.get_next_id", return_value="SES-42"),
             patch(
                 "raise_cli.cli.commands.session.generate_session_id",
                 return_value="S-A-260322-1430",

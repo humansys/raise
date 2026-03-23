@@ -733,12 +733,11 @@ class TestSessionStartCreatesDir:
             )
 
         assert result.exit_code == 0
-        # Flat files should be moved to per-session dir
-        session_dir = (
-            project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
-        )
-        assert (session_dir / "state.yaml").exists()
-        assert (session_dir / "signals.jsonl").exists()
+        # Flat files should be moved to a per-session dir (new format: S-T-YYMMDD-HHMM)
+        sessions_dir = project_path / ".raise" / "rai" / "personal" / "sessions"
+        session_dirs = [d for d in sessions_dir.iterdir() if d.is_dir() and (d / "state.yaml").exists()]
+        assert len(session_dirs) == 1, "Migration should create one session dir with state"
+        assert (session_dirs[0] / "signals.jsonl").exists()
         # Old flat files should be removed
         assert not flat_state.exists(), (
             "Flat state file should be removed after migration"
