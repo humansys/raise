@@ -629,15 +629,18 @@ def close(  # noqa: C901
     )
 
     # Write to shared session index (new registry) — only on success
-    final_session_id = resolved_session_id or close_result.session_id
+    # Prefer active pointer ID (new format) over legacy close_result.session_id
+    active_pointer = read_active_session(project_root=project_path)
+    final_session_id = (
+        resolved_session_id
+        or (active_pointer.id if active_pointer is not None else None)
+        or close_result.session_id
+    )
     if final_session_id and close_result.success:
         from datetime import datetime
 
         close_time = datetime.now()
         dev_prefix = profile.get_pattern_prefix()
-
-        # Read session metadata from active pointer (carries name + start time)
-        active_pointer = read_active_session(project_root=project_path)
         session_name_val = (
             active_pointer.name
             if active_pointer is not None and active_pointer.name
@@ -661,13 +664,16 @@ def close(  # noqa: C901
 
     # Clear active session pointer (only if it matches this session)
     clear_active_session(
-        session_id=final_session_id, project_root=project_path
+        session_id=(active_pointer.id if active_pointer is not None else final_session_id),
+        project_root=project_path,
     )
 
-    # Cleanup per-session directory
-    cleanup_session_id = resolved_session_id or close_result.session_id
-    if cleanup_session_id:
-        cleanup_session_dir(project_path, cleanup_session_id)
+    # Cleanup per-session directories (both new and legacy if different)
+    if final_session_id:
+        cleanup_session_dir(project_path, final_session_id)
+    legacy_id = close_result.session_id
+    if legacy_id and legacy_id != final_session_id:
+        cleanup_session_dir(project_path, legacy_id)
 
     # Emit session:close event
     emitter.emit(
@@ -678,7 +684,8 @@ def close(  # noqa: C901
     )
 
     # Output summary
-    typer.echo(f"Session {close_result.session_id} closed.")
+    display_id = final_session_id or close_result.session_id
+    typer.echo(f"Session {display_id} closed.")
     if close_result.patterns_added > 0:
         typer.echo(f"  Patterns added: {close_result.patterns_added}")
     if close_result.corrections_added > 0:
