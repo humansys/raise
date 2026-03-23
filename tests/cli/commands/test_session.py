@@ -698,11 +698,11 @@ class TestSessionStartCreatesDir:
             )
 
         assert result.exit_code == 0
-        # Per-session directory should exist (new format: S-T-YYMMDD-HHMM)
+        # Per-session directory should exist (new format: S-{P}-YYMMDD-HHMM)
         sessions_dir = project_path / ".raise" / "rai" / "personal" / "sessions"
-        if sessions_dir.exists():
-            session_dirs = [d for d in sessions_dir.iterdir() if d.is_dir() and d.name.startswith("S-")]
-            assert len(session_dirs) >= 1, "Per-session directory should be created on start"
+        assert sessions_dir.exists(), "Sessions directory should exist after start"
+        session_dirs = [d for d in sessions_dir.iterdir() if d.is_dir() and d.name.startswith("S-")]
+        assert len(session_dirs) >= 1, "Per-session directory should be created on start"
 
     def test_start_migrates_flat_files(self, tmp_path: Path) -> None:
         """Session start migrates flat state/telemetry files to per-session dir."""
@@ -1130,6 +1130,9 @@ class TestSessionCloseCoherenceValidation:
             patch("raise_cli.cli.commands.session.resolve_session_id") as mock_resolve,
             patch("raise_cli.cli.commands.session.process_session_close") as mock_close,
             patch("raise_cli.cli.commands.session.cleanup_session_dir"),
+            patch("raise_cli.cli.commands.session.write_session_entry"),
+            patch("raise_cli.cli.commands.session.clear_active_session"),
+            patch("raise_cli.cli.commands.session.read_active_session", return_value=None),
         ):
             mock_resolve.return_value = "SES-219"
             mock_close.return_value = CloseResult(success=True, session_id="SES-219")
@@ -1197,6 +1200,123 @@ class TestSessionStartContextLoadsState:
         ) -> str:
             captured.append(state)
             return "# Session Context\n"
+class TestSessionList:
+    """Tests for raise session list command."""
+
+    def test_list_empty_registry(self) -> None:
+        """No sessions should show helpful message."""
+        profile = DeveloperProfile(name="Alice")
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.read_session_entries",
+                return_value=[],
+            ),
+        ):
+            result = runner.invoke(app, ["session", "list"])
+
+        assert result.exit_code == 0
+        assert "No sessions found" in result.output
+
+    def test_list_shows_sessions(self) -> None:
+        """Should display session names and IDs."""
+        from datetime import datetime
+
+        from raise_cli.session.index import SessionIndexEntry
+
+        profile = DeveloperProfile(name="Alice")
+        entries = [
+            SessionIndexEntry(
+                id="S-A-260322-1430",
+                name="gemba research",
+                started=datetime(2026, 3, 22, 14, 30),
+                closed=datetime(2026, 3, 22, 16, 0),
+                type="research",
+            ),
+            SessionIndexEntry(
+                id="S-A-260322-1600",
+                name="epic design",
+                started=datetime(2026, 3, 22, 16, 0),
+                closed=datetime(2026, 3, 22, 18, 30),
+                type="feature",
+            ),
+        ]
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.read_session_entries",
+                return_value=entries,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.read_active_session",
+                return_value=None,
+            ),
+        ):
+            result = runner.invoke(app, ["session", "list"])
+
+        assert result.exit_code == 0
+        assert "gemba research" in result.output
+        assert "epic design" in result.output
+        assert "S-A-260322-1430" in result.output
+        assert "2 total sessions" in result.output
+
+    def test_list_shows_active_indicator(self) -> None:
+        """Active session should show (active) marker."""
+        from datetime import datetime
+
+        from raise_cli.session.index import ActiveSessionPointer, SessionIndexEntry
+
+        profile = DeveloperProfile(name="Alice")
+        entries = [
+            SessionIndexEntry(
+                id="S-A-260322-1430",
+                name="active session",
+                started=datetime(2026, 3, 22, 14, 30),
+            ),
+        ]
+        active = ActiveSessionPointer(
+            id="S-A-260322-1430",
+            name="active session",
+            started=datetime(2026, 3, 22, 14, 30),
+        )
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.read_session_entries",
+                return_value=entries,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.read_active_session",
+                return_value=active,
+            ),
+        ):
+            result = runner.invoke(app, ["session", "list"])
+
+        assert result.exit_code == 0
+        assert "(active)" in result.output
+
+
+class TestSessionCloseSharedIndex:
+    """Tests for shared index write during structured close."""
+
+    def test_close_writes_to_shared_index(self, tmp_path: Path) -> None:
+        """Structured close should write SessionIndexEntry to shared index."""
+        profile = DeveloperProfile(name="Test")
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
 
         with (
             patch(
@@ -1224,3 +1344,86 @@ class TestSessionStartContextLoadsState:
 
         assert isinstance(state, SessionState)
         assert state.current_work.story == "RAISE-566"
+
+
+class TestSessionCloseSharedIndex:
+    """Tests for shared index write during structured close."""
+
+    def test_close_writes_to_shared_index(self, tmp_path: Path) -> None:
+        """Structured close should write SessionIndexEntry to shared index."""
+        profile = DeveloperProfile(name="Test")
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("raise_cli.cli.commands.session.process_session_close") as mock_close,
+            patch("raise_cli.cli.commands.session.cleanup_session_dir"),
+            patch(
+                "raise_cli.cli.commands.session.write_session_entry"
+            ) as mock_write_entry,
+            patch("raise_cli.cli.commands.session.clear_active_session"),
+            patch("raise_cli.cli.commands.session.read_active_session", return_value=None),
+        ):
+            mock_close.return_value = CloseResult(
+                success=True, session_id="S-T-260322-1430"
+            )
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test close",
+                    "--project",
+                    str(project),
+                ],
+            )
+
+        assert result.exit_code == 0
+        mock_write_entry.assert_called_once()
+        entry = mock_write_entry.call_args[0][1]
+        assert entry.summary == "test close"
+        assert entry.id == "S-T-260322-1430"
+
+    def test_close_does_not_write_index_on_failure(self, tmp_path: Path) -> None:
+        """Failed close should NOT write to shared index."""
+        profile = DeveloperProfile(name="Test")
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("raise_cli.cli.commands.session.process_session_close") as mock_close,
+            patch("raise_cli.cli.commands.session.cleanup_session_dir"),
+            patch(
+                "raise_cli.cli.commands.session.write_session_entry"
+            ) as mock_write_entry,
+            patch("raise_cli.cli.commands.session.clear_active_session"),
+        ):
+            mock_close.return_value = CloseResult(
+                success=False, session_id="S-T-260322-1430"
+            )
+            runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "failed close",
+                    "--project",
+                    str(project),
+                ],
+            )
+
+        mock_write_entry.assert_not_called()

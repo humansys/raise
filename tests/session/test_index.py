@@ -9,6 +9,7 @@ import pytest
 
 from raise_cli.config.paths import get_developer_sessions_dir
 from raise_cli.session.index import (
+    ActiveSessionPointer,
     SessionIndexEntry,
     clear_active_session,
     read_active_session,
@@ -150,20 +151,33 @@ class TestWriteAndReadIndex:
 
 
 class TestActiveSessionPointer:
-    """Tests for active session pointer (plain text file)."""
+    """Tests for active session pointer (JSON file with metadata)."""
+
+    def _make_pointer(
+        self, session_id: str = "S-E-260322-1430", name: str = "test session"
+    ) -> ActiveSessionPointer:
+        return ActiveSessionPointer(
+            id=session_id,
+            name=name,
+            started=datetime(2026, 3, 22, 14, 30),
+        )
 
     def test_write_active_session(self, tmp_path: Path) -> None:
-        """Should write session ID to active-session file."""
-        write_active_session("S-E-260322-1430", project_root=tmp_path)
+        """Should write session metadata to active-session file."""
+        pointer = self._make_pointer()
+        write_active_session(pointer, project_root=tmp_path)
         pointer_file = tmp_path / ".raise" / "rai" / "personal" / "active-session"
         assert pointer_file.exists()
-        assert pointer_file.read_text(encoding="utf-8").strip() == "S-E-260322-1430"
 
     def test_read_active_session(self, tmp_path: Path) -> None:
-        """Should read back the session ID."""
-        write_active_session("S-E-260322-1430", project_root=tmp_path)
+        """Should read back the full pointer with name and timestamp."""
+        pointer = self._make_pointer(name="gemba research")
+        write_active_session(pointer, project_root=tmp_path)
         result = read_active_session(project_root=tmp_path)
-        assert result == "S-E-260322-1430"
+        assert result is not None
+        assert result.id == "S-E-260322-1430"
+        assert result.name == "gemba research"
+        assert result.started == datetime(2026, 3, 22, 14, 30)
 
     def test_read_active_session_nonexistent(self, tmp_path: Path) -> None:
         """Should return None if no active session."""
@@ -172,17 +186,42 @@ class TestActiveSessionPointer:
 
     def test_clear_active_session(self, tmp_path: Path) -> None:
         """Should remove the active session pointer file."""
-        write_active_session("S-E-260322-1430", project_root=tmp_path)
+        write_active_session(self._make_pointer(), project_root=tmp_path)
         clear_active_session(project_root=tmp_path)
+        result = read_active_session(project_root=tmp_path)
+        assert result is None
+
+    def test_clear_only_if_matching_session(self, tmp_path: Path) -> None:
+        """Should NOT clear if active pointer belongs to a different session."""
+        write_active_session(self._make_pointer("S-E-260322-1430"), project_root=tmp_path)
+        clear_active_session(session_id="S-E-260322-1600", project_root=tmp_path)
+        result = read_active_session(project_root=tmp_path)
+        assert result is not None  # Not cleared — different session
+        assert result.id == "S-E-260322-1430"
+
+    def test_clear_matching_session(self, tmp_path: Path) -> None:
+        """Should clear if session ID matches."""
+        write_active_session(self._make_pointer("S-E-260322-1430"), project_root=tmp_path)
+        clear_active_session(session_id="S-E-260322-1430", project_root=tmp_path)
         result = read_active_session(project_root=tmp_path)
         assert result is None
 
     def test_write_overwrites_previous(self, tmp_path: Path) -> None:
         """Writing a new active session should replace the previous one."""
-        write_active_session("S-E-260322-1430", project_root=tmp_path)
-        write_active_session("S-E-260322-1600", project_root=tmp_path)
-        assert read_active_session(project_root=tmp_path) == "S-E-260322-1600"
+        write_active_session(self._make_pointer("S-E-260322-1430"), project_root=tmp_path)
+        write_active_session(self._make_pointer("S-E-260322-1600"), project_root=tmp_path)
+        result = read_active_session(project_root=tmp_path)
+        assert result is not None
+        assert result.id == "S-E-260322-1600"
 
     def test_clear_nonexistent_is_noop(self, tmp_path: Path) -> None:
         """Clearing nonexistent pointer should not raise."""
         clear_active_session(project_root=tmp_path)  # Should not raise
+
+    def test_read_malformed_returns_none(self, tmp_path: Path) -> None:
+        """Malformed pointer file should return None, not crash."""
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "active-session").write_text("not json\n", encoding="utf-8")
+        result = read_active_session(project_root=tmp_path)
+        assert result is None

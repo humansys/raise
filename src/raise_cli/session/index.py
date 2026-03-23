@@ -38,6 +38,18 @@ class SessionIndexEntry(BaseModel, frozen=True):
     branch: str = ""
 
 
+class ActiveSessionPointer(BaseModel, frozen=True):
+    """Active session state stored locally (gitignored).
+
+    Carries session metadata that needs to survive from start to close:
+    session ID, human-readable name, and exact start timestamp.
+    """
+
+    id: str
+    name: str
+    started: datetime
+
+
 def write_session_entry(
     prefix: str,
     entry: SessionIndexEntry,
@@ -104,54 +116,78 @@ def read_session_entries(
 
 
 def write_active_session(
-    session_id: str,
+    pointer_data: ActiveSessionPointer,
     *,
     project_root: Path | None = None,
 ) -> None:
     """Write the active session pointer.
 
+    Stores session ID, name, and start timestamp as JSON so that
+    close can build a complete SessionIndexEntry.
+
     Args:
-        session_id: Session ID to mark as active.
+        pointer_data: Active session metadata.
         project_root: Project root path. Defaults to current directory.
     """
     personal_dir = get_personal_dir(project_root)
     personal_dir.mkdir(parents=True, exist_ok=True)
     pointer = personal_dir / ACTIVE_SESSION_FILE
-    pointer.write_text(session_id + "\n", encoding="utf-8")
-    logger.debug("Active session pointer: %s", session_id)
+    pointer.write_text(pointer_data.model_dump_json() + "\n", encoding="utf-8")
+    logger.debug("Active session pointer: %s", pointer_data.id)
 
 
 def read_active_session(
     *,
     project_root: Path | None = None,
-) -> str | None:
+) -> ActiveSessionPointer | None:
     """Read the active session pointer.
 
     Args:
         project_root: Project root path. Defaults to current directory.
 
     Returns:
-        Session ID string, or None if no active session.
+        ActiveSessionPointer if found and valid, None otherwise.
     """
     pointer = get_personal_dir(project_root) / ACTIVE_SESSION_FILE
     if not pointer.exists():
         return None
     content = pointer.read_text(encoding="utf-8").strip()
-    return content if content else None
+    if not content:
+        return None
+    try:
+        return ActiveSessionPointer.model_validate_json(content)
+    except (json.JSONDecodeError, ValueError):
+        logger.warning("Malformed active session pointer, ignoring")
+        return None
 
 
 def clear_active_session(
     *,
+    session_id: str | None = None,
     project_root: Path | None = None,
 ) -> None:
     """Remove the active session pointer.
 
+    If session_id is provided, only clears if the active pointer matches.
+    This prevents one session from clearing another's pointer.
+
     No-op if the pointer doesn't exist.
 
     Args:
+        session_id: Only clear if this ID matches the active pointer.
         project_root: Project root path. Defaults to current directory.
     """
     pointer = get_personal_dir(project_root) / ACTIVE_SESSION_FILE
-    if pointer.exists():
-        pointer.unlink()
-        logger.debug("Active session pointer cleared")
+    if not pointer.exists():
+        return
+    if session_id is not None:
+        current = read_active_session(project_root=project_root)
+        if current is not None and current.id != session_id:
+            logger.debug(
+                "Not clearing pointer: active=%s, requested=%s",
+                current.id,
+                session_id,
+            )
+            return
+    pointer.unlink()
+    logger.debug("Active session pointer cleared")

@@ -47,6 +47,7 @@ from raise_cli.session.close import CloseInput, load_state_file, process_session
 from raise_cli.session.resolver import resolve_session_id
 from raise_cli.session.identity import generate_session_id
 from raise_cli.session.index import (
+    ActiveSessionPointer,
     SessionIndexEntry,
     clear_active_session,
     read_active_session,
@@ -287,10 +288,18 @@ def start(  # noqa: C901
             registry.save(prefixes_path)
 
         # Generate new-format session ID
-        session_id = generate_session_id(dev_prefix)
+        from datetime import datetime
 
-        # Write active session pointer
-        write_active_session(session_id, project_root=project_path_obj)
+        start_time = datetime.now()
+        session_id = generate_session_id(dev_prefix, now=start_time)
+
+        # Write active session pointer (carries name + start time to close)
+        pointer = ActiveSessionPointer(
+            id=session_id,
+            name=session_name or "",
+            started=start_time,
+        )
+        write_active_session(pointer, project_root=project_path_obj)
 
         # Legacy: also generate old-format ID for dual-write
         personal_dir = project_path_obj / _DOT_RAISE / "rai" / "personal"
@@ -624,19 +633,30 @@ def close(  # noqa: C901
         close_input, profile, project_path, session_id=resolved_session_id
     )
 
-    # Write to shared session index (new registry)
+    # Write to shared session index (new registry) — only on success
     final_session_id = resolved_session_id or close_result.session_id
-    if final_session_id:
+    if final_session_id and close_result.success:
         from datetime import datetime
 
+        close_time = datetime.now()
         dev_prefix = profile.get_pattern_prefix()
-        # Read session name from active pointer context or use summary
-        active_name = close_input.summary or final_session_id
+
+        # Read session metadata from active pointer (carries name + start time)
+        active_pointer = read_active_session(project_root=project_path)
+        session_name_val = (
+            active_pointer.name
+            if active_pointer is not None and active_pointer.name
+            else close_input.summary or final_session_id
+        )
+        start_time = (
+            active_pointer.started if active_pointer is not None else close_time
+        )
+
         entry = SessionIndexEntry(
             id=final_session_id,
-            name=active_name,
-            started=datetime.now(),  # Approximate — exact start time not tracked yet
-            closed=datetime.now(),
+            name=session_name_val,
+            started=start_time,
+            closed=close_time,
             type=close_input.session_type,
             summary=close_input.summary,
             outcomes=close_input.outcomes,
@@ -644,8 +664,10 @@ def close(  # noqa: C901
         )
         write_session_entry(dev_prefix, entry, project_root=project_path)
 
-    # Clear active session pointer
-    clear_active_session(project_root=project_path)
+    # Clear active session pointer (only if it matches this session)
+    clear_active_session(
+        session_id=final_session_id, project_root=project_path
+    )
 
     # Cleanup per-session directory
     cleanup_session_id = resolved_session_id or close_result.session_id
@@ -718,7 +740,8 @@ def list_sessions(
     recent = list(reversed(entries[-limit:]))
 
     # Detect active session
-    active_id = read_active_session(project_root=project_path)
+    active_pointer = read_active_session(project_root=project_path)
+    active_id = active_pointer.id if active_pointer is not None else None
 
     typer.echo(f"Sessions for {profile.name} ({dev_prefix}):\n")
     for entry in recent:
