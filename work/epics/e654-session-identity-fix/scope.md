@@ -107,7 +107,7 @@ S654.1 → S654.2 → S654.3 → S654.4
 | S654.1 | done | 7 commits, 26 tests, AR+QR PASS |
 | S654.2 | done | 5 commits, 16 tests, AR+QR PASS |
 | S654.3 | done | 4 commits, 8 new tests, AR+QR PASS |
-| S654.4 | pending | |
+| S654.4 | done | 4 commits, 5 tests, AR+QR PASS |
 | S654.5 | pending | |
 
 ### Sequencing Risks
