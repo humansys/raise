@@ -108,7 +108,7 @@ class TestPatternAddCommand:
             os.chdir(original_cwd)
 
     def test_add_pattern_creates_missing_dir(self, tmp_path: Path) -> None:
-        """Test pattern add auto-creates personal directory if missing (default scope)."""
+        """Test pattern add auto-creates project memory directory if missing (default scope)."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
@@ -116,8 +116,8 @@ class TestPatternAddCommand:
 
             assert result.exit_code == 0
             assert "PAT-" in result.stdout
-            personal_dir = tmp_path / ".raise" / "rai" / "personal"
-            assert personal_dir.exists()
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            assert memory_dir.exists()
         finally:
             os.chdir(original_cwd)
 
@@ -168,8 +168,12 @@ class TestPatternAddCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_add_pattern_defaults_to_personal_scope(self, tmp_path: Path) -> None:
-        """Test pattern add without --scope writes to personal dir, not project."""
+    def test_add_pattern_defaults_to_project_scope(self, tmp_path: Path) -> None:
+        """Test pattern add without --scope writes to project dir, not personal.
+
+        RAISE-608: default scope must be project so that the add→reinforce
+        round-trip works without explicit --scope flags on both commands.
+        """
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
@@ -188,15 +192,15 @@ class TestPatternAddCommand:
 
             assert result.exit_code == 0
             assert "PAT-" in result.stdout
-            # Should write to personal, not project
+            # Should write to project, not personal
             personal_content = (personal_dir / "patterns.jsonl").read_text(
                 encoding="utf-8"
             )
             project_content = (project_dir / "patterns.jsonl").read_text(
                 encoding="utf-8"
             )
-            assert "Default scope test" in personal_content
-            assert "Default scope test" not in project_content
+            assert "Default scope test" in project_content
+            assert "Default scope test" not in personal_content
         finally:
             os.chdir(original_cwd)
 
@@ -216,6 +220,40 @@ class TestPatternAddCommand:
 
             assert result.exit_code == 7
             assert "Invalid scope" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_then_reinforce_default_scope_round_trip(self, tmp_path: Path) -> None:
+        """Regression test RAISE-608: add→reinforce round-trip works without --scope.
+
+        Without explicit --scope, both commands must operate on the same file.
+        Previously: add defaulted to personal scope, reinforce to project scope —
+        so reinforce always failed with 'not found' after a default add.
+        """
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            (memory_dir / "patterns.jsonl").write_text("")
+
+            add_result = runner.invoke(
+                app,
+                ["pattern", "add", "Round-trip test pattern", "-c", "test"],
+            )
+            assert add_result.exit_code == 0
+            pat_id = next(
+                line.split("ID:")[1].strip()
+                for line in add_result.stdout.splitlines()
+                if "ID:" in line
+            )
+
+            reinforce_result = runner.invoke(
+                app,
+                ["pattern", "reinforce", pat_id, "--vote", "1"],
+            )
+            assert reinforce_result.exit_code == 0, reinforce_result.output
+            assert pat_id in reinforce_result.stdout
         finally:
             os.chdir(original_cwd)
 

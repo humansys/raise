@@ -173,7 +173,7 @@ def add_pattern(
     scope: Annotated[
         str,
         typer.Option("--scope", "-s", help="Memory scope (global, project, personal)"),
-    ] = "personal",
+    ] = "project",
     memory_dir: Annotated[
         Path | None,
         typer.Option(
