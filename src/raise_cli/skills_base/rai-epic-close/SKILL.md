@@ -129,8 +129,7 @@ Tag created. Retrospective committed.
 1. Mark epic complete via CLI:
    - **If Jira issue exists:** `rai backlog transition {JIRA_KEY} "Done" -a jira`
    - **If no Jira key:** `rai backlog search "summary ~ '{epic name}'" -a jira` to find it, then transition
-2. Update `CLAUDE.local.md` to reflect completion and next epic
-3. Emit telemetry:
+2. Emit telemetry:
 
 ```bash
 rai signal emit-work epic E{N} --event complete
@@ -147,7 +146,6 @@ Backlog reflects completion. Local context updated.
 | Retrospective | `work/epics/e{N}-{name}/retrospective.md` |
 | Tag | `epic/e{N}-complete` on `{dev_branch}` |
 | Backlog update | Tracker via `rai backlog` CLI |
-| Context update | `CLAUDE.local.md` |
 
 ## Quality Checklist
 
