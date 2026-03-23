@@ -8,7 +8,12 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
-from rai_pro.adapters.acli_jira import AcliJiraAdapter, _adf_to_text, normalize_status, to_jql
+from rai_pro.adapters.acli_jira import (
+    AcliJiraAdapter,
+    _adf_to_text,
+    normalize_status,
+    to_jql,
+)
 
 from raise_cli.adapters.models import (
     AdapterHealth,

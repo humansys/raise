@@ -66,21 +66,21 @@ def _adf_to_text(value: object) -> str:
 
     parts: list[str] = []
 
-    def _walk(node: dict[str, object]) -> None:
+    def _walk(node: dict[str, Any]) -> None:
         node_type = node.get("type", "")
-        content = node.get("content") or []
+        raw_content: Any = node.get("content")
+        content: list[Any] = cast(list[Any], raw_content) if isinstance(raw_content, list) else []
         if node_type == "text":
             parts.append(str(node.get("text", "")))
             return
         if node_type == "listItem":
             parts.append("- ")
         for child in content:
-            if isinstance(child, dict):
-                _walk(child)
+            _walk(child)
         if node_type in ("paragraph", "heading", "blockquote", "codeBlock", "listItem"):
             parts.append("\n")
 
-    _walk(value)
+    _walk(cast(dict[str, Any], value))
     return "".join(parts).strip()
 
 
