@@ -8,7 +8,7 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
-from rai_pro.adapters.acli_jira import AcliJiraAdapter, normalize_status, to_jql
+from rai_pro.adapters.acli_jira import AcliJiraAdapter, _adf_to_text, normalize_status, to_jql
 
 from raise_cli.adapters.models import (
     AdapterHealth,
@@ -458,7 +458,30 @@ NESTED_ISSUE: dict[str, Any] = {
         "parent": {"key": "RAISE-10"},
         "created": "2026-03-19T10:00:00.000+0000",
         "updated": "2026-03-19T12:00:00.000+0000",
-        "description": {"type": "doc", "content": []},
+        "description": {
+            "version": 1,
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": "Fix the ADF bug."}],
+                },
+                {
+                    "type": "bulletList",
+                    "content": [
+                        {
+                            "type": "listItem",
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "content": [{"type": "text", "text": "Step one"}],
+                                }
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
     },
 }
 
@@ -477,6 +500,81 @@ NESTED_ISSUE_MINIMAL: dict[str, Any] = {
         "description": "",
     },
 }
+
+
+# ── ADF to text ─────────────────────────────────────────────────────────────
+
+
+class TestAdfToText:
+    """_adf_to_text converts ADF dicts to plain text; passes strings through."""
+
+    def test_plain_string_passthrough(self) -> None:
+        assert _adf_to_text("hello world") == "hello world"
+
+    def test_empty_string_passthrough(self) -> None:
+        assert _adf_to_text("") == ""
+
+    def test_none_returns_empty(self) -> None:
+        assert _adf_to_text(None) == ""
+
+    def test_empty_doc(self) -> None:
+        assert _adf_to_text({"type": "doc", "content": []}) == ""
+
+    def test_paragraph_with_text(self) -> None:
+        adf = {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": "Hello world"}],
+                }
+            ],
+        }
+        result = _adf_to_text(adf)
+        assert "Hello world" in result
+        assert "{'type'" not in result
+
+    def test_bullet_list(self) -> None:
+        adf = {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "bulletList",
+                    "content": [
+                        {
+                            "type": "listItem",
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "content": [{"type": "text", "text": "Item A"}],
+                                }
+                            ],
+                        },
+                        {
+                            "type": "listItem",
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "content": [{"type": "text", "text": "Item B"}],
+                                }
+                            ],
+                        },
+                    ],
+                }
+            ],
+        }
+        result = _adf_to_text(adf)
+        assert "Item A" in result
+        assert "Item B" in result
+
+    def test_nested_doc_from_fixture(self) -> None:
+        """NESTED_ISSUE description must yield readable text."""
+        description = NESTED_ISSUE["fields"]["description"]
+        result = _adf_to_text(description)
+        assert "Fix the ADF bug." in result
+        assert "Step one" in result
+        assert "{'type'" not in result
+        assert "{'version'" not in result
 
 
 class TestGetIssue:
@@ -498,6 +596,8 @@ class TestGetIssue:
         assert result.priority == "Medium"
         assert result.labels == ["backend", "acli"]
         assert "humansys.atlassian.net" in result.url
+        assert "Fix the ADF bug." in result.description
+        assert "{'type'" not in result.description
 
     def test_handles_null_fields(self, tmp_path: Path) -> None:
         adapter = _adapter_with_mock_bridge(tmp_path)
