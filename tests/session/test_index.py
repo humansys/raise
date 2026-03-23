@@ -5,6 +5,9 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+
+from raise_cli.config.paths import get_developer_sessions_dir
 from raise_cli.session.index import (
     SessionIndexEntry,
     clear_active_session,
@@ -47,16 +50,14 @@ class TestSessionIndexEntry:
 
     def test_frozen(self) -> None:
         """Entry should be immutable."""
+        import pydantic
         entry = SessionIndexEntry(
             id="S-E-260322-1430",
             name="test",
             started=datetime(2026, 3, 22, 14, 30),
         )
-        try:
+        with pytest.raises(pydantic.ValidationError):
             entry.name = "changed"  # type: ignore[misc]
-            raise AssertionError("Should have raised")
-        except (AttributeError, TypeError, Exception):
-            pass  # Expected — frozen model
 
 
 class TestWriteAndReadIndex:
@@ -116,12 +117,23 @@ class TestWriteAndReadIndex:
 
     def test_read_entries_empty_file(self, tmp_path: Path) -> None:
         """Should return empty list if index file is empty."""
-        index_dir = tmp_path / ".raise" / "rai" / "sessions" / "E"
+        index_dir = get_developer_sessions_dir("E", tmp_path)
         index_dir.mkdir(parents=True)
         (index_dir / "index.jsonl").write_text("", encoding="utf-8")
 
         entries = read_session_entries("E", project_root=tmp_path)
         assert entries == []
+
+    def test_read_entries_skips_malformed(self, tmp_path: Path) -> None:
+        """Should skip malformed entries (valid JSON, invalid schema)."""
+        index_dir = get_developer_sessions_dir("E", tmp_path)
+        index_dir.mkdir(parents=True)
+        lines = '{"name": "oops"}\n{"id": "S-E-260322-1430", "name": "good", "started": "2026-03-22T14:30:00"}\n'
+        (index_dir / "index.jsonl").write_text(lines, encoding="utf-8")
+
+        entries = read_session_entries("E", project_root=tmp_path)
+        assert len(entries) == 1
+        assert entries[0].name == "good"
 
     def test_entry_roundtrip_datetime(self, tmp_path: Path) -> None:
         """Datetime serialization should survive write/read roundtrip."""
@@ -164,6 +176,12 @@ class TestActiveSessionPointer:
         clear_active_session(project_root=tmp_path)
         result = read_active_session(project_root=tmp_path)
         assert result is None
+
+    def test_write_overwrites_previous(self, tmp_path: Path) -> None:
+        """Writing a new active session should replace the previous one."""
+        write_active_session("S-E-260322-1430", project_root=tmp_path)
+        write_active_session("S-E-260322-1600", project_root=tmp_path)
+        assert read_active_session(project_root=tmp_path) == "S-E-260322-1600"
 
     def test_clear_nonexistent_is_noop(self, tmp_path: Path) -> None:
         """Clearing nonexistent pointer should not raise."""
