@@ -44,7 +44,6 @@ from raise_cli.onboarding.profile import (
 from raise_cli.schemas.session_state import SessionState
 from raise_cli.session.bundle import assemble_context_bundle, assemble_sections
 from raise_cli.session.close import CloseInput, load_state_file, process_session_close
-from raise_cli.session.resolver import resolve_session_id
 from raise_cli.session.identity import generate_session_id
 from raise_cli.session.index import (
     ActiveSessionPointer,
@@ -56,6 +55,7 @@ from raise_cli.session.index import (
     write_session_entry,
 )
 from raise_cli.session.prefix import PrefixRegistry
+from raise_cli.session.resolver import resolve_session_id
 from raise_cli.session.state import (
     cleanup_session_dir,
     load_session_state,

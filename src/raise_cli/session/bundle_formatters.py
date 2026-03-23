@@ -167,7 +167,7 @@ def format_progress(state: SessionState | None) -> str:
     return "\n".join(lines)
 
 
-def format_recent_sessions(
+def format_recent_sessions(  # noqa: C901
     project_path: Path,
     limit: int = 3,
     developer_prefix: str | None = None,

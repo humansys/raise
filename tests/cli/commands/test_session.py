@@ -1199,6 +1199,35 @@ class TestSessionStartContextLoadsState:
         ) -> str:
             captured.append(state)
             return "# Session Context\n"
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch(
+                "raise_cli.cli.commands.session.assemble_context_bundle",
+                side_effect=capture_bundle,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "start", "--project", str(project), "--context"],
+            )
+
+        assert result.exit_code == 0
+        assert len(captured) == 1, "assemble_context_bundle must be called once"
+        state = captured[0]
+        assert state is not None, (
+            "state must not be None when flat session-state.yaml exists before start"
+        )
+        from raise_cli.schemas.session_state import SessionState
+
+        assert isinstance(state, SessionState)
+        assert state.current_work.story == "RAISE-566"
+
+
 class TestSessionList:
     """Tests for raise session list command."""
 
@@ -1305,44 +1334,6 @@ class TestSessionList:
 
         assert result.exit_code == 0
         assert "(active)" in result.output
-
-
-class TestSessionCloseSharedIndex:
-    """Tests for shared index write during structured close."""
-
-    def test_close_writes_to_shared_index(self, tmp_path: Path) -> None:
-        """Structured close should write SessionIndexEntry to shared index."""
-        profile = DeveloperProfile(name="Test")
-        project = tmp_path / "project"
-        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
-        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
-
-        with (
-            patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
-                return_value=profile,
-            ),
-            patch("raise_cli.cli.commands.session.save_developer_profile"),
-            patch(
-                "raise_cli.cli.commands.session.assemble_context_bundle",
-                side_effect=capture_bundle,
-            ),
-        ):
-            result = runner.invoke(
-                app,
-                ["session", "start", "--project", str(project), "--context"],
-            )
-
-        assert result.exit_code == 0
-        assert len(captured) == 1, "assemble_context_bundle must be called once"
-        state = captured[0]
-        assert state is not None, (
-            "state must not be None when flat session-state.yaml exists before start"
-        )
-        from raise_cli.schemas.session_state import SessionState
-
-        assert isinstance(state, SessionState)
-        assert state.current_work.story == "RAISE-566"
 
 
 class TestSessionCloseSharedIndex:
