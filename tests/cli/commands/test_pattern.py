@@ -219,6 +219,42 @@ class TestPatternAddCommand:
         finally:
             os.chdir(original_cwd)
 
+    def test_add_then_reinforce_default_scope_round_trip(
+        self, tmp_path: Path
+    ) -> None:
+        """Regression test RAISE-608: add→reinforce round-trip works without --scope.
+
+        Without explicit --scope, both commands must operate on the same file.
+        Previously: add defaulted to personal scope, reinforce to project scope —
+        so reinforce always failed with 'not found' after a default add.
+        """
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            (memory_dir / "patterns.jsonl").write_text("")
+
+            add_result = runner.invoke(
+                app,
+                ["pattern", "add", "Round-trip test pattern", "-c", "test"],
+            )
+            assert add_result.exit_code == 0
+            pat_id = next(
+                line.split("ID:")[1].strip()
+                for line in add_result.stdout.splitlines()
+                if "ID:" in line
+            )
+
+            reinforce_result = runner.invoke(
+                app,
+                ["pattern", "reinforce", pat_id, "--vote", "1"],
+            )
+            assert reinforce_result.exit_code == 0, reinforce_result.output
+            assert pat_id in reinforce_result.stdout
+        finally:
+            os.chdir(original_cwd)
+
 
 # =============================================================================
 # rai pattern reinforce
