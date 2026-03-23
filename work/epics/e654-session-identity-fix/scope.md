@@ -104,7 +104,7 @@ S654.1 → S654.2 → S654.3 → S654.4
 
 | Story | Status | Notes |
 |-------|--------|-------|
-| S654.1 | pending | |
+| S654.1 | done | 7 commits, 26 tests, AR+QR PASS |
 | S654.2 | pending | |
 | S654.3 | pending | |
 | S654.4 | pending | |
