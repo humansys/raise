@@ -225,6 +225,20 @@ acli jira auth status
 - Ya no es necesario para Jira (`rai backlog`).
 - No hay nada que borrar — el adapter `mcp_jira` simplemente ya no existe en el código.
 
+### rai-dev apunta a PyPI en vez del source de raise-commons
+
+Si tu rai-dev tenía raise-cli instalado desde PyPI (no editable), reinstala apuntando al source local:
+
+```bash
+~/miniconda3/envs/rai-dev/bin/pip install -e . -e packages/raise-pro -e packages/raise-server
+```
+
+Verifica que quedó editable:
+```bash
+~/miniconda3/envs/rai-dev/bin/pip show raise-cli | grep Location
+# Location debe mostrar .../raise-commons/src — no .../site-packages
+```
+
 ---
 
 ## Cómo resuelve `rai`
