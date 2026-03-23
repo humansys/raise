@@ -708,6 +708,96 @@ class TestFormatRecentSessions:
         assert "..." in result
 
 
+class TestFormatRecentSessionsSharedIndex:
+    """Tests for format_recent_sessions reading from shared index."""
+
+    def test_reads_shared_index_with_names(self, tmp_path: Path) -> None:
+        """Should read from shared index and show session names."""
+        from datetime import datetime
+
+        from raise_cli.session.index import SessionIndexEntry, write_session_entry
+
+        for i, name in enumerate(["gemba research", "epic design", "implementation"]):
+            entry = SessionIndexEntry(
+                id=f"S-E-26032{i}-1430",
+                name=name,
+                started=datetime(2026, 3, 20 + i, 14, 30),
+                closed=datetime(2026, 3, 20 + i, 16, 0),
+                type="feature",
+            )
+            write_session_entry("E", entry, project_root=tmp_path)
+
+        result = format_recent_sessions(tmp_path, limit=3, developer_prefix="E")
+        assert "implementation" in result
+        assert "epic design" in result
+        assert "gemba research" in result
+        assert "1h30m" in result  # Duration
+
+    def test_shared_index_empty_falls_back(self, tmp_path: Path) -> None:
+        """Empty shared index with no personal index returns empty."""
+        result = format_recent_sessions(tmp_path, limit=3, developer_prefix="E")
+        assert result == ""
+
+    def test_no_prefix_falls_back_to_personal(self, tmp_path: Path) -> None:
+        """Without prefix, should fall back to personal index."""
+        import json as json_mod
+
+        index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
+        index_dir.mkdir(parents=True)
+        session = {
+            "id": "SES-001",
+            "date": "2026-02-08",
+            "type": "feature",
+            "topic": "legacy session",
+        }
+        (index_dir / "index.jsonl").write_text(json_mod.dumps(session))
+
+        result = format_recent_sessions(tmp_path, limit=3, developer_prefix=None)
+        assert "SES-001" in result
+        assert "legacy session" in result
+
+    def test_shared_index_shows_duration(self, tmp_path: Path) -> None:
+        """Should format duration correctly for sessions with closed timestamp."""
+        from datetime import datetime
+
+        from raise_cli.session.index import SessionIndexEntry, write_session_entry
+
+        entry = SessionIndexEntry(
+            id="S-E-260322-0900",
+            name="long session",
+            started=datetime(2026, 3, 22, 9, 0),
+            closed=datetime(2026, 3, 22, 9, 45),
+            type="research",
+        )
+        write_session_entry("E", entry, project_root=tmp_path)
+
+        result = format_recent_sessions(tmp_path, limit=3, developer_prefix="E")
+        assert "45m" in result
+        assert "research" in result
+
+
+class TestActiveSessionNameInBundle:
+    """Test that active session name appears in orientation output."""
+
+    def test_orientation_shows_session_name(self, tmp_path: Path) -> None:
+        """assemble_orientation should show session name from active pointer."""
+        from raise_cli.session.index import ActiveSessionPointer, write_active_session
+
+        pointer = ActiveSessionPointer(
+            id="S-E-260322-1430",
+            name="gemba research",
+            started=date.today(),
+        )
+        write_active_session(pointer, project_root=tmp_path)
+
+        profile = DeveloperProfile(name="Emilio")
+        result = assemble_orientation(
+            profile, None, tmp_path, session_id="S-E-260322-1430"
+        )
+        assert "Session: S-E-260322-1430" in result
+        assert "gemba research" in result
+
+
 class TestBundleReleaseContext:
     """Tests for release context in session bundle."""
 

@@ -243,9 +243,15 @@ def assemble_orientation(
         format_developer_section(profile),
     ]
 
-    # Add session ID if provided
+    # Add session ID with name if available
     if session_id:
-        parts.append(f"Session: {session_id}")
+        from raise_cli.session.index import read_active_session
+
+        active_pointer = read_active_session(project_root=project_path)
+        if active_pointer is not None and active_pointer.name:
+            parts.append(f"Session: {session_id} — {active_pointer.name}")
+        else:
+            parts.append(f"Session: {session_id}")
 
     # Fetch live backlog status (never blocks — degrades gracefully)
     live = fetch_live_status(state)
@@ -254,7 +260,8 @@ def assemble_orientation(
 
     # Last session + recent sessions
     parts.append(format_last_session(state))
-    recent = format_recent_sessions(project_path)
+    dev_prefix = profile.get_pattern_prefix()
+    recent = format_recent_sessions(project_path, developer_prefix=dev_prefix)
     if recent:
         parts.append(recent)
 
