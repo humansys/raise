@@ -13,15 +13,16 @@ def _normalize_session_id(session_id: str) -> str:
     """Normalize session ID to standard format.
 
     Accepts:
-    - "SES-177" (already normalized)
+    - "S-E-260322-1430" (new timestamp-based format)
+    - "SES-177" (legacy sequential format)
     - "ses-177" (lowercase prefix)
-    - "177" (numeric only)
+    - "177" (numeric only — legacy shorthand)
 
     Rejects values containing path traversal components (CWE-23) since
     session IDs are used to construct file paths.
 
     Returns:
-        Normalized session ID in format "SES-NNN".
+        Normalized session ID (uppercased if starts with S- or SES-).
 
     Raises:
         ValueError: If session_id contains '..' or path separator characters.
@@ -38,11 +39,15 @@ def _normalize_session_id(session_id: str) -> str:
             f"Invalid session ID — path traversal characters detected: {session_id!r}"
         )
 
-    # Already normalized (case-insensitive check)
+    # New format: S-{prefix}-{YYMMDD}-{HHMM}
+    if session_id.upper().startswith("S-"):
+        return session_id.upper()
+
+    # Legacy format: SES-NNN
     if session_id.upper().startswith("SES-"):
         return session_id.upper()
 
-    # Numeric only — add prefix
+    # Numeric only — add legacy prefix
     if session_id.isdigit():
         return f"SES-{session_id}"
 

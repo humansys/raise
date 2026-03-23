@@ -167,16 +167,47 @@ def format_progress(state: SessionState | None) -> str:
     return "\n".join(lines)
 
 
-def format_recent_sessions(project_path: Path, limit: int = 3) -> str:
-    """Format recent sessions from sessions/index.jsonl.
+def format_recent_sessions(  # noqa: C901
+    project_path: Path,
+    limit: int = 3,
+    developer_prefix: str | None = None,
+) -> str:
+    """Format recent sessions from the session index.
+
+    Reads from personal/sessions/{prefix}/index.jsonl (new format with names).
+    Falls back to personal/sessions/index.jsonl (legacy format without prefix dir).
 
     Args:
         project_path: Absolute path to the project root.
         limit: Number of recent sessions to include.
+        developer_prefix: Developer prefix for per-developer index lookup.
 
     Returns:
         Formatted recent sessions section, or empty string if none.
     """
+    # New format: per-developer index with names and timestamps
+    if developer_prefix:
+        from raise_cli.session.index import read_session_entries
+
+        entries = read_session_entries(developer_prefix, project_root=project_path)
+        if entries:
+            recent = list(reversed(entries[-limit:]))
+            lines = ["Recent:"]
+            for entry in recent:
+                name = entry.name or entry.summary or entry.id
+                if len(name) > 80:
+                    name = name[:77] + "..."
+                duration_str = ""
+                if entry.closed and entry.started:
+                    mins = int((entry.closed - entry.started).total_seconds() / 60)
+                    if mins >= 60:
+                        duration_str = f", {mins // 60}h{mins % 60:02d}m"
+                    else:
+                        duration_str = f", {mins}m"
+                lines.append(f"- {entry.id}: {name} ({entry.type}{duration_str})")
+            return "\n".join(lines)
+
+    # Legacy format: flat index without prefix directory
     index_path = project_path / SESSIONS_INDEX_REL_PATH
     if not index_path.exists():
         return ""

@@ -11,10 +11,12 @@ from raise_cli.config.paths import (
     get_cache_dir,
     get_config_dir,
     get_data_dir,
+    get_developer_sessions_dir,
     get_framework_dir,
     get_global_rai_dir,
     get_identity_dir,
     get_personal_dir,
+    get_prefixes_path,
     get_session_dir,
 )
 
@@ -232,6 +234,42 @@ class TestGetPersonalDir:
         """Should return a Path object, not a string."""
         result = get_personal_dir(tmp_path)
         assert isinstance(result, Path)
+
+
+class TestGetPrefixesPath:
+    """Tests for get_prefixes_path() function."""
+
+    def test_returns_prefixes_path(self, tmp_path: Path) -> None:
+        """Should return .raise/rai/prefixes.yaml within project root."""
+        result = get_prefixes_path(tmp_path)
+        expected = tmp_path / ".raise" / "rai" / "prefixes.yaml"
+        assert result == expected
+
+
+class TestGetDeveloperSessionsDir:
+    """Tests for get_developer_sessions_dir() function."""
+
+    def test_returns_developer_sessions_path(self, tmp_path: Path) -> None:
+        """Should return .raise/rai/personal/sessions/{prefix}/."""
+        result = get_developer_sessions_dir("E", tmp_path)
+        expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "E"
+        assert result == expected
+
+    def test_handles_multi_char_prefix(self, tmp_path: Path) -> None:
+        """Should handle multi-character prefixes like 'EO'."""
+        result = get_developer_sessions_dir("EO", tmp_path)
+        expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "EO"
+        assert result == expected
+
+    def test_rejects_path_traversal_in_prefix(self, tmp_path: Path) -> None:
+        """Prefix with '..' must raise ValueError."""
+        with pytest.raises(ValueError, match="path traversal"):
+            get_developer_sessions_dir("../evil", tmp_path)
+
+    def test_rejects_slash_in_prefix(self, tmp_path: Path) -> None:
+        """Prefix with '/' must raise ValueError."""
+        with pytest.raises(ValueError, match="path traversal"):
+            get_developer_sessions_dir("E/../../etc", tmp_path)
 
 
 class TestGetSessionDir:

@@ -32,7 +32,7 @@ from raise_cli.hooks.events import (
     SessionCloseEvent,
     SessionStartEvent,
 )
-from raise_cli.memory.writer import get_next_id, validate_session_index
+from raise_cli.memory.writer import validate_session_index
 from raise_cli.onboarding.profile import (
     DeveloperProfile,
     end_session,
@@ -44,6 +44,17 @@ from raise_cli.onboarding.profile import (
 from raise_cli.schemas.session_state import SessionState
 from raise_cli.session.bundle import assemble_context_bundle, assemble_sections
 from raise_cli.session.close import CloseInput, load_state_file, process_session_close
+from raise_cli.session.identity import generate_session_id
+from raise_cli.session.index import (
+    ActiveSessionPointer,
+    SessionIndexEntry,
+    clear_active_session,
+    read_active_session,
+    read_session_entries,
+    write_active_session,
+    write_session_entry,
+)
+from raise_cli.session.prefix import PrefixRegistry
 from raise_cli.session.resolver import resolve_session_id
 from raise_cli.session.state import (
     cleanup_session_dir,
@@ -53,6 +64,22 @@ from raise_cli.session.state import (
 
 _ERR_NO_PROFILE = "No developer profile found"
 _DOT_RAISE = ".raise"
+
+
+def _get_current_branch() -> str:
+    """Get current git branch name, or empty string if not in a repo."""
+    import subprocess
+
+    try:
+        result = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return result.stdout.strip() if result.returncode == 0 else ""
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return ""
 
 
 def _maybe_sync_skills(project_path: Path) -> SkillScaffoldResult | None:
@@ -140,6 +167,12 @@ def _check_cwd_guard(
 
 @session_app.command()
 def start(  # noqa: C901
+    session_name: Annotated[
+        str | None,
+        typer.Argument(
+            help="Session name (e.g., 'gemba research', 'epic design')",
+        ),
+    ] = None,
     name: Annotated[
         str | None,
         typer.Option(
@@ -237,20 +270,47 @@ def start(  # noqa: C901
     session_id: str | None = None
     prev_state: SessionState | None = None
     if project is not None:
-        personal_dir = Path(project) / _DOT_RAISE / "rai" / "personal"
-        sessions_index = personal_dir / "sessions" / "index.jsonl"
-        session_id = get_next_id(sessions_index, "SES")
+        project_path_obj = Path(project)
 
-        # Load prior state before migration moves the flat file to SES-{prev}/
+        # Auto-register developer prefix
+        from raise_cli.config.paths import get_prefixes_path
+
+        prefixes_path = get_prefixes_path(project_path_obj)
+        registry = PrefixRegistry.load(prefixes_path)
+        dev_prefix = profile.get_pattern_prefix()
+        try:
+            registry.register(dev_prefix, profile.name)
+            registry.save(prefixes_path)
+        except ValueError:
+            # Collision — use suggested extended prefix
+            dev_prefix = registry.resolve_collision(dev_prefix, profile.name)
+            registry.register(dev_prefix, profile.name)
+            registry.save(prefixes_path)
+
+        # Generate new-format session ID
+        from datetime import datetime
+
+        start_time = datetime.now()
+        session_id = generate_session_id(dev_prefix, now=start_time)
+
+        # Write active session pointer (carries name + start time to close)
+        pointer = ActiveSessionPointer(
+            id=session_id,
+            name=session_name or "",
+            started=start_time,
+        )
+        write_active_session(pointer, project_root=project_path_obj)
+
+        # Load prior state before migration moves the flat file
         prev_state = load_session_state(Path(project))
 
         # Migrate flat files if they exist (before creating dir)
-        migrate_flat_to_session(Path(project), session_id)
+        migrate_flat_to_session(project_path_obj, session_id)
 
-        # Ensure per-session directory exists (migration may have created it)
-        session_dir = (
-            Path(project) / _DOT_RAISE / "rai" / "personal" / "sessions" / session_id
-        )
+        # Ensure per-session directory exists
+        from raise_cli.config.paths import get_session_dir
+
+        session_dir = get_session_dir(session_id, project_path_obj)
         session_dir.mkdir(parents=True, exist_ok=True)
 
         # Add to active_sessions (with stale warning)
@@ -292,8 +352,9 @@ def start(  # noqa: C901
         )
         typer.echo(bundle)
     else:
+        display_name = f" — {session_name}" if session_name else ""
         if session_id:
-            typer.echo(f"▶ Session {session_id} started ({agent_name})")
+            typer.echo(f"▶ Session {session_id}{display_name} started ({agent_name})")
         else:
             typer.echo(f"▶ Session started ({agent_name})")
         typer.echo(f"Session recorded. (last: {updated.last_session})")
@@ -567,10 +628,54 @@ def close(  # noqa: C901
         close_input, profile, project_path, session_id=resolved_session_id
     )
 
-    # Cleanup per-session directory
-    cleanup_session_id = resolved_session_id or close_result.session_id
-    if cleanup_session_id:
-        cleanup_session_dir(project_path, cleanup_session_id)
+    # Write to shared session index (new registry) — only on success
+    # Prefer active pointer ID (new format) over legacy close_result.session_id
+    active_pointer = read_active_session(project_root=project_path)
+    final_session_id = (
+        resolved_session_id
+        or (active_pointer.id if active_pointer is not None else None)
+        or close_result.session_id
+    )
+    if final_session_id and close_result.success:
+        from datetime import datetime
+
+        close_time = datetime.now()
+        dev_prefix = profile.get_pattern_prefix()
+        session_name_val = (
+            active_pointer.name
+            if active_pointer is not None and active_pointer.name
+            else close_input.summary or final_session_id
+        )
+        start_time = (
+            active_pointer.started if active_pointer is not None else close_time
+        )
+
+        entry = SessionIndexEntry(
+            id=final_session_id,
+            name=session_name_val,
+            started=start_time,
+            closed=close_time,
+            type=close_input.session_type,
+            summary=close_input.summary,
+            outcomes=close_input.outcomes,
+            branch=_get_current_branch(),
+        )
+        write_session_entry(dev_prefix, entry, project_root=project_path)
+
+    # Clear active session pointer (only if it matches this session)
+    clear_active_session(
+        session_id=(
+            active_pointer.id if active_pointer is not None else final_session_id
+        ),
+        project_root=project_path,
+    )
+
+    # Cleanup per-session directories (both new and legacy if different)
+    if final_session_id:
+        cleanup_session_dir(project_path, final_session_id)
+    legacy_id = close_result.session_id
+    if legacy_id and legacy_id != final_session_id:
+        cleanup_session_dir(project_path, legacy_id)
 
     # Emit session:close event
     emitter.emit(
@@ -581,8 +686,78 @@ def close(  # noqa: C901
     )
 
     # Output summary
-    typer.echo(f"Session {close_result.session_id} closed.")
+    display_id = final_session_id or close_result.session_id
+    typer.echo(f"Session {display_id} closed.")
     if close_result.patterns_added > 0:
         typer.echo(f"  Patterns added: {close_result.patterns_added}")
     if close_result.corrections_added > 0:
         typer.echo(f"  Corrections recorded: {close_result.corrections_added}")
+
+
+@session_app.command("list")
+def list_sessions(
+    project: Annotated[
+        str | None,
+        typer.Option(
+            "--project",
+            "-p",
+            help="Project path",
+        ),
+    ] = None,
+    limit: Annotated[
+        int,
+        typer.Option(
+            "--limit",
+            "-n",
+            help="Maximum number of sessions to show",
+        ),
+    ] = 20,
+) -> None:
+    """List sessions from the shared session registry.
+
+    Shows sessions recorded in .raise/rai/sessions/{prefix}/index.jsonl.
+    Reads from the committed session index that travels with the repo.
+
+    Examples:
+        $ raise session list
+        $ raise session list --limit 5
+        $ raise session list --project /my/project
+    """
+    profile = load_developer_profile()
+    if profile is None:
+        cli_error("No developer profile found")
+        return
+
+    project_path = Path(project) if project else Path.cwd()
+    dev_prefix = profile.get_pattern_prefix()
+    entries = read_session_entries(dev_prefix, project_root=project_path)
+
+    if not entries:
+        typer.echo("No sessions found in shared registry.")
+        typer.echo(
+            "Sessions are recorded on close. "
+            "Use `rai session start` + `rai session close` to create entries."
+        )
+        return
+
+    # Show most recent first, limited
+    recent = list(reversed(entries[-limit:]))
+
+    # Detect active session
+    active_pointer = read_active_session(project_root=project_path)
+    active_id = active_pointer.id if active_pointer is not None else None
+
+    typer.echo(f"Sessions for {profile.name} ({dev_prefix}):\n")
+    for entry in recent:
+        status = "(active)" if entry.id == active_id else ""
+        date_str = entry.started.strftime("%Y-%m-%d %H:%M")
+        closed_str = ""
+        if entry.closed:
+            duration_min = int((entry.closed - entry.started).total_seconds() / 60)
+            if duration_min >= 60:
+                closed_str = f", {duration_min // 60}h{duration_min % 60:02d}m"
+            else:
+                closed_str = f", {duration_min}m"
+        typer.echo(f"  {entry.id}  {entry.name}  ({date_str}{closed_str}) {status}")
+
+    typer.echo(f"\n{len(entries)} total sessions.")

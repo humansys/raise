@@ -47,6 +47,11 @@ CALIBRATION_FILE = "calibration.jsonl"
 SESSIONS_DIR = "sessions"
 SIGNALS_FILE = "signals.jsonl"
 
+# Prefix registry (committed to git under .raise/rai/)
+PREFIXES_FILE = "prefixes.yaml"
+# Active session pointer (gitignored, under personal/)
+ACTIVE_SESSION_FILE = "active-session"
+
 
 def get_raise_dir(project_root: Path | None = None) -> Path:
     """Get the .raise/ directory for a project.
@@ -249,6 +254,44 @@ def get_credentials_path() -> Path:
         >>> # Use with rai_pro.providers.auth.credentials.store_token()
     """
     return get_global_rai_dir() / "credentials.json"
+
+
+def get_prefixes_path(project_root: Path | None = None) -> Path:
+    """Get path to the developer prefix registry (committed to git).
+
+    This is the only session-related file in git by default.
+    Lives at .raise/rai/prefixes.yaml.
+
+    Args:
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to prefixes.yaml.
+    """
+    return get_rai_dir(project_root) / PREFIXES_FILE
+
+
+def get_developer_sessions_dir(prefix: str, project_root: Path | None = None) -> Path:
+    """Get the per-developer session index directory.
+
+    Lives under personal/sessions/{prefix}/ (gitignored by default).
+    Teams can opt-in to sharing by modifying .gitignore.
+
+    Args:
+        prefix: Developer prefix (e.g., "E", "EO").
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to .raise/rai/personal/sessions/{prefix}/ directory.
+
+    Raises:
+        ValueError: If prefix contains path traversal characters.
+    """
+    if ".." in prefix or "/" in prefix or "\\" in prefix:
+        raise ValueError(
+            f"Invalid developer prefix — path traversal detected: {prefix!r}"
+        )
+    return get_personal_dir(project_root) / SESSIONS_DIR / prefix
 
 
 def get_session_dir(session_id: str, project_root: Path | None = None) -> Path:
