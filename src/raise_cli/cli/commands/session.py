@@ -664,7 +664,9 @@ def close(  # noqa: C901
 
     # Clear active session pointer (only if it matches this session)
     clear_active_session(
-        session_id=(active_pointer.id if active_pointer is not None else final_session_id),
+        session_id=(
+            active_pointer.id if active_pointer is not None else final_session_id
+        ),
         project_root=project_path,
     )
 

@@ -271,9 +271,7 @@ def get_prefixes_path(project_root: Path | None = None) -> Path:
     return get_rai_dir(project_root) / PREFIXES_FILE
 
 
-def get_developer_sessions_dir(
-    prefix: str, project_root: Path | None = None
-) -> Path:
+def get_developer_sessions_dir(prefix: str, project_root: Path | None = None) -> Path:
     """Get the per-developer session index directory.
 
     Lives under personal/sessions/{prefix}/ (gitignored by default).

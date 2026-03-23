@@ -52,6 +52,7 @@ class TestSessionIndexEntry:
     def test_frozen(self) -> None:
         """Entry should be immutable."""
         import pydantic
+
         entry = SessionIndexEntry(
             id="S-E-260322-1430",
             name="test",
@@ -193,7 +194,9 @@ class TestActiveSessionPointer:
 
     def test_clear_only_if_matching_session(self, tmp_path: Path) -> None:
         """Should NOT clear if active pointer belongs to a different session."""
-        write_active_session(self._make_pointer("S-E-260322-1430"), project_root=tmp_path)
+        write_active_session(
+            self._make_pointer("S-E-260322-1430"), project_root=tmp_path
+        )
         clear_active_session(session_id="S-E-260322-1600", project_root=tmp_path)
         result = read_active_session(project_root=tmp_path)
         assert result is not None  # Not cleared — different session
@@ -201,15 +204,21 @@ class TestActiveSessionPointer:
 
     def test_clear_matching_session(self, tmp_path: Path) -> None:
         """Should clear if session ID matches."""
-        write_active_session(self._make_pointer("S-E-260322-1430"), project_root=tmp_path)
+        write_active_session(
+            self._make_pointer("S-E-260322-1430"), project_root=tmp_path
+        )
         clear_active_session(session_id="S-E-260322-1430", project_root=tmp_path)
         result = read_active_session(project_root=tmp_path)
         assert result is None
 
     def test_write_overwrites_previous(self, tmp_path: Path) -> None:
         """Writing a new active session should replace the previous one."""
-        write_active_session(self._make_pointer("S-E-260322-1430"), project_root=tmp_path)
-        write_active_session(self._make_pointer("S-E-260322-1600"), project_root=tmp_path)
+        write_active_session(
+            self._make_pointer("S-E-260322-1430"), project_root=tmp_path
+        )
+        write_active_session(
+            self._make_pointer("S-E-260322-1600"), project_root=tmp_path
+        )
         result = read_active_session(project_root=tmp_path)
         assert result is not None
         assert result.id == "S-E-260322-1600"

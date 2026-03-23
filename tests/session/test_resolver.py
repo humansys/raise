@@ -131,16 +131,12 @@ class TestNormalizeNewFormat:
 
     def test_new_format_via_resolve(self) -> None:
         """New format should work through resolve_session_id."""
-        result = resolve_session_id(
-            session_flag="S-E-260322-1430", env_var=None
-        )
+        result = resolve_session_id(session_flag="S-E-260322-1430", env_var=None)
         assert result == "S-E-260322-1430"
 
     def test_new_format_via_env_var(self) -> None:
         """New format should work via RAI_SESSION_ID env var."""
-        result = resolve_session_id(
-            session_flag=None, env_var="S-E-260322-1430"
-        )
+        result = resolve_session_id(session_flag=None, env_var="S-E-260322-1430")
         assert result == "S-E-260322-1430"
 
     def test_legacy_format_still_works(self) -> None:

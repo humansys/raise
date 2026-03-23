@@ -45,7 +45,9 @@ class TestPrefixRegistryRegister:
     def test_register_existing_same_name_is_idempotent(self) -> None:
         """Registering the same prefix+name should be idempotent."""
         registry = PrefixRegistry(
-            prefixes={"E": PrefixEntry(name="Emilio Osorio", registered=date(2026, 1, 1))}
+            prefixes={
+                "E": PrefixEntry(name="Emilio Osorio", registered=date(2026, 1, 1))
+            }
         )
         actual = registry.register("E", "Emilio Osorio")
         assert actual == "E"
@@ -59,7 +61,9 @@ class TestPrefixRegistryCollision:
     def test_collision_detected(self) -> None:
         """Different developer with same prefix should trigger collision."""
         registry = PrefixRegistry(
-            prefixes={"E": PrefixEntry(name="Eduardo Pérez", registered=date(2026, 1, 1))}
+            prefixes={
+                "E": PrefixEntry(name="Eduardo Pérez", registered=date(2026, 1, 1))
+            }
         )
         with pytest.raises(ValueError, match="already registered"):
             registry.register("E", "Emilio Osorio")
@@ -67,7 +71,9 @@ class TestPrefixRegistryCollision:
     def test_resolve_collision_suggests_extended(self) -> None:
         """Should suggest extended prefix based on last name initial."""
         registry = PrefixRegistry(
-            prefixes={"E": PrefixEntry(name="Eduardo Pérez", registered=date(2026, 1, 1))}
+            prefixes={
+                "E": PrefixEntry(name="Eduardo Pérez", registered=date(2026, 1, 1))
+            }
         )
         suggested = registry.resolve_collision("E", "Emilio Osorio")
         assert suggested == "EO"

@@ -189,9 +189,7 @@ def format_recent_sessions(  # noqa: C901
     if developer_prefix:
         from raise_cli.session.index import read_session_entries
 
-        entries = read_session_entries(
-            developer_prefix, project_root=project_path
-        )
+        entries = read_session_entries(developer_prefix, project_root=project_path)
         if entries:
             recent = list(reversed(entries[-limit:]))
             lines = ["Recent:"]
@@ -201,16 +199,12 @@ def format_recent_sessions(  # noqa: C901
                     name = name[:77] + "..."
                 duration_str = ""
                 if entry.closed and entry.started:
-                    mins = int(
-                        (entry.closed - entry.started).total_seconds() / 60
-                    )
+                    mins = int((entry.closed - entry.started).total_seconds() / 60)
                     if mins >= 60:
                         duration_str = f", {mins // 60}h{mins % 60:02d}m"
                     else:
                         duration_str = f", {mins}m"
-                lines.append(
-                    f"- {entry.id}: {name} ({entry.type}{duration_str})"
-                )
+                lines.append(f"- {entry.id}: {name} ({entry.type}{duration_str})")
             return "\n".join(lines)
 
     # Legacy format: flat index without prefix directory

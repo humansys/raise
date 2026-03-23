@@ -701,8 +701,12 @@ class TestSessionStartCreatesDir:
         # Per-session directory should exist (new format: S-{P}-YYMMDD-HHMM)
         sessions_dir = project_path / ".raise" / "rai" / "personal" / "sessions"
         assert sessions_dir.exists(), "Sessions directory should exist after start"
-        session_dirs = [d for d in sessions_dir.iterdir() if d.is_dir() and d.name.startswith("S-")]
-        assert len(session_dirs) >= 1, "Per-session directory should be created on start"
+        session_dirs = [
+            d for d in sessions_dir.iterdir() if d.is_dir() and d.name.startswith("S-")
+        ]
+        assert len(session_dirs) >= 1, (
+            "Per-session directory should be created on start"
+        )
 
     def test_start_migrates_flat_files(self, tmp_path: Path) -> None:
         """Session start migrates flat state/telemetry files to per-session dir."""
@@ -735,8 +739,14 @@ class TestSessionStartCreatesDir:
         assert result.exit_code == 0
         # Flat files should be moved to a per-session dir (new format: S-T-YYMMDD-HHMM)
         sessions_dir = project_path / ".raise" / "rai" / "personal" / "sessions"
-        session_dirs = [d for d in sessions_dir.iterdir() if d.is_dir() and (d / "state.yaml").exists()]
-        assert len(session_dirs) == 1, "Migration should create one session dir with state"
+        session_dirs = [
+            d
+            for d in sessions_dir.iterdir()
+            if d.is_dir() and (d / "state.yaml").exists()
+        ]
+        assert len(session_dirs) == 1, (
+            "Migration should create one session dir with state"
+        )
         assert (session_dirs[0] / "signals.jsonl").exists()
         # Old flat files should be removed
         assert not flat_state.exists(), (
@@ -1131,7 +1141,9 @@ class TestSessionCloseCoherenceValidation:
             patch("raise_cli.cli.commands.session.cleanup_session_dir"),
             patch("raise_cli.cli.commands.session.write_session_entry"),
             patch("raise_cli.cli.commands.session.clear_active_session"),
-            patch("raise_cli.cli.commands.session.read_active_session", return_value=None),
+            patch(
+                "raise_cli.cli.commands.session.read_active_session", return_value=None
+            ),
         ):
             mock_resolve.return_value = "SES-219"
             mock_close.return_value = CloseResult(success=True, session_id="SES-219")
@@ -1358,7 +1370,9 @@ class TestSessionCloseSharedIndex:
                 "raise_cli.cli.commands.session.write_session_entry"
             ) as mock_write_entry,
             patch("raise_cli.cli.commands.session.clear_active_session"),
-            patch("raise_cli.cli.commands.session.read_active_session", return_value=None),
+            patch(
+                "raise_cli.cli.commands.session.read_active_session", return_value=None
+            ),
         ):
             mock_close.return_value = CloseResult(
                 success=True, session_id="S-T-260322-1430"
