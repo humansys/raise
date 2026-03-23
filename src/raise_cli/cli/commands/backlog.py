@@ -227,10 +227,7 @@ def get(
     # Description
     if detail.description:
         console.print()
-        desc = detail.description
-        if len(desc) > 500:
-            desc = desc[:500] + "..."
-        console.print(desc)
+        console.print(detail.description)
 
 
 @backlog_app.command("get-comments")
