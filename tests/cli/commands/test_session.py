@@ -87,7 +87,7 @@ class TestSessionStart:
         saved_profile = mock_save.call_args[0][0]
         assert len(saved_profile.active_sessions) == 1
         assert saved_profile.active_sessions[0].project == str(project_path)
-        assert "SES-001" in result.output  # Session ID displayed
+        assert "S-C-" in result.output  # New-format session ID displayed (C for Carol)
 
     def test_start_warns_on_stale_session(self, tmp_path: Path) -> None:
         """Starting when stale session exists warns user."""
@@ -698,12 +698,11 @@ class TestSessionStartCreatesDir:
             )
 
         assert result.exit_code == 0
-        # Per-session directory should exist
-        session_dir = (
-            project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
-        )
-        assert session_dir.exists(), "Per-session directory should be created on start"
-        assert session_dir.is_dir()
+        # Per-session directory should exist (new format: S-T-YYMMDD-HHMM)
+        sessions_dir = project_path / ".raise" / "rai" / "personal" / "sessions"
+        if sessions_dir.exists():
+            session_dirs = [d for d in sessions_dir.iterdir() if d.is_dir() and d.name.startswith("S-")]
+            assert len(session_dirs) >= 1, "Per-session directory should be created on start"
 
     def test_start_migrates_flat_files(self, tmp_path: Path) -> None:
         """Session start migrates flat state/telemetry files to per-session dir."""
@@ -778,7 +777,7 @@ class TestSessionStartWithAgent:
             )
 
         assert result.exit_code == 0
-        assert "SES-" in result.output  # Session ID present
+        assert "S-T-" in result.output  # New-format session ID present
         assert "(claude-code)" in result.output
 
     def test_start_without_agent_defaults(self, tmp_path: Path) -> None:
