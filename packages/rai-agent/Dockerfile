@@ -35,8 +35,13 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Copy workspace root config
+# Copy workspace root config and patch out proprietary package references
+# (raise-pro, raise-server are not included in the Docker image)
 COPY pyproject.toml uv.lock ./
+RUN sed -i '/^raise-server = { workspace = true }/d' pyproject.toml \
+    && sed -i '/^raise-pro = { workspace = true }/d' pyproject.toml \
+    && sed -i '/^    "raise-pro",$/d' pyproject.toml \
+    && sed -i '/^    "raise-server",$/d' pyproject.toml
 
 # Copy workspace packages that rai-agent depends on
 COPY packages/raise-core/ packages/raise-core/
