@@ -17,7 +17,7 @@ from raise_cli.exceptions import (
     ValidationError,
 )
 
-__version__ = "2.2.3"
+__version__ = "2.3.0"
 __author__ = "Emilio Osorio"
 __license__ = "MIT"
 

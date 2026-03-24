@@ -12,7 +12,7 @@ raise-pro = { workspace = true }
 
 [project]
 name = "raise-cli"
-version = "2.2.3"
+version = "2.3.0"
 description = "RaiSE CLI - Reliable AI Software Engineering governance framework"
 authors = [
     {name = "Emilio Osorio", email = "emilio@humansys.ai"}
