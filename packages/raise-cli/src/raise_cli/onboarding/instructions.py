@@ -464,8 +464,8 @@ class InstructionsGenerator:
             "| why: PATH positional"
         )
         lines.append(
-            '- wrong: rai backlog create RAISE --summary "Title" '
-            '| right: rai backlog create "Title" -p RAISE '
+            '- wrong: rai backlog create MY_PROJECT --summary "Title" '
+            '| right: rai backlog create "Title" -p MY_PROJECT '
             "| why: SUMMARY positional, project is -p flag"
         )
         lines.append(
