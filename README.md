@@ -219,39 +219,51 @@ rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 
 ---
 
-## Repository Structure
+## Project Structure
+
+This is a **uv workspace monorepo** with 5 packages:
+
+| Package | Description | PyPI |
+|---------|-------------|------|
+| **raise-core** | Graph, memory, patterns, discovery engine | `pip install raise-core` |
+| **raise-cli** | `rai` CLI toolkit (session, graph, backlog, gates) | `pip install raise-cli` |
+| **rai-agent** | Autonomous agent daemon (Telegram, cron, Claude Code) | `pip install rai-agent` |
+| **raise-pro** | Enterprise integrations (Jira, Confluence) | Private |
+| **raise-server** | REST API + PostgreSQL backend | Private |
 
 ```
 raise-commons/
-├── .claude/skills/      # Claude Code skills (27 skills)
+├── packages/
+│   ├── raise-core/        # Core library (graph, memory, patterns)
+│   ├── raise-cli/         # CLI toolkit
+│   ├── rai-agent/         # Agent daemon + Dockerfile
+│   ├── raise-pro/         # Enterprise integrations (private)
+│   └── raise-server/      # API server (private)
 │
-├── framework/           # Public textbook (concepts, reference)
-│   ├── reference/       #   Constitution, glossary, philosophy
-│   ├── concepts/        #   Core concepts (katas, gates, artifacts)
-│   └── getting-started/ #   Greenfield/brownfield guides
-│
-├── .raise/              # Framework engine
-│   ├── rai/             #   Rai's memory and personal data
-│   │   ├── memory/      #     Patterns, knowledge graph (shared)
-│   │   └── personal/    #     Sessions, calibration (per-developer, gitignored)
-│   ├── katas/           #   Process definitions
-│   ├── gates/           #   Validation criteria
-│   ├── templates/       #   Artifact scaffolds
-│   └── skills/          #   Legacy skill definitions
-│
-├── governance/          # Project governance
-│   ├── architecture/    #   Module docs, system design
-│   └── solution/        #   Vision, guardrails, business case
-│
-├── src/rai_cli/         # CLI toolkit (Python)
-│
-├── work/                # Work in progress
-│   └── stories/         #   Story artifacts (scope, design, plan, retro)
-│
-└── dev/                 # Framework maintenance
-    ├── decisions/       #   ADRs (Architecture Decision Records)
-    └── parking-lot.md   #   Ideas and tangents for later
+├── .claude/skills/        # Claude Code skills (27 skills)
+├── framework/             # Public textbook (concepts, reference)
+├── .raise/                # Framework engine (memory, gates, templates)
+├── governance/            # Architecture docs, guardrails
+├── work/                  # Epics and story artifacts
+└── docker-compose.yml     # Local dev + rai-agent deployment
 ```
+
+## Running rai-agent with Docker
+
+The fastest way to run rai-agent (Telegram bot + daemon):
+
+```bash
+git clone https://github.com/humansys/raise.git
+cd raise
+cp .env.example .env   # Edit: add your auth + Telegram bot token
+docker compose up rai-agent
+```
+
+See `.env.example` for all supported authentication methods:
+- Claude subscription (Pro/Max) via `claude setup-token`
+- Anthropic API key (BYOK, pay-as-you-go)
+- AWS Bedrock, Google Vertex AI, Azure Foundry
+- LLM Proxy / Gateway
 
 ---
 
@@ -259,14 +271,13 @@ raise-commons/
 
 ```
 main (stable releases)
-  └── v2 (development)
-        └── epic/e{N}/{name}
-              └── story/s{N}.{M}/{name}
+  └── dev (development)
+        └── story/s{N}.{M}/{name}
 ```
 
-- Work on `v2` (development branch)
-- Stories branch from and merge back to their epic or `v2`
-- `main` receives releases from `v2`
+- Stories branch from and merge to `dev`
+- Epics are logical containers (directory + tracker), not branches
+- `main` receives releases from `dev`
 
 ---
 
