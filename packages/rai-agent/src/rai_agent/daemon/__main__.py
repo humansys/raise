@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
+import os
 import signal
 from dataclasses import dataclass
 from pathlib import Path
@@ -220,6 +221,10 @@ def main(argv: list[str] | None = None) -> None:
     Args:
         argv: Argument list (defaults to sys.argv[1:]).
     """
+    # Allow launching from inside a Claude Code session (e.g. during development).
+    # The SDK refuses to nest sessions when this variable is set.
+    os.environ.pop("CLAUDECODE", None)
+
     logging.basicConfig(
         level=logging.INFO,
         format="%(levelname)s %(name)s: %(message)s",
