@@ -52,6 +52,38 @@ def _quote_project_values(jql: str) -> str:
     return _UNQUOTED_PROJECT.sub(r'\1"\2"', jql)
 
 
+def _adf_to_text(value: object) -> str:
+    """Convert an ADF (Atlassian Document Format) dict to plain text.
+
+    Passes plain strings through unchanged. Returns empty string for None/falsy.
+    Handles: paragraph, heading, text, bulletList, orderedList, listItem,
+    codeBlock, blockquote.
+    """
+    if not value:
+        return ""
+    if not isinstance(value, dict):
+        return str(value)
+
+    parts: list[str] = []
+
+    def _walk(node: dict[str, Any]) -> None:
+        node_type = node.get("type", "")
+        raw_content: Any = node.get("content")
+        content: list[Any] = cast(list[Any], raw_content) if isinstance(raw_content, list) else []
+        if node_type == "text":
+            parts.append(str(node.get("text", "")))
+            return
+        if node_type == "listItem":
+            parts.append("- ")
+        for child in content:
+            _walk(child)
+        if node_type in ("paragraph", "heading", "blockquote", "codeBlock", "listItem"):
+            parts.append("\n")
+
+    _walk(cast(dict[str, Any], value))
+    return "".join(parts).strip()
+
+
 def to_jql(query: str) -> str:
     r"""Normalize a user query to valid JQL.
 
@@ -217,7 +249,7 @@ class AcliJiraAdapter:
         return IssueDetail(
             **common,
             url=self.build_url(common["key"]),
-            description=str(fields.get("description", "")),
+            description=_adf_to_text(fields.get("description", "")),
             labels=fields.get("labels", []),
             assignee=assignee.get("displayName") if assignee else None,
             priority=priority.get("name") if priority else None,
