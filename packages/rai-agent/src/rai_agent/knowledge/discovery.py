@@ -333,7 +333,7 @@ def reconcile_extracted(
 
         modified = False
         new_rels: list[dict[str, str]] = []
-        rels = cast(list[dict[str, str]], raw["relationships"])
+        rels = cast("list[dict[str, str]]", raw["relationships"])
         for rel in rels:
             if "target" not in rel:
                 new_rels.append(rel)

@@ -258,7 +258,7 @@ def run_coverage(config: GateConfig, domain: str = "unknown") -> GateResult:
 
         # Try to use the ScaleUp coverage checker if available
         try:
-            from rai_agent.scaleup.validation.models import CompetencyQuestion  # pyright: ignore[reportMissingImports]
+            from rai_agent.scaleup.validation.models import CompetencyQuestion  # noqa: I001  # pyright: ignore[reportMissingImports]
             from rai_agent.scaleup.validation.schema_validator import check_competency  # pyright: ignore[reportMissingImports]
 
             cq_raw: object = yaml.safe_load(config.cq_file.read_text())
