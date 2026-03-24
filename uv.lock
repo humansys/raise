@@ -16,6 +16,7 @@ resolution-markers = [
 [manifest]
 members = [
     "raise-cli",
+    "raise-core",
     "raise-pro",
     "raise-server",
 ]
@@ -1414,6 +1415,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
+    { name = "raise-core" },
     { name = "rich" },
     { name = "tree-sitter" },
     { name = "tree-sitter-javascript" },
@@ -1469,6 +1471,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "pyyaml", specifier = ">=6.0.1" },
+    { name = "raise-core", editable = "packages/raise-core" },
     { name = "raise-pro", marker = "extra == 'dev'", editable = "packages/raise-pro" },
     { name = "raise-server", marker = "extra == 'dev'", editable = "packages/raise-server" },
     { name = "rich", specifier = ">=13.7.0" },
@@ -1486,6 +1489,21 @@ provides-extras = ["dev", "mcp", "observability", "csharp"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "readme-renderer", extras = ["md"], specifier = ">=44.0" }]
+
+[[package]]
+name = "raise-core"
+version = "2.3.0"
+source = { editable = "packages/raise-core" }
+dependencies = [
+    { name = "networkx" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "networkx", specifier = ">=3.6.1" },
+    { name = "pydantic", specifier = ">=2.6.0" },
+]
 
 [[package]]
 name = "raise-pro"

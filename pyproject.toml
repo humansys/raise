@@ -7,6 +7,7 @@ constraint-dependencies = ["pyjwt>=2.12.0"]
 members = ["packages/*"]
 
 [tool.uv.sources]
+raise-core = { workspace = true }
 raise-server = { workspace = true }
 raise-pro = { workspace = true }
 
@@ -33,6 +34,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "raise-core",
     "typer>=0.12.0",
     "rich>=13.7.0",
     "pydantic>=2.6.0",
@@ -126,12 +128,11 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/raise_cli", "src/raise_core"]
+packages = ["src/raise_cli"]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/src/raise_cli/",
-    "/src/raise_core/",
     "/LICENSE",
     "/README.md",
     "/pyproject.toml",
