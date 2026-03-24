@@ -1,0 +1,312 @@
+[tool.uv]
+# Security constraints for transitive dependencies
+# CVE-2026-32597: pyjwt <2.12.0 improper crit header validation (CVSS 8.7)
+constraint-dependencies = ["pyjwt>=2.12.0"]
+
+[tool.uv.sources]
+
+[project]
+name = "raise-cli"
+version = "2.3.0"
+description = "RaiSE CLI - Reliable AI Software Engineering governance framework"
+authors = [
+    {name = "Emilio Osorio", email = "emilio@humansys.ai"}
+]
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.12"
+keywords = ["ai", "governance", "cli", "software-engineering", "methodology"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+    "networkx>=3.6.1",
+    "tree-sitter>=0.25.2",
+    "tree-sitter-typescript>=0.23.2",
+    "tree-sitter-javascript>=0.25.0",
+    "tree-sitter-php>=0.24.1",
+    "tree-sitter-svelte>=1.0.2",
+    "tree-sitter-language-pack>=0.13.0",
+    "logfire-api>=4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.4.0",
+    "pyright>=1.1.350",
+    "bandit>=1.7.8",
+    "httpx>=0.27.0",
+    "mcp>=1.26,<2",
+    "import-linter>=2.11",
+]
+mcp = [
+    "mcp>=1.26,<2",
+]
+observability = [
+    "logfire>=4.0",
+]
+csharp = [
+    "tree-sitter-c-sharp>=0.23.1",
+]
+
+[project.urls]
+Homepage = "https://raiseframework.ai"
+Documentation = "https://docs.raiseframework.ai"
+Repository = "https://github.com/humansys/raise"
+Changelog = "https://github.com/humansys/raise/blob/main/CHANGELOG.md"
+
+[project.scripts]
+rai = "raise_cli.cli.main:app"
+
+[project.entry-points."rai.governance.parsers"]
+prd = "raise_cli.governance.parsers.prd:PrdParser"
+vision = "raise_cli.governance.parsers.vision:VisionParser"
+constitution = "raise_cli.governance.parsers.constitution:ConstitutionParser"
+roadmap = "raise_cli.governance.parsers.roadmap:RoadmapParser"
+backlog = "raise_cli.governance.parsers.backlog:BacklogParser"
+epic_scope = "raise_cli.governance.parsers.epic:EpicScopeParser"
+adr = "raise_cli.governance.parsers.adr:AdrParser"
+guardrails = "raise_cli.governance.parsers.guardrails:GuardrailsParser"
+glossary = "raise_cli.governance.parsers.glossary:GlossaryParser"
+
+[project.entry-points."rai.hooks"]
+telemetry = "raise_cli.hooks.builtin.telemetry:TelemetryHook"
+gate-bridge = "raise_cli.hooks.builtin.gate_bridge:GateBridgeHook"
+backlog = "raise_cli.hooks.builtin.backlog:BacklogHook"
+memory-sync = "raise_cli.hooks.builtin.memory:MemoryMdSyncHook"
+
+[project.entry-points."rai.gates"]
+tests = "raise_cli.gates.builtin.tests:TestGate"
+types = "raise_cli.gates.builtin.types:TypeGate"
+lint = "raise_cli.gates.builtin.lint:LintGate"
+coverage = "raise_cli.gates.builtin.coverage:CoverageGate"
+format = "raise_cli.gates.builtin.format:FormatGate"
+
+[project.entry-points."rai.doctor.checks"]
+environment = "raise_cli.doctor.checks.environment:EnvironmentCheck"
+project = "raise_cli.doctor.checks.project:ProjectCheck"
+developer = "raise_cli.doctor.checks.developer:DeveloperCheck"
+
+[project.entry-points."rai.adapters.pm"]
+filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"
+
+[project.entry-points."rai.graph.backends"]
+local = "raise_core.graph.backends.filesystem:FilesystemGraphBackend"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "readme-renderer[md]>=44.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raise_cli", "src/raise_core"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/raise_cli/",
+    "/src/raise_core/",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["src"]
+exclude = ["dev/experiments"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "S",   # flake8-bandit (security)
+    "C90", # McCabe complexity
+    "PL",  # Pylint subset
+    "PERF",# Perflint
+    "FURB",# refurb
+    "RET", # flake8-return
+    "ARG", # flake8-unused-arguments
+    "ERA", # eradicate
+    "PT",  # flake8-pytest-style
+    "TC",  # flake8-type-checking
+    "A",   # flake8-builtins
+    "ANN", # flake8-annotations (D3.1)
+    "D",   # pydocstyle (D5.1)
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "S603",   # subprocess calls are expected in a CLI tool that runs gates/tools
+    "S607",   # partial executable paths are intentional (uv, git, etc.)
+    "PLC0415",# inline imports are a project pattern (lazy loading, conditional imports)
+    "PLR2004",# magic value comparisons are pervasive in tests and parsers
+    "PLR0913",# many-argument functions are common in CLI commands and Pydantic models
+    "PLR0912",# too-many-branches covered by C901 complexity check
+    "PLR0915",# too-many-statements covered by C901 complexity check
+    "PLR0911",# too-many-return-statements covered by C901 complexity check
+    "PLW2901",# loop variable reassignment is a common pattern (line stripping, normalization)
+    "PLW1510",# subprocess.run without check is intentional -- we inspect returncode
+    "PLC0414",# explicit re-exports (X as X) are intentional for backward compatibility
+    "PERF401",# manual list comprehension: many cases have complex loop bodies where comprehension reduces readability
+    "RET504", # unnecessary assignment before return: named returns improve readability
+    "ARG002", # unused method argument: many are protocol/interface conformance
+    "ERA001", # commented-out code: high false positive rate (API docs, section headers, code examples)
+    "PT012", # pytest.raises with multiple statements: often intentional for testing specific line
+    "PT018", # composite assertion: splitting weakens test readability
+    "PT011", # pytest.raises too broad: adding match= to existing tests changes semantics
+    "PT019", # fixture without value: false positives on @patch mock parameters
+    "TC001", # typing-only first-party import: risky with Pydantic/isinstance runtime usage
+    "TC002", # typing-only third-party import: risky with Pydantic/isinstance runtime usage
+    "TC003", # typing-only stdlib import: risky with Pydantic/isinstance runtime usage
+    "TC004", # runtime-import-in-type-checking: intentional lazy imports for optional deps
+    "A002",  # builtin argument shadowing: `format`, `id`, `type` are common domain names
+    "D100",  # module docstring: not required for every module, especially small utilities
+    "D104",  # package docstring: __init__.py files rarely need docstrings
+    "D107",  # __init__ docstring: class docstring suffices
+    "D203",  # one-blank-line-before-class: conflicts with D211 (no-blank-line-before-class)
+    "D213",  # multi-line-summary-second-line: conflicts with D212 (summary-first-line)
+    "ANN401",# Any type: pyright strict enforces real type safety; Any is legitimate for entry points, **kwargs, dynamic dispatch
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Protocol stubs, sync wrappers, and adapter implementations of protocol methods
+"src/raise_cli/adapters/protocols.py" = ["D102"]
+"src/raise_cli/adapters/sync.py" = ["D102"]
+"src/raise_cli/adapters/declarative/adapter.py" = ["D102"]
+"src/raise_cli/doctor/protocol.py" = ["D102"]
+"src/raise_cli/gates/protocol.py" = ["D102"]
+"src/raise_cli/hooks/protocol.py" = ["D102"]
+"tests/**/*.py" = [
+    "S101", "S104", "S108", "S105", "S106",  # security rules relaxed in tests
+    "ARG001", "ARG002", "ARG005",             # unused args (fixtures, mocks)
+    "ANN001", "ANN002", "ANN003",             # parameter annotations optional in tests
+    "ANN201", "ANN202",                       # return annotations optional in tests
+    "D100", "D101", "D102", "D103",           # docstrings optional in tests
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+include = ["src"]
+exclude = [
+    "**/__pycache__",
+    "**/node_modules",
+    ".venv",
+]
+venvPath = "."
+venv = ".venv"
+reportMissingTypeStubs = false
+reportUnknownMemberType = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-m", "not integration",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src/raise_cli",
+    "--cov=src/raise_core",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+markers = [
+    "integration: Manual integration tests requiring external services (run with -m integration)",
+]
+
+[tool.coverage.run]
+source = ["src/raise_cli", "src/raise_core"]
+omit = [
+    "*/tests/*",
+    "*/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.importlinter]
+root_packages = ["raise_cli"]
+
+[[tool.importlinter.contracts]]
+name = "ADR-001 Foundation Independence"
+type = "independence"
+modules = [
+    "raise_cli.core",
+    "raise_cli.schemas",
+    "raise_cli.rai_base",
+    "raise_cli.skills_base",
+]
+
+[[tool.importlinter.contracts]]
+name = "ADR-001 No Upward CLI Dependency"
+type = "forbidden"
+source_modules = [
+    "raise_cli.discovery",
+    "raise_cli.graph",
+    "raise_cli.engines",
+    "raise_cli.core",
+    "raise_cli.schemas",
+    "raise_cli.rai_base",
+    "raise_cli.skills_base",
+]
+forbidden_modules = [
+    "raise_cli.cli",
+    "raise_cli.output",
+    "raise_cli.viz",
+]
+
+[tool.rai]
+# RaiSE CLI configuration for this project
+output_format = "human"
+color = true
+verbosity = 0
+
+[tool.logfire]
+ignore_no_config = true
+

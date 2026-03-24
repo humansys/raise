@@ -1,0 +1,30 @@
+---
+title: rai artifact
+description: Manage and validate skill artifacts.
+---
+
+Manage skill artifacts. Artifacts are typed YAML files in `.raise/artifacts/` that serve as the source of truth for skill outputs (designs, plans, etc.).
+
+## `rai artifact validate`
+
+Validate YAML artifacts against their Pydantic schemas. Reads all `.yaml` files from `.raise/artifacts/` (or a single file with `--file`) and validates each against the type registry.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--file` | | Path to a single artifact file to validate |
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Validate all artifacts
+rai artifact validate
+
+# Validate a specific artifact
+rai artifact validate --file .raise/artifacts/s354.1-design.yaml
+
+# JSON output
+rai artifact validate --format json
+```
+
+**Exit codes:** 0 all pass, 1 any fail.
+
+**See also:** [`rai skill validate`](cli/skill.md)

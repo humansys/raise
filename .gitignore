@@ -1,0 +1,129 @@
+# IDE / editor directories
+.specstory/
+.cursor/
+.idea/
+.vscode/
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+CLAUDE.local.md
+.claude/worktrees/
+.claude/projects/
+
+# Claude Code legacy files (superseded, prevent re-addition)
+.claude/RAI.md
+.claude/RAI-naming.md
+.claude/rai.archive/
+
+# RaiSE generated/cache files
+.raise/cache/
+.raise/confluence-pages.yaml
+.raise/backlog/
+
+# RaiSE adapter configs (contain PII — use .example templates)
+.raise/jira.yaml
+.raise/confluence.yaml
+
+# RaiSE derived artifacts (rebuild with `rai memory build`)
+.raise/rai/memory/index.json
+
+# RaiSE personal directory (per-developer, not shared)
+.raise/rai/personal/
+
+# RaiSE sync state (per-instance JIRA mappings, not shared)
+.raise/rai/sync/
+
+# Temporary files
+req.txt
+*.tmp
+*.bak-*
+*.log
+.DS_Store
+Thumbs.db
+
+# Script generated folders (if testing locally)
+.specify-raise/commands/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+.rai/memory/graph.json
+.envrc
+
+# Legacy telemetry (should be in personal/, will migrate)
+.raise/rai/telemetry/
+
+# MCP server config (contains API tokens)
+.mcp.json
+
+# Secrets & credentials
+.env
+.env.*
+*.pem
+*.key
+.pypirc
+credentials.json
+*.sqlite
+.netrc
+.raise/mcp/
+!.raise/mcp/catalog.yaml
+
+# Website (Astro)
+site/node_modules/
+site/dist/
+site/.astro/
+site/.wrangler/
+docs/node_modules/
+docs/.astro/
+
+# Issue analysis artifacts (PDFs, images — binary, no git value)
+dev/issues/**/*.pdf
+dev/issues/**/*.png
+dev/issues/**/*.jpg
+dev/issues/**/*.txt
+dev/transcripts/
+
+# Prevent symlink artifacts from being tracked at root
+/es/

@@ -1,0 +1,12 @@
+adapter:
+  protocol: pm
+
+server:
+  command: echo
+  args: [test]
+
+methods:
+  search:
+    tool: test_search
+    args:
+      q: "{{ query }}"

@@ -1,0 +1,141 @@
+# Framework Index
+# Manifest of authoritative artifacts that define the RaiSE framework
+# This is the "textbook" of RaiSE - what adopters need to understand and use it
+# See ADR-011 for the Three-Directory Model specification
+
+schema_version: "2.0.0"
+
+framework:
+  name: "RaiSE Framework"
+  description: "Reliable AI Software Engineering - Explicit governance for AI-assisted development"
+  version: "2.5.0"
+  status: active
+
+# Framework documentation structure
+# Organized for progressive learning: overview → getting-started → concepts → reference
+
+artifacts:
+  # Entry Point
+  - path: README.md
+    type: overview
+    version: 2.5.0
+    status: accepted
+    description: "Framework overview - What is RaiSE?"
+
+  - path: vision.md
+    type: vision
+    version: 2.5.0
+    status: accepted
+    description: "Full framework vision document"
+
+  # Getting Started (adoption guides)
+  - path: getting-started/README.md
+    type: guide
+    version: 2.5.0
+    status: accepted
+    description: "Getting started overview"
+
+  - path: getting-started/brownfield.md
+    type: guide
+    version: 2.5.0
+    status: accepted
+    description: "Adopting RaiSE in existing projects"
+
+  - path: getting-started/greenfield.md
+    type: guide
+    version: 2.5.0
+    status: accepted
+    description: "Starting new projects with RaiSE"
+
+  # Concepts (core ideas explained simply)
+  - path: concepts/README.md
+    type: concept
+    version: 2.5.0
+    status: accepted
+    description: "Concepts overview and reading order"
+
+  - path: concepts/governance.md
+    type: concept
+    version: 2.5.0
+    status: accepted
+    description: "Why explicit governance matters"
+
+  - path: concepts/work-cycles.md
+    type: concept
+    version: 2.5.0
+    status: accepted
+    description: "The five phases of work"
+
+  - path: concepts/katas.md
+    type: concept
+    version: 2.5.0
+    status: accepted
+    description: "Guided step-by-step workflows"
+
+  - path: concepts/gates.md
+    type: concept
+    version: 2.5.0
+    status: accepted
+    description: "Validation checkpoints"
+
+  - path: concepts/artifacts.md
+    type: concept
+    version: 2.5.0
+    status: accepted
+    description: "Document hierarchy (Solution → Project → Feature)"
+
+  # Reference (dense, authoritative)
+  - path: reference/glossary.md
+    type: reference
+    version: 2.5.0
+    status: accepted
+    description: "Canonical terminology"
+
+  - path: reference/constitution.md
+    type: reference
+    version: 2.0.0
+    status: accepted
+    description: "Core principles that govern the framework"
+
+  - path: reference/philosophy.md
+    type: reference
+    version: 1.0.0
+    status: accepted
+    description: "Learning philosophy (Heutagogy, Jidoka)"
+
+  - path: reference/work-cycles.md
+    type: reference
+    version: 2.5.0
+    status: accepted
+    description: "Detailed work cycles specification"
+
+  - path: reference/compliance.md
+    type: reference
+    version: 1.0.0
+    status: accepted
+    description: "Compliance patterns and requirements"
+
+# Note: ADRs and schemas moved to dev/ (internal implementation details)
+# See: dev/decisions/framework/ and dev/schemas/
+
+relationships:
+  - from: concepts/governance.md
+    to: reference/constitution.md
+    type: simplifies
+
+  - from: concepts/work-cycles.md
+    to: reference/work-cycles.md
+    type: simplifies
+
+  - from: getting-started/brownfield.md
+    to: concepts/governance.md
+    type: requires_understanding
+
+  - from: getting-started/greenfield.md
+    to: concepts/work-cycles.md
+    type: requires_understanding
+
+# Metadata
+created: 2026-01-30
+last_updated: 2026-01-30
+maintained_by: "RaiSE Framework Maintainers"
