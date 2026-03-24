@@ -2,6 +2,7 @@
 story_id: "{STORY_ID}"
 epic_ref: "{EPIC_ID}"
 size: "{XS|S|M|L}"
+type: "{code|docs|analysis}"
 status: "draft"
 ---
 

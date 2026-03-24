@@ -1,9 +1,10 @@
 ---
 name: rai-epic-close
 description: >
-  Complete an epic with retrospective, metrics capture, and tracking update.
-  No branch merge — epics are logical containers. Story branches merge
-  directly to the development branch during story-close.
+  Complete an epic with retrospective, metrics capture, push to origin,
+  merge request creation, and tracking update. Epics are logical containers —
+  stories merge locally to dev during story-close, then epic-close pushes
+  dev and creates the MR.
 
 license: MIT
 
@@ -124,7 +125,50 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 Tag created. Retrospective committed.
 </verification>
 
-### Step 4: Update Backlog & Context
+### Step 4: Push and Create Merge Request
+
+Push `{dev_branch}` to origin and create a merge request. This is the single MR for the entire epic — all stories were merged locally during `/rai-story-close`.
+
+```bash
+# Push dev with all epic commits
+git push origin {dev_branch}
+
+# Create merge request via glab (dev → main for releases, or just push dev)
+glab mr create \
+  --source-branch {dev_branch} \
+  --target-branch {main_branch} \
+  --title "epic(e{N}): {Epic Name}" \
+  --description "## Epic E{N}: {Epic Name}
+
+### Stories delivered
+- S{N}.1: {name}
+- S{N}.2: {name}
+- ...
+
+### Key changes
+- {summary of deliverables}
+
+### Retrospective
+- {top learnings}
+
+Co-Authored-By: Rai <rai@humansys.ai>" \
+  --no-editor
+```
+
+Present the MR URL to the developer for review.
+
+| Condition | Action |
+|-----------|--------|
+| MR to main needed | Create MR as above |
+| No release planned | Push dev only, skip MR to main |
+| `glab` not available | Provide the GitLab URL from `git push` output for manual MR creation |
+| Push rejected | `git pull --rebase origin {dev_branch}`, resolve conflicts, push again |
+
+<verification>
+Dev pushed to origin. MR created if targeting main. MR URL presented to developer.
+</verification>
+
+### Step 5: Update Backlog & Context
 
 1. Mark epic complete via CLI:
    - **If Jira issue exists:** `rai backlog transition {JIRA_KEY} "Done" -a jira`
@@ -145,6 +189,8 @@ Backlog reflects completion. Local context updated.
 |------|-------------|
 | Retrospective | `work/epics/e{N}-{name}/retrospective.md` |
 | Tag | `epic/e{N}-complete` on `{dev_branch}` |
+| Push | `{dev_branch}` pushed to origin |
+| Merge request | GitLab MR: `{dev_branch}` → `{main_branch}` (if release) |
 | Backlog update | Tracker via `rai backlog` CLI |
 
 ## Quality Checklist
@@ -153,9 +199,12 @@ Backlog reflects completion. Local context updated.
 - [ ] Tests pass before closing
 - [ ] Retrospective captures metrics, patterns, and process insights
 - [ ] Epic milestone tagged on `{dev_branch}`
+- [ ] Dev pushed to origin with all epic commits
+- [ ] Merge request created if targeting main (epic-level MR, not per story)
 - [ ] Backlog updated via `rai backlog transition` CLI
 - [ ] No epic branch to clean up — epics are logical containers
 - [ ] NEVER close without retrospective — learnings compound across epics
+- [ ] NEVER create per-story MRs — one MR per epic at close time
 
 ## References
 

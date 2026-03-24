@@ -6,6 +6,23 @@
 
 ---
 
+## Docs Audience Tagging + Package-Aware Publish — 2026-03-23
+
+**Origin:** E680/S680.3 — discovered Pro/Community docs are mixed in `docs/`.
+
+**Problem:** Jira adapter docs (Pro feature) live in raise-commons/docs/ alongside Community docs. Release prep can accidentally update/publish Pro docs in a Community release. Users see features they can't use.
+
+**Proposed solution:**
+1. `audience: pro|community|both` frontmatter tag on each doc file
+2. `rai release publish --package X` filters docs by audience matching package
+3. Release prep skills scope docs to the package being released
+
+**Timing:** Resolve during monorepo migration — each package gets its own docs directory naturally. Frontmatter tagging is the bridge pattern until then.
+
+**Promote when:** Monorepo migration epic starts.
+
+---
+
 ## raise-pro Distribution & Licensing — 2026-03-20
 
 **Context:** E494 delivered the ACLI Jira adapter as the first raise-pro feature. Need secure distribution to clients before more pro features land.
