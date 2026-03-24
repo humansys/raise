@@ -173,7 +173,369 @@ def _get_cli_version() -> str:
         return "unknown"
 
 
-def scaffold_skills(  # noqa: C901 -- multi-step scaffolding with many conditions; defer decomposition to S370.5
+def _apply_skill_write(
+    skill_name: str,
+    skill_md: Path,
+    skill_dest: Path,
+    source: Path | Traversable,
+    bundled_content: str,
+    hash_new: str,
+    cli_version: str,
+    manifest: SkillManifest,
+    result: SkillScaffoldResult,
+    *,
+    plugin: AgentPlugin | None,
+    agent_config: AgentConfig,
+) -> None:
+    """Write SKILL.md, copy tree, and update manifest (shared write pattern)."""
+    skill_md.write_text(bundled_content, encoding="utf-8")
+    result.files_copied.append(str(skill_md))
+    copy_skill_tree(
+        source,
+        skill_dest,
+        result,
+        plugin=plugin,
+        agent_config=agent_config,
+        overwrite=True,
+    )
+    manifest.skills[skill_name] = SkillEntry(sha256=hash_new, version=cli_version)
+
+
+def _handle_new_skill(
+    skill_name: str,
+    source: Path | Traversable,
+    skill_dest: Path,
+    hash_new: str,
+    cli_version: str,
+    manifest: SkillManifest,
+    result: SkillScaffoldResult,
+    *,
+    dry_run: bool,
+    plugin: AgentPlugin | None,
+    agent_config: AgentConfig,
+) -> None:
+    """Install a skill that doesn't exist on disk yet."""
+    if not dry_run:
+        copied = copy_skill_tree(
+            source,
+            skill_dest,
+            result,
+            plugin=plugin,
+            agent_config=agent_config,
+            overwrite=True,
+        )
+        manifest.skills[skill_name] = SkillEntry(sha256=hash_new, version=cli_version)
+        if copied > 0:
+            result.skills_copied += 1
+    result.skills_installed.append(skill_name)
+
+
+def _handle_auto_update(
+    skill_name: str,
+    skill_md: Path,
+    skill_dest: Path,
+    source: Path | Traversable,
+    bundled_content: str,
+    hash_new: str,
+    cli_version: str,
+    manifest: SkillManifest,
+    result: SkillScaffoldResult,
+    *,
+    skip_updates: bool,
+    dry_run: bool,
+    plugin: AgentPlugin | None,
+    agent_config: AgentConfig,
+) -> None:
+    """Handle AUTO_UPDATE: safe to overwrite since user hasn't customized."""
+    if skip_updates:
+        result.skills_current.append(skill_name)
+        result.skills_skipped_names.append(skill_name)
+    elif not dry_run:
+        _apply_skill_write(
+            skill_name,
+            skill_md,
+            skill_dest,
+            source,
+            bundled_content,
+            hash_new,
+            cli_version,
+            manifest,
+            result,
+            plugin=plugin,
+            agent_config=agent_config,
+        )
+        result.skills_updated.append(skill_name)
+    else:
+        result.skills_updated.append(skill_name)
+
+
+def _resolve_conflict_interactive(
+    skill_name: str,
+    skill_md: Path,
+    skill_dest: Path,
+    source: Path | Traversable,
+    bundled_content: str,
+    hash_new: str,
+    cli_version: str,
+    manifest: SkillManifest,
+    result: SkillScaffoldResult,
+    *,
+    plugin: AgentPlugin | None,
+    agent_config: AgentConfig,
+) -> tuple[bool, bool]:
+    """Prompt user to resolve a conflict. Returns (batch_keep, batch_overwrite)."""
+    from raise_cli.onboarding.skill_conflict import (
+        ConflictAction,
+        prompt_skill_conflict,
+    )
+
+    on_disk_content = skill_md.read_text(encoding="utf-8")
+    user_action = prompt_skill_conflict(skill_name, on_disk_content, bundled_content)
+
+    if user_action == ConflictAction.KEEP:
+        result.skills_kept.append(skill_name)
+        return False, False
+    if user_action == ConflictAction.KEEP_ALL:
+        result.skills_kept.append(skill_name)
+        return True, False
+    if user_action in (ConflictAction.OVERWRITE, ConflictAction.OVERWRITE_ALL):
+        _apply_skill_write(
+            skill_name,
+            skill_md,
+            skill_dest,
+            source,
+            bundled_content,
+            hash_new,
+            cli_version,
+            manifest,
+            result,
+            plugin=plugin,
+            agent_config=agent_config,
+        )
+        result.skills_overwritten.append(skill_name)
+        return False, user_action == ConflictAction.OVERWRITE_ALL
+    if user_action == ConflictAction.BACKUP_OVERWRITE:
+        skill_md.with_suffix(".md.bak").write_text(on_disk_content, encoding="utf-8")
+        _apply_skill_write(
+            skill_name,
+            skill_md,
+            skill_dest,
+            source,
+            bundled_content,
+            hash_new,
+            cli_version,
+            manifest,
+            result,
+            plugin=plugin,
+            agent_config=agent_config,
+        )
+        result.skills_overwritten.append(skill_name)
+    return False, False
+
+
+def _resolve_conflict(
+    skill_name: str,
+    skill_md: Path,
+    skill_dest: Path,
+    source: Path | Traversable,
+    bundled_content: str,
+    hash_new: str,
+    cli_version: str,
+    manifest: SkillManifest,
+    result: SkillScaffoldResult,
+    *,
+    force: bool,
+    skip_updates: bool,
+    batch_overwrite: bool,
+    batch_keep: bool,
+    dry_run: bool,
+    plugin: AgentPlugin | None,
+    agent_config: AgentConfig,
+) -> tuple[bool, bool]:
+    """Handle CONFLICT action. Returns updated (batch_keep, batch_overwrite)."""
+    if force or batch_overwrite:
+        if not dry_run:
+            _apply_skill_write(
+                skill_name,
+                skill_md,
+                skill_dest,
+                source,
+                bundled_content,
+                hash_new,
+                cli_version,
+                manifest,
+                result,
+                plugin=plugin,
+                agent_config=agent_config,
+            )
+        result.skills_overwritten.append(skill_name)
+        return batch_keep, batch_overwrite
+    if skip_updates or batch_keep:
+        result.skills_conflicted.append(skill_name)
+        result.skills_skipped_names.append(skill_name)
+        return batch_keep, batch_overwrite
+    if dry_run:
+        result.skills_conflicted.append(skill_name)
+        return batch_keep, batch_overwrite
+    new_keep, new_overwrite = _resolve_conflict_interactive(
+        skill_name,
+        skill_md,
+        skill_dest,
+        source,
+        bundled_content,
+        hash_new,
+        cli_version,
+        manifest,
+        result,
+        plugin=plugin,
+        agent_config=agent_config,
+    )
+    return batch_keep or new_keep, batch_overwrite or new_overwrite
+
+
+def _apply_skill_set_overlay(
+    project_root: Path,
+    skills_dir: Path,
+    skill_set: str,
+    manifest: SkillManifest,
+    result: SkillScaffoldResult,
+    cli_version: str,
+    *,
+    plugin: AgentPlugin | None,
+    agent_config: AgentConfig,
+) -> None:
+    """Copy skill-set overlay on top of builtins (S340.1)."""
+    from raise_cli.config.paths import get_raise_dir
+
+    overlay_dir = get_raise_dir(project_root) / "skills" / skill_set
+    if not overlay_dir.is_dir():
+        logger.warning("Skill set '%s' not found at %s", skill_set, overlay_dir)
+        return
+    for skill_dir in sorted(overlay_dir.iterdir()):
+        if not skill_dir.is_dir():
+            continue
+        if not (skill_dir / SKILL_MD_FILENAME).exists():
+            continue
+        copy_skill_tree(
+            skill_dir,
+            skills_dir / skill_dir.name,
+            result,
+            plugin=plugin,
+            agent_config=agent_config,
+            overwrite=True,
+        )
+        overlay_content = (skill_dir / SKILL_MD_FILENAME).read_text(encoding="utf-8")
+        manifest.skills[skill_dir.name] = SkillEntry(
+            sha256=compute_content_hash(overlay_content),
+            version=cli_version,
+            origin="project",
+        )
+    manifest.skill_set = skill_set
+
+
+def _sync_skill(
+    skill_name: str,
+    source: Path | Traversable,
+    skill_dest: Path,
+    base: Traversable,
+    manifest: SkillManifest,
+    result: SkillScaffoldResult,
+    cli_version: str,
+    *,
+    force: bool,
+    skip_updates: bool,
+    batch_overwrite: bool,
+    batch_keep: bool,
+    dry_run: bool,
+    plugin: AgentPlugin | None,
+    agent_config: AgentConfig,
+) -> tuple[bool, bool]:
+    """Process one skill: install if new, classify and sync if existing.
+
+    Returns updated (batch_keep, batch_overwrite) for subsequent iterations.
+    """
+    skill_md = skill_dest / SKILL_MD_FILENAME
+    bundled_content = _read_bundled_content(
+        base, skill_name, plugin=plugin, agent_config=agent_config
+    )
+    hash_new = compute_content_hash(bundled_content)
+
+    if not skill_md.exists():
+        _handle_new_skill(
+            skill_name,
+            source,
+            skill_dest,
+            hash_new,
+            cli_version,
+            manifest,
+            result,
+            dry_run=dry_run,
+            plugin=plugin,
+            agent_config=agent_config,
+        )
+        return batch_keep, batch_overwrite
+
+    hash_on_disk = compute_content_hash(skill_md.read_text(encoding="utf-8"))
+    entry = manifest.skills.get(skill_name)
+    action = classify_skill(entry.sha256 if entry else None, hash_on_disk, hash_new)
+
+    if action == SkillSyncAction.CURRENT:
+        result.skills_current.append(skill_name)
+        if skill_name not in manifest.skills:
+            manifest.skills[skill_name] = SkillEntry(
+                sha256=hash_on_disk, version=cli_version
+            )
+    elif action == SkillSyncAction.AUTO_UPDATE:
+        _handle_auto_update(
+            skill_name,
+            skill_md,
+            skill_dest,
+            source,
+            bundled_content,
+            hash_new,
+            cli_version,
+            manifest,
+            result,
+            skip_updates=skip_updates,
+            dry_run=dry_run,
+            plugin=plugin,
+            agent_config=agent_config,
+        )
+    elif action == SkillSyncAction.KEEP_USER:
+        result.skills_current.append(skill_name)
+        result.skills_skipped_names.append(skill_name)
+    elif action == SkillSyncAction.CONFLICT:
+        batch_keep, batch_overwrite = _resolve_conflict(
+            skill_name,
+            skill_md,
+            skill_dest,
+            source,
+            bundled_content,
+            hash_new,
+            cli_version,
+            manifest,
+            result,
+            force=force,
+            skip_updates=skip_updates,
+            batch_overwrite=batch_overwrite,
+            batch_keep=batch_keep,
+            dry_run=dry_run,
+            plugin=plugin,
+            agent_config=agent_config,
+        )
+    elif action == SkillSyncAction.LEGACY:
+        hash_to_record = hash_new if hash_on_disk == hash_new else hash_on_disk
+        manifest.skills[skill_name] = SkillEntry(
+            sha256=hash_to_record, version=cli_version
+        )
+        result.skills_current.append(skill_name)
+        result.files_skipped.append(str(skill_md))
+        result.skills_skipped_names.append(skill_name)
+
+    return batch_keep, batch_overwrite
+
+
+def scaffold_skills(
     project_root: Path,
     *,
     agent_config: AgentConfig | None = None,
@@ -223,217 +585,39 @@ def scaffold_skills(  # noqa: C901 -- multi-step scaffolding with many condition
 
     for skill_name in DISTRIBUTABLE_SKILLS:
         skill_dest = skills_dir / skill_name
-        skill_md = skill_dest / SKILL_MD_FILENAME
-        source = base / skill_name
-
-        bundled_content = _read_bundled_content(
-            base, skill_name, plugin=plugin, agent_config=config
+        batch_keep, batch_overwrite = _sync_skill(
+            skill_name,
+            base / skill_name,
+            skill_dest,
+            base,
+            manifest,
+            result,
+            cli_version,
+            force=force,
+            skip_updates=skip_updates,
+            batch_overwrite=batch_overwrite,
+            batch_keep=batch_keep,
+            dry_run=dry_run,
+            plugin=plugin,
+            agent_config=config,
         )
-        hash_new = compute_content_hash(bundled_content)
 
-        # --- Case: skill doesn't exist on disk → install ---
-        if not skill_md.exists():
-            if not dry_run:
-                copied = copy_skill_tree(
-                    source,
-                    skill_dest,
-                    result,
-                    plugin=plugin,
-                    agent_config=config,
-                    overwrite=True,
-                )
-                manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_new,
-                    version=cli_version,
-                )
-                if copied > 0:
-                    result.skills_copied += 1
-            result.skills_installed.append(skill_name)
-            continue
-
-        # --- Skill exists on disk → classify with three-hash ---
-        hash_on_disk = compute_content_hash(skill_md.read_text(encoding="utf-8"))
-        entry = manifest.skills.get(skill_name)
-        hash_distributed = entry.sha256 if entry else None
-
-        action = classify_skill(hash_distributed, hash_on_disk, hash_new)
-
-        if action == SkillSyncAction.CURRENT:
-            result.skills_current.append(skill_name)
-            # Ensure manifest entry exists (legacy fixup)
-            if skill_name not in manifest.skills:
-                manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_on_disk,
-                    version=cli_version,
-                )
-
-        elif action == SkillSyncAction.AUTO_UPDATE:
-            if skip_updates:
-                result.skills_current.append(skill_name)
-                result.skills_skipped_names.append(skill_name)
-            elif not dry_run:
-                # Safe to overwrite — user hasn't touched it
-                skill_md.write_text(bundled_content, encoding="utf-8")
-                result.files_copied.append(str(skill_md))
-                # Also update reference files
-                copy_skill_tree(
-                    source,
-                    skill_dest,
-                    result,
-                    plugin=plugin,
-                    agent_config=config,
-                    overwrite=True,
-                )
-                manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_new,
-                    version=cli_version,
-                )
-                result.skills_updated.append(skill_name)
-            else:
-                result.skills_updated.append(skill_name)
-
-        elif action == SkillSyncAction.KEEP_USER:
-            result.skills_current.append(skill_name)
-            result.skills_skipped_names.append(skill_name)
-
-        elif action == SkillSyncAction.CONFLICT:
-            if force or batch_overwrite:
-                if not dry_run:
-                    skill_md.write_text(bundled_content, encoding="utf-8")
-                    result.files_copied.append(str(skill_md))
-                    copy_skill_tree(
-                        source,
-                        skill_dest,
-                        result,
-                        plugin=plugin,
-                        agent_config=config,
-                        overwrite=True,
-                    )
-                    manifest.skills[skill_name] = SkillEntry(
-                        sha256=hash_new,
-                        version=cli_version,
-                    )
-                result.skills_overwritten.append(skill_name)
-            elif skip_updates or batch_keep:
-                result.skills_conflicted.append(skill_name)
-                result.skills_skipped_names.append(skill_name)
-            elif dry_run:
-                result.skills_conflicted.append(skill_name)
-            else:
-                # Interactive conflict resolution
-                from raise_cli.onboarding.skill_conflict import (
-                    ConflictAction,
-                    prompt_skill_conflict,
-                )
-
-                on_disk_content = skill_md.read_text(encoding="utf-8")
-                user_action = prompt_skill_conflict(
-                    skill_name,
-                    on_disk_content,
-                    bundled_content,
-                )
-
-                if user_action == ConflictAction.KEEP:
-                    result.skills_kept.append(skill_name)
-                elif user_action == ConflictAction.KEEP_ALL:
-                    result.skills_kept.append(skill_name)
-                    batch_keep = True
-                elif user_action in (
-                    ConflictAction.OVERWRITE,
-                    ConflictAction.OVERWRITE_ALL,
-                ):
-                    skill_md.write_text(bundled_content, encoding="utf-8")
-                    result.files_copied.append(str(skill_md))
-                    copy_skill_tree(
-                        source,
-                        skill_dest,
-                        result,
-                        plugin=plugin,
-                        agent_config=config,
-                        overwrite=True,
-                    )
-                    manifest.skills[skill_name] = SkillEntry(
-                        sha256=hash_new,
-                        version=cli_version,
-                    )
-                    result.skills_overwritten.append(skill_name)
-                    if user_action == ConflictAction.OVERWRITE_ALL:
-                        batch_overwrite = True
-                elif user_action == ConflictAction.BACKUP_OVERWRITE:
-                    # Save backup before overwriting
-                    backup_path = skill_md.with_suffix(".md.bak")
-                    backup_path.write_text(on_disk_content, encoding="utf-8")
-                    skill_md.write_text(bundled_content, encoding="utf-8")
-                    result.files_copied.append(str(skill_md))
-                    copy_skill_tree(
-                        source,
-                        skill_dest,
-                        result,
-                        plugin=plugin,
-                        agent_config=config,
-                        overwrite=True,
-                    )
-                    manifest.skills[skill_name] = SkillEntry(
-                        sha256=hash_new,
-                        version=cli_version,
-                    )
-                    result.skills_overwritten.append(skill_name)
-
-        elif action == SkillSyncAction.LEGACY:
-            # No manifest entry — first encounter
-            if hash_on_disk == hash_new:
-                # File matches bundled — safe to record
-                manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_new,
-                    version=cli_version,
-                )
-            else:
-                # File differs — treat as customized, record on-disk hash
-                manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_on_disk,
-                    version=cli_version,
-                )
-            result.skills_current.append(skill_name)
-            result.files_skipped.append(str(skill_md))
-            result.skills_skipped_names.append(skill_name)
-
-    # --- Skill set overlay (S340.1) ---
     if skill_set is not None and not dry_run:
-        from raise_cli.config.paths import get_raise_dir
+        _apply_skill_set_overlay(
+            project_root,
+            skills_dir,
+            skill_set,
+            manifest,
+            result,
+            cli_version,
+            plugin=plugin,
+            agent_config=config,
+        )
 
-        overlay_dir = get_raise_dir(project_root) / "skills" / skill_set
-        if overlay_dir.is_dir():
-            for skill_dir in sorted(overlay_dir.iterdir()):
-                if not skill_dir.is_dir():
-                    continue
-                if not (skill_dir / SKILL_MD_FILENAME).exists():
-                    continue
-                copy_skill_tree(
-                    skill_dir,
-                    skills_dir / skill_dir.name,
-                    result,
-                    plugin=plugin,
-                    agent_config=config,
-                    overwrite=True,
-                )
-                overlay_content = (skill_dir / SKILL_MD_FILENAME).read_text(
-                    encoding="utf-8"
-                )
-                manifest.skills[skill_dir.name] = SkillEntry(
-                    sha256=compute_content_hash(overlay_content),
-                    version=cli_version,
-                    origin="project",
-                )
-            manifest.skill_set = skill_set
-        else:
-            logger.warning("Skill set '%s' not found at %s", skill_set, overlay_dir)
-
-    # Update backward-compat flag
     result.already_existed = (
         len(result.skills_installed) == 0 and len(result.skills_updated) == 0
     )
 
-    # Persist manifest
     if not dry_run:
         manifest.raise_cli_version = cli_version
         save_skill_manifest(manifest, project_root)
