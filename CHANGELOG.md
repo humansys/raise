@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Session identity model — deterministic session IDs per developer+repo using timestamp-based format `S-{prefix}-{YYMMDD}-{HHMM}`, Pydantic prefix registry with collision detection, per-project active pointer (E654, RAISE-654)
 - CLI extension mechanism via entry points — `ExtensionInfo` discovery, collision and duplicate protection, wired into main CLI (RAISE-594)
-- ISO 27001 audit report generator — Pydantic control mapping models, YAML config loader, git evidence extractor for commits, tags, and branches (E479 partial, S479.1–S479.2)
 - `rai doctor` adapter availability diagnostics (RAISE-614, S613.1)
 
 ### Changed
