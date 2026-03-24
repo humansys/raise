@@ -61,7 +61,7 @@ class TestPreToolUseBypass:
     """PreToolUse auto-approves all tools when permission_mode='bypassPermissions'."""
 
     async def test_bypass_approves_sensitive_tool(self) -> None:
-        """bypassPermissions → empty dict (no intervention) even for sensitive tools."""
+        """BypassPermissions → empty dict (no intervention) even for sensitive tools."""
         hooks = GovernanceHooks(
             sensitive_patterns=["Bash", "Write"],
             permission_mode="bypassPermissions",
@@ -71,7 +71,7 @@ class TestPreToolUseBypass:
         assert result == {}
 
     async def test_bypass_approves_any_tool(self) -> None:
-        """bypassPermissions → empty dict for any tool."""
+        """BypassPermissions → empty dict for any tool."""
         hooks = GovernanceHooks(
             sensitive_patterns=["Bash"],
             permission_mode="bypassPermissions",
@@ -85,7 +85,7 @@ class TestPreToolUseAcceptEdits:
     """PreToolUse with acceptEdits mode allows Edit/Write but denies Bash."""
 
     async def test_accept_edits_allows_write(self) -> None:
-        """acceptEdits → allow Write tool."""
+        """AcceptEdits → allow Write tool."""
         hooks = GovernanceHooks(
             sensitive_patterns=["Bash", "Write", "Edit"],
             permission_mode="acceptEdits",
@@ -95,7 +95,7 @@ class TestPreToolUseAcceptEdits:
         assert result == {}
 
     async def test_accept_edits_allows_edit(self) -> None:
-        """acceptEdits → allow Edit tool."""
+        """AcceptEdits → allow Edit tool."""
         hooks = GovernanceHooks(
             sensitive_patterns=["Bash", "Write", "Edit"],
             permission_mode="acceptEdits",
@@ -105,7 +105,7 @@ class TestPreToolUseAcceptEdits:
         assert result == {}
 
     async def test_accept_edits_allows_notebook_edit(self) -> None:
-        """acceptEdits → allow NotebookEdit tool."""
+        """AcceptEdits → allow NotebookEdit tool."""
         hooks = GovernanceHooks(
             sensitive_patterns=["Bash", "NotebookEdit"],
             permission_mode="acceptEdits",
@@ -115,7 +115,7 @@ class TestPreToolUseAcceptEdits:
         assert result == {}
 
     async def test_accept_edits_denies_bash(self) -> None:
-        """acceptEdits → deny Bash (not an edit tool)."""
+        """AcceptEdits → deny Bash (not an edit tool)."""
         hooks = GovernanceHooks(
             sensitive_patterns=["Bash", "Write", "Edit"],
             permission_mode="acceptEdits",

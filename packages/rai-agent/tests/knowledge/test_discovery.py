@@ -10,11 +10,7 @@ import yaml
 
 from rai_agent.knowledge.discovery import (
     DISCOVERY_PROMPT,
-    FieldDiff,
-    NodeDiffReport,
     NodeTypeSpec,
-    ReconcileReport,
-    SchemaDiffReport,
     SchemaSpec,
     diff_nodes,
     diff_schemas,
@@ -22,7 +18,6 @@ from rai_agent.knowledge.discovery import (
     reconcile_extracted,
     refine_schema,
 )
-
 
 # --- Model construction ---
 
@@ -245,7 +240,7 @@ Cash Conversion Cycle and Power of One for financial levers.
 
 
 class TestDiscoverSchema:
-    @pytest.fixture()
+    @pytest.fixture
     def corpus_path(self, tmp_path: Path) -> Path:
         p = tmp_path / "corpus.md"
         p.write_text(SAMPLE_CORPUS)
@@ -336,7 +331,7 @@ class TestReconcileExtracted:
 
 
 class TestRefineSchema:
-    @pytest.fixture()
+    @pytest.fixture
     def corpus_path(self, tmp_path: Path) -> Path:
         p = tmp_path / "corpus.md"
         p.write_text(SAMPLE_CORPUS)
@@ -416,7 +411,8 @@ class TestRefineSchema:
 
 def _make_mock_factory(response_json: str) -> Any:
     """Create a factory for invoke_structured's _client_factory that yields canned text."""
-    from dataclasses import dataclass, field as dc_field
+    from dataclasses import dataclass
+    from dataclasses import field as dc_field
 
     @dataclass
     class _FakeTextBlock:

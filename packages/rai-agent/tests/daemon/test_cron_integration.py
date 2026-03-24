@@ -53,7 +53,7 @@ class TestCronTriggerIntegration:
     async def test_schedule_persists_and_fires_across_restart(
         self, tmp_path: Any
     ) -> None:
-        """add job → stop → new CronTrigger same DB → schedule persists AND fires (AC6).
+        """Add job → stop → new CronTrigger same DB → schedule persists AND fires (AC6).
 
         Verifies both that the schedule exists in the data store AND that
         the persisted args contain the serialized RunConfig, so _fire_handler

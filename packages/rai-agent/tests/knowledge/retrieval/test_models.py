@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-from raise_core.graph.models import GraphNode
 
 from rai_agent.knowledge.retrieval.models import (
     DomainAdapter,
@@ -12,7 +11,7 @@ from rai_agent.knowledge.retrieval.models import (
     ScoredNode,
     TraversalAdvice,
 )
-
+from raise_core.graph.models import GraphNode
 
 # --- DomainHints ---
 
@@ -61,7 +60,7 @@ class TestTraversalAdvice:
 
 
 class TestScoredNode:
-    @pytest.fixture()
+    @pytest.fixture
     def sample_node(self) -> GraphNode:
         return GraphNode(id="n1", content="Test node", created="2026-01-01")
 

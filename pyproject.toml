@@ -39,7 +39,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py312"
-src = ["packages/raise-cli/src", "packages/raise-core/src"]
+src = ["packages/raise-cli/src", "packages/raise-core/src", "packages/rai-agent/src"]
 exclude = ["dev/experiments"]
 
 [tool.ruff.lint]
@@ -110,11 +110,30 @@ ignore = [
 "packages/raise-cli/src/raise_cli/gates/protocol.py" = ["D102"]
 "packages/raise-cli/src/raise_cli/hooks/protocol.py" = ["D102"]
 "**/tests/**/*.py" = [
-    "S101", "S104", "S108", "S105", "S106",  # security rules relaxed in tests
+    "S101", "S104", "S108", "S105", "S106", "S310",  # security rules relaxed in tests
     "ARG001", "ARG002", "ARG005",             # unused args (fixtures, mocks)
     "ANN001", "ANN002", "ANN003",             # parameter annotations optional in tests
     "ANN201", "ANN202",                       # return annotations optional in tests
-    "D100", "D101", "D102", "D103",           # docstrings optional in tests
+    "D100", "D101", "D102", "D103", "D105",  # docstrings optional in tests
+]
+# rai-agent: imported code with pre-existing style — suppress until cleanup story
+"packages/rai-agent/src/**/*.py" = [
+    "C901",    # complexity (11 functions > 10)
+    "D102",    # missing docstrings in protocol methods
+    "D105",    # missing docstrings in magic methods
+    "D301",    # raw docstrings
+    "D417",    # missing arg descriptions
+    "S101",    # assert in non-test code (registry guards)
+    "S110",    # bare except-pass
+    "S310",    # URL audit
+    "PLW0603", # global statement
+    "PLW1641", # missing __hash__
+    "PLR1714", # mergeable comparisons
+    "SIM105",  # contextlib.suppress
+    "UP047",   # generic type parameters
+    "PERF102", # dict values()
+    "ARG001",  # unused function arg
+    "ARG004",  # unused static method arg
 ]
 
 [tool.ruff.lint.mccabe]

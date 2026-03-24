@@ -27,7 +27,7 @@ def _write_yaml(path: Path, data: dict[str, Any]) -> None:
     path.write_text(yaml.dump(data, default_flow_style=False, allow_unicode=True))
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_domain_dir(tmp_path: Path) -> Path:
     """Create a sample domain directory with domain.yaml and a few nodes."""
     domain_dir = tmp_path / "test-domain"
@@ -83,7 +83,7 @@ def sample_domain_dir(tmp_path: Path) -> Path:
     return domain_dir
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_cqs_file(sample_domain_dir: Path) -> Path:
     """Create a sample competency questions file."""
     cqs = [

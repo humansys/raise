@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 from rai_agent.inference import invoke_structured
 
-
 # --- Test models ---
 
 

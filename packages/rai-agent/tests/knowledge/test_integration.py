@@ -7,6 +7,7 @@ from pathlib import Path  # noqa: TC003
 from unittest.mock import patch
 
 import yaml
+from tests.knowledge.conftest import SampleNode
 from typer.testing import CliRunner
 
 from rai_agent.knowledge.cli import app
@@ -17,7 +18,6 @@ from rai_agent.knowledge.gates import (
     run_reconcile,
     run_validate,
 )
-from tests.knowledge.conftest import SampleNode
 
 runner = CliRunner()
 

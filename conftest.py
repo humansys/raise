@@ -13,7 +13,7 @@ from pathlib import Path
 _RAI_AGENT_PKG = str(Path(__file__).resolve().parent / "packages" / "rai-agent")
 
 
-def pytest_configure(config: object) -> None:
+def pytest_configure(config: object) -> None:  # noqa: ARG001
     """Add rai-agent package root to sys.path before collection."""
     if _RAI_AGENT_PKG not in sys.path:
         sys.path.insert(0, _RAI_AGENT_PKG)

@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from raise_core.graph.engine import Graph
-from raise_core.graph.models import GraphEdge, GraphNode
 
 from rai_agent.knowledge.retrieval.engine import (
     W_ATTR,
@@ -22,7 +20,8 @@ from rai_agent.knowledge.retrieval.models import (
     ScoredNode,
     TraversalAdvice,
 )
-
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphEdge, GraphNode
 
 # --- Fixtures ---
 

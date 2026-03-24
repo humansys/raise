@@ -6,6 +6,7 @@ from pathlib import Path  # noqa: TC003
 
 import pytest
 import yaml
+from tests.knowledge.conftest import SampleNode
 
 from rai_agent.knowledge.domain import (
     DomainConfigError,
@@ -13,7 +14,6 @@ from rai_agent.knowledge.domain import (
     load_domain,
     scaffold_domain,
 )
-from tests.knowledge.conftest import SampleNode
 
 
 class TestLoadDomain:

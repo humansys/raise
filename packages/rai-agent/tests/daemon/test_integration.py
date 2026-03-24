@@ -41,7 +41,7 @@ async def _stub_dispatch(
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 
-@pytest.fixture()
+@pytest.fixture
 async def running_daemon() -> AsyncGenerator[tuple[str, Ed25519PrivateKey], None]:
     """Start a real uvicorn daemon on a random port. Yields (ws_url, private_key)."""
     private_key = Ed25519PrivateKey.generate()
@@ -201,7 +201,7 @@ async def _async_sdk_messages(items: list[Any]):  # type: ignore[return]
         yield item
 
 
-@pytest.fixture()
+@pytest.fixture
 async def running_daemon_with_runtime() -> AsyncGenerator[
     tuple[str, Ed25519PrivateKey], None
 ]:

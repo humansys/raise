@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from raise_core.graph.models import GraphNode
-
 from rai_agent.knowledge.formatter import (
     format_query_compact,
     format_query_human,
@@ -15,6 +13,7 @@ from rai_agent.knowledge.retrieval.models import (
     RetrievalResult,
     ScoredNode,
 )
+from raise_core.graph.models import GraphNode
 
 
 def _make_node(node_id: str, node_type: str, content: str) -> GraphNode:

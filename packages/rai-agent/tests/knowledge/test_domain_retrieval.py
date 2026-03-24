@@ -5,10 +5,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+import yaml
+
+from rai_agent.knowledge.domain import (
+    DomainConfigError,
+    load_domain,
+    resolve_adapter,
+    resolve_builder,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
-import yaml
 
 
 def _scaleup_available() -> bool:
@@ -17,13 +24,6 @@ def _scaleup_available() -> bool:
         return True
     except ModuleNotFoundError:
         return False
-
-from rai_agent.knowledge.domain import (
-    DomainConfigError,
-    load_domain,
-    resolve_adapter,
-    resolve_builder,
-)
 
 
 def _write_domain_yaml(domain_dir: Path, data: dict[str, object]) -> None:

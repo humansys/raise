@@ -18,12 +18,12 @@ from rai_agent.daemon.auth import AuthError, NonceStore, authenticate, validate_
 # ─── Fixtures ────────────────────────────────────────────────────────────────
 
 
-@pytest.fixture()
+@pytest.fixture
 def private_key() -> Ed25519PrivateKey:
     return Ed25519PrivateKey.generate()
 
 
-@pytest.fixture()
+@pytest.fixture
 def nonce_store() -> NonceStore:
     return NonceStore()
 

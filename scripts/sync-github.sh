@@ -13,7 +13,7 @@
 # Excluded (internal/proprietary):
 #   Dirs:  work/, dev/, .raise/, archive/, blog/, governance/, .claude/,
 #          .agent/, scripts/, htmlcov/, dist/, packages/raise-pro/,
-#          packages/raise-server/, site/
+#          packages/raise-server/, packages/rai-agent/, site/
 #   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md,
 #          .gitlab-ci.yml, .coverage, .envrc, .pre-commit-config.yaml,
 #          .secrets.baseline, DEMO-STRATEGY.md, AGENTS.md,
@@ -41,7 +41,7 @@ set -euo pipefail
 
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
-EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages/raise-pro" "packages/raise-server" "site")
+EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages/raise-pro" "packages/raise-server" "packages/rai-agent" "site")
 EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml" ".coverage" ".envrc" ".pre-commit-config.yaml" ".secrets.baseline" "DEMO-STRATEGY.md" "AGENTS.md" "sonar-project.properties" "scope.md" "docker-compose.yml" "bug-396-retro.md" "bug-396-scope.md" "bug-397-retro.md" "bug-397-scope.md" "bug-398-retro.md" "bug-398-scope.md" ".github/workflows/deploy-site.yml")
 
 # Colors for output
