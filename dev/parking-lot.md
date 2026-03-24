@@ -6,6 +6,21 @@
 
 ---
 
+## raise-pro Independent Versioning — 2026-03-24
+
+**Origin:** E680 session — discovered 19 Jira tickets are Pro-only with no version target.
+
+**Decision:** raise-pro uses independent semver, starting at `pro-0.1.0`. Compatibility via `raise-cli>=2.3.0,<3.0.0` constraint. Rationale: open-core SOTA (Grafana, PostHog, GitLab EE) — independent cycles give flexibility, each package owns its semver contract.
+
+**Next steps:**
+1. Create `pro-0.1.0` version in Jira
+2. Assign 19 Pro tickets to `pro-0.1.0`
+3. Define Pro release process (separate from Community E688)
+
+**Promote when:** Next Pro-focused session.
+
+---
+
 ## Docs Audience Tagging + Package-Aware Publish — 2026-03-23
 
 **Origin:** E680/S680.3 — discovered Pro/Community docs are mixed in `docs/`.
