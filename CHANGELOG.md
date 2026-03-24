@@ -23,17 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- ADF description parsing — replace `str()` with `_adf_to_text()` in `_parse_issue_detail`, remove 500-char hard-cap on description display (RAISE-663)
 - CLAUDE.local.md references removed from skills_base close skills (RAISE-635)
 - Session-start context loss — load session state before migration so previous state is preserved (RAISE-566)
-- Backlog command error handling — wrap adapter calls with consistent error messages (RAISE-553)
-- Backlog search smart JQL wrapping — normalize plain-text queries to JQL in adapter (RAISE-552)
 - `promote_unreleased` fails when Unreleased is last section in changelog — add `\Z` to regex (RAISE-547)
 - Unicode symbols crash on Windows CP1252 terminals — add symbols module with fallbacks (RAISE-554)
 - C# scanner not extracting constructor dependencies — pass `depends_on` through `build_hierarchy` (RAISE-227)
 - `rai init` ide.type not syncing with `agents.types[0]` (RAISE-218)
 - CI container missing git — add to `apt-get install` (RAISE-570)
-- Quote project values in JQL to avoid reserved word errors (S494.4)
 - Regex precedence/grouping fixes in ADR and changelog parsers (RAISE-589)
 - Story-plan skill enforces project-wide verification scope (RAISE-572)
 - Doctor callback cognitive complexity reduced from 47 to ~7 via extract refactoring (RAISE-598)
