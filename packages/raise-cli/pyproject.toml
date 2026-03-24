@@ -5,7 +5,8 @@ description = "RaiSE CLI - Reliable AI Software Engineering governance framework
 authors = [
     {name = "Emilio Osorio", email = "emilio@humansys.ai"}
 ]
-readme = "../../README.md"
+# README.md is at repo root — referenced via sdist include, not readme field
+# (hatch resolves readme relative to build temp dir, not source dir)
 license = {text = "Apache-2.0"}
 requires-python = ">=3.12"
 keywords = ["ai", "governance", "cli", "software-engineering", "methodology"]
