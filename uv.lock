@@ -22,6 +22,23 @@ members = [
 ]
 constraints = [{ name = "pyjwt", specifier = ">=2.12.0" }]
 
+[manifest.dependency-groups]
+dev = [
+    { name = "bandit", specifier = ">=1.7.8" },
+    { name = "httpx", specifier = ">=0.27.0" },
+    { name = "import-linter", specifier = ">=2.11" },
+    { name = "mcp", specifier = ">=1.26,<2" },
+    { name = "pyright", specifier = ">=1.1.350" },
+    { name = "pytest", specifier = ">=8.0.0" },
+    { name = "pytest-cov", specifier = ">=4.1.0" },
+    { name = "raise-cli", editable = "packages/raise-cli" },
+    { name = "raise-core", editable = "packages/raise-core" },
+    { name = "raise-pro", editable = "packages/raise-pro" },
+    { name = "raise-server", editable = "packages/raise-server" },
+    { name = "readme-renderer", extras = ["md"], specifier = ">=44.0" },
+    { name = "ruff", specifier = ">=0.4.0" },
+]
+
 [[package]]
 name = "alembic"
 version = "1.18.4"
@@ -1407,7 +1424,7 @@ wheels = [
 [[package]]
 name = "raise-cli"
 version = "2.3.0"
-source = { editable = "." }
+source = { editable = "packages/raise-cli" }
 dependencies = [
     { name = "logfire-api" },
     { name = "networkx" },
@@ -1430,18 +1447,6 @@ dependencies = [
 csharp = [
     { name = "tree-sitter-c-sharp" },
 ]
-dev = [
-    { name = "bandit" },
-    { name = "httpx" },
-    { name = "import-linter" },
-    { name = "mcp" },
-    { name = "pyright" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "raise-pro" },
-    { name = "raise-server" },
-    { name = "ruff" },
-]
 mcp = [
     { name = "mcp" },
 ]
@@ -1449,33 +1454,18 @@ observability = [
     { name = "logfire" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "readme-renderer", extra = ["md"] },
-]
-
 [package.metadata]
 requires-dist = [
-    { name = "bandit", marker = "extra == 'dev'", specifier = ">=1.7.8" },
-    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
-    { name = "import-linter", marker = "extra == 'dev'", specifier = ">=2.11" },
     { name = "logfire", marker = "extra == 'observability'", specifier = ">=4.0" },
     { name = "logfire-api", specifier = ">=4.0" },
-    { name = "mcp", marker = "extra == 'dev'", specifier = ">=1.26,<2" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.26,<2" },
     { name = "networkx", specifier = ">=3.6.1" },
     { name = "pydantic", specifier = ">=2.6.0" },
     { name = "pydantic-settings", specifier = ">=2.2.0" },
-    { name = "pyright", marker = "extra == 'dev'", specifier = ">=1.1.350" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "raise-core", editable = "packages/raise-core" },
-    { name = "raise-pro", marker = "extra == 'dev'", editable = "packages/raise-pro" },
-    { name = "raise-server", marker = "extra == 'dev'", editable = "packages/raise-server" },
     { name = "rich", specifier = ">=13.7.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
     { name = "tree-sitter", specifier = ">=0.25.2" },
     { name = "tree-sitter-c-sharp", marker = "extra == 'csharp'", specifier = ">=0.23.1" },
     { name = "tree-sitter-javascript", specifier = ">=0.25.0" },
@@ -1485,10 +1475,7 @@ requires-dist = [
     { name = "tree-sitter-typescript", specifier = ">=0.23.2" },
     { name = "typer", specifier = ">=0.12.0" },
 ]
-provides-extras = ["dev", "mcp", "observability", "csharp"]
-
-[package.metadata.requires-dev]
-dev = [{ name = "readme-renderer", extras = ["md"], specifier = ">=44.0" }]
+provides-extras = ["mcp", "observability", "csharp"]
 
 [[package]]
 name = "raise-core"
@@ -1525,7 +1512,7 @@ requires-dist = [
     { name = "authlib", specifier = ">=1.6.9" },
     { name = "certifi", specifier = ">=2024.7.4" },
     { name = "cryptography", specifier = ">=46.0.5" },
-    { name = "raise-cli", editable = "." },
+    { name = "raise-cli", editable = "packages/raise-cli" },
     { name = "requests", specifier = ">=2.32.4" },
     { name = "urllib3", specifier = ">=2.6.3" },
 ]

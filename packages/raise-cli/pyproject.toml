@@ -1,0 +1,112 @@
+[project]
+name = "raise-cli"
+version = "2.3.0"
+description = "RaiSE CLI - Reliable AI Software Engineering governance framework"
+authors = [
+    {name = "Emilio Osorio", email = "emilio@humansys.ai"}
+]
+readme = "../../README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.12"
+keywords = ["ai", "governance", "cli", "software-engineering", "methodology"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+dependencies = [
+    "raise-core",
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+    "networkx>=3.6.1",
+    "tree-sitter>=0.25.2",
+    "tree-sitter-typescript>=0.23.2",
+    "tree-sitter-javascript>=0.25.0",
+    "tree-sitter-php>=0.24.1",
+    "tree-sitter-svelte>=1.0.2",
+    "tree-sitter-language-pack>=0.13.0",
+    "logfire-api>=4.0",
+]
+
+[project.optional-dependencies]
+mcp = [
+    "mcp>=1.26,<2",
+]
+observability = [
+    "logfire>=4.0",
+]
+csharp = [
+    "tree-sitter-c-sharp>=0.23.1",
+]
+
+[project.urls]
+Homepage = "https://raiseframework.ai"
+Documentation = "https://docs.raiseframework.ai"
+Repository = "https://github.com/humansys/raise"
+Changelog = "https://github.com/humansys/raise/blob/main/CHANGELOG.md"
+
+[project.scripts]
+rai = "raise_cli.cli.main:app"
+
+[project.entry-points."rai.governance.parsers"]
+prd = "raise_cli.governance.parsers.prd:PrdParser"
+vision = "raise_cli.governance.parsers.vision:VisionParser"
+constitution = "raise_cli.governance.parsers.constitution:ConstitutionParser"
+roadmap = "raise_cli.governance.parsers.roadmap:RoadmapParser"
+backlog = "raise_cli.governance.parsers.backlog:BacklogParser"
+epic_scope = "raise_cli.governance.parsers.epic:EpicScopeParser"
+adr = "raise_cli.governance.parsers.adr:AdrParser"
+guardrails = "raise_cli.governance.parsers.guardrails:GuardrailsParser"
+glossary = "raise_cli.governance.parsers.glossary:GlossaryParser"
+
+[project.entry-points."rai.hooks"]
+telemetry = "raise_cli.hooks.builtin.telemetry:TelemetryHook"
+gate-bridge = "raise_cli.hooks.builtin.gate_bridge:GateBridgeHook"
+backlog = "raise_cli.hooks.builtin.backlog:BacklogHook"
+memory-sync = "raise_cli.hooks.builtin.memory:MemoryMdSyncHook"
+
+[project.entry-points."rai.gates"]
+tests = "raise_cli.gates.builtin.tests:TestGate"
+types = "raise_cli.gates.builtin.types:TypeGate"
+lint = "raise_cli.gates.builtin.lint:LintGate"
+coverage = "raise_cli.gates.builtin.coverage:CoverageGate"
+format = "raise_cli.gates.builtin.format:FormatGate"
+
+[project.entry-points."rai.doctor.checks"]
+environment = "raise_cli.doctor.checks.environment:EnvironmentCheck"
+project = "raise_cli.doctor.checks.project:ProjectCheck"
+developer = "raise_cli.doctor.checks.developer:DeveloperCheck"
+
+[project.entry-points."rai.adapters.pm"]
+filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"
+
+[project.entry-points."rai.graph.backends"]
+local = "raise_core.graph.backends.filesystem:FilesystemGraphBackend"
+
+[tool.uv.sources]
+raise-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raise_cli"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/raise_cli/",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
