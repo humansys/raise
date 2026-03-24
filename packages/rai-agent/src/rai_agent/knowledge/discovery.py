@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 from pydantic import BaseModel, Field
@@ -332,13 +332,14 @@ def reconcile_extracted(
             continue
 
         modified = False
-        new_rels = []
-        for rel in raw["relationships"]:
-            if not isinstance(rel, dict) or "target" not in rel:
+        new_rels: list[dict[str, str]] = []
+        rels = cast(list[dict[str, str]], raw["relationships"])
+        for rel in rels:
+            if "target" not in rel:
                 new_rels.append(rel)
                 continue
 
-            target = rel["target"]
+            target: str = rel["target"]
             if target in all_ids:
                 new_rels.append(rel)
                 continue
