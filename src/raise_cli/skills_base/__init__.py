@@ -15,7 +15,6 @@ Contents:
     Discovery:          rai-discover
     Onboarding:         rai-project-create, rai-project-onboard, rai-welcome
     Governance:         rai-docs-update
-    Quality:            rai-architecture-review, rai-code-audit, rai-quality-review
     MCP:                rai-mcp-add, rai-mcp-remove, rai-mcp-status
     Tools:              rai-research, rai-debug, rai-doctor, rai-problem-shape
 
@@ -66,45 +65,6 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-mcp-add",
     "rai-mcp-remove",
     "rai-mcp-status",
-    "rai-problem-shape",
-    "rai-research",
-] = [
-    # Session lifecycle
-    "rai-session-close",
-    "rai-session-start",
-    # Story lifecycle
-    "rai-story-close",
-    "rai-story-design",
-    "rai-story-implement",
-    "rai-story-plan",
-    "rai-story-review",
-    "rai-story-run",
-    "rai-story-start",
-    # Epic lifecycle
-    "rai-epic-close",
-    "rai-epic-design",
-    "rai-epic-plan",
-    "rai-epic-run",
-    "rai-epic-start",
-    # Discovery
-    "rai-discover",
-    # Onboarding
-    "rai-project-create",
-    "rai-project-onboard",
-    "rai-welcome",
-    # Governance
-    "rai-docs-update",
-    # Quality
-    "rai-architecture-review",
-    "rai-code-audit",
-    "rai-quality-review",
-    # MCP
-    "rai-mcp-add",
-    "rai-mcp-remove",
-    "rai-mcp-status",
-    # Tools
-    "rai-debug",
-    "rai-doctor",
     "rai-problem-shape",
     "rai-research",
 ]
