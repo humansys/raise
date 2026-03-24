@@ -15,6 +15,7 @@ raise-core = { workspace = true }
 raise-cli = { workspace = true }
 raise-server = { workspace = true }
 raise-pro = { workspace = true }
+rai-agent = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -22,6 +23,7 @@ dev = [
     "raise-core",
     "raise-pro",
     "raise-server",
+    "rai-agent",
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
     "ruff>=0.4.0",
