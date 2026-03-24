@@ -48,7 +48,7 @@ New stories needed for monorepo approach:
 | S11.2 | ✅ RAISE-674 | uv Workspace Setup — convert raise-commons to monorepo | M | 2 | — |
 | S11.3 | ✅ RAISE-675 | rai-agent Package — move code to packages/rai-agent/ | M | 2 | S11.2 |
 | S11.4 | ✅ RAISE-676 | CI/CD Workspace — selective pipeline per package | S | 3 | S11.3 |
-| S11.5 | RAISE-677 | Distribution Packaging — Docker, license, docs | S | 3 | S11.3 |
+| S11.5 | ✅ RAISE-677 | Distribution Packaging — Docker, license, docs | S | 3 | S11.3 |
 | S11.6 | RAISE-678 | Personal Instance Cleanup — remove product code, verify | M | 4 | S11.3, S11.4 |
 | S11.7 | RAISE-701 | Publish rai-agent Docker image to GHCR | XS | 3 | S11.5 |
 | S11.8 | RAISE-702 | One-click deploy templates (Railway/Render) | S | 3 | S11.7 |
@@ -57,7 +57,7 @@ New stories needed for monorepo approach:
 ```
 S11.1 ✅
 S11.2 ✅── S11.3 ✅──┬── S11.4 ✅──┬── S11.6
-                       └── S11.5 ──── S11.7 ──── S11.8
+                       └── S11.5 ✅── S11.7 ──── S11.8
 ```
 
 ## Risks
