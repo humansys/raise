@@ -101,6 +101,7 @@ dmypy.json
 # Secrets & credentials
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 .pypirc
