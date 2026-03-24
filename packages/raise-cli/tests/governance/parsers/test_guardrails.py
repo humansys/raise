@@ -387,7 +387,7 @@ class TestIntegrationWithRealGuardrails:
     @pytest.fixture
     def project_root(self) -> Path:
         """Get project root."""
-        return Path(__file__).parent.parent.parent.parent
+        return Path(__file__).parent.parent.parent.parent.parent.parent
 
     def test_extract_real_guardrails(self, project_root: Path) -> None:
         """Extract from actual governance/guardrails.md."""

@@ -144,11 +144,16 @@ reportMissingTypeStubs = false
 reportUnknownMemberType = false
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = [
+    "packages/raise-core/tests",
+    "packages/raise-cli/tests",
+    "packages/raise-pro/tests",
+]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
+    "--import-mode=importlib",
     "-m", "not integration",
     "--strict-markers",
     "--strict-config",

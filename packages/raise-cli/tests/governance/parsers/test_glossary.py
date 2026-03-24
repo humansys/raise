@@ -242,7 +242,7 @@ class TestIntegrationWithRealGlossary:
     @pytest.fixture
     def project_root(self) -> Path:
         """Get project root."""
-        return Path(__file__).parent.parent.parent.parent
+        return Path(__file__).parent.parent.parent.parent.parent.parent
 
     def test_extract_real_glossary(self, project_root: Path) -> None:
         """Extract from actual framework/reference/glossary.md."""
