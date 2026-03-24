@@ -11,15 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- ACLI Jira adapter with multi-instance support — replaces MCP adapter with subprocess-based ACLI bridge, site resolution, and telemetry (E494, RAISE-579)
 - Session identity model — deterministic session IDs per developer+repo using timestamp-based format `S-{prefix}-{YYMMDD}-{HHMM}`, Pydantic prefix registry with collision detection, per-project active pointer (E654, RAISE-654)
 - CLI extension mechanism via entry points — `ExtensionInfo` discovery, collision and duplicate protection, wired into main CLI (RAISE-594)
 - ISO 27001 audit report generator — Pydantic control mapping models, YAML config loader, git evidence extractor for commits, tags, and branches (E479 partial, S479.1–S479.2)
-- `rai doctor` ACLI availability and authentication check (RAISE-614, S613.1)
+- `rai doctor` adapter availability diagnostics (RAISE-614, S613.1)
 
 ### Changed
 
-- MCP Jira adapter replaced by ACLI adapter (E494) — **breaking** for users who extended `McpJiraAdapter`; deleted in S494.5, entry point migrated to `AcliJiraAdapter`
 - Session data moved from global `~/.rai/` tracking to per-project `.raise/rai/personal/` directory (E654) — **breaking** for tools that read `developer.yaml` active session fields
 - Pattern add default scope changed from `personal` to `project` (RAISE-608)
 
