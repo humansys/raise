@@ -1,0 +1,78 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-03-23T00:00:00Z'
+story: 'S680.3'
+epic: 'E680'
+content:
+  summary: >
+    Update 3 existing doc files to reflect v2.3.0 Community features:
+    session identity model (E654), CLI extension via entry points (RAISE-594),
+    and pattern scope default change (RAISE-608). Mark breaking changes with
+    admonitions.
+  complexity: simple
+  approach: >
+    Read current doc content, cross-reference source code and epic artifacts
+    for accuracy, update each file with new/modified sections. No new pages.
+  components:
+    - path: 'docs/cli/session.mdx'
+      action: modify
+      changes:
+        - 'Add Session Identity section: ID format S-{prefix}-{YYMMDD}-{HHMM}'
+        - 'Document developer prefix registry (.raise/rai/prefixes.yaml)'
+        - 'Document per-project session data path (.raise/rai/personal/)'
+        - 'Add breaking change callout for session data path migration'
+    - path: 'docs/guides/extending.mdx'
+      action: modify
+      changes:
+        - 'Add CLI Extensions section with rai.cli.commands entry point group'
+        - 'Document Typer app registration convention'
+        - 'Document collision protection (built-in names, duplicates)'
+    - path: 'docs/cli/pattern.mdx'
+      action: modify
+      changes:
+        - 'Update default scope from personal to project in rai pattern add table'
+        - 'Add breaking change callout for scope default change'
+        - 'Add before/after example showing explicit --scope personal'
+  acceptance_criteria:
+    - id: AC1
+      description: 'Session docs explain identity model: ID format, prefix registry, per-project storage'
+      verifiable: true
+    - id: AC2
+      description: 'Extending guide explains CLI extension via rai.cli.commands entry point group'
+      verifiable: true
+    - id: AC3
+      description: 'Pattern docs note default scope changed from personal to project'
+      verifiable: true
+    - id: AC4
+      description: 'Breaking changes clearly marked with admonition/callout'
+      verifiable: true
+    - id: AC5
+      description: 'Before/after examples for breaking changes'
+      verifiable: true
+    - id: AC6
+      description: 'No Pro features (Jira/ACLI adapter) referenced'
+      verifiable: true
+    - id: AC7
+      description: 'Existing doc structure and navigation preserved'
+      verifiable: true
+  decisions:
+    - id: D1
+      choice: 'Update existing files only, no new pages'
+      rationale: 'Scope constraint from story definition; keeps doc structure stable'
+      alternatives_considered: ['Create new dedicated pages per feature']
+    - id: D2
+      choice: 'Use admonition/callout blocks for breaking changes'
+      rationale: 'Standard MDX pattern, visually distinct, scannable'
+      alternatives_considered: ['Inline bold text', 'Separate breaking changes page']
+    - id: D3
+      choice: 'Exclude Pro features (ACLI adapter, Jira multi-instance)'
+      rationale: 'Community docs only per scope; Pro docs deferred to audience tagging story'
+      alternatives_considered: ['Include with Pro badge']
+refs:
+  story: 'work/epics/e680-release-v2.3.0-prep/stories/s680.3-story.md'
+  scope: 'work/epics/e680-release-v2.3.0-prep/stories/s680.3-scope.md'
+  e654_docs: 'work/epics/e680-release-v2.3.0-prep/stories/s680.1-e654-docs.md'
+  release_notes: 'work/epics/e680-release-v2.3.0-prep/stories/s680.2-release-notes-draft.md'
+  extensions_source: 'src/raise_cli/cli/extensions.py'
+metadata: {}
