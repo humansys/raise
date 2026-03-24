@@ -1405,7 +1405,7 @@ wheels = [
 
 [[package]]
 name = "raise-cli"
-version = "2.2.3"
+version = "2.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "logfire-api" },
