@@ -1,0 +1,29 @@
+name: "CI: raise-pro"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/raise-pro/**"
+      - "packages/raise-cli/**"
+      - "packages/raise-core/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/raise-pro/**"
+      - "packages/raise-cli/**"
+      - "packages/raise-core/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci-package.yml
+    with:
+      package: raise-pro
+      test-path: packages/raise-pro/tests/
+      src-path: packages/raise-pro/src/
