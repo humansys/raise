@@ -1,5 +1,0 @@
-type: architecture_domain_model
-project: "{project_name}"
-status: draft
-bounded_contexts: []
-shared_kernel: {}

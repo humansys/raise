@@ -1,8 +1,0 @@
-name: Windsurf
-agent_type: windsurf
-instructions_file: .windsurf/rules/raise.md
-skills_dir: .windsurf/skills
-workflows_dir: .windsurf/workflows
-detection_markers:
-  - .windsurf/rules
-  - .windsurf

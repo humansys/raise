@@ -1,8 +1,0 @@
-name: Roo Code
-agent_type: roo
-instructions_file: .roo/rules/raise.md
-skills_dir: .roo/skills
-detection_markers:
-  - .roo/rules
-  - .roo
-  - .rooignore
