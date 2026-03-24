@@ -6,6 +6,36 @@
 
 ---
 
+## rai-agent Product Vision: Self-Hosted Agent with Guided Onboarding — 2026-03-24
+
+Target: Google Workspace users + Atlassian users. Dream: one-click deploy → guided setup → productive agent.
+
+### Epic candidates (independent, composable):
+
+**E-A: Google Chat Channel** — adapter for Google Chat (primary channel for target). Service account, webhook receiver, message adapter. Same runtime, different channel than Telegram.
+
+**E-B: Onboarding Wizard** — Web UI at `/setup` in the daemon. Guides: auth → channel → verification. Replaces manual `.env` editing. Detects first-run vs already-configured.
+
+**E-C: Open-Source Adapter Ecosystem** — Plane (issues + wiki + sprints, single self-hosted UI) as the default PM integration for open-source rai-agent. Pro version keeps Jira/Confluence via raise-pro. Docker Compose stack: rai-agent + Plane = complete environment.
+
+**E-D: One-Click Deploy** — Railway/Render templates (RAISE-701, RAISE-702 already created). Wizard (E-B) handles post-deploy onboarding. Zero local setup.
+
+### Dependencies
+```
+E-A (Google Chat) ──────────────┐
+                                ├── E-D (One-Click Deploy)
+E-B (Onboarding Wizard) ───────┤
+                                │
+E-C (Plane adapter) ────────────┘
+```
+
+### Key decisions pending
+- Plane vs alternatives (Taiga, OpenProject) — Plane has issues+wiki in one UI
+- Google Chat API approach (webhook vs bot vs Pub/Sub)
+- rai-agent OSS boundary (D2 from E673, still deferred)
+
+---
+
 ## raise-pro Independent Versioning — 2026-03-24
 
 **Origin:** E680 session — discovered 19 Jira tickets are Pro-only with no version target.
