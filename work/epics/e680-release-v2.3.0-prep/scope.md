@@ -55,14 +55,14 @@ Key finding: a proper release covers 7 dimensions (scope audit, changelog, docum
 
 ## Stories
 
-| ID | Story | Description | Size | Status |
-|----|-------|-------------|:----:|--------|
-| S680.1 | Epic documentation | `/rai-epic-docs` for E478, E494, E654 → Confluence | M | pending |
-| S680.2 | Changelog & release notes | CHANGELOG.md (Keep a Changelog) + GitHub release notes | S | pending |
-| S680.3 | User & dev docs | Update `/docs` — ACLI migration, session identity, CLI extensions | S | pending |
-| S680.4 | Quality gates & security | `rai gate check --all`, `rai skill validate`, dep scan, full test suite | S | pending |
-| S680.5 | Smoke test & verification | Session roundtrip, ACLI integration smoke, clean install test | S | pending |
-| S680.6 | Release publish & announce | `/rai-publish` minor + GitHub release + Confluence release notes | XS | pending |
+| ID | Jira | Story | Description | Size | Status |
+|----|------|-------|-------------|:----:|--------|
+| S680.1 | RAISE-683 | Epic documentation | `/rai-epic-docs` for E478, E494, E654 → Confluence | M | pending |
+| S680.2 | RAISE-686 | Changelog & release notes | CHANGELOG.md (Keep a Changelog) + GitHub release notes | S | pending |
+| S680.3 | RAISE-684 | User & dev docs | Update `/docs` — ACLI migration, session identity, CLI extensions | S | pending |
+| S680.4 | RAISE-682 | Quality gates & security | `rai gate check --all`, `rai skill validate`, dep scan, full test suite | S | pending |
+| S680.5 | RAISE-685 | Smoke test & verification | Session roundtrip, ACLI integration smoke, clean install test | S | pending |
+| S680.6 | RAISE-687 | Release publish & announce | `/rai-publish` minor + GitHub release + Confluence release notes | XS | pending |
 
 ## Dependencies
 
@@ -115,3 +115,75 @@ To validate in retro — does this matrix hold?
 | RaiSE: skill validate | skip | run | run |
 | RaiSE: graph build | skip | run | run |
 | RaiSE: gate check --all | run | run | run |
+
+---
+
+## Implementation Plan
+
+### Sequencing Strategy
+
+**Quick wins + dependency-driven.** No technical uncertainty (all code exists), optimize for throughput and critical path.
+
+### Execution Order
+
+| # | Story | Stream | Rationale | Enables |
+|:-:|-------|:------:|-----------|---------|
+| 1 | S680.4 Quality gates & security | C | Quick win — automated, fast feedback. If gates fail, everything else is moot. | S680.5 |
+| 2 | S680.1 Epic documentation | A | Critical path (M size). Start early, runs in parallel with S680.4. | S680.2 |
+| 3 | S680.3 User & dev docs | B | Independent. Parallel with S680.1. | S680.6 |
+| 4 | S680.5 Smoke test & verification | C | Depends on S680.4. Run after gates pass. | S680.6 |
+| 5 | S680.2 Changelog & release notes | A | Depends on S680.1 (epic docs inform content). | S680.6 |
+| 6 | S680.6 Release publish & announce | — | Final gate. All prep done. | Done |
+
+### Parallel Streams
+
+```
+         Day 1-2                    Day 3-4              Day 5
+Stream A: ████ S680.1 (M) ████ → ██ S680.2 (S) ██ ─┐
+Stream B: ██ S680.3 (S) ██ ─────────────────────────┤→ S680.6 (XS)
+Stream C: █ S680.4 (S) █ → ██ S680.5 (S) ██ ───────┘
+```
+
+- Stream A is the critical path (S680.1 at M is the largest story)
+- Stream C starts first (S680.4 is fast, automated)
+- Stream B runs independently, finishes early
+
+### Milestones
+
+#### M1: Docs Complete (target: Day 3)
+- [ ] S680.1: 3 Confluence pages published (E478, E494, E654)
+- [ ] S680.3: `/docs` updated for ACLI adapter, session identity, CLI extensions
+- [ ] S680.2: CHANGELOG.md v2.3.0 entry written
+
+**Demo:** Show Confluence pages + CHANGELOG diff.
+
+#### M2: Release Ready (target: Day 4)
+- [ ] S680.4: `rai gate check --all` passes, 0 CVEs, full test suite green
+- [ ] S680.5: Session roundtrip verified, ACLI smoke test passes
+
+**Demo:** Gate output + smoke test evidence.
+
+#### M3: Released (target: Day 5 — 2026-03-30)
+- [ ] S680.6: v2.3.0 on PyPI, GitHub release with notes
+- [ ] Retrospective captured
+
+**Demo:** `pip install raise-cli==2.3.0` works.
+
+### Progress Tracking
+
+| Story | Jira | Size | Status | Started | Completed | Notes |
+|-------|------|:----:|--------|---------|-----------|-------|
+| S680.4 | RAISE-682 | S | pending | | | gates + security |
+| S680.1 | RAISE-683 | M | pending | | | epic docs (critical path) |
+| S680.3 | RAISE-684 | S | pending | | | user/dev docs |
+| S680.5 | RAISE-685 | S | pending | | | smoke tests |
+| S680.2 | RAISE-686 | S | pending | | | changelog |
+| S680.6 | RAISE-687 | XS | pending | | | publish |
+
+### Sequencing Risks
+
+| Risk | Mitigation |
+|------|------------|
+| S680.1 takes longer than 2 days (artifact gaps) | Use git log + retros as fallback. Reduce doc depth for E478 (simplest epic). |
+| S680.4 finds failing gates | Fix before proceeding — this is the point of running gates first. |
+| Fernando's bugs not closed by Day 5 | Already planned: document as known issues. Don't block release. |
