@@ -58,7 +58,7 @@ Key finding: a proper release covers 7 dimensions (scope audit, changelog, docum
 | ID | Jira | Story | Description | Size | Status |
 |----|------|-------|-------------|:----:|--------|
 | S680.1 | RAISE-683 | Epic documentation | `/rai-epic-docs` for E478, E494, E654 → Confluence | M | pending |
-| S680.2 | RAISE-686 | Changelog & release notes | CHANGELOG.md (Keep a Changelog) + GitHub release notes | S | pending |
+| S680.2 | RAISE-686 | Changelog & release notes | CHANGELOG.md (Keep a Changelog) + GitHub release notes | S | done |
 | S680.3 | RAISE-684 | User & dev docs | Update `/docs` — ACLI migration, session identity, CLI extensions | S | pending |
 | S680.4 | RAISE-682 | Quality gates & security | `rai gate check --all`, `rai skill validate`, dep scan, full test suite | S | pending |
 | S680.5 | RAISE-685 | Smoke test & verification | Session roundtrip, ACLI integration smoke, clean install test | S | pending |
@@ -177,7 +177,7 @@ Stream C: █ S680.4 (S) █ → ██ S680.5 (S) ██ ───────�
 | S680.1 | RAISE-683 | M | pending | | | epic docs (critical path) |
 | S680.3 | RAISE-684 | S | pending | | | user/dev docs |
 | S680.5 | RAISE-685 | S | pending | | | smoke tests |
-| S680.2 | RAISE-686 | S | pending | | | changelog |
+| S680.2 | RAISE-686 | S | done | 2026-03-23 | 2026-03-23 | changelog |
 | S680.6 | RAISE-687 | XS | pending | | | publish |
 
 ### Sequencing Risks
