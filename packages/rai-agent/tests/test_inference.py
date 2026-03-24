@@ -116,7 +116,9 @@ class TestInvokeStructured:
                     content: list[Any] = field(default_factory=list)
                     type: str = "assistant"
 
-                msg = FakeAssistantMessage(content=[FakeTextBlock(text=original_response)])
+                msg = FakeAssistantMessage(
+                    content=[FakeTextBlock(text=original_response)]
+                )
                 yield msg
 
             return fake_query
@@ -131,7 +133,9 @@ class TestInvokeStructured:
             )
         finally:
             # Env var should be restored after the call
-            assert os.environ.get("CLAUDECODE") == "1", "CLAUDECODE not restored after call"
+            assert os.environ.get("CLAUDECODE") == "1", (
+                "CLAUDECODE not restored after call"
+            )
             os.environ.pop("CLAUDECODE", None)
 
         # During the SDK call, CLAUDECODE should have been unset

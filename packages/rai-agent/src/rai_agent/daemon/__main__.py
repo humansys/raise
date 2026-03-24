@@ -81,18 +81,16 @@ def build_daemon(config: DaemonConfig) -> DaemonComponents:
     )
     assembler = PromptAssembler(project_root=".")
     runtime = ClaudeRuntime(
-        governance=governance, assembler=assembler, cwd=".",
+        governance=governance,
+        assembler=assembler,
+        cwd=".",
     )
 
     # Triggers
     cron_trigger = CronTrigger(db_url=config.db_url)
 
     # Session infrastructure (S5.5)
-    db_path = (
-        config.db_url.split("///")[-1]
-        if "///" in config.db_url
-        else "daemon.db"
-    )
+    db_path = config.db_url.split("///")[-1] if "///" in config.db_url else "daemon.db"
     registry = SessionRegistry(
         db_path=db_path,
         max_sessions=config.max_sessions_per_chat,
@@ -101,16 +99,14 @@ def build_daemon(config: DaemonConfig) -> DaemonComponents:
     # Get bot from PTB Application directly (avoid circular dep)
     from telegram.ext import Application  # type: ignore[import-untyped]
 
-    ptb_app: Any = (
-        Application.builder()
-        .token(config.telegram_bot_token)
-        .build()
-    )
+    ptb_app: Any = Application.builder().token(config.telegram_bot_token).build()
     bot: Any = ptb_app.bot
 
     # Handler + dispatcher
     handler = TelegramHandler(
-        runtime=runtime, bot=bot, registry=registry,
+        runtime=runtime,
+        bot=bot,
+        registry=registry,
     )
     dispatcher = SessionDispatcher(handler=handler.handle)
 
@@ -163,9 +159,7 @@ def build_daemon(config: DaemonConfig) -> DaemonComponents:
                 "cron": "configured",
             },
             "ws": "listening",
-            "briefing": (
-                "enabled" if config.briefing_chat_id else "disabled"
-            ),
+            "briefing": ("enabled" if config.briefing_chat_id else "disabled"),
         }
 
     return DaemonComponents(

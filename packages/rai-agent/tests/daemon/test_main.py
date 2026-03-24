@@ -217,7 +217,8 @@ class TestIntegration:
             components = build_daemon(config)
 
         route_paths: list[Any] = [
-            r.path for r in components.app.routes  # type: ignore[union-attr]
+            r.path
+            for r in components.app.routes  # type: ignore[union-attr]
         ]
         assert "/ws" in route_paths
         assert "/health" in route_paths

@@ -112,9 +112,7 @@ class GovernanceHooks:
         # Check if tool matches sensitive patterns → HITL gate
         if tool_name in self._sensitive_patterns:
             session_id: str = input_data.get("session_id", "unknown")
-            tool_input: dict[str, Any] = input_data.get(
-                "tool_input", {}
-            )
+            tool_input: dict[str, Any] = input_data.get("tool_input", {})
             approved = await self._request_hitl_approval(
                 tool_name, tool_input, session_id
             )
@@ -204,9 +202,7 @@ class GovernanceHooks:
         bus.emit(request)
 
         try:
-            approved = await asyncio.wait_for(
-                future, timeout=self._hitl_timeout
-            )
+            approved = await asyncio.wait_for(future, timeout=self._hitl_timeout)
             return approved
         except TimeoutError:
             _log.warning(

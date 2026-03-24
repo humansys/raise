@@ -122,8 +122,9 @@ def scaffold_domain(
     }
 
     (domain_dir / DOMAIN_YAML).write_text(
-        yaml.dump(manifest, default_flow_style=False, sort_keys=False,
-                  allow_unicode=True)
+        yaml.dump(
+            manifest, default_flow_style=False, sort_keys=False, allow_unicode=True
+        )
     )
 
     return domain_dir
@@ -206,8 +207,7 @@ def _resolve_schema(manifest: DomainManifest) -> type[BaseModel]:
     cls: Any = getattr(mod, schema_ref.class_name, None)
     if cls is None:
         msg = (
-            f"Class '{schema_ref.class_name}' not found "
-            f"in module '{schema_ref.module}'"
+            f"Class '{schema_ref.class_name}' not found in module '{schema_ref.module}'"
         )
         raise DomainConfigError(msg)
 

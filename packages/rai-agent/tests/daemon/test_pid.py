@@ -37,12 +37,14 @@ class TestReadPid:
     """Tests for read_pid()."""
 
     def test_returns_pid_when_file_exists_and_alive(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         pid_file = tmp_path / "daemon.pid"
         pid_file.write_text("12345\n")
         with patch(
-            "rai_agent.daemon.pid.is_alive", return_value=True,
+            "rai_agent.daemon.pid.is_alive",
+            return_value=True,
         ):
             assert read_pid(pid_file) == 12345
 
@@ -51,7 +53,8 @@ class TestReadPid:
         assert read_pid(pid_file) is None
 
     def test_returns_none_and_cleans_corrupt_file(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         pid_file = tmp_path / "daemon.pid"
         pid_file.write_text("not-a-number\n")
@@ -59,7 +62,8 @@ class TestReadPid:
         assert not pid_file.exists()
 
     def test_returns_none_and_cleans_empty_file(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         pid_file = tmp_path / "daemon.pid"
         pid_file.write_text("")
@@ -70,7 +74,8 @@ class TestReadPid:
         pid_file = tmp_path / "daemon.pid"
         pid_file.write_text("99999\n")
         with patch(
-            "rai_agent.daemon.pid.is_alive", return_value=False,
+            "rai_agent.daemon.pid.is_alive",
+            return_value=False,
         ):
             assert read_pid(pid_file) is None
         assert not pid_file.exists()
@@ -79,7 +84,8 @@ class TestReadPid:
         pid_file = tmp_path / "daemon.pid"
         pid_file.write_text("12345\n")
         with patch(
-            "rai_agent.daemon.pid.is_alive", return_value=True,
+            "rai_agent.daemon.pid.is_alive",
+            return_value=True,
         ):
             assert read_pid(pid_file) == 12345
 
@@ -96,14 +102,16 @@ class TestIsAlive:
 
     @patch("os.kill", side_effect=PermissionError)
     def test_returns_true_when_permission_denied(
-        self, _mock_kill: object,
+        self,
+        _mock_kill: object,
     ) -> None:
         # Process exists but we can't signal it
         assert is_alive(1) is True
 
     @patch("os.kill", side_effect=ProcessLookupError)
     def test_returns_false_when_process_not_found(
-        self, _mock_kill: object,
+        self,
+        _mock_kill: object,
     ) -> None:
         assert is_alive(99999) is False
 

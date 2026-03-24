@@ -105,7 +105,8 @@ class TestRunResult:
         from rai_agent.daemon.runtime import RunResult
 
         result = RunResult(
-            session_id="abc-123", input_tokens=150000,
+            session_id="abc-123",
+            input_tokens=150000,
         )
         assert result.session_id == "abc-123"
         assert result.input_tokens == 150000
@@ -130,7 +131,9 @@ class TestTelegramHandlerHandle:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         request = _make_request(session=session)
@@ -159,11 +162,14 @@ class TestTelegramHandlerHandle:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session(sdk_session_id="existing-sid")
         request = _make_request(
-            prompt="follow up", session=session,
+            prompt="follow up",
+            session=session,
         )
 
         await handler.handle(request)
@@ -186,7 +192,9 @@ class TestTelegramHandlerHandle:
         registry = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session(sdk_session_id=None)
         request = _make_request(prompt="/new", session=session)
@@ -218,7 +226,9 @@ class TestTelegramHandlerHandle:
         mock_streamer.flush = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         request = _make_request(session=session)
@@ -244,7 +254,9 @@ class TestTelegramHandlerHandle:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         session.cwd = "/projects/myapp"
@@ -269,12 +281,15 @@ class TestTelegramHandlerHandle:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session(sdk_session_id="existing-sid")
         session.cwd = "/projects/other"
         request = _make_request(
-            prompt="follow up", session=session,
+            prompt="follow up",
+            session=session,
         )
 
         await handler.handle(request)
@@ -299,7 +314,8 @@ class TestTelegramHandlerTokenTracking:
         runtime = _make_mock_runtime()
         runtime.run = AsyncMock(
             return_value=RunResult(
-                session_id="x", input_tokens=140000,
+                session_id="x",
+                input_tokens=140000,
             ),
         )
         bot = _make_mock_bot()
@@ -307,7 +323,9 @@ class TestTelegramHandlerTokenTracking:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         request = _make_request(session=session)
@@ -329,7 +347,8 @@ class TestTelegramHandlerTokenTracking:
         runtime = _make_mock_runtime()
         runtime.run = AsyncMock(
             return_value=RunResult(
-                session_id="x", input_tokens=155000,
+                session_id="x",
+                input_tokens=155000,
             ),
         )
         bot = _make_mock_bot()
@@ -337,7 +356,9 @@ class TestTelegramHandlerTokenTracking:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         request = _make_request(session=session)
@@ -347,9 +368,7 @@ class TestTelegramHandlerTokenTracking:
         send_mock: AsyncMock = request.send  # type: ignore[assignment]
         calls = [str(c) for c in send_mock.call_args_list]
         suggestion_sent = any("77%" in c for c in calls)
-        assert suggestion_sent, (
-            f"Expected 77% suggestion, got calls: {calls}"
-        )
+        assert suggestion_sent, f"Expected 77% suggestion, got calls: {calls}"
 
     @pytest.mark.asyncio
     async def test_handler_no_suggestion_below_75_percent(
@@ -362,7 +381,8 @@ class TestTelegramHandlerTokenTracking:
         runtime = _make_mock_runtime()
         runtime.run = AsyncMock(
             return_value=RunResult(
-                session_id="x", input_tokens=140000,
+                session_id="x",
+                input_tokens=140000,
             ),
         )
         bot = _make_mock_bot()
@@ -370,7 +390,9 @@ class TestTelegramHandlerTokenTracking:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         request = _make_request(session=session)
@@ -399,7 +421,9 @@ class TestTelegramHandlerTokenTracking:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         request = _make_request(session=session)
@@ -427,7 +451,8 @@ class TestNamedSessionRouting:
         runtime = _make_mock_runtime()
         runtime.run = AsyncMock(
             return_value=RunResult(
-                session_id="x", input_tokens=160000,
+                session_id="x",
+                input_tokens=160000,
             ),
         )
         bot = _make_mock_bot()
@@ -435,7 +460,9 @@ class TestNamedSessionRouting:
         registry.update = AsyncMock()
 
         handler = TelegramHandler(
-            runtime=runtime, bot=bot, registry=registry,
+            runtime=runtime,
+            bot=bot,
+            registry=registry,
         )
         session = _make_session()
         request = _make_request(session=session)

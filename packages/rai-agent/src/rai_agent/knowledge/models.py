@@ -51,9 +51,7 @@ class DomainManifest(BaseModel):
     node_schema: SchemaRef = Field(validation_alias="schema")
     corpus: list[str] = Field(default_factory=list)
     competency_questions: str | None = None
-    thresholds: dict[str, float] = Field(
-        default_factory=lambda: {"cq_coverage": 80.0}
-    )
+    thresholds: dict[str, float] = Field(default_factory=lambda: {"cq_coverage": 80.0})
     required_types: set[str] = Field(default_factory=set)
     retrieval: RetrievalConfig | None = None
     prompting: PromptingConfig | None = None

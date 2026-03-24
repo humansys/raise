@@ -116,7 +116,9 @@ def make_integration_handler(
 
         if existing_sid is not None:
             result = await runtime.resume(
-                run_config, existing_sid, request.send,
+                run_config,
+                existing_sid,
+                request.send,
             )
         else:
             result = await runtime.run(run_config, request.send)
@@ -165,7 +167,8 @@ def _make_ctx(
 
 class TestSmoke:
     async def test_smoke_single_message_through_pipeline(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Single message through full pipeline: FakeRuntime.run() called once."""
         # Setup
@@ -233,7 +236,8 @@ def _build_pipeline(
         ),
         make_coalescing_middleware(
             CoalescingConfig(
-                window_seconds=coalesce_window, max_parts=10,
+                window_seconds=coalesce_window,
+                max_parts=10,
             ),
         ),
         make_session_command_middleware(registry, cwd),
@@ -243,7 +247,8 @@ def _build_pipeline(
 
 class TestMultiChatIsolation:
     async def test_two_chats_no_context_leakage(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Concurrent chats have independent sessions, no cross-talk."""
         runtime = FakeRuntime()
@@ -252,7 +257,8 @@ class TestMultiChatIsolation:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(registry, dispatcher, cwd)
@@ -290,7 +296,8 @@ class TestMultiChatIsolation:
             await registry.close()
 
     async def test_three_chats_concurrent(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Scale test: 3 concurrent chats, each independent."""
         runtime = FakeRuntime()
@@ -299,17 +306,14 @@ class TestMultiChatIsolation:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(registry, dispatcher, cwd)
 
-        keys = [
-            f"telegram:default:dm:{i}" for i in range(300, 303)
-        ]
-        ctxs = [
-            _make_ctx(k, f"msg from {k}") for k in keys
-        ]
+        keys = [f"telegram:default:dm:{i}" for i in range(300, 303)]
+        ctxs = [_make_ctx(k, f"msg from {k}") for k in keys]
 
         try:
             await asyncio.gather(
@@ -334,7 +338,8 @@ class TestMultiChatIsolation:
 
 class TestFIFOOrdering:
     async def test_messages_processed_in_order_through_pipeline(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """FIFO: messages to same session processed in order."""
         runtime = FakeRuntime()
@@ -343,13 +348,16 @@ class TestFIFOOrdering:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
 
         # Use max_parts=1 to flush immediately (no coalescing)
         middlewares = _build_pipeline(
-            registry, dispatcher, cwd,
+            registry,
+            dispatcher,
+            cwd,
             coalesce_window=0.01,
         )
 
@@ -382,7 +390,8 @@ class TestFIFOOrdering:
 
 class TestBackpressure:
     async def test_queue_full_replies_to_user(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Backpressure: queue full sends reply to user."""
         gate = asyncio.Event()
@@ -393,7 +402,9 @@ class TestBackpressure:
         handler = make_integration_handler(runtime, registry)
         # maxsize=1 so queue fills fast
         dispatcher = SessionDispatcher(
-            handler=handler, maxsize=1, idle_timeout=1.0,
+            handler=handler,
+            maxsize=1,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         # No coalescing — direct dispatch
@@ -434,7 +445,8 @@ class TestBackpressure:
 
 class TestCoalescing:
     async def test_rapid_messages_coalesced(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Rapid messages within window coalesced into single dispatch."""
         runtime = FakeRuntime()
@@ -443,11 +455,14 @@ class TestCoalescing:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(
-            registry, dispatcher, cwd,
+            registry,
+            dispatcher,
+            cwd,
             coalesce_window=0.1,
         )
 
@@ -472,10 +487,10 @@ class TestCoalescing:
             await registry.close()
 
 
-
 class TestSessionResumeAfterRestart:
     async def test_resume_after_registry_reopen(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Close + reopen registry from same file; resume() called."""
         runtime = FakeRuntime()
@@ -485,7 +500,8 @@ class TestSessionResumeAfterRestart:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(registry, dispatcher, cwd)
@@ -517,10 +533,13 @@ class TestSessionResumeAfterRestart:
         runtime2 = FakeRuntime()
         handler2 = make_integration_handler(runtime2, registry2)
         dispatcher2 = SessionDispatcher(
-            handler=handler2, idle_timeout=1.0,
+            handler=handler2,
+            idle_timeout=1.0,
         )
         middlewares2 = _build_pipeline(
-            registry2, dispatcher2, cwd,
+            registry2,
+            dispatcher2,
+            cwd,
         )
 
         try:
@@ -541,7 +560,8 @@ class TestSessionResumeAfterRestart:
 
 class TestSessionSwitch:
     async def test_switch_via_session_command_middleware(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """'/session switch first' through pipeline switches to session by name."""
         runtime = FakeRuntime()
@@ -550,7 +570,8 @@ class TestSessionSwitch:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(registry, dispatcher, cwd)
@@ -571,7 +592,9 @@ class TestSessionSwitch:
             # Send /session switch first through the pipeline
             replies: list[str] = []
             ctx_switch = _make_ctx(
-                key, "/session switch first", replies=replies,
+                key,
+                "/session switch first",
+                replies=replies,
             )
             await compose(middlewares, ctx_switch)
             await asyncio.sleep(0.1)
@@ -593,7 +616,8 @@ class TestSessionSwitch:
 
 class TestProviderAgnosticHarness:
     async def test_harness_works_with_telegram_keys(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Pipeline processes telegram:default:dm:X keys correctly."""
         runtime = FakeRuntime()
@@ -602,7 +626,8 @@ class TestProviderAgnosticHarness:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(registry, dispatcher, cwd)
@@ -629,7 +654,8 @@ class TestProviderAgnosticHarness:
             await registry.close()
 
     async def test_harness_works_with_gchat_keys(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Pipeline processes gchat:default:group:spaces/X keys."""
         runtime = FakeRuntime()
@@ -638,7 +664,8 @@ class TestProviderAgnosticHarness:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(registry, dispatcher, cwd)
@@ -665,7 +692,8 @@ class TestProviderAgnosticHarness:
             await registry.close()
 
     async def test_different_providers_isolated(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Telegram + GChat sessions are fully isolated."""
         runtime = FakeRuntime()
@@ -674,7 +702,8 @@ class TestProviderAgnosticHarness:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_pipeline(registry, dispatcher, cwd)
@@ -746,7 +775,8 @@ def _build_command_pipeline(
 
 class TestMultiSessionCreate:
     async def test_create_three_sessions_last_is_current(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Create 3 named sessions via /session new, last one is current."""
         runtime = FakeRuntime()
@@ -755,7 +785,8 @@ class TestMultiSessionCreate:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -768,7 +799,9 @@ class TestMultiSessionCreate:
             for name in ["alpha", "beta", "gamma"]:
                 replies: list[str] = []
                 ctx = _make_ctx(
-                    key, f"/session new {name}", replies=replies,
+                    key,
+                    f"/session new {name}",
+                    replies=replies,
                 )
                 await compose(middlewares, ctx)
                 assert any("created" in r.lower() for r in replies)
@@ -793,7 +826,8 @@ class TestMultiSessionCreate:
             await registry.close()
 
     async def test_create_auto_named_sessions(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Create sessions without names, verify auto-naming."""
         runtime = FakeRuntime()
@@ -802,7 +836,8 @@ class TestMultiSessionCreate:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -826,7 +861,8 @@ class TestMultiSessionCreate:
             await registry.close()
 
     async def test_create_with_duplicate_name_rejected(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Create session with duplicate name raises IntegrityError.
 
@@ -842,7 +878,8 @@ class TestMultiSessionCreate:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -854,7 +891,9 @@ class TestMultiSessionCreate:
             # Create first session
             replies1: list[str] = []
             ctx1 = _make_ctx(
-                key, "/session new myname", replies=replies1,
+                key,
+                "/session new myname",
+                replies=replies1,
             )
             await compose(middlewares, ctx1)
             assert any("created" in r.lower() for r in replies1)
@@ -878,7 +917,8 @@ class TestMultiSessionCreate:
 
 class TestMultiSessionSwitch:
     async def test_switch_changes_current_session(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Switch to a named session makes it current."""
         runtime = FakeRuntime()
@@ -887,7 +927,8 @@ class TestMultiSessionSwitch:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -910,7 +951,9 @@ class TestMultiSessionSwitch:
             # Switch to inbox
             replies: list[str] = []
             ctx_switch = _make_ctx(
-                key, "/session switch inbox", replies=replies,
+                key,
+                "/session switch inbox",
+                replies=replies,
             )
             await compose(middlewares, ctx_switch)
 
@@ -924,7 +967,8 @@ class TestMultiSessionSwitch:
             await registry.close()
 
     async def test_switch_routes_messages_to_new_session(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """After switching, messages route to the switched-to session."""
         runtime = FakeRuntime()
@@ -933,7 +977,8 @@ class TestMultiSessionSwitch:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -983,7 +1028,8 @@ class TestMultiSessionSwitch:
             await registry.close()
 
     async def test_switch_to_nonexistent_session_replies_error(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Switching to non-existent session gives error reply."""
         runtime = FakeRuntime()
@@ -992,7 +1038,8 @@ class TestMultiSessionSwitch:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1007,7 +1054,9 @@ class TestMultiSessionSwitch:
             # Try to switch to non-existent
             replies: list[str] = []
             ctx_switch = _make_ctx(
-                key, "/session switch ghost", replies=replies,
+                key,
+                "/session switch ghost",
+                replies=replies,
             )
             await compose(middlewares, ctx_switch)
 
@@ -1022,7 +1071,8 @@ class TestMultiSessionSwitch:
 
 class TestMultiSessionConcurrent:
     async def test_concurrent_sessions_have_distinct_sdk_ids(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Two sessions in same chat have distinct SDK session IDs."""
         runtime = FakeRuntime()
@@ -1031,7 +1081,8 @@ class TestMultiSessionConcurrent:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1073,7 +1124,8 @@ class TestMultiSessionConcurrent:
             await registry.close()
 
     async def test_message_only_dispatched_to_active_session(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Message dispatched only to the active session's SDK session."""
         runtime = FakeRuntime()
@@ -1082,7 +1134,8 @@ class TestMultiSessionConcurrent:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1115,18 +1168,21 @@ class TestMultiSessionConcurrent:
 
 class TestMultiSessionLimits:
     async def test_max_sessions_rejects_creation(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Creating beyond max_sessions limit is rejected."""
         runtime = FakeRuntime()
         registry = SessionRegistry(
-            db_path=str(tmp_path / "test.db"), max_sessions=2,
+            db_path=str(tmp_path / "test.db"),
+            max_sessions=2,
         )
         await registry.init()
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1143,7 +1199,9 @@ class TestMultiSessionLimits:
             # Attempt a 3rd
             replies: list[str] = []
             ctx_over = _make_ctx(
-                key, "/session new three", replies=replies,
+                key,
+                "/session new three",
+                replies=replies,
             )
             await compose(middlewares, ctx_over)
 
@@ -1158,18 +1216,21 @@ class TestMultiSessionLimits:
             await registry.close()
 
     async def test_close_then_create_allows_new_session(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """After closing a session, a new one can be created within limit."""
         runtime = FakeRuntime()
         registry = SessionRegistry(
-            db_path=str(tmp_path / "test.db"), max_sessions=2,
+            db_path=str(tmp_path / "test.db"),
+            max_sessions=2,
         )
         await registry.init()
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1191,7 +1252,9 @@ class TestMultiSessionLimits:
             # Now create a new session — should succeed
             replies: list[str] = []
             ctx_new = _make_ctx(
-                key, "/session new three", replies=replies,
+                key,
+                "/session new three",
+                replies=replies,
             )
             await compose(middlewares, ctx_new)
 
@@ -1212,7 +1275,8 @@ class TestMultiSessionLimits:
 
 class TestMultiSessionLifecycle:
     async def test_close_session_by_name(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Close a specific session by name via /session close."""
         runtime = FakeRuntime()
@@ -1221,7 +1285,8 @@ class TestMultiSessionLifecycle:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1239,7 +1304,9 @@ class TestMultiSessionLifecycle:
             # Close alpha by name
             replies: list[str] = []
             ctx_close = _make_ctx(
-                key, "/session close alpha", replies=replies,
+                key,
+                "/session close alpha",
+                replies=replies,
             )
             await compose(middlewares, ctx_close)
 
@@ -1254,7 +1321,8 @@ class TestMultiSessionLifecycle:
             await registry.close()
 
     async def test_delete_closed_session_not_found(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Deleting a closed session replies 'not found'.
 
@@ -1267,7 +1335,8 @@ class TestMultiSessionLifecycle:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1288,7 +1357,9 @@ class TestMultiSessionLifecycle:
             # Try to delete alpha (closed) — lookup won't find it
             replies: list[str] = []
             ctx_del = _make_ctx(
-                key, "/session delete alpha", replies=replies,
+                key,
+                "/session delete alpha",
+                replies=replies,
             )
             await compose(middlewares, ctx_del)
 
@@ -1298,7 +1369,8 @@ class TestMultiSessionLifecycle:
             await registry.close()
 
     async def test_delete_active_session_rejected(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Deleting the current active session is rejected."""
         runtime = FakeRuntime()
@@ -1307,7 +1379,8 @@ class TestMultiSessionLifecycle:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1323,7 +1396,9 @@ class TestMultiSessionLifecycle:
             # Try to delete the current session
             replies: list[str] = []
             ctx_del = _make_ctx(
-                key, "/session delete active", replies=replies,
+                key,
+                "/session delete active",
+                replies=replies,
             )
             await compose(middlewares, ctx_del)
 
@@ -1337,7 +1412,8 @@ class TestMultiSessionLifecycle:
             await registry.close()
 
     async def test_close_then_switch_to_remaining(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Close active session, switch to remaining one."""
         runtime = FakeRuntime()
@@ -1346,7 +1422,8 @@ class TestMultiSessionLifecycle:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1368,7 +1445,9 @@ class TestMultiSessionLifecycle:
             # Switch to remaining (first)
             replies: list[str] = []
             ctx_switch = _make_ctx(
-                key, "/session switch first", replies=replies,
+                key,
+                "/session switch first",
+                replies=replies,
             )
             await compose(middlewares, ctx_switch)
 
@@ -1387,7 +1466,8 @@ class TestMultiSessionLifecycle:
 
 class TestMultiSessionAutoCreate:
     async def test_fresh_chat_auto_creates_session(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Regular message to empty chat auto-creates a named session."""
         runtime = FakeRuntime()
@@ -1396,7 +1476,8 @@ class TestMultiSessionAutoCreate:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)
@@ -1422,7 +1503,8 @@ class TestMultiSessionAutoCreate:
             await registry.close()
 
     async def test_auto_created_session_is_current(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """Auto-created session is marked current with sdk_session_id."""
         runtime = FakeRuntime()
@@ -1431,7 +1513,8 @@ class TestMultiSessionAutoCreate:
 
         handler = make_integration_handler(runtime, registry)
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=1.0,
+            handler=handler,
+            idle_timeout=1.0,
         )
         cwd = str(tmp_path)
         middlewares = _build_command_pipeline(registry, dispatcher, cwd)

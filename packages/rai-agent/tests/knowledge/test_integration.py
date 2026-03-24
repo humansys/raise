@@ -160,23 +160,15 @@ class TestCLIIntegration:
 
     def test_check_full_domain(self, tmp_path: Path) -> None:
         _build_domain(tmp_path)
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
-            result = runner.invoke(
-                app, ["check", "integration-test"]
-            )
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
+            result = runner.invoke(app, ["check", "integration-test"])
         assert result.exit_code == 0
         assert "4 gates" in result.output.lower() or "gates" in result.output.lower()
 
     def test_check_json_full(self, tmp_path: Path) -> None:
         _build_domain(tmp_path)
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
-            result = runner.invoke(
-                app, ["check", "integration-test", "--json"]
-            )
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
+            result = runner.invoke(app, ["check", "integration-test", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert len(data) == 4
@@ -185,18 +177,14 @@ class TestCLIIntegration:
 
     def test_status_shows_domain(self, tmp_path: Path) -> None:
         _build_domain(tmp_path)
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["status"])
         assert result.exit_code == 0
         assert "integration-test" in result.output
 
     def test_init_and_status(self, tmp_path: Path) -> None:
         """Init a domain, then verify status shows it."""
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             init_result = runner.invoke(app, ["init", "new-domain"])
             assert init_result.exit_code == 0
 

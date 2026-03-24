@@ -303,11 +303,7 @@ class TestStreamTiming:
         assert "agent.start" in events
         assert "agent.end" in events
 
-        end_log = next(
-            log
-            for log in logs
-            if log["event"] == "agent.end"
-        )
+        end_log = next(log for log in logs if log["event"] == "agent.end")
         assert "duration_ms" in end_log
         assert isinstance(end_log["duration_ms"], int)
         assert "message_count" in end_log
@@ -475,11 +471,7 @@ class TestFullPipelineLogSequence:
                 conversation_id="test:redact",
             )
 
-        tool_end_log = next(
-            log
-            for log in logs
-            if log["event"] == "tool.end"
-        )
+        tool_end_log = next(log for log in logs if log["event"] == "tool.end")
         assert "sk-ant-" not in tool_end_log["content"]
         assert "[REDACTED]" in tool_end_log["content"]
 
@@ -487,9 +479,7 @@ class TestFullPipelineLogSequence:
 class TestVerboseConfigFromEnv:
     """Validate the full config-to-runtime path."""
 
-    def test_verbose_config_from_env(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_verbose_config_from_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """RAI_DAEMON_VERBOSE_LOGGING=1 -> verbose_logging=True."""
         from rai_agent.daemon.config import DaemonConfig
 

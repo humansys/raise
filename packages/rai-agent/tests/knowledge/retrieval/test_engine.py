@@ -168,8 +168,7 @@ class _FakeAdapter:
         if self._fail_annotate:
             raise ValueError("annotate failed")
         return [
-            ScoredNode(node=n, score=0.7, explanation="fake annotation")
-            for n in nodes
+            ScoredNode(node=n, score=0.7, explanation="fake annotation") for n in nodes
         ]
 
 

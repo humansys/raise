@@ -82,10 +82,7 @@ def _metric_summary(result: GateResult) -> str:
     if result.gate == "validate":
         return f"{m.get('valid', 0)} valid, {m.get('invalid', 0)} invalid"
     if result.gate == "reconcile":
-        return (
-            f"{m.get('phantoms', 0)} phantoms, "
-            f"{m.get('orphans', 0)} orphans"
-        )
+        return f"{m.get('phantoms', 0)} phantoms, {m.get('orphans', 0)} orphans"
     if result.gate == "coverage":
         pct = m.get("coverage_pct", 0)
         total = m.get("total", 0)
@@ -173,9 +170,7 @@ def format_query_compact(
         content = node.content
         if len(content) > _COMPACT_MAX:
             content = content[:_COMPACT_MAX] + "..."
-        lines.append(
-            f"**{node.type}** {node.id} ({scored.score:.2f}): {content}"
-        )
+        lines.append(f"**{node.type}** {node.id} ({scored.score:.2f}): {content}")
 
     return "\n".join(lines)
 

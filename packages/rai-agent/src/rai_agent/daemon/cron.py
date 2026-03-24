@@ -101,9 +101,7 @@ class CronTrigger:
         """Stop the APScheduler async context."""
         await self._scheduler.__aexit__(None, None, None)
 
-    async def add_job(
-        self, job_id: str, cron_expr: str, run_config: RunConfig
-    ) -> None:
+    async def add_job(self, job_id: str, cron_expr: str, run_config: RunConfig) -> None:
         """Register a cron schedule.
 
         Args:

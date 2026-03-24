@@ -84,9 +84,7 @@ class TestValidateToken:
         wrong_key = Ed25519PrivateKey.generate()
         correct_key = Ed25519PrivateKey.generate()
         token = _sign(wrong_key, nonce)  # signed with wrong key
-        assert not validate_token(
-            nonce, token, correct_key.public_key(), nonce_store
-        )
+        assert not validate_token(nonce, token, correct_key.public_key(), nonce_store)
 
     def test_tampered_nonce_rejected(
         self, private_key: Ed25519PrivateKey, nonce_store: NonceStore
@@ -139,8 +137,12 @@ class TestAuthenticate:
             nonce = challenge["payload"]["nonce"]
             token = _sign(private_key, nonce)
             return json.dumps(
-                {"type": "req", "id": str(uuid.uuid4()), "method": "auth",
-                 "params": {"token": token}}
+                {
+                    "type": "req",
+                    "id": str(uuid.uuid4()),
+                    "method": "auth",
+                    "params": {"token": token},
+                }
             )
 
         ws.receive_text = AsyncMock(side_effect=fake_receive)
@@ -178,8 +180,12 @@ class TestAuthenticate:
             nonce = challenge["payload"]["nonce"]
             token = _sign(wrong_key, nonce)  # signed with wrong key
             return json.dumps(
-                {"type": "req", "id": str(uuid.uuid4()), "method": "auth",
-                 "params": {"token": token}}
+                {
+                    "type": "req",
+                    "id": str(uuid.uuid4()),
+                    "method": "auth",
+                    "params": {"token": token},
+                }
             )
 
         ws.receive_text = AsyncMock(side_effect=fake_receive)

@@ -122,9 +122,7 @@ class TestBriefingE2E:
         trigger = CronTrigger(db_url="sqlite+aiosqlite://")
         await trigger.start()
         try:
-            await trigger.add_job(
-                "daily-briefing", "0 8 * * *", config
-            )
+            await trigger.add_job("daily-briefing", "0 8 * * *", config)
 
             # Subscribe pipeline
             pipeline = BriefingPipeline(
@@ -136,9 +134,7 @@ class TestBriefingE2E:
             pipeline.subscribe()
 
             # Simulate APScheduler calling _fire_handler
-            await _fire_handler(
-                "daily-briefing", config.model_dump_json()
-            )
+            await _fire_handler("daily-briefing", config.model_dump_json())
 
             await asyncio.sleep(0.3)
 
@@ -171,16 +167,18 @@ class TestBriefingE2E:
             config: RunConfig,
             send: Any,
         ) -> str | None:
-            frame = json.dumps({
-                "type": "event",
-                "event": "assistant_message",
-                "payload": {
-                    "content": [
-                        {"text": "## Daily Briefing\n\nHere are your tasks..."}
-                    ]
-                },
-                "seq": 0,
-            })
+            frame = json.dumps(
+                {
+                    "type": "event",
+                    "event": "assistant_message",
+                    "payload": {
+                        "content": [
+                            {"text": "## Daily Briefing\n\nHere are your tasks..."}
+                        ]
+                    },
+                    "seq": 0,
+                }
+            )
             await send(frame)
             return "session-stream-001"
 

@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, Field
+
 from raise_core.graph.models import GraphNode
 
 
@@ -57,9 +58,7 @@ class ScoredNode(BaseModel):
 
     node: GraphNode = Field(..., description="The graph node")
     score: float = Field(..., description="Composite relevance score (0.0–1.0)")
-    explanation: str = Field(
-        default="", description="Human-readable scoring breakdown"
-    )
+    explanation: str = Field(default="", description="Human-readable scoring breakdown")
 
     def __lt__(self, other: ScoredNode) -> bool:
         return self.score < other.score

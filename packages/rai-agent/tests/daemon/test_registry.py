@@ -58,8 +58,10 @@ class TestSessionKey:
     def test_equality(self) -> None:
         a = SessionKey.parse("ws:default:session:uuid-abc")
         b = SessionKey(
-            provider="ws", account="default",
-            scope="session", channel_id="uuid-abc",
+            provider="ws",
+            account="default",
+            scope="session",
+            channel_id="uuid-abc",
         )
         assert a == b
 
@@ -72,7 +74,10 @@ class TestSessionKey:
 # ── Fixtures ────────────────────────────────────────────────────────────────
 
 KEY = SessionKey(
-    provider="tg", account="default", scope="dm", channel_id="123",
+    provider="tg",
+    account="default",
+    scope="dm",
+    channel_id="123",
 )
 
 
@@ -92,7 +97,8 @@ class TestNewSchema:
     """T1: Verify the new schema columns exist."""
 
     async def test_schema_has_id_column(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """New schema has autoincrement id column."""
         db = registry._conn()
@@ -102,7 +108,8 @@ class TestNewSchema:
         assert "id" in col_names
 
     async def test_schema_has_name_column(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         db = registry._conn()
         async with db.execute("PRAGMA table_info(sessions)") as cursor:
@@ -111,7 +118,8 @@ class TestNewSchema:
         assert "name" in col_names
 
     async def test_schema_has_is_current_column(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         db = registry._conn()
         async with db.execute("PRAGMA table_info(sessions)") as cursor:
@@ -120,7 +128,8 @@ class TestNewSchema:
         assert "is_current" in col_names
 
     async def test_schema_has_origin_column(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         db = registry._conn()
         async with db.execute("PRAGMA table_info(sessions)") as cursor:
@@ -129,12 +138,12 @@ class TestNewSchema:
         assert "origin" in col_names
 
     async def test_sessions_table_exists(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         db = registry._conn()
         async with db.execute(
-            "SELECT name FROM sqlite_master "
-            "WHERE type='table' AND name='sessions'",
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='sessions'",
         ) as cursor:
             rows = await cursor.fetchall()
         assert len(rows) == 1
@@ -191,6 +200,7 @@ class TestSessionModel:
 
     def test_session_accepts_new_fields(self) -> None:
         from datetime import UTC, datetime
+
         s = Session(
             id=1,
             session_key="tg:default:dm:123",
@@ -213,11 +223,13 @@ class TestSessionModel:
     def test_session_status_is_open_closed(self) -> None:
         """SessionStatus should be Literal['open', 'closed']."""
         from typing import get_args
+
         args = get_args(SessionStatus)
         assert set(args) == {"open", "closed"}
 
     def test_session_default_status_is_open(self) -> None:
         from datetime import UTC, datetime
+
         s = Session(
             id=1,
             session_key="tg:default:dm:123",
@@ -273,7 +285,8 @@ class TestCreateNamed:
     """T2: create_named() with auto-naming and max sessions."""
 
     async def test_creates_with_explicit_name(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         session = await registry.create_named(KEY, name="my-chat", cwd="/tmp")
         assert isinstance(session, Session)
@@ -283,14 +296,16 @@ class TestCreateNamed:
         assert session.cwd == "/tmp"
 
     async def test_auto_names_session_1(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """First auto-named session is 'Session 1'."""
         session = await registry.create_named(KEY, cwd="/tmp")
         assert session.name == "Session 1"
 
     async def test_auto_names_session_2(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """Second auto-named session is 'Session 2'."""
         await registry.create_named(KEY, cwd="/tmp")
@@ -298,7 +313,8 @@ class TestCreateNamed:
         assert session.name == "Session 2"
 
     async def test_no_gap_fill(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """Deleting 'Session 2' doesn't fill the gap -- next is 'Session 3'."""
         await registry.create_named(KEY, cwd="/tmp")
@@ -310,7 +326,8 @@ class TestCreateNamed:
         assert s4.name == "Session 4"
 
     async def test_new_session_is_current(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """New session gets is_current=True, previous gets False."""
         s1 = await registry.create_named(KEY, cwd="/tmp")
@@ -340,10 +357,12 @@ class TestCreateNamed:
             await reg.close()
 
     async def test_duplicate_name_raises(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """Duplicate (session_key, name) raises IntegrityError."""
         import aiosqlite
+
         await registry.create_named(KEY, name="dupe", cwd="/tmp")
         with pytest.raises(aiosqlite.IntegrityError):
             await registry.create_named(KEY, name="dupe", cwd="/tmp")
@@ -356,13 +375,15 @@ class TestGetCurrent:
     """T3: get_current() returns the is_current=1 session."""
 
     async def test_returns_none_when_no_sessions(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         result = await registry.get_current(KEY)
         assert result is None
 
     async def test_returns_current_after_create(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         created = await registry.create_named(KEY, cwd="/tmp")
         result = await registry.get_current(KEY)
@@ -375,16 +396,19 @@ class TestListNamed:
     """T3: list_named() returns open sessions ordered by last_active_at."""
 
     async def test_empty_when_no_sessions(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         result = await registry.list_named(KEY)
         assert result == []
 
     async def test_returns_sessions_ordered(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """Sessions ordered by last_active_at DESC (most recent first)."""
         import asyncio
+
         s1 = await registry.create_named(KEY, name="first", cwd="/tmp")
         await asyncio.sleep(0.01)
         s2 = await registry.create_named(KEY, name="second", cwd="/tmp")
@@ -395,7 +419,8 @@ class TestListNamed:
         assert result[1].id == s1.id
 
     async def test_excludes_closed_sessions(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         await registry.create_named(KEY, name="keep", cwd="/tmp")
         s2 = await registry.create_named(KEY, name="close-me", cwd="/tmp")
@@ -412,7 +437,8 @@ class TestSwitchTo:
     """T4: switch_to() changes the current session."""
 
     async def test_switch_by_name(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         s1 = await registry.create_named(KEY, name="first", cwd="/tmp")
         await registry.create_named(KEY, name="second", cwd="/tmp")
@@ -421,10 +447,12 @@ class TestSwitchTo:
         assert result.is_current is True
 
     async def test_switch_by_index(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """1-based index from list_named order (last_active DESC)."""
         import asyncio
+
         await registry.create_named(KEY, name="older", cwd="/tmp")
         await asyncio.sleep(0.01)
         s2 = await registry.create_named(KEY, name="newer", cwd="/tmp")
@@ -433,7 +461,8 @@ class TestSwitchTo:
         assert result.id == s2.id
 
     async def test_switch_unknown_raises(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         await registry.create_named(KEY, cwd="/tmp")
         with pytest.raises(KeyError):
@@ -444,7 +473,8 @@ class TestCloseNamed:
     """T4: close_named() sets status='closed' and clears is_current."""
 
     async def test_close_current(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """No name = close the current session."""
         s = await registry.create_named(KEY, cwd="/tmp")
@@ -460,7 +490,8 @@ class TestCloseNamed:
         assert row[1] == 0
 
     async def test_close_by_name(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         await registry.create_named(KEY, name="a", cwd="/tmp")
         s2 = await registry.create_named(KEY, name="b", cwd="/tmp")
@@ -480,7 +511,8 @@ class TestCloseNamed:
         assert current.id == s2.id
 
     async def test_close_not_found_raises(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         with pytest.raises(KeyError):
             await registry.close_named(KEY)
@@ -490,7 +522,8 @@ class TestDeleteNamed:
     """T4: delete_named() hard-deletes a session."""
 
     async def test_delete_removes_session(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         await registry.create_named(KEY, name="a", cwd="/tmp")
         s2 = await registry.create_named(KEY, name="b", cwd="/tmp")
@@ -501,17 +534,20 @@ class TestDeleteNamed:
         assert sessions[0].id == s2.id
 
     async def test_delete_current_raises_value_error(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         await registry.create_named(KEY, cwd="/tmp")
         with pytest.raises(ValueError, match="current active"):
             await registry.delete_named(KEY, name="Session 1")
 
     async def test_delete_by_index(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         """1-based index from list_named order."""
         import asyncio
+
         await registry.create_named(KEY, name="older", cwd="/tmp")
         await asyncio.sleep(0.01)
         await registry.create_named(KEY, name="newer", cwd="/tmp")
@@ -522,7 +558,8 @@ class TestDeleteNamed:
         assert sessions[0].name == "newer"
 
     async def test_delete_not_found_raises(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         with pytest.raises(KeyError):
             await registry.delete_named(KEY, name="ghost")
@@ -535,23 +572,27 @@ class TestUpdate:
     """T5: update() works on the current session (is_current=1)."""
 
     async def test_updates_sdk_session_id(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         await registry.create_named(KEY, cwd="/tmp")
         updated = await registry.update(KEY, sdk_session_id="sdk-abc")
         assert updated.sdk_session_id == "sdk-abc"
 
     async def test_updates_input_tokens(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         await registry.create_named(KEY, cwd="/tmp")
         updated = await registry.update(KEY, input_tokens=1500)
         assert updated.last_input_tokens == 1500
 
     async def test_updates_last_active_at(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         import asyncio
+
         session = await registry.create_named(KEY, cwd="/tmp")
         first_active = session.last_active_at
         await asyncio.sleep(0.01)
@@ -559,7 +600,8 @@ class TestUpdate:
         assert updated.last_active_at > first_active
 
     async def test_update_no_current_raises(
-        self, registry: SessionRegistry,
+        self,
+        registry: SessionRegistry,
     ) -> None:
         with pytest.raises(KeyError):
             await registry.update(KEY, sdk_session_id="x")

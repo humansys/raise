@@ -31,9 +31,7 @@ if TYPE_CHECKING:
 # ─── Stub dispatcher ─────────────────────────────────────────────────────────
 
 
-async def _stub_dispatch(
-    req: ReqFrame, send: Any
-) -> None:
+async def _stub_dispatch(req: ReqFrame, send: Any) -> None:
     res = ResFrame(type="res", id=req.id, ok=True, payload={"method": req.method})
     await send(res.model_dump_json())
 
@@ -119,12 +117,14 @@ async def test_happy_path_auth_and_run(
         assert auth_res["ok"] is True, f"Auth failed: {auth_res}"
 
         req_id = str(uuid.uuid4())
-        run_req = json.dumps({
-            "type": "req",
-            "id": req_id,
-            "method": "run",
-            "params": {"prompt": "what is the capital of France?"},
-        })
+        run_req = json.dumps(
+            {
+                "type": "req",
+                "id": req_id,
+                "method": "run",
+                "params": {"prompt": "what is the capital of France?"},
+            }
+        )
         await ws.send(run_req)
 
         res_raw = await ws.recv()
@@ -228,6 +228,7 @@ async def running_daemon_with_runtime() -> AsyncGenerator[
     session_manager = InMemorySessionManager()
 
     with patch("rai_agent.daemon.runtime.query") as mock_query:
+
         def _sdk_gen(**_kw: Any):  # type: ignore[return]
             return _async_sdk_messages(sdk_messages)
 
@@ -273,12 +274,16 @@ async def test_real_dispatch_run_streams_event_frames(
         auth_res = await _authenticate_client(ws, private_key)
         assert auth_res["ok"] is True
 
-        await ws.send(json.dumps({
-            "type": "req",
-            "id": str(uuid.uuid4()),
-            "method": "run",
-            "params": {"prompt": "capital of France?"},
-        }))
+        await ws.send(
+            json.dumps(
+                {
+                    "type": "req",
+                    "id": str(uuid.uuid4()),
+                    "method": "run",
+                    "params": {"prompt": "capital of France?"},
+                }
+            )
+        )
 
         frames: list[dict[str, Any]] = []
         for _ in range(2):  # AssistantMessage + ResultMessage
@@ -302,12 +307,16 @@ async def test_real_dispatch_unknown_method_returns_error(
         assert auth_res["ok"] is True
 
         req_id = str(uuid.uuid4())
-        await ws.send(json.dumps({
-            "type": "req",
-            "id": req_id,
-            "method": "explode",
-            "params": {},
-        }))
+        await ws.send(
+            json.dumps(
+                {
+                    "type": "req",
+                    "id": req_id,
+                    "method": "explode",
+                    "params": {},
+                }
+            )
+        )
 
         res = json.loads(await ws.recv())
         assert res["id"] == req_id

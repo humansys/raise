@@ -88,7 +88,8 @@ class TestDownloadTelegramImage:
     @pytest.mark.asyncio
     async def test_document_image_returns_original_mime(self) -> None:
         msg = _make_photo_message(
-            has_document=True, doc_mime="image/png",
+            has_document=True,
+            doc_mime="image/png",
         )
         data, mime = await download_telegram_image(msg)
         assert mime == "image/png"
@@ -96,7 +97,8 @@ class TestDownloadTelegramImage:
     @pytest.mark.asyncio
     async def test_document_unsupported_mime_raises(self) -> None:
         msg = _make_photo_message(
-            has_document=True, doc_mime="image/tiff",
+            has_document=True,
+            doc_mime="image/tiff",
         )
         with pytest.raises(ValueError, match="no está soportado"):
             await download_telegram_image(msg)

@@ -19,7 +19,8 @@ class TestDaemonStart:
     """Tests for `rai daemon start`."""
 
     def test_starts_daemon_and_acquires_pid(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         pid_file = tmp_path / ".rai" / "daemon.pid"
         log_file = tmp_path / ".rai" / "daemon.log"
@@ -30,10 +31,12 @@ class TestDaemonStart:
             patch("rai_agent.daemon.cli._pid_path", return_value=pid_file),
             patch("rai_agent.daemon.cli._log_path", return_value=log_file),
             patch(
-                "subprocess.Popen", return_value=mock_process,
+                "subprocess.Popen",
+                return_value=mock_process,
             ) as mock_popen,
             patch(
-                "rai_agent.daemon.pid.acquire_pid", return_value=None,
+                "rai_agent.daemon.pid.acquire_pid",
+                return_value=None,
             ) as mock_acquire,
             patch("dotenv.load_dotenv"),
         ):
@@ -56,7 +59,8 @@ class TestDaemonStart:
             patch("rai_agent.daemon.cli._log_path", return_value=log_file),
             patch("subprocess.Popen", return_value=mock_process),
             patch(
-                "rai_agent.daemon.pid.acquire_pid", return_value=12345,
+                "rai_agent.daemon.pid.acquire_pid",
+                return_value=12345,
             ),
             patch("dotenv.load_dotenv"),
         ):
@@ -75,7 +79,8 @@ class TestDaemonStart:
         captured_env: dict[str, str] = {}
 
         def _capture_popen(
-            *args: object, **kwargs: object,
+            *args: object,
+            **kwargs: object,
         ) -> MagicMock:
             env = kwargs.get("env", {})
             assert isinstance(env, dict)
@@ -104,7 +109,8 @@ class TestDaemonStart:
         captured_args: list[str] = []
 
         def _capture_popen(
-            args: list[str], **_kwargs: object,
+            args: list[str],
+            **_kwargs: object,
         ) -> MagicMock:
             captured_args.extend(args)
             return mock_process
@@ -138,7 +144,8 @@ class TestDaemonStop:
             patch("rai_agent.daemon.pid.read_pid", return_value=12345),
             patch("os.kill") as mock_kill,
             patch(
-                "rai_agent.daemon.cli._wait_for_exit", return_value=True,
+                "rai_agent.daemon.cli._wait_for_exit",
+                return_value=True,
             ),
             patch("rai_agent.daemon.pid.remove") as mock_remove,
         ):
@@ -150,14 +157,16 @@ class TestDaemonStop:
         mock_remove.assert_called_once_with(pid_file)
 
     def test_handles_process_died_between_read_and_kill(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         pid_file = tmp_path / ".rai" / "daemon.pid"
         with (
             patch("rai_agent.daemon.cli._pid_path", return_value=pid_file),
             patch("rai_agent.daemon.pid.read_pid", return_value=12345),
             patch(
-                "os.kill", side_effect=ProcessLookupError,
+                "os.kill",
+                side_effect=ProcessLookupError,
             ),
             patch("rai_agent.daemon.pid.remove") as mock_remove,
         ):
@@ -194,7 +203,8 @@ class TestDaemonRestart:
             call_order.append("kill")
 
         def _track_popen(
-            *_args: object, **_kwargs: object,
+            *_args: object,
+            **_kwargs: object,
         ) -> MagicMock:
             call_order.append("popen")
             return mock_process
@@ -204,11 +214,13 @@ class TestDaemonRestart:
             patch("rai_agent.daemon.cli._pid_path", return_value=pid_file),
             patch("rai_agent.daemon.cli._log_path", return_value=log_file),
             patch(
-                "rai_agent.daemon.pid.read_pid", return_value=12345,
+                "rai_agent.daemon.pid.read_pid",
+                return_value=12345,
             ),
             patch("os.kill", side_effect=_track_kill),
             patch(
-                "rai_agent.daemon.cli._wait_for_exit", return_value=True,
+                "rai_agent.daemon.cli._wait_for_exit",
+                return_value=True,
             ),
             patch("rai_agent.daemon.pid.remove"),
             patch("subprocess.Popen", side_effect=_track_popen),

@@ -13,12 +13,14 @@ from __future__ import annotations
 import base64
 from typing import Any
 
-SUPPORTED_MIMES: frozenset[str] = frozenset({
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-})
+SUPPORTED_MIMES: frozenset[str] = frozenset(
+    {
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+    }
+)
 """MIME types supported by Claude's vision API."""
 
 MAX_IMAGE_SIZE: int = 5 * 1024 * 1024  # 5 MB
@@ -36,10 +38,7 @@ def validate_image(data: bytes, mime_type: str) -> None:
     """
     if mime_type not in SUPPORTED_MIMES:
         supported = ", ".join(sorted(SUPPORTED_MIMES))
-        msg = (
-            f"El formato {mime_type} no está soportado. "
-            f"Formatos válidos: {supported}"
-        )
+        msg = f"El formato {mime_type} no está soportado. Formatos válidos: {supported}"
         raise ValueError(msg)
     if len(data) > MAX_IMAGE_SIZE:
         size_mb = len(data) / (1024 * 1024)
@@ -75,14 +74,16 @@ def build_image_content_blocks(
     for data, mime_type in images:
         validate_image(data, mime_type)
         encoded = base64.standard_b64encode(data).decode("utf-8")
-        blocks.append({
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": mime_type,
-                "data": encoded,
-            },
-        })
+        blocks.append(
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": mime_type,
+                    "data": encoded,
+                },
+            }
+        )
 
     text = caption.strip() if caption else ""
     if not text:

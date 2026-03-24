@@ -61,7 +61,7 @@ class TestInMemorySessionManager:
         mgr = InMemorySessionManager()
         mgr.create("dup")
         mgr.next_seq("dup")  # seq = 1
-        mgr.create("dup")    # reset
+        mgr.create("dup")  # reset
         assert mgr.get("dup") is not None
         assert mgr.get("dup").seq == 0  # type: ignore[union-attr]
 
@@ -69,10 +69,12 @@ class TestInMemorySessionManager:
 class TestEventBus:
     def test_get_bus_returns_same_instance(self) -> None:
         from rai_agent.daemon.events import get_bus
+
         bus1 = get_bus()
         bus2 = get_bus()
         assert bus1 is bus2
 
     def test_bus_is_not_none(self) -> None:
         from rai_agent.daemon.events import get_bus
+
         assert get_bus() is not None

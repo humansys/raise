@@ -89,6 +89,7 @@ class TestDispatch:
         await dispatcher.dispatch(req)
 
         import asyncio
+
         await asyncio.sleep(0.05)
 
         assert len(received) == 1
@@ -109,6 +110,7 @@ class TestDispatch:
         await dispatcher.dispatch(req)
 
         import asyncio
+
         await asyncio.sleep(0.05)
 
         assert completed == [True]
@@ -119,6 +121,7 @@ class TestDispatch:
 
         async def handler(req: SessionRequest) -> None:
             import asyncio
+
             await asyncio.sleep(0.01)
             order.append(req.prompt)
 
@@ -129,6 +132,7 @@ class TestDispatch:
             )
 
         import asyncio
+
         await asyncio.sleep(0.15)
 
         assert order == ["msg-0", "msg-1", "msg-2"]
@@ -139,6 +143,7 @@ class TestDispatch:
 
         async def handler(req: SessionRequest) -> None:
             import asyncio
+
             await asyncio.sleep(0.01)
             order.append(f"{req.session_key}:{req.prompt}")
 
@@ -151,6 +156,7 @@ class TestDispatch:
         )
 
         import asyncio
+
         await asyncio.sleep(0.1)
 
         # Both processed — order may interleave
@@ -186,7 +192,8 @@ class TestBackpressure:
             await block.wait()
 
         dispatcher = SessionDispatcher(
-            handler=slow_handler, maxsize=2,
+            handler=slow_handler,
+            maxsize=2,
         )
 
         # First fills the worker, second and third fill the queue
@@ -197,6 +204,7 @@ class TestBackpressure:
 
         # Fourth should raise — queue full
         import pytest
+
         with pytest.raises(SessionBusyError):
             await dispatcher.dispatch(_make_request(prompt="4"))
 
@@ -224,6 +232,7 @@ class TestOnError:
         )
 
         import asyncio
+
         await asyncio.sleep(0.05)
 
         assert len(errors) == 1
@@ -246,6 +255,7 @@ class TestOnError:
         await dispatcher.dispatch(_make_request(prompt="good"))
 
         import asyncio
+
         await asyncio.sleep(0.1)
 
         assert results == ["good"]
@@ -288,11 +298,13 @@ class TestIdleTimeout:
             pass
 
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=0.1,
+            handler=handler,
+            idle_timeout=0.1,
         )
         await dispatcher.dispatch(_make_request())
 
         import asyncio
+
         await asyncio.sleep(0.05)
         assert dispatcher.active_session_count == 1
 
@@ -305,11 +317,13 @@ class TestIdleTimeout:
             pass
 
         dispatcher = SessionDispatcher(
-            handler=handler, idle_timeout=0.1,
+            handler=handler,
+            idle_timeout=0.1,
         )
         await dispatcher.dispatch(_make_request())
 
         import asyncio
+
         await asyncio.sleep(0.3)
 
         assert dispatcher.active_session_count == 0

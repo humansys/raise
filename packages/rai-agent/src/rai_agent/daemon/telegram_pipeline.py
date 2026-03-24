@@ -177,11 +177,14 @@ class TelegramHandler:
         try:
             if existing_sid is not None:
                 result = await self._runtime.resume(
-                    run_config, existing_sid, _on_event,
+                    run_config,
+                    existing_sid,
+                    _on_event,
                 )
             else:
                 result = await self._runtime.run(
-                    run_config, _on_event,
+                    run_config,
+                    _on_event,
                 )
 
             if result.session_id is not None:
@@ -196,8 +199,7 @@ class TelegramHandler:
         # Context window suggestion
         if (
             result.input_tokens > 0
-            and result.input_tokens / CONTEXT_WINDOW
-            >= CONTEXT_THRESHOLD
+            and result.input_tokens / CONTEXT_WINDOW >= CONTEXT_THRESHOLD
         ):
             pct = int(
                 result.input_tokens / CONTEXT_WINDOW * 100,

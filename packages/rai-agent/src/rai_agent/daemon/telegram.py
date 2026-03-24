@@ -259,9 +259,7 @@ class TokenBucketRateLimiter:
     Default: 5 burst tokens, refill at 1 token every 5 seconds (0.2/s).
     """
 
-    def __init__(
-        self, max_tokens: int = 5, refill_rate: float = 0.2
-    ) -> None:
+    def __init__(self, max_tokens: int = 5, refill_rate: float = 0.2) -> None:
         self._max_tokens = max_tokens
         self._refill_rate = refill_rate
         self._buckets: dict[int, tuple[float, float]] = {}
@@ -269,9 +267,7 @@ class TokenBucketRateLimiter:
     def allow(self, user_id: int) -> bool:
         """Check if user_id is allowed to proceed. Consumes one token if yes."""
         now = time.monotonic()
-        tokens, last_refill = self._buckets.get(
-            user_id, (float(self._max_tokens), now)
-        )
+        tokens, last_refill = self._buckets.get(user_id, (float(self._max_tokens), now))
         elapsed = now - last_refill
         tokens = min(float(self._max_tokens), tokens + elapsed * self._refill_rate)
         if tokens >= 1.0:
@@ -330,7 +326,8 @@ class DraftStreamer:
                 if self._last_status:
                     try:
                         await self._bot.send_chat_action(
-                            self._chat_id, "typing",
+                            self._chat_id,
+                            "typing",
                         )
                         await self._bot.send_message_draft(
                             chat_id=self._chat_id,
@@ -350,7 +347,8 @@ class DraftStreamer:
             now = time.monotonic()
             if now - self._last_draft >= self._throttle_s:
                 await self._bot.send_chat_action(
-                    self._chat_id, "typing",
+                    self._chat_id,
+                    "typing",
                 )
                 await self._bot.send_message_draft(
                     chat_id=self._chat_id,
@@ -386,7 +384,8 @@ class DraftStreamer:
         for text, entities in chunks:
             try:
                 await self._bot.send_message(
-                    self._chat_id, text,
+                    self._chat_id,
+                    text,
                     entities=entities,
                 )
             except BadRequest:
@@ -432,8 +431,7 @@ async def download_telegram_image(
         if mime not in SUPPORTED_MIMES:
             supported = ", ".join(sorted(SUPPORTED_MIMES))
             raise ValueError(
-                f"El formato {mime} no está soportado. "
-                f"Formatos válidos: {supported}"
+                f"El formato {mime} no está soportado. Formatos válidos: {supported}"
             )
         file = await msg.document.get_file()
         data = await file.download_as_bytearray()
@@ -476,7 +474,8 @@ class TelegramTrigger:
 
         self._allowed_users = allowed_users
         self._rate_limiter = TokenBucketRateLimiter(
-            max_tokens=max_tokens, refill_rate=refill_rate,
+            max_tokens=max_tokens,
+            refill_rate=refill_rate,
         )
 
         # Build middleware pipeline once
@@ -494,9 +493,7 @@ class TelegramTrigger:
         ]
 
         # PTB Application — Any due to 6 generic type params
-        self._app: Any = (
-            Application.builder().token(bot_token).build()
-        )
+        self._app: Any = Application.builder().token(bot_token).build()
         self._app.add_handler(
             MessageHandler(
                 filters.TEXT,
@@ -580,9 +577,7 @@ class TelegramTrigger:
 
         # Download image
         try:
-            image_bytes, mime_type = (
-                await download_telegram_image(msg)
-            )
+            image_bytes, mime_type = await download_telegram_image(msg)
         except ValueError as exc:
             await msg.reply_text(str(exc))
             return
@@ -592,10 +587,7 @@ class TelegramTrigger:
                 msg.chat_id,
                 exc_info=True,
             )
-            await msg.reply_text(
-                "No pude descargar la imagen. "
-                "¿Podrías reenviarla?"
-            )
+            await msg.reply_text("No pude descargar la imagen. ¿Podrías reenviarla?")
             return
 
         # Validate image
@@ -613,6 +605,9 @@ class TelegramTrigger:
         )
 
         ctx = self._build_ctx(
-            msg, user, caption, content_blocks,
+            msg,
+            user,
+            caption,
+            content_blocks,
         )
         await compose(self._pipeline, ctx)

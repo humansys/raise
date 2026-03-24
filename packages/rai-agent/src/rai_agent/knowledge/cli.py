@@ -67,7 +67,8 @@ def check(
     gate: Annotated[
         str | None,
         typer.Option(
-            "--gate", "-g",
+            "--gate",
+            "-g",
             help=f"Run specific gate: {', '.join(_GATE_NAMES)}",
         ),
     ] = None,
@@ -88,8 +89,7 @@ def check(
     if gate:
         if gate not in _GATE_RUNNERS:
             typer.echo(
-                f"Unknown gate '{gate}'. "
-                f"Available: {', '.join(_GATE_NAMES)}",
+                f"Unknown gate '{gate}'. Available: {', '.join(_GATE_NAMES)}",
                 err=True,
             )
             raise typer.Exit(1)
@@ -107,11 +107,10 @@ def check(
     if output_json:
         data = [r.model_dump() for r in results]
         typer.echo(json.dumps(data, indent=2))
+    elif len(results) == 1:
+        typer.echo(format_gate_result(results[0]))
     else:
-        if len(results) == 1:
-            typer.echo(format_gate_result(results[0]))
-        else:
-            typer.echo(format_check_summary(results, manifest.name))
+        typer.echo(format_check_summary(results, manifest.name))
 
     # Exit code
     all_passed = all(r.passed for r in results)
@@ -135,12 +134,14 @@ def status(
             base = config.domain_dir or config.node_dir.parent
             extracted = _count_yaml(base / "extracted")
             curated = _count_yaml(base / "curated")
-            data.append({
-                "name": manifest.name,
-                "display_name": manifest.display_name,
-                "extracted": extracted,
-                "curated": curated,
-            })
+            data.append(
+                {
+                    "name": manifest.name,
+                    "display_name": manifest.display_name,
+                    "extracted": extracted,
+                    "curated": curated,
+                }
+            )
         typer.echo(json.dumps(data, indent=2))
     else:
         display_data: list[tuple[DomainManifest, int, int]] = []
@@ -161,7 +162,8 @@ def init_domain(
     corpus: Annotated[
         list[str] | None,
         typer.Option(
-            "--corpus", "-c",
+            "--corpus",
+            "-c",
             help="Corpus file paths",
         ),
     ] = None,
@@ -183,8 +185,7 @@ def init_domain(
     typer.echo("  curated/            # empty")
     typer.echo("")
     typer.echo(
-        "Next: edit domain.yaml (set schema module + class), "
-        "add competency questions."
+        "Next: edit domain.yaml (set schema module + class), add competency questions."
     )
 
 
@@ -277,8 +278,7 @@ def _resolve_query_args(
         raise typer.Exit(1)
     names = ", ".join(m.name for m, _ in domains)
     typer.echo(
-        f"Error: Multiple domains found ({names}). "
-        f"Specify domain explicitly.",
+        f"Error: Multiple domains found ({names}). Specify domain explicitly.",
         err=True,
     )
     raise typer.Exit(1)

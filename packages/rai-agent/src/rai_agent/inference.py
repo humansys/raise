@@ -15,8 +15,9 @@ import json
 import logging
 import os
 import re
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Generator, TypeVar
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
@@ -69,7 +70,9 @@ def invoke_structured(
         f"```json\n{schema_hint}\n```"
     )
 
-    text = _run_query(full_prompt, system_prompt, model, max_turns, cwd, _client_factory)
+    text = _run_query(
+        full_prompt, system_prompt, model, max_turns, cwd, _client_factory
+    )
 
     if not text.strip():
         msg = "Empty response from Claude"
@@ -92,7 +95,8 @@ def _run_query(
         if client_factory is not None:
             query_fn = client_factory()
         else:
-            from claude_agent_sdk import ClaudeAgentOptions, query as sdk_query
+            from claude_agent_sdk import ClaudeAgentOptions
+            from claude_agent_sdk import query as sdk_query
 
             options = ClaudeAgentOptions(
                 system_prompt=system_prompt,

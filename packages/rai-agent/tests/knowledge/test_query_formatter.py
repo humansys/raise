@@ -97,10 +97,7 @@ class TestFormatQueryCompact:
     def test_one_line_per_node(self) -> None:
         result = _make_result(2)
         output = format_query_compact(result, "scaleup", None)
-        lines = [
-            line for line in output.strip().split("\n")
-            if line.startswith("**")
-        ]
+        lines = [line for line in output.strip().split("\n") if line.startswith("**")]
         assert len(lines) == 2
 
     def test_empty_results(self) -> None:

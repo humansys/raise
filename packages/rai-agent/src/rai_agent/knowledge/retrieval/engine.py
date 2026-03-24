@@ -9,9 +9,6 @@ import logging
 from collections import deque
 from typing import Any
 
-from raise_core.graph.engine import Graph
-from raise_core.graph.models import GraphNode
-
 from rai_agent.knowledge.retrieval.models import (
     DomainAdapter,
     DomainHints,
@@ -19,6 +16,8 @@ from rai_agent.knowledge.retrieval.models import (
     ScoredNode,
     TraversalAdvice,
 )
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
@@ -137,9 +136,7 @@ def _keyword_search_fallback(graph: Graph, query: str) -> list[GraphNode]:
     return results
 
 
-def _traverse(
-    graph: Graph, advice: TraversalAdvice
-) -> list[GraphNode]:
+def _traverse(graph: Graph, advice: TraversalAdvice) -> list[GraphNode]:
     """Execute BFS traversal following adapter's advice."""
     if not advice.start_node_ids:
         return []
@@ -165,7 +162,10 @@ def _traverse(
         for neighbor in neighbors:
             if neighbor.id not in visited:
                 visited.add(neighbor.id)
-                if advice.node_type_filter is None or neighbor.type in advice.node_type_filter:
+                if (
+                    advice.node_type_filter is None
+                    or neighbor.type in advice.node_type_filter
+                ):
                     nodes.append(neighbor)
 
     return nodes
@@ -190,9 +190,7 @@ def retrieve(
 
     # Step 2: get traversal advice
     try:
-        available_types = frozenset(
-            n.type for n in graph.iter_concepts() if n.type
-        )
+        available_types = frozenset(n.type for n in graph.iter_concepts() if n.type)
         advice = adapter.advise_traversal(hints, available_types)
     except Exception:
         logger.warning("adapter.advise_traversal failed, using keyword fallback")

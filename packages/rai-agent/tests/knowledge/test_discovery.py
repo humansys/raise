@@ -167,7 +167,9 @@ class TestDiffNodes:
         cur_dir.mkdir()
 
         _write_node(ext_dir / "tool-ccc.yaml", "tool-ccc", "tool", decision="cash")
-        _write_node(ext_dir / "concept-cv.yaml", "concept-cv", "concept", decision="people")
+        _write_node(
+            ext_dir / "concept-cv.yaml", "concept-cv", "concept", decision="people"
+        )
         _write_node(cur_dir / "tool-ccc.yaml", "tool-ccc", "tool", decision="cash")
 
         report = diff_nodes(ext_dir, cur_dir)
@@ -182,7 +184,9 @@ class TestDiffNodes:
         (cur_dir / "people" / "concepts").mkdir(parents=True)
 
         _write_node(ext_dir / "concept-cv.yaml", "concept-cv", "concept")
-        _write_node(cur_dir / "people" / "concepts" / "concept-cv.yaml", "concept-cv", "concept")
+        _write_node(
+            cur_dir / "people" / "concepts" / "concept-cv.yaml", "concept-cv", "concept"
+        )
 
         report = diff_nodes(ext_dir, cur_dir)
         assert "concept-cv" in report.nodes_both
@@ -289,8 +293,15 @@ class TestReconcileExtracted:
         ext_dir = tmp_path / "extracted"
         ext_dir.mkdir()
         # Only decision-people exists
-        _write_node(ext_dir / "decision-people.yaml", "decision-people", "decision", decision="people")
-        _write_node(ext_dir / "concept-x.yaml", "concept-x", "concept", decision="strategy")
+        _write_node(
+            ext_dir / "decision-people.yaml",
+            "decision-people",
+            "decision",
+            decision="people",
+        )
+        _write_node(
+            ext_dir / "concept-x.yaml", "concept-x", "concept", decision="strategy"
+        )
 
         report = reconcile_extracted(ext_dir, {})
         assert "decision-strategy" in report.nodes_created
@@ -304,7 +315,9 @@ class TestReconcileExtracted:
         ext_dir.mkdir()
         # Node with broken ref to decision-execution
         data: dict[str, Any] = {
-            "id": "concept-x", "type": "concept", "name": "X",
+            "id": "concept-x",
+            "type": "concept",
+            "name": "X",
             "relationships": [{"type": "belongs-to", "target": "decision-execution"}],
         }
         (ext_dir / "concept-x.yaml").write_text(yaml.dump(data))
@@ -318,7 +331,9 @@ class TestReconcileExtracted:
         ext_dir = tmp_path / "extracted"
         ext_dir.mkdir()
         data: dict[str, Any] = {
-            "id": "concept-x", "type": "concept", "name": "X",
+            "id": "concept-x",
+            "type": "concept",
+            "name": "X",
             "relationships": [{"type": "requires", "target": "nonexistent-xyz"}],
         }
         (ext_dir / "concept-x.yaml").write_text(yaml.dump(data))
@@ -391,7 +406,11 @@ class TestRefineSchema:
             client=factory,
         )
 
-        assert sorted(result.relationship_types) == ["belongs_to", "fills_out", "requires"]
+        assert sorted(result.relationship_types) == [
+            "belongs_to",
+            "fills_out",
+            "requires",
+        ]
 
     def test_no_missing_returns_initial(self, corpus_path: Path) -> None:
         """If no types are missing, returns initial schema unchanged."""

@@ -53,27 +53,21 @@ def _write_yaml(path: Path, data: object) -> None:
 class TestCheckCommand:
     def test_check_all_gates(self, tmp_path: Path) -> None:
         _create_domain(tmp_path, "demo")
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["check", "demo"])
         assert result.exit_code == 0
         assert "gates" in result.output.lower()
 
     def test_check_single_gate(self, tmp_path: Path) -> None:
         _create_domain(tmp_path, "demo")
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["check", "demo", "--gate", "validate"])
         assert result.exit_code == 0
         assert "validate" in result.output.lower()
 
     def test_check_json_output(self, tmp_path: Path) -> None:
         _create_domain(tmp_path, "demo")
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["check", "demo", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -82,21 +76,15 @@ class TestCheckCommand:
         assert all("gate" in item for item in data)
 
     def test_check_nonexistent_domain(self, tmp_path: Path) -> None:
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["check", "nonexistent"])
         assert result.exit_code == 1
         assert "error" in result.output.lower()
 
     def test_check_unknown_gate(self, tmp_path: Path) -> None:
         _create_domain(tmp_path, "demo")
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
-            result = runner.invoke(
-                app, ["check", "demo", "--gate", "bogus"]
-            )
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
+            result = runner.invoke(app, ["check", "demo", "--gate", "bogus"])
         assert result.exit_code == 1
         assert "unknown gate" in result.output.lower()
 
@@ -104,27 +92,21 @@ class TestCheckCommand:
 class TestStatusCommand:
     def test_status_with_domains(self, tmp_path: Path) -> None:
         _create_domain(tmp_path, "alpha")
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["status"])
         assert result.exit_code == 0
         assert "alpha" in result.output
         assert "1 registered" in result.output
 
     def test_status_empty(self, tmp_path: Path) -> None:
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["status"])
         assert result.exit_code == 0
         assert "no" in result.output.lower()
 
     def test_status_json(self, tmp_path: Path) -> None:
         _create_domain(tmp_path, "alpha")
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["status", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -134,9 +116,7 @@ class TestStatusCommand:
 
 class TestInitCommand:
     def test_init_creates_scaffold(self, tmp_path: Path) -> None:
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["init", "gtd"])
         assert result.exit_code == 0
         assert "created" in result.output.lower()
@@ -145,24 +125,18 @@ class TestInitCommand:
         assert (tmp_path / "gtd" / "curated").is_dir()
 
     def test_init_with_corpus(self, tmp_path: Path) -> None:
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(
                 app,
                 ["init", "gtd", "--corpus", "~/Books/gtd.md"],
             )
         assert result.exit_code == 0
-        manifest = yaml.safe_load(
-            (tmp_path / "gtd" / "domain.yaml").read_text()
-        )
+        manifest = yaml.safe_load((tmp_path / "gtd" / "domain.yaml").read_text())
         assert "~/Books/gtd.md" in manifest["corpus"]
 
     def test_init_duplicate(self, tmp_path: Path) -> None:
         _create_domain(tmp_path, "existing")
-        with patch(
-            "rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path
-        ):
+        with patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR", tmp_path):
             result = runner.invoke(app, ["init", "existing"])
         assert result.exit_code == 1
         assert "already exists" in result.output.lower()

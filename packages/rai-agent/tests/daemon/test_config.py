@@ -98,18 +98,14 @@ class TestDaemonConfigEnvVars:
         cfg = DaemonConfig()
         assert cfg.allowed_user_ids == [111, 222, 333]
 
-    def test_single_allowed_user_id(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_single_allowed_user_id(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
         monkeypatch.setenv("ANTHROPIC_API_KEY", "key")
         monkeypatch.setenv("TELEGRAM_ALLOWED_USERS", "42")
         cfg = DaemonConfig()
         assert cfg.allowed_user_ids == [42]
 
-    def test_empty_allowed_users_string(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_empty_allowed_users_string(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
         monkeypatch.setenv("ANTHROPIC_API_KEY", "key")
         monkeypatch.setenv("TELEGRAM_ALLOWED_USERS", "")
@@ -212,18 +208,14 @@ class TestDaemonConfigBriefing:
         cfg = DaemonConfig()
         assert cfg.briefing_cron == "0 8 * * *"
 
-    def test_env_var_briefing_chat_id(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_env_var_briefing_chat_id(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
         monkeypatch.setenv("ANTHROPIC_API_KEY", "key")
         monkeypatch.setenv("RAI_DAEMON_BRIEFING_CHAT_ID", "12345")
         cfg = DaemonConfig()
         assert cfg.briefing_chat_id == 12345
 
-    def test_env_var_briefing_cron(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_env_var_briefing_cron(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
         monkeypatch.setenv("ANTHROPIC_API_KEY", "key")
         monkeypatch.setenv("RAI_DAEMON_BRIEFING_CRON", "30 9 * * 1-5")
@@ -242,9 +234,7 @@ class TestDaemonConfigVerboseLogging:
         cfg = DaemonConfig()
         assert cfg.verbose_logging is False
 
-    def test_verbose_logging_from_env(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_verbose_logging_from_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
         monkeypatch.setenv("ANTHROPIC_API_KEY", "key")
         monkeypatch.setenv("RAI_DAEMON_VERBOSE_LOGGING", "1")
@@ -256,7 +246,8 @@ class TestDaemonConfigMaxSessions:
     """T6: max_sessions_per_chat config field + env override."""
 
     def test_default_is_10(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
         monkeypatch.setenv("ANTHROPIC_API_KEY", "key")
@@ -264,7 +255,8 @@ class TestDaemonConfigMaxSessions:
         assert cfg.max_sessions_per_chat == 10
 
     def test_env_override(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
         monkeypatch.setenv("ANTHROPIC_API_KEY", "key")

@@ -123,12 +123,14 @@ class TestConstants:
     """Verify constants are correctly defined."""
 
     def test_supported_mimes(self) -> None:
-        expected = frozenset({
-            "image/jpeg",
-            "image/png",
-            "image/gif",
-            "image/webp",
-        })
+        expected = frozenset(
+            {
+                "image/jpeg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+            }
+        )
         assert expected == SUPPORTED_MIMES
 
     def test_max_image_size(self) -> None:

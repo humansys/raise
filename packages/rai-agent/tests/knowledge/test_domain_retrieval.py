@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 def _scaleup_available() -> bool:
     try:
         import rai_agent.scaleup  # noqa: F401
+
         return True
     except ModuleNotFoundError:
         return False

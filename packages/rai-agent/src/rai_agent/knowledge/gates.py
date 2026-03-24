@@ -92,9 +92,7 @@ def run_validate(config: GateConfig, domain: str = "unknown") -> GateResult:
         by_type: Counter[str] = Counter()
 
         yaml_files = (
-            list(config.node_dir.rglob("*.yaml"))
-            if config.node_dir.exists()
-            else []
+            list(config.node_dir.rglob("*.yaml")) if config.node_dir.exists() else []
         )
 
         for yaml_path in sorted(yaml_files):
@@ -122,9 +120,7 @@ def run_validate(config: GateConfig, domain: str = "unknown") -> GateResult:
 
         warnings: list[str] = []
         if valid == 0 and invalid == 0:
-            warnings.append(
-                f"No YAML node files found in {config.node_dir}"
-            )
+            warnings.append(f"No YAML node files found in {config.node_dir}")
 
         return GateResult(
             gate="validate",
@@ -176,7 +172,8 @@ def run_reconcile(config: GateConfig, domain: str = "unknown") -> GateResult:
 
         # Phantoms: referenced but no node exists (exclude structural anchors)
         phantoms = sorted(
-            t for t in all_targets
+            t
+            for t in all_targets
             if t not in node_ids and not t.startswith("decision-")
         )
 
@@ -246,9 +243,7 @@ def run_coverage(config: GateConfig, domain: str = "unknown") -> GateResult:
                 passed=True,
                 metrics={"covered": 0, "total": 0, "coverage_pct": 100.0},
                 errors=[],
-                warnings=[
-                    "No CQ file configured — skipping coverage check"
-                ],
+                warnings=["No CQ file configured — skipping coverage check"],
                 duration_ms=0,
             )
 
@@ -263,8 +258,12 @@ def run_coverage(config: GateConfig, domain: str = "unknown") -> GateResult:
 
         # Try to use the ScaleUp coverage checker if available
         try:
-            from rai_agent.scaleup.validation.models import CompetencyQuestion  # pyright: ignore[reportMissingImports]
-            from rai_agent.scaleup.validation.schema_validator import check_competency  # pyright: ignore[reportMissingImports]
+            from rai_agent.scaleup.validation.models import (
+                CompetencyQuestion,  # pyright: ignore[reportMissingImports]
+            )
+            from rai_agent.scaleup.validation.schema_validator import (
+                check_competency,  # pyright: ignore[reportMissingImports]
+            )
 
             cq_raw: object = yaml.safe_load(config.cq_file.read_text())
             if not isinstance(cq_raw, list):
@@ -295,7 +294,9 @@ def run_coverage(config: GateConfig, domain: str = "unknown") -> GateResult:
                     "coverage_pct": result.coverage_pct,
                     "threshold": config.cq_threshold,
                 },
-                errors=[] if passed else [
+                errors=[]
+                if passed
+                else [
                     f"Coverage {result.coverage_pct:.1f}% "
                     f"< threshold {config.cq_threshold}%"
                 ],
@@ -306,13 +307,8 @@ def run_coverage(config: GateConfig, domain: str = "unknown") -> GateResult:
             # Fallback: CQ evaluator not available for this domain.
             # Full evaluation requires CQs in ScaleUp format:
             # {id, question, decision, expected_path, expected_min_results}
-            cq_raw_fallback: object = yaml.safe_load(
-                config.cq_file.read_text()
-            )
-            total_cqs = (
-                len(cq_raw_fallback)
-                if isinstance(cq_raw_fallback, list) else 0
-            )
+            cq_raw_fallback: object = yaml.safe_load(config.cq_file.read_text())
+            total_cqs = len(cq_raw_fallback) if isinstance(cq_raw_fallback, list) else 0
             return GateResult(
                 gate="coverage",
                 domain=domain,
@@ -363,8 +359,7 @@ def run_graph(config: GateConfig, domain: str = "unknown") -> GateResult:
             for rel in getattr(node, "relationships", []):
                 target = rel.target if hasattr(rel, "target") else rel.get("target", "")
                 rel_type = (
-                    rel.type if hasattr(rel, "type")
-                    else rel.get("type", "unknown")
+                    rel.type if hasattr(rel, "type") else rel.get("type", "unknown")
                 )
                 g.add_edge(nid, str(target), type=str(rel_type))
 

@@ -32,7 +32,10 @@ def _clean_event_bus() -> Any:  # noqa: PT005
 
 
 def _make_update(
-    *, user_id: int, chat_id: int = 100, text: str = "hello",
+    *,
+    user_id: int,
+    chat_id: int = 100,
+    text: str = "hello",
 ) -> MagicMock:
     """Create a mock PTB Update."""
     update = MagicMock()
@@ -115,7 +118,9 @@ class TestTriggerMiddlewarePipeline:
         )
 
         update = _make_update(
-            user_id=67890, chat_id=100, text="test msg",
+            user_id=67890,
+            chat_id=100,
+            text="test msg",
         )
         context = MagicMock()
         await trigger._handle_message(update, context)
@@ -260,7 +265,8 @@ class TestFullPipelineIntegration:
             return_value=_make_session(),
         )
         limiter = TokenBucketRateLimiter(
-            max_tokens=10, refill_rate=0.0,
+            max_tokens=10,
+            refill_rate=0.0,
         )
 
         pipeline = [
@@ -361,7 +367,8 @@ class TestFullPipelineIntegration:
 
         # maxsize=1: worker takes first, queue holds second
         dispatcher = SessionDispatcher(
-            handler=slow_handler, maxsize=1,
+            handler=slow_handler,
+            maxsize=1,
         )
 
         async def _noop() -> None:
@@ -429,7 +436,8 @@ class TestFullPipelineIntegration:
         dispatcher = SessionDispatcher(handler=mock_handler)
         registry = AsyncMock()
         limiter = TokenBucketRateLimiter(
-            max_tokens=10, refill_rate=0.0,
+            max_tokens=10,
+            refill_rate=0.0,
         )
 
         pipeline = [

@@ -25,9 +25,7 @@ def _sign_token(private_key: Ed25519PrivateKey, nonce: str) -> str:
     return base64.b64encode(private_key.sign(nonce.encode())).decode()
 
 
-async def _stub_dispatch(
-    req: ReqFrame, send: Callable[[str], Awaitable[None]]
-) -> None:
+async def _stub_dispatch(req: ReqFrame, send: Callable[[str], Awaitable[None]]) -> None:
     """Stub dispatcher: echoes request id back in a ResFrame."""
     res = ResFrame(type="res", id=req.id, ok=True, payload={"echo": req.method})
     await send(res.model_dump_json())
@@ -53,12 +51,14 @@ def _do_auth(ws: Any, private_key: Ed25519PrivateKey) -> dict[str, Any]:
     nonce = challenge["payload"]["nonce"]
 
     # 2. Send auth req
-    ws.send_json({
-        "type": "req",
-        "id": str(uuid.uuid4()),
-        "method": "auth",
-        "params": {"token": _sign_token(private_key, nonce)},
-    })
+    ws.send_json(
+        {
+            "type": "req",
+            "id": str(uuid.uuid4()),
+            "method": "auth",
+            "params": {"token": _sign_token(private_key, nonce)},
+        }
+    )
 
     # 3. Receive auth success
     return ws.receive_json()  # type: ignore[no-any-return]
@@ -93,12 +93,14 @@ class TestConnection:
             assert auth_res["ok"] is True
 
             req_id = str(uuid.uuid4())
-            ws.send_json({
-                "type": "req",
-                "id": req_id,
-                "method": "run",
-                "params": {"prompt": "hello"},
-            })
+            ws.send_json(
+                {
+                    "type": "req",
+                    "id": req_id,
+                    "method": "run",
+                    "params": {"prompt": "hello"},
+                }
+            )
             res = ws.receive_json()
             assert res["id"] == req_id
             assert res["ok"] is True
@@ -116,12 +118,14 @@ class TestConnection:
                 with client.websocket_connect("/ws") as ws:
                     challenge = ws.receive_json()
                     nonce = challenge["payload"]["nonce"]
-                    ws.send_json({
-                        "type": "req",
-                        "id": str(uuid.uuid4()),
-                        "method": "auth",
-                        "params": {"token": _sign_token(wrong_key, nonce)},
-                    })
+                    ws.send_json(
+                        {
+                            "type": "req",
+                            "id": str(uuid.uuid4()),
+                            "method": "auth",
+                            "params": {"token": _sign_token(wrong_key, nonce)},
+                        }
+                    )
                     ws.receive_json()  # expects close
             assert exc_info.value.code == 4401
 

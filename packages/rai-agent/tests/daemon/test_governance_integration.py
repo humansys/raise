@@ -89,9 +89,7 @@ class TestGovernanceIntegration:
             side_effect=mock_query,
         ):
             runtime = ClaudeRuntime(governance=hooks)
-            await runtime.run(
-                RunConfig(prompt="test"), AsyncMock()
-            )
+            await runtime.run(RunConfig(prompt="test"), AsyncMock())
 
         opts = captured[0]
         assert opts.hooks is not None
@@ -102,20 +100,14 @@ class TestGovernanceIntegration:
             assert len(matchers[0].hooks) == 1
             assert callable(matchers[0].hooks[0])
 
-    async def test_assembler_plus_runtime(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_assembler_plus_runtime(self, tmp_path: Any) -> None:
         """PromptAssembler + RunConfig with skills/memory → prompt."""
         # Set up files
         mem = tmp_path / "CLAUDE.md"
         mem.write_text("# Rai Rules\nAlways be concise.")
-        skill_dir = (
-            tmp_path / ".raise" / "skills" / "daily-briefing"
-        )
+        skill_dir = tmp_path / ".raise" / "skills" / "daily-briefing"
         skill_dir.mkdir(parents=True)
-        (skill_dir / "prompt.md").write_text(
-            "Generate a morning briefing."
-        )
+        (skill_dir / "prompt.md").write_text("Generate a morning briefing.")
 
         captured: list[Any] = []
 
@@ -148,9 +140,7 @@ class TestGovernanceIntegration:
     @pytest.mark.skip(
         reason="BUG(RAI-29): hooks disabled — SDK ProcessTransport crash on shutdown"
     )
-    async def test_full_pipeline_options(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_full_pipeline_options(self, tmp_path: Any) -> None:
         """Full pipeline: governance + assembler + max_turns."""
         mem = tmp_path / "CLAUDE.md"
         mem.write_text("Memory content.")
@@ -172,9 +162,7 @@ class TestGovernanceIntegration:
             "rai_agent.daemon.runtime.query",
             side_effect=mock_query,
         ):
-            runtime = ClaudeRuntime(
-                governance=hooks, assembler=assembler
-            )
+            runtime = ClaudeRuntime(governance=hooks, assembler=assembler)
             await runtime.run(
                 RunConfig(
                     prompt="Do the daily briefing",
@@ -242,13 +230,8 @@ class TestGovernanceIntegration:
             "tool_input": {"command": "rm -rf /"},
             "tool_use_id": "tu-1",
         }
-        result = await hooks.pre_tool_use(
-            input_data, "tu-1", {"signal": None}
-        )
-        assert (
-            result["hookSpecificOutput"]["permissionDecision"]
-            == "deny"
-        )
+        result = await hooks.pre_tool_use(input_data, "tu-1", {"signal": None})
+        assert result["hookSpecificOutput"]["permissionDecision"] == "deny"
 
     async def test_governance_stop_enforces_turn_limit(
         self,
@@ -270,9 +253,7 @@ class TestGovernanceIntegration:
             "tool_use_id": "tu-1",
         }
         for _ in range(3):
-            await hooks.post_tool_use(
-                post_input, "tu-x", {"signal": None}
-            )
+            await hooks.post_tool_use(post_input, "tu-x", {"signal": None})
 
         stop_input = {
             "hook_event_name": "Stop",
@@ -281,8 +262,6 @@ class TestGovernanceIntegration:
             "cwd": "/tmp",
             "stop_hook_active": True,
         }
-        result = await hooks.stop(
-            stop_input, None, {"signal": None}
-        )
+        result = await hooks.stop(stop_input, None, {"signal": None})
         assert result["continue_"] is False
         assert "3/3" in result["stopReason"]

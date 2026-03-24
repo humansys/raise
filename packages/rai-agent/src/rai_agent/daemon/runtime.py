@@ -71,9 +71,9 @@ class RunConfig(BaseModel):
     runtime uses AsyncIterable mode to send structured content."""
     session_id: str | None = None
     system_prompt: str | None = None
-    permission_mode: (
-        Literal["default", "acceptEdits", "bypassPermissions"] | None
-    ) = None
+    permission_mode: Literal["default", "acceptEdits", "bypassPermissions"] | None = (
+        None
+    )
     # S2.6 governance additions — all optional, backward compatible
     max_turns: int | None = None
     skills: list[str] | None = None
@@ -199,26 +199,20 @@ def _log_sdk_message(
                 _logger.debug(
                     "llm.thinking",
                     **base,
-                    content=_truncate(
-                        _redact(block.thinking, sensitive_patterns)
-                    ),
+                    content=_truncate(_redact(block.thinking, sensitive_patterns)),
                 )
             elif isinstance(block, ToolUseBlock):
                 _logger.debug(
                     "tool.start",
                     **base,
                     tool_name=block.name,
-                    tool_input=_truncate(
-                        _redact(str(block.input), sensitive_patterns)
-                    ),
+                    tool_input=_truncate(_redact(str(block.input), sensitive_patterns)),
                 )
             elif isinstance(block, TextBlock):
                 _logger.debug(
                     "message.out",
                     **base,
-                    content=_truncate(
-                        _redact(block.text, sensitive_patterns)
-                    ),
+                    content=_truncate(_redact(block.text, sensitive_patterns)),
                 )
     elif isinstance(msg, UserMessage):
         if isinstance(msg.content, list):
@@ -230,9 +224,7 @@ def _log_sdk_message(
                         **base,
                         tool_use_id=block.tool_use_id,
                         is_error=block.is_error,
-                        content=_truncate(
-                            _redact(content, sensitive_patterns)
-                        ),
+                        content=_truncate(_redact(content, sensitive_patterns)),
                     )
         else:
             _logger.debug("message.in", **base)
@@ -294,9 +286,7 @@ class ClaudeRuntime:
 
         options = ClaudeAgentOptions(
             system_prompt=system_prompt,
-            permission_mode=(
-                config.permission_mode or "bypassPermissions"
-            ),
+            permission_mode=(config.permission_mode or "bypassPermissions"),
             max_turns=config.max_turns,
             cwd=config.cwd or self._cwd,
             setting_sources=["project", "local"],
@@ -340,13 +330,13 @@ class ClaudeRuntime:
         send: Callable[[str], Awaitable[None]],
     ) -> RunResult:
         """Run a prompt from scratch. Returns RunResult."""
-        self._sensitive_patterns = frozenset(
-            config.sensitive_patterns or []
-        )
+        self._sensitive_patterns = frozenset(config.sensitive_patterns or [])
         options = await self._build_options(config)
         conv_id = config.session_id or ""
         return await self._stream(
-            config.prompt, options, send,
+            config.prompt,
+            options,
+            send,
             conversation_id=conv_id,
             content_blocks=config.content_blocks,
         )
@@ -358,15 +348,13 @@ class ClaudeRuntime:
         send: Callable[[str], Awaitable[None]],
     ) -> RunResult:
         """Resume an existing SDK session. Returns RunResult."""
-        self._sensitive_patterns = frozenset(
-            config.sensitive_patterns or []
-        )
-        options = await self._build_options(
-            config, resume_id=session_id
-        )
+        self._sensitive_patterns = frozenset(config.sensitive_patterns or [])
+        options = await self._build_options(config, resume_id=session_id)
         conv_id = config.session_id or ""
         return await self._stream(
-            config.prompt, options, send,
+            config.prompt,
+            options,
+            send,
             conversation_id=conv_id,
             content_blocks=config.content_blocks,
         )
@@ -398,9 +386,7 @@ class ClaudeRuntime:
         source: str | AsyncIterable[dict[str, Any]]
         if content_blocks is not None:
 
-            async def _image_prompt() -> AsyncIterator[
-                dict[str, Any]
-            ]:
+            async def _image_prompt() -> AsyncIterator[dict[str, Any]]:
                 yield {
                     "type": "user",
                     "session_id": "",
@@ -429,7 +415,8 @@ class ClaudeRuntime:
                 captured_session_id = msg.session_id
                 usage = msg.usage or {}
                 captured_input_tokens = usage.get(
-                    "input_tokens", 0,
+                    "input_tokens",
+                    0,
                 )
             seq += 1
 

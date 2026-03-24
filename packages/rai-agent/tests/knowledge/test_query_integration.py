@@ -105,9 +105,7 @@ class TestRealScaleUpQuery:
             adapter=scaleup_adapter,  # type: ignore[arg-type]
             top_k=5,
         )
-        output = format_query_human(
-            result, manifest.display_name, manifest.prompting
-        )
+        output = format_query_human(result, manifest.display_name, manifest.prompting)
         assert "Scaling Up" in output
         assert "Eres experto" in output
 

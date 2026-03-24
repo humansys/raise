@@ -265,9 +265,7 @@ class TestClaudeRuntime:
             side_effect=mock_query_factory,
         ):
             runtime = ClaudeRuntime()
-            await runtime.run(
-                RunConfig(prompt="test"), AsyncMock()
-            )
+            await runtime.run(RunConfig(prompt="test"), AsyncMock())
 
         assert captured_options[0].hooks is None
 
@@ -295,9 +293,7 @@ class TestClaudeRuntime:
             side_effect=mock_query_factory,
         ):
             runtime = ClaudeRuntime(governance=hooks)
-            await runtime.run(
-                RunConfig(prompt="test"), AsyncMock()
-            )
+            await runtime.run(RunConfig(prompt="test"), AsyncMock())
 
         opts = captured_options[0]
         assert opts.hooks is not None
@@ -355,9 +351,7 @@ class TestClaudeRuntime:
         options = await runtime._build_options(config)  # pyright: ignore[reportPrivateUsage]
         assert options.cwd is None
 
-    async def test_assembler_builds_system_prompt(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_assembler_builds_system_prompt(self, tmp_path: Any) -> None:
         """ClaudeRuntime with assembler builds system_prompt."""
         from rai_agent.daemon.governance import PromptAssembler
 
@@ -387,6 +381,4 @@ class TestClaudeRuntime:
                 AsyncMock(),
             )
 
-        assert "Project rules here." in (
-            captured_options[0].system_prompt or ""
-        )
+        assert "Project rules here." in (captured_options[0].system_prompt or "")

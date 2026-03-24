@@ -51,8 +51,7 @@ class SessionKey(NamedTuple):
         parts = raw.split(":", 3)
         if len(parts) < 4:  # noqa: PLR2004
             msg = (
-                f"Expected at least 4 colon-separated parts, "
-                f"got {len(parts)}: {raw!r}"
+                f"Expected at least 4 colon-separated parts, got {len(parts)}: {raw!r}"
             )
             raise ValueError(msg)
         return cls(
@@ -63,10 +62,7 @@ class SessionKey(NamedTuple):
         )
 
     def __str__(self) -> str:
-        return (
-            f"{self.provider}:{self.account}"
-            f":{self.scope}:{self.channel_id}"
-        )
+        return f"{self.provider}:{self.account}:{self.scope}:{self.channel_id}"
 
 
 # ── Exceptions ────────────────────────────────────────────────────────────
@@ -128,8 +124,7 @@ _CREATE_IDX_PROVIDER = (
     "ON sessions(provider, status)"
 )
 _CREATE_IDX_ACTIVE = (
-    "CREATE INDEX IF NOT EXISTS idx_sessions_last_active "
-    "ON sessions(last_active_at)"
+    "CREATE INDEX IF NOT EXISTS idx_sessions_last_active ON sessions(last_active_at)"
 )
 _CREATE_IDX_CURRENT = (
     "CREATE INDEX IF NOT EXISTS idx_sessions_current "
@@ -137,9 +132,21 @@ _CREATE_IDX_CURRENT = (
 )
 
 _COLUMN_LIST = [
-    "id", "session_key", "name", "provider", "account", "scope",
-    "channel_id", "sdk_session_id", "cwd", "status", "is_current",
-    "origin", "created_at", "last_active_at", "last_input_tokens",
+    "id",
+    "session_key",
+    "name",
+    "provider",
+    "account",
+    "scope",
+    "channel_id",
+    "sdk_session_id",
+    "cwd",
+    "status",
+    "is_current",
+    "origin",
+    "created_at",
+    "last_active_at",
+    "last_input_tokens",
     "metadata",
 ]
 _COLUMNS = ", ".join(_COLUMN_LIST)
@@ -178,7 +185,10 @@ class SessionRegistry:
     """
 
     def __init__(
-        self, db_path: str = "daemon.db", *, max_sessions: int = 10,
+        self,
+        db_path: str = "daemon.db",
+        *,
+        max_sessions: int = 10,
     ) -> None:
         self._db_path = db_path
         self._db: aiosqlite.Connection | None = None
@@ -202,8 +212,7 @@ class SessionRegistry:
 
         # Migration: detect old schema by checking for 'id' column
         async with self._db.execute(
-            "SELECT name FROM sqlite_master "
-            "WHERE type='table' AND name='sessions'",
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='sessions'",
         ) as cursor:
             table_exists = await cursor.fetchone() is not None
 
@@ -226,7 +235,11 @@ class SessionRegistry:
     # ── Named session CRUD ─────────────────────────────────────────────
 
     async def create_named(
-        self, key: SessionKey, *, name: str | None = None, cwd: str,
+        self,
+        key: SessionKey,
+        *,
+        name: str | None = None,
+        cwd: str,
     ) -> Session:
         """Create a new named session, optionally auto-naming.
 
@@ -251,17 +264,13 @@ class SessionRegistry:
 
         # Check session limit
         async with db.execute(
-            "SELECT COUNT(*) FROM sessions "
-            "WHERE session_key = ? AND status = 'open'",
+            "SELECT COUNT(*) FROM sessions WHERE session_key = ? AND status = 'open'",
             (sk,),
         ) as cursor:
             row = await cursor.fetchone()
             count = row[0] if row else 0
         if count >= self._max_sessions:
-            msg = (
-                f"Session limit reached ({self._max_sessions}) "
-                f"for key {key}"
-            )
+            msg = f"Session limit reached ({self._max_sessions}) for key {key}"
             raise SessionLimitError(msg)
 
         # Auto-name if not provided
@@ -282,8 +291,7 @@ class SessionRegistry:
 
         # Clear is_current on all existing sessions for this key
         await db.execute(
-            "UPDATE sessions SET is_current = 0 "
-            "WHERE session_key = ?",
+            "UPDATE sessions SET is_current = 0 WHERE session_key = ?",
             (sk,),
         )
 
@@ -368,8 +376,7 @@ class SessionRegistry:
         # Set new current and update last_active_at
         now_iso = datetime.now(UTC).isoformat()
         await db.execute(
-            "UPDATE sessions SET is_current = 1, last_active_at = ? "
-            "WHERE id = ?",
+            "UPDATE sessions SET is_current = 1, last_active_at = ? WHERE id = ?",
             (now_iso, target.id),
         )
         await db.commit()
@@ -379,7 +386,10 @@ class SessionRegistry:
         return result
 
     async def close_named(
-        self, key: SessionKey, *, name: str | None = None,
+        self,
+        key: SessionKey,
+        *,
+        name: str | None = None,
     ) -> None:
         """Close a session (set status='closed', clear is_current).
 
@@ -400,8 +410,7 @@ class SessionRegistry:
             target_id = target.id
 
         await db.execute(
-            "UPDATE sessions SET status = 'closed', is_current = 0 "
-            "WHERE id = ?",
+            "UPDATE sessions SET status = 'closed', is_current = 0 WHERE id = ?",
             (target_id,),
         )
         await db.commit()

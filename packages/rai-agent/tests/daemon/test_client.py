@@ -149,9 +149,7 @@ class TestDaemonClientAuth:
         from rai_agent.daemon.client import DaemonClient
 
         private_key = Ed25519PrivateKey.generate()
-        client = DaemonClient(
-            host="127.0.0.1", port=8000, private_key=private_key
-        )
+        client = DaemonClient(host="127.0.0.1", port=8000, private_key=private_key)
 
         # Build mock WS that simulates auth challenge/response
         mock_ws = AsyncMock()
@@ -200,9 +198,7 @@ class TestDaemonClientAuth:
         from rai_agent.daemon.client import DaemonClient
 
         private_key = Ed25519PrivateKey.generate()
-        client = DaemonClient(
-            host="127.0.0.1", port=8000, private_key=private_key
-        )
+        client = DaemonClient(host="127.0.0.1", port=8000, private_key=private_key)
 
         mock_ws = AsyncMock()
         challenge_json = _make_auth_challenge()
@@ -242,9 +238,7 @@ class TestDaemonClientRun:
         from rai_agent.daemon.client import DaemonClient
 
         private_key = Ed25519PrivateKey.generate()
-        client = DaemonClient(
-            host="127.0.0.1", port=8000, private_key=private_key
-        )
+        client = DaemonClient(host="127.0.0.1", port=8000, private_key=private_key)
 
         # Build event frames the daemon would send
         msg_frame = EventFrame(
@@ -283,9 +277,7 @@ class TestDaemonClientRun:
         from rai_agent.daemon.client import DaemonClient
 
         private_key = Ed25519PrivateKey.generate()
-        client = DaemonClient(
-            host="127.0.0.1", port=8000, private_key=private_key
-        )
+        client = DaemonClient(host="127.0.0.1", port=8000, private_key=private_key)
 
         msg1 = EventFrame(
             type="event",
@@ -369,14 +361,10 @@ class TestDaemonClientStop:
         from rai_agent.daemon.client import DaemonClient
 
         private_key = Ed25519PrivateKey.generate()
-        client = DaemonClient(
-            host="127.0.0.1", port=8000, private_key=private_key
-        )
+        client = DaemonClient(host="127.0.0.1", port=8000, private_key=private_key)
 
         # Mock WS: first recv is the shutdown success response
-        shutdown_resp = ResFrame(
-            type="res", id="any", ok=True
-        ).model_dump_json()
+        shutdown_resp = ResFrame(type="res", id="any", ok=True).model_dump_json()
         mock_ws = MockWebSocket(recv_frames=[shutdown_resp])
 
         client._ws = mock_ws  # type: ignore[assignment]
@@ -516,9 +504,7 @@ class TestClientIntegration:
 
         port: int = server.servers[0].sockets[0].getsockname()[1]  # type: ignore[index]
 
-        client = DaemonClient(
-            host="127.0.0.1", port=port, private_key=private_key
-        )
+        client = DaemonClient(host="127.0.0.1", port=port, private_key=private_key)
 
         try:
             await client.connect()
@@ -634,9 +620,7 @@ class TestClientIntegration:
 
         port: int = server.servers[0].sockets[0].getsockname()[1]  # type: ignore[index]
 
-        client = DaemonClient(
-            host="127.0.0.1", port=port, private_key=private_key
-        )
+        client = DaemonClient(host="127.0.0.1", port=port, private_key=private_key)
 
         try:
             await client.connect()

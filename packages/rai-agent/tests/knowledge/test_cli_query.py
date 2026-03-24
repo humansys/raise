@@ -23,6 +23,7 @@ runner = CliRunner()
 def _scaleup_available() -> bool:
     try:
         import rai_agent.scaleup  # noqa: F401
+
         return True
     except ModuleNotFoundError:
         return False
@@ -122,9 +123,7 @@ class TestQueryCommand:
         assert "cash" in result.output.lower()
 
     @patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR")
-    def test_query_json_format(
-        self, mock_dir: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_query_json_format(self, mock_dir: MagicMock, tmp_path: Path) -> None:
         import json
 
         knowledge_dir = _setup_domain(tmp_path)
@@ -132,18 +131,14 @@ class TestQueryCommand:
         mock_dir.exists.return_value = True
         mock_dir.iterdir.return_value = list(knowledge_dir.iterdir())
 
-        result = runner.invoke(
-            app, ["query", "scaleup", "cash", "--format", "json"]
-        )
+        result = runner.invoke(app, ["query", "scaleup", "cash", "--format", "json"])
         assert result.exit_code == 0, result.output
         parsed = json.loads(result.output)
         assert "results" in parsed
         assert "prompting" in parsed
 
     @patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR")
-    def test_query_limit(
-        self, mock_dir: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_query_limit(self, mock_dir: MagicMock, tmp_path: Path) -> None:
         import json
 
         knowledge_dir = _setup_domain(tmp_path)
@@ -159,9 +154,7 @@ class TestQueryCommand:
         assert len(parsed["results"]) <= 1
 
     @patch("rai_agent.knowledge.cli._DEFAULT_KNOWLEDGE_DIR")
-    def test_query_unknown_domain(
-        self, mock_dir: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_query_unknown_domain(self, mock_dir: MagicMock, tmp_path: Path) -> None:
         knowledge_dir = _setup_domain(tmp_path)
         mock_dir.__truediv__ = lambda self, x: knowledge_dir / x  # type: ignore[assignment]
 

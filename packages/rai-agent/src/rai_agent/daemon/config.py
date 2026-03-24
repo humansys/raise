@@ -49,15 +49,16 @@ def _env_overrides() -> dict[str, Any]:
             os.environ["TELEGRAM_ALLOWED_USERS"]
         )
     if "RAI_DAEMON_BRIEFING_CHAT_ID" in os.environ:
-        overrides["briefing_chat_id"] = int(
-            os.environ["RAI_DAEMON_BRIEFING_CHAT_ID"]
-        )
+        overrides["briefing_chat_id"] = int(os.environ["RAI_DAEMON_BRIEFING_CHAT_ID"])
     if "RAI_DAEMON_BRIEFING_CRON" in os.environ:
         overrides["briefing_cron"] = os.environ["RAI_DAEMON_BRIEFING_CRON"]
     if "RAI_DAEMON_VERBOSE_LOGGING" in os.environ:
-        overrides["verbose_logging"] = os.environ[
-            "RAI_DAEMON_VERBOSE_LOGGING"
-        ] in ("1", "true", "True", "yes")
+        overrides["verbose_logging"] = os.environ["RAI_DAEMON_VERBOSE_LOGGING"] in (
+            "1",
+            "true",
+            "True",
+            "yes",
+        )
     if "RAI_DAEMON_MAX_SESSIONS" in os.environ:
         overrides["max_sessions_per_chat"] = int(
             os.environ["RAI_DAEMON_MAX_SESSIONS"],

@@ -63,9 +63,7 @@ class TestSaveKeys:
         content = (tmp_path / "daemon.pub").read_text()
         assert "PUBLIC KEY" in content
 
-    def test_private_key_has_restricted_permissions(
-        self, tmp_path: Path
-    ) -> None:
+    def test_private_key_has_restricted_permissions(self, tmp_path: Path) -> None:
         kp = generate_keys()
         save_keys(kp, tmp_path)
         mode = (tmp_path / "daemon.key").stat().st_mode & 0o777

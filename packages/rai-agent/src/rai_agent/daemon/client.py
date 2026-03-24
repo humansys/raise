@@ -119,10 +119,7 @@ class DaemonClient:
 
         async for raw in self._ws:
             frame: dict[str, Any] = json.loads(raw)
-            if (
-                frame["type"] == "event"
-                and frame["event"] == "assistant_message"
-            ):
+            if frame["type"] == "event" and frame["event"] == "assistant_message":
                 payload: dict[str, Any] = frame.get("payload", {})
                 content: Any = payload.get("content", [])
                 _print_content(content)
@@ -203,9 +200,7 @@ async def run_command(args: argparse.Namespace) -> None:
     from rai_agent.daemon.keys import load_or_generate_keys
 
     keys = load_or_generate_keys()
-    client = DaemonClient(
-        host=args.host, port=args.port, private_key=keys.private_key
-    )
+    client = DaemonClient(host=args.host, port=args.port, private_key=keys.private_key)
     try:
         await client.connect()
         await client.authenticate()
@@ -219,9 +214,7 @@ async def stop_command(args: argparse.Namespace) -> None:
     from rai_agent.daemon.keys import load_or_generate_keys
 
     keys = load_or_generate_keys()
-    client = DaemonClient(
-        host=args.host, port=args.port, private_key=keys.private_key
-    )
+    client = DaemonClient(host=args.host, port=args.port, private_key=keys.private_key)
     try:
         await client.connect()
         await client.authenticate()

@@ -112,13 +112,16 @@ class SessionDispatcher:
             )
 
     async def _run_worker(
-        self, key: str, queue: asyncio.Queue[SessionRequest],
+        self,
+        key: str,
+        queue: asyncio.Queue[SessionRequest],
     ) -> None:
         """Worker loop: process requests from queue in FIFO order."""
         try:
             while True:
                 request = await asyncio.wait_for(
-                    queue.get(), timeout=self._idle_timeout,
+                    queue.get(),
+                    timeout=self._idle_timeout,
                 )
                 try:
                     await self._handler(request)

@@ -147,7 +147,8 @@ class TestDraftStreamer:
         streamer = DraftStreamer(bot=bot, chat_id=100, throttle_s=0.0)
         await streamer.set_status("\U0001f9e0 Thinking...")
         bot.send_message_draft.assert_called_once_with(
-            chat_id=100, draft_id=streamer._draft_id,
+            chat_id=100,
+            draft_id=streamer._draft_id,
             text="\U0001f9e0 Thinking...",
         )
 
@@ -329,9 +330,7 @@ class TestSplitForTelegram:
         from rai_agent.daemon.telegram import split_for_telegram
 
         # Build a markdown string well over 4096 chars
-        long_md = "\n\n".join(
-            f"Paragraph {i}: " + "A" * 200 for i in range(30)
-        )
+        long_md = "\n\n".join(f"Paragraph {i}: " + "A" * 200 for i in range(30))
         assert len(long_md) > 5000
         chunks = split_for_telegram(long_md)
         assert len(chunks) >= 2
@@ -502,13 +501,20 @@ class TestExtractStatusFromFrame:
         """Returns status for Read tool with filename."""
         from rai_agent.daemon.telegram_pipeline import extract_status_from_frame
 
-        frame = json.dumps({
-            "event": "assistant_message",
-            "payload": {"content": [
-                {"id": "t1", "name": "Read",
-                 "input": {"file_path": "/home/user/src/foo.py"}},
-            ]},
-        })
+        frame = json.dumps(
+            {
+                "event": "assistant_message",
+                "payload": {
+                    "content": [
+                        {
+                            "id": "t1",
+                            "name": "Read",
+                            "input": {"file_path": "/home/user/src/foo.py"},
+                        },
+                    ]
+                },
+            }
+        )
         result = extract_status_from_frame(frame)
         assert result is not None
         assert "Reading" in result
@@ -518,13 +524,20 @@ class TestExtractStatusFromFrame:
         """Returns status for Bash tool with command preview."""
         from rai_agent.daemon.telegram_pipeline import extract_status_from_frame
 
-        frame = json.dumps({
-            "event": "assistant_message",
-            "payload": {"content": [
-                {"id": "t2", "name": "Bash",
-                 "input": {"command": "uv run pytest"}},
-            ]},
-        })
+        frame = json.dumps(
+            {
+                "event": "assistant_message",
+                "payload": {
+                    "content": [
+                        {
+                            "id": "t2",
+                            "name": "Bash",
+                            "input": {"command": "uv run pytest"},
+                        },
+                    ]
+                },
+            }
+        )
         result = extract_status_from_frame(frame)
         assert result is not None
         assert "Running command" in result
@@ -534,12 +547,16 @@ class TestExtractStatusFromFrame:
         """Returns thinking status for thinking blocks."""
         from rai_agent.daemon.telegram_pipeline import extract_status_from_frame
 
-        frame = json.dumps({
-            "event": "assistant_message",
-            "payload": {"content": [
-                {"thinking": "Let me analyze...", "signature": "sig"},
-            ]},
-        })
+        frame = json.dumps(
+            {
+                "event": "assistant_message",
+                "payload": {
+                    "content": [
+                        {"thinking": "Let me analyze...", "signature": "sig"},
+                    ]
+                },
+            }
+        )
         result = extract_status_from_frame(frame)
         assert result is not None
         assert "Thinking" in result
@@ -548,24 +565,32 @@ class TestExtractStatusFromFrame:
         """Returns None for text blocks (handled by extract_text_from_frame)."""
         from rai_agent.daemon.telegram_pipeline import extract_status_from_frame
 
-        frame = json.dumps({
-            "event": "assistant_message",
-            "payload": {"content": [
-                {"text": "Here is the answer"},
-            ]},
-        })
+        frame = json.dumps(
+            {
+                "event": "assistant_message",
+                "payload": {
+                    "content": [
+                        {"text": "Here is the answer"},
+                    ]
+                },
+            }
+        )
         assert extract_status_from_frame(frame) is None
 
     def test_unknown_tool(self) -> None:
         """Returns generic status for unknown tools."""
         from rai_agent.daemon.telegram_pipeline import extract_status_from_frame
 
-        frame = json.dumps({
-            "event": "assistant_message",
-            "payload": {"content": [
-                {"id": "t3", "name": "CustomTool", "input": {}},
-            ]},
-        })
+        frame = json.dumps(
+            {
+                "event": "assistant_message",
+                "payload": {
+                    "content": [
+                        {"id": "t3", "name": "CustomTool", "input": {}},
+                    ]
+                },
+            }
+        )
         result = extract_status_from_frame(frame)
         assert result is not None
         assert "CustomTool" in result

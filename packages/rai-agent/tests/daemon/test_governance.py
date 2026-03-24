@@ -278,13 +278,9 @@ class TestHitlGate:
             lambda e: received.append(e),  # type: ignore[reportUnknownLambdaType]
         )
 
-        input_data = _make_pre_tool_input(
-            "Bash", {"command": "ls"}
-        )
+        input_data = _make_pre_tool_input("Bash", {"command": "ls"})
         # Will timeout (no response) → deny
-        result = await hooks.pre_tool_use(
-            input_data, "tu-hitl", {"signal": None}
-        )
+        result = await hooks.pre_tool_use(input_data, "tu-hitl", {"signal": None})
         assert len(received) == 1
         assert received[0].tool_name == "Bash"
         # Timeout → deny
@@ -298,9 +294,7 @@ class TestHitlGate:
             permission_mode="default",
             hitl_timeout=5.0,
         )
-        input_data = _make_pre_tool_input(
-            "Bash", {"command": "ls"}
-        )
+        input_data = _make_pre_tool_input("Bash", {"command": "ls"})
 
         async def _approve_later() -> None:
             """Wait for pending HITL, then approve."""
@@ -310,9 +304,7 @@ class TestHitlGate:
             hooks.resolve_hitl(rid, approved=True)
 
         task = asyncio.create_task(_approve_later())
-        result = await hooks.pre_tool_use(
-            input_data, "tu-hitl2", {"signal": None}
-        )
+        result = await hooks.pre_tool_use(input_data, "tu-hitl2", {"signal": None})
         await task
         assert result == {}
 
@@ -323,9 +315,7 @@ class TestHitlGate:
             permission_mode="default",
             hitl_timeout=5.0,
         )
-        input_data = _make_pre_tool_input(
-            "Bash", {"command": "rm -rf /"}
-        )
+        input_data = _make_pre_tool_input("Bash", {"command": "rm -rf /"})
 
         async def _reject_later() -> None:
             """Wait for pending HITL, then reject."""
@@ -335,9 +325,7 @@ class TestHitlGate:
             hooks.resolve_hitl(rid, approved=False)
 
         task = asyncio.create_task(_reject_later())
-        result = await hooks.pre_tool_use(
-            input_data, "tu-hitl3", {"signal": None}
-        )
+        result = await hooks.pre_tool_use(input_data, "tu-hitl3", {"signal": None})
         await task
         out = result["hookSpecificOutput"]
         assert out["permissionDecision"] == "deny"
@@ -349,12 +337,8 @@ class TestHitlGate:
             permission_mode="default",
             hitl_timeout=0.1,
         )
-        input_data = _make_pre_tool_input(
-            "Bash", {"command": "ls"}
-        )
-        result = await hooks.pre_tool_use(
-            input_data, "tu-timeout", {"signal": None}
-        )
+        input_data = _make_pre_tool_input("Bash", {"command": "ls"})
+        result = await hooks.pre_tool_use(input_data, "tu-timeout", {"signal": None})
         out = result["hookSpecificOutput"]
         assert out["permissionDecision"] == "deny"
 
@@ -367,12 +351,8 @@ class TestHitlGate:
             permission_mode="default",
             hitl_timeout=0.1,
         )
-        input_data = _make_pre_tool_input(
-            "Bash", {"command": "ls"}
-        )
-        await hooks.pre_tool_use(
-            input_data, "tu-dangle", {"signal": None}
-        )
+        input_data = _make_pre_tool_input("Bash", {"command": "ls"})
+        await hooks.pre_tool_use(input_data, "tu-dangle", {"signal": None})
         # No pending futures should remain
         assert len(hooks._pending_hitl) == 0
 
@@ -383,22 +363,16 @@ class TestHitlGate:
 class TestPromptAssembler:
     """PromptAssembler loads skills and memory into system prompt."""
 
-    async def test_memory_content_with_section_header(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_memory_content_with_section_header(self, tmp_path: Any) -> None:
         """Memory paths are loaded with # Memory header."""
         mem = tmp_path / "CLAUDE.md"
         mem.write_text("# Project Rules\nBe concise.")
         assembler = PromptAssembler(project_root=tmp_path)
-        result = await assembler.assemble(
-            memory_paths=["CLAUDE.md"]
-        )
+        result = await assembler.assemble(memory_paths=["CLAUDE.md"])
         assert "# Memory" in result
         assert "Be concise." in result
 
-    async def test_skill_content_with_section_header(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_skill_content_with_section_header(self, tmp_path: Any) -> None:
         """Skills are loaded with # Skills and ## name headers."""
         skill_dir = tmp_path / ".raise" / "skills" / "daily-briefing"
         skill_dir.mkdir(parents=True)
@@ -409,9 +383,7 @@ class TestPromptAssembler:
         assert "## daily-briefing" in result
         assert "Generate a daily briefing." in result
 
-    async def test_existing_system_prompt_prepended(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_existing_system_prompt_prepended(self, tmp_path: Any) -> None:
         """Explicit system_prompt is prepended to assembled content."""
         mem = tmp_path / "CLAUDE.md"
         mem.write_text("Memory content.")
@@ -423,38 +395,26 @@ class TestPromptAssembler:
         assert result.startswith("You are Rai.")
         assert "Memory content." in result
 
-    async def test_missing_file_skipped_gracefully(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_missing_file_skipped_gracefully(self, tmp_path: Any) -> None:
         """Missing memory paths are skipped without crash."""
         assembler = PromptAssembler(project_root=tmp_path)
-        result = await assembler.assemble(
-            memory_paths=["nonexistent.md"]
-        )
+        result = await assembler.assemble(memory_paths=["nonexistent.md"])
         # Should not crash, result should be empty
         assert result == ""
 
-    async def test_missing_skill_skipped_gracefully(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_missing_skill_skipped_gracefully(self, tmp_path: Any) -> None:
         """Missing skills are skipped without crash."""
         assembler = PromptAssembler(project_root=tmp_path)
-        result = await assembler.assemble(
-            skills=["nonexistent-skill"]
-        )
+        result = await assembler.assemble(skills=["nonexistent-skill"])
         assert result == ""
 
-    async def test_empty_config_returns_empty(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_empty_config_returns_empty(self, tmp_path: Any) -> None:
         """No skills, no memory, no prompt → empty string."""
         assembler = PromptAssembler(project_root=tmp_path)
         result = await assembler.assemble()
         assert result == ""
 
-    async def test_multiple_skills_and_memory(
-        self, tmp_path: Any
-    ) -> None:
+    async def test_multiple_skills_and_memory(self, tmp_path: Any) -> None:
         """Multiple skills and memory files are concatenated."""
         # Memory
         mem = tmp_path / "CLAUDE.md"
@@ -481,9 +441,7 @@ class TestPromptAssembler:
 # ─── Test helpers ────────────────────────────────────────────────────────────
 
 
-def _make_pre_tool_input(
-    tool_name: str, tool_input: dict[str, Any]
-) -> dict[str, Any]:
+def _make_pre_tool_input(tool_name: str, tool_input: dict[str, Any]) -> dict[str, Any]:
     """Create a PreToolUseHookInput-like dict."""
     return {
         "hook_event_name": "PreToolUse",

@@ -621,12 +621,8 @@ class TestCoalescingIntegration:
     @pytest.mark.asyncio
     async def test_two_instances_with_different_configs(self) -> None:
         """Two middleware instances with different configs (per-provider)."""
-        fast_cfg = CoalescingConfig(
-            window_seconds=10.0, max_parts=2, max_chars=10_000
-        )
-        slow_cfg = CoalescingConfig(
-            window_seconds=10.0, max_parts=3, max_chars=10_000
-        )
+        fast_cfg = CoalescingConfig(window_seconds=10.0, max_parts=2, max_chars=10_000)
+        slow_cfg = CoalescingConfig(window_seconds=10.0, max_parts=3, max_chars=10_000)
         fast_dispatched: list[str] = []
         slow_dispatched: list[str] = []
 
@@ -641,26 +637,20 @@ class TestCoalescingIntegration:
 
         # Send 2 messages to fast — should flush immediately (max_parts=2)
         for text in ["f1", "f2"]:
-            ctx = _make_coalescing_ctx(
-                session_key="fast:session", prompt=text
-            )
+            ctx = _make_coalescing_ctx(session_key="fast:session", prompt=text)
             await compose([fast_mw, fast_handler], ctx)
 
         assert fast_dispatched == ["f1\nf2"]
 
         # Send 2 messages to slow — should NOT flush yet (max_parts=3)
         for text in ["s1", "s2"]:
-            ctx = _make_coalescing_ctx(
-                session_key="slow:session", prompt=text
-            )
+            ctx = _make_coalescing_ctx(session_key="slow:session", prompt=text)
             await compose([slow_mw, slow_handler], ctx)
 
         assert slow_dispatched == []
 
         # Third message to slow — now it flushes
-        ctx = _make_coalescing_ctx(
-            session_key="slow:session", prompt="s3"
-        )
+        ctx = _make_coalescing_ctx(session_key="slow:session", prompt="s3")
         await compose([slow_mw, slow_handler], ctx)
         assert slow_dispatched == ["s1\ns2\ns3"]
 
@@ -735,7 +725,9 @@ class TestCoalescingBypassForImages:
     async def test_image_message_dispatched_immediately(self) -> None:
         """Messages with content_blocks bypass coalescing entirely."""
         cfg = CoalescingConfig(
-            window_seconds=10.0, max_parts=10, max_chars=10_000,
+            window_seconds=10.0,
+            max_parts=10,
+            max_chars=10_000,
         )
         dispatched: list[Any] = []
 
@@ -762,7 +754,9 @@ class TestCoalescingBypassForImages:
     async def test_text_still_coalesced_after_image(self) -> None:
         """Text messages are still coalesced normally after an image."""
         cfg = CoalescingConfig(
-            window_seconds=0.05, max_parts=10, max_chars=10_000,
+            window_seconds=0.05,
+            max_parts=10,
+            max_chars=10_000,
         )
         dispatched: list[str] = []
 
@@ -936,10 +930,7 @@ class TestDispatchMiddleware:
         ctx.session_key = "telegram:default:dm:123"
         await compose([mw], ctx)
 
-        assert any(
-            "queued" in r.lower() or "try again" in r.lower()
-            for r in replies
-        )
+        assert any("queued" in r.lower() or "try again" in r.lower() for r in replies)
 
     @pytest.mark.asyncio
     async def test_dispatch_middleware_calls_get_current_then_create(
@@ -977,7 +968,9 @@ class TestDispatchMiddleware:
         registry.create_named = AsyncMock(return_value=mock_session)
 
         mw = make_dispatch_middleware(
-            dispatcher, registry, "/home/user/project",
+            dispatcher,
+            registry,
+            "/home/user/project",
         )
 
         ctx = _make_ctx()
@@ -1056,7 +1049,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session foobar", replies=replies,
+            prompt="/session foobar",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1133,7 +1127,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session new MyChat", replies=replies,
+            prompt="/session new MyChat",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1172,7 +1167,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session new", replies=replies,
+            prompt="/session new",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1195,7 +1191,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session new overflow", replies=replies,
+            prompt="/session new overflow",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1254,7 +1251,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session list", replies=replies,
+            prompt="/session list",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1278,7 +1276,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session list", replies=replies,
+            prompt="/session list",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1318,7 +1317,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session switch MyChat", replies=replies,
+            prompt="/session switch MyChat",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1337,7 +1337,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session switch", replies=replies,
+            prompt="/session switch",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1357,7 +1358,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session switch NonExistent", replies=replies,
+            prompt="/session switch NonExistent",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1377,7 +1379,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session close", replies=replies,
+            prompt="/session close",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1399,7 +1402,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session close MyChat", replies=replies,
+            prompt="/session close MyChat",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1422,7 +1426,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session close", replies=replies,
+            prompt="/session close",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1442,7 +1447,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session delete MyChat", replies=replies,
+            prompt="/session delete MyChat",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1460,7 +1466,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session delete", replies=replies,
+            prompt="/session delete",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1482,7 +1489,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session delete Current", replies=replies,
+            prompt="/session delete Current",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 
@@ -1502,7 +1510,8 @@ class TestSessionCommandMiddleware:
 
         replies: list[str] = []
         ctx = _make_command_ctx(
-            prompt="/session delete NonExistent", replies=replies,
+            prompt="/session delete NonExistent",
+            replies=replies,
         )
         await mw(ctx, AsyncMock())
 

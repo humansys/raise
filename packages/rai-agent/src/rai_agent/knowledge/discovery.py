@@ -73,9 +73,7 @@ class NodeTypeSpec(BaseModel):
 class SchemaSpec(BaseModel):
     """Schema discovered from a corpus — types, fields, relationships."""
 
-    node_types: list[NodeTypeSpec] = Field(
-        default_factory=lambda: list[NodeTypeSpec]()
-    )
+    node_types: list[NodeTypeSpec] = Field(default_factory=lambda: list[NodeTypeSpec]())
     relationship_types: list[str] = Field(default_factory=list)
 
 
@@ -225,8 +223,7 @@ def refine_schema(
     missing_names = ", ".join(missing_types)
 
     prompt = (
-        REFINEMENT_PROMPT
-        .replace("{discovered_types}", discovered_names)
+        REFINEMENT_PROMPT.replace("{discovered_types}", discovered_names)
         .replace("{missing_types}", missing_names)
         .replace("{corpus_text}", corpus_text)
     )
@@ -312,7 +309,14 @@ def reconcile_extracted(
                 "tags": [area, "decision-area", "scaling-up"],
             }
             path = extracted_dir / f"{node_id}.yaml"
-            path.write_text(yaml.dump(node_data, default_flow_style=False, allow_unicode=True, sort_keys=False))
+            path.write_text(
+                yaml.dump(
+                    node_data,
+                    default_flow_style=False,
+                    allow_unicode=True,
+                    sort_keys=False,
+                )
+            )
             all_ids.add(node_id)
             report.nodes_created.append(node_id)
             logger.info("Created missing decision node: %s", node_id)
@@ -354,7 +358,11 @@ def reconcile_extracted(
 
         if modified:
             raw["relationships"] = new_rels
-            path.write_text(yaml.dump(raw, default_flow_style=False, allow_unicode=True, sort_keys=False))
+            path.write_text(
+                yaml.dump(
+                    raw, default_flow_style=False, allow_unicode=True, sort_keys=False
+                )
+            )
 
     # Count remaining broken
     nodes_after = _load_node_ids_from_dir(extracted_dir)
@@ -372,7 +380,11 @@ def reconcile_extracted(
 
     logger.info(
         "Reconciliation: %d created, %d resolved, %d removed, %d→%d broken",
-        len(report.nodes_created), resolved, removed, broken_before, broken_after,
+        len(report.nodes_created),
+        resolved,
+        removed,
+        broken_before,
+        broken_after,
     )
     return report
 
@@ -385,7 +397,9 @@ def _fuzzy_find_id(target: str, existing_ids: set[str]) -> str | None:
     """
     # Exact prefix match (e.g. "concept-employee-engagement" matches
     # "concept-employee-engagement-survey")
-    candidates = [eid for eid in existing_ids if eid.startswith(target) or target.startswith(eid)]
+    candidates = [
+        eid for eid in existing_ids if eid.startswith(target) or target.startswith(eid)
+    ]
     if len(candidates) == 1:
         return candidates[0]
 
@@ -439,9 +453,7 @@ def diff_nodes(
     by_decision: dict[str, DecisionDiff] = {}
     all_nodes = {**extracted, **curated}
     decisions = {
-        n.get("decision", "unknown")
-        for n in all_nodes.values()
-        if n.get("decision")
+        n.get("decision", "unknown") for n in all_nodes.values() if n.get("decision")
     }
 
     for decision in sorted(decisions):

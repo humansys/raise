@@ -307,5 +307,6 @@ class TestBriefingPipeline:
 
         # Should have sent error notification to chat
         bot.send_message.assert_called_once_with(
-            12345, "⚠ Briefing failed. Check logs for details.",
+            12345,
+            "⚠ Briefing failed. Check logs for details.",
         )

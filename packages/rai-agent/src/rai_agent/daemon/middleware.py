@@ -88,8 +88,7 @@ class _SessionBuffer:
     def should_flush(self, config: CoalescingConfig) -> bool:
         """Return True if the buffer should be flushed immediately."""
         return (
-            len(self.parts) >= config.max_parts
-            or self.total_chars >= config.max_chars
+            len(self.parts) >= config.max_parts or self.total_chars >= config.max_chars
         )
 
 
@@ -296,7 +295,8 @@ def make_session_command_middleware(
         return f"{tokens // 1000}k tokens"
 
     async def _resolve_name(
-        ctx: MessageContext, arg: str,
+        ctx: MessageContext,
+        arg: str,
     ) -> str | None:
         """Resolve #N index to session name, or return arg as-is.
 
@@ -343,8 +343,7 @@ def make_session_command_middleware(
         for i, s in enumerate(sessions, 1):
             current = " *" if s.is_current else ""
             parts.append(
-                f"  #{i}  {s.name}  "
-                f"{_fmt_tokens(s.last_input_tokens)}{current}",
+                f"  #{i}  {s.name}  {_fmt_tokens(s.last_input_tokens)}{current}",
             )
         await ctx.reply_text("\n".join(parts))
 
@@ -400,8 +399,7 @@ def make_session_command_middleware(
             await registry.delete_named(key, name=name)
         except ValueError:
             await ctx.reply_text(
-                "Cannot delete the current session. "
-                "Switch to another session first.",
+                "Cannot delete the current session. Switch to another session first.",
             )
             return
         except KeyError:
@@ -454,8 +452,7 @@ def make_session_command_middleware(
             await handlers[subcommand](ctx, arg)
         else:
             await ctx.reply_text(
-                f"Unknown: /session {subcommand}\n"
-                "Use /session for available commands.",
+                f"Unknown: /session {subcommand}\nUse /session for available commands.",
             )
 
     return middleware
@@ -500,7 +497,9 @@ def make_dispatch_middleware(
 
         async def _on_error(exc: Exception) -> None:
             _dispatch_log.error(
-                "Run failed for session %s: %s", ctx.session_key, exc,
+                "Run failed for session %s: %s",
+                ctx.session_key,
+                exc,
             )
             await ctx.reply_text("Run failed. Check logs for details.")
 
