@@ -129,4 +129,55 @@ rai session journal show --last 5
 rai session journal show --compact
 ```
 
+---
+
+## Session Identity (v2.3.0)
+
+Starting with v2.3.0, sessions use a deterministic, timestamp-based ID format tied to the developer who started them.
+
+### Session ID Format
+
+```
+S-{prefix}-{YYMMDD}-{HHMM}
+```
+
+For example, a session started by developer `E` on March 23, 2026 at 11:00 produces `S-E-260323-1100`. The format is 16 characters, requires no coordination between developers, and is unique per developer at minute granularity. Same-minute collision is prevented by the active session check — you cannot start a new session while one is already active.
+
+### Developer Prefix Registry
+
+Each developer has a short prefix (typically their first initial) registered in `.raise/rai/prefixes.yaml`:
+
+```yaml
+E: {name: "Emilio Osorio", registered: "2026-03-22"}
+J: {name: "Juan Pérez", registered: "2026-03-25"}
+```
+
+Prefixes auto-register on first `rai session start`. If two developers share the same initial, collision detection suggests an extended prefix (e.g., `E` is taken by Emilio, so Elena gets `EG`). This file is committed to git so the whole team can see registered prefixes.
+
+### Per-Project Session Storage
+
+Session data is stored per-project in `.raise/rai/personal/` (gitignored):
+
+| Path | Purpose |
+|------|---------|
+| `.raise/rai/personal/active-session` | Current session pointer (JSON) |
+| `.raise/rai/personal/sessions/{prefix}/index.jsonl` | Session ledger per developer |
+| `.raise/rai/personal/sessions/{session-id}/` | Per-session working state |
+
+Only `.raise/rai/prefixes.yaml` is committed to git. All session data stays local by default. Teams can opt-in to sharing session indexes by modifying `.gitignore`.
+
+The active session pointer carries metadata (ID, name, start timestamp) from start to close, so the close command does not need to reconstruct state.
+
+:::caution[Breaking Change — Session Data Path]
+Session data storage moved from the global `~/.rai/developer.yaml` to per-project `.raise/rai/personal/`. There is no automatic migration.
+
+**Before (v2.2.x):** Session state stored globally in `~/.rai/developer.yaml`. Session IDs used `SES-NNN` format with a per-project counter.
+
+**After (v2.3.0):** Session state stored per-project in `.raise/rai/personal/`. Session IDs use `S-{prefix}-{YYMMDD}-{HHMM}` format.
+
+Old `SES-NNN` sessions remain readable, but new sessions use the new format exclusively. To preserve old session data, keep your existing `~/.rai/developer.yaml` — it is not modified or deleted.
+:::
+
+---
+
 **See also:** [`rai session start`](#rai-session-start), [`rai signal emit-session`](cli/signal.md)

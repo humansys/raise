@@ -18,8 +18,18 @@ Add a new pattern to memory.
 | `--context` | `-c` | Context keywords (comma-separated) |
 | `--type` | `-t` | Pattern type: `codebase`, `process`, `architecture`, `technical`. Default: `process` |
 | `--from` | `-f` | Story/session where learned |
-| `--scope` | `-s` | Memory scope: `global`, `project`, `personal`. Default: `personal` |
+| `--scope` | `-s` | Memory scope: `global`, `project`, `personal`. Default: `project` |
 | `--memory-dir` | `-m` | Memory directory path (overrides scope) |
+
+:::caution[Breaking Change — Default Scope (v2.3.0)]
+The default value of `--scope` changed from `personal` to `project`.
+
+**Before (v2.2.x):** `rai pattern add "..."` saved to personal patterns.
+
+**After (v2.3.0):** `rai pattern add "..."` saves to project patterns.
+
+To use the old behavior, pass the scope explicitly: `rai pattern add "..." --scope personal`.
+:::
 
 ```bash
 # Add a process pattern
