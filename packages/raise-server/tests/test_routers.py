@@ -14,10 +14,10 @@ from fastapi.testclient import TestClient
 from raise_server.api.v1.agent import router as agent_router
 from raise_server.api.v1.graph import router as graph_router
 from raise_server.api.v1.memory import router as memory_router
-from raise_server.auth import MemberContext, verify_member
+from raise_server.auth import MemberContext, Plan, verify_member
 
 
-def _make_ctx(*, plan: str = "team") -> MemberContext:
+def _make_ctx(*, plan: Plan = "team") -> MemberContext:
     return MemberContext(
         org_id=uuid.uuid4(),
         org_name="TestOrg",
@@ -29,7 +29,7 @@ def _make_ctx(*, plan: str = "team") -> MemberContext:
     )
 
 
-def _make_app(plan: str = "team") -> FastAPI:
+def _make_app(plan: Plan = "team") -> FastAPI:
     """Build app with all routers and overridden auth."""
     app = FastAPI()
     ctx = _make_ctx(plan=plan)

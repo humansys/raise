@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import uuid
+from typing import Literal, cast
 
 from fastapi import Depends, HTTPException, Request
 from pydantic import BaseModel
@@ -15,6 +16,9 @@ from sqlalchemy import func, select
 
 from raise_server.db.models import ApiKeyRow, LicenseRow, MemberRow, Organization
 from raise_server.deps import get_session_factory
+
+Role = Literal["admin", "member"]
+Plan = Literal["community", "pro", "team", "enterprise"]
 
 PLAN_RANK: dict[str, int] = {"community": 0, "pro": 1, "team": 2, "enterprise": 3}
 
@@ -26,8 +30,8 @@ class MemberContext(BaseModel):
     org_name: str
     member_id: uuid.UUID
     email: str
-    role: str
-    plan: str
+    role: Role
+    plan: Plan
     features: list[str]
 
 
@@ -83,17 +87,20 @@ async def verify_member(request: Request) -> MemberContext:
         plan = lic.plan if lic else "community"
         features: list[str] = lic.features if lic else []
 
-        # Update last_used_at inline (acceptable at <10 clients)
-        api_key.last_used_at = func.now()  # type: ignore[assignment]
-        await session.commit()
+        # Update last_used_at — telemetry, must not break auth on failure
+        try:
+            api_key.last_used_at = func.now()  # type: ignore[assignment]  # SQL expression, not datetime
+            await session.commit()
+        except Exception:  # noqa: BLE001
+            await session.rollback()
 
         return MemberContext(
             org_id=org.id,
             org_name=org.name,
             member_id=member.id,
             email=member.email,
-            role=member.role,
-            plan=plan,
+            role=cast("Role", member.role),
+            plan=cast("Plan", plan),
             features=features,
         )
 

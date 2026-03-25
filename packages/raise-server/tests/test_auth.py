@@ -16,6 +16,8 @@ from fastapi.testclient import TestClient
 from raise_server.auth import (
     PLAN_RANK,
     MemberContext,
+    Plan,
+    Role,
     requires_plan,
     requires_role,
     verify_member,
@@ -24,8 +26,8 @@ from raise_server.auth import (
 
 def _make_ctx(
     *,
-    plan: str = "team",
-    role: str = "member",
+    plan: Plan = "team",
+    role: Role = "member",
     features: list[str] | None = None,
 ) -> MemberContext:
     return MemberContext(
