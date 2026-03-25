@@ -138,16 +138,16 @@ PROJECT_DETECTED_SHU = """
      [dim]→ Loads your context, remembers patterns, proposes focused work[/dim]
 
   [bold]3. Explore the CLI[/bold] (in terminal):
-     [dim]raise --help[/dim]      — see all commands
-     [dim]raise context[/dim]     — query project context
-     [dim]raise memory[/dim]      — query Rai's memory
+     [dim]rai --help[/dim]      — see all commands
+     [dim]rai context[/dim]     — query project context
+     [dim]rai memory[/dim]      — query Rai's memory
 
 [dim]Don't have Claude Code? https://claude.ai/download[/dim]
 """
 
 PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
-[dim]Next:[/dim] {skill_recommendation}   [dim]Then:[/dim] /rai-session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
+[dim]Next:[/dim] {skill_recommendation}   [dim]Then:[/dim] /rai-session-start   [dim]CLI:[/dim] rai --help   [dim](claude.ai/download)[/dim]
 """
 
 

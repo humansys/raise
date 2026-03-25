@@ -257,7 +257,7 @@ def start(  # noqa: C901
             validation = validate_session_index(personal_dir)
             if not validation.is_valid:
                 typer.echo(f"Warning: {validation.summary()}")
-                typer.echo("Run `raise memory validate` to fix data quality issues.\n")
+                typer.echo("Run `rai memory validate` to fix data quality issues.\n")
 
     # Auto-sync skills if CLI was upgraded
     if project is not None:

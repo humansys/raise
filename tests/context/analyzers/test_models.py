@@ -20,7 +20,7 @@ class TestModuleInfo:
             imports=["config", "context"],
             exports=["append_pattern", "PatternInput"],
             component_count=12,
-            entry_points=["raise memory add"],
+            entry_points=["rai memory add"],
         )
         assert info.name == "memory"
         assert info.language == "python"
@@ -28,7 +28,7 @@ class TestModuleInfo:
         assert info.imports == ["config", "context"]
         assert info.exports == ["append_pattern", "PatternInput"]
         assert info.component_count == 12
-        assert info.entry_points == ["raise memory add"]
+        assert info.entry_points == ["rai memory add"]
 
     def test_defaults_for_optional_lists(self) -> None:
         """Should default to empty lists for imports, exports, entry_points."""

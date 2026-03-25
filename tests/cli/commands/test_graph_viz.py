@@ -1,4 +1,4 @@
-"""Tests for `raise memory viz` CLI command."""
+"""Tests for `rai memory viz` CLI command."""
 
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def graph_project(tmp_path: Path) -> Path:
 
 
 class TestGraphVizCommand:
-    """Tests for `raise memory viz` CLI command."""
+    """Tests for `rai memory viz` CLI command."""
 
     def test_viz_no_graph(self, tmp_path: Path) -> None:
         """Fails with exit code 4 when no index exists."""
