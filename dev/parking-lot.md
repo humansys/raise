@@ -12,9 +12,13 @@
 - [ ] **Per-member feature override** — granular entitlements per member. Promote for enterprise tier.
 - [ ] **SSO/SAML integration** — enterprise auth. Promote when first enterprise client requests.
 - [ ] **Roles beyond admin/member** — viewer, billing, etc. Promote when needed.
-- [ ] **Phone-home / usage telemetry** — track which features are used per member. Promote for billing.
-- [ ] **License revocation with grace period** — soft revoke with warning. Promote when >20 clients.
-- [ ] **Self-service member invitation** — email invite flow. Promote when admin console exists.
+- [ ] **API key rotation endpoint** — POST .../rotate with overlap window. Manual revoke+create works for <10 clients.
+- [ ] **Email invitation flow** — admin-managed onboarding fine early. Promote when console exists.
+- [ ] **Audit log API** — log internally from day 1, expose API later. Promote when compliance requires.
+- [ ] **Cursor pagination** — offset acceptable for <10 clients. Promote before 50+ clients.
+- [ ] **Bulk operations** — batch create/deactivate. Not needed at small scale.
+- [ ] **Undelete endpoints** — soft delete gives data, admin restores via DB. Promote when console exists.
+- [ ] **Self-service org creation** — admin-managed safer early. Promote for self-serve model.
 - [ ] **On-prem deployment guide** — enterprise self-hosted. Promote for first enterprise client.
 
 ---

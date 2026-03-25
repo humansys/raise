@@ -10,19 +10,15 @@ raise-server is a FastAPI application with:
 - **Deploy**: Docker multi-stage + docker-compose (postgres + server)
 - **Pattern**: thin routers → services → queries. Stateless services, session_factory injected.
 - **Config**: pydantic-settings, `RAI_*` env vars
-
-No license or member infrastructure exists. `api_keys` is a flat table with no
-user identity — just org-level auth tokens.
+- **Users**: Zero. PoC only. No data to migrate.
 
 ## Key Insight: Always-Connected Model
 
 raise-pro **requires** raise-server for its core features (cross-repo graphs,
-governance, shared memory). There is no disconnected scenario — if you can't
-reach the server, pro features don't work regardless of licensing.
+governance, shared memory). No disconnected scenario exists.
 
-This eliminates the need for offline JWT validation, embedded public keys,
-and client-side crypto. **The server validates the license on every request**
-as part of the auth flow.
+License validation happens server-side on every request as part of auth flow.
+No offline JWT, no embedded keys, no client-side crypto.
 
 Enterprise clients get an **on-prem** server, not a disconnected client.
 
@@ -33,7 +29,8 @@ Enterprise clients get an **on-prem** server, not a disconnected client.
 ```
 Organization
   ├── License (plan=pro, features=[...], seats=5, expires_at)
-  └── Members (email, role, api_key)
+  └── Members (email, name, role)
+       ├── API Keys (N per member, scopes, show-once)
        └── all inherit org plan features
 ```
 
@@ -45,7 +42,7 @@ Organization
   ├── Members
   │    ├── member_features (per-member override)
   │    └── roles (admin, developer, viewer, billing)
-  └── Admin Console (web UI for all of this)
+  └── Admin Console (web UI)
 ```
 
 ### Enterprise (future)
@@ -54,175 +51,236 @@ Organization
 Organization
   ├── SSO/SAML integration
   ├── Per-member feature granularity
-  ├── Audit log
+  ├── Audit log API
   └── On-prem server deployment
 ```
 
-## Target Components
+## Data Model
 
-### New: `raise_server.db.models.MemberRow`
-
-Replaces `api_keys` table. Each member = one human with their own API key.
+### `organizations` (exists, unchanged)
 
 ```
-members table:
+id          UUID PK
+name        String(255)
+slug        String(63) unique
+created_at  DateTime(tz)
+```
+
+### New: `members`
+
+```
+members:
   id          UUID PK
   org_id      FK → organizations
-  email       String(255)         -- unique per org
+  email       String(255)
   name        String(255)
-  role        String(20)          -- "admin", "member"
-  key_hash    String(128)         -- SHA-256 of API key (was in api_keys)
-  key_prefix  String(12)          -- first 12 chars for identification
-  is_active   Boolean
+  role        String(20)          -- "admin" | "member"
+  is_active   Boolean DEFAULT true
+  deleted_at  DateTime(tz) NULL   -- soft delete
   created_at  DateTime(tz)
   updated_at  DateTime(tz)
 
-  unique constraint: (org_id, email)
+  UNIQUE (org_id, email)
 ```
 
-### New: `raise_server.db.models.LicenseRow`
+### New: `api_keys`
+
+Separate from members. One member can have N keys (CLI, CI, etc.).
 
 ```
-licenses table:
+api_keys:
   id          UUID PK
-  org_id      FK → organizations  -- unique (one active license per org)
-  plan        String(20)          -- "pro", "team", "enterprise"
+  member_id   FK → members
+  org_id      FK → organizations  -- denormalized for fast auth lookup
+  key_hash    String(128)         -- SHA-256
+  key_prefix  String(12)          -- for identification in logs
+  scopes      JSONB DEFAULT '["full_access"]'
+  last_used_at DateTime(tz) NULL
+  is_active   Boolean DEFAULT true
+  created_at  DateTime(tz)
+
+  INDEX (key_hash)               -- primary lookup path
+```
+
+### New: `licenses`
+
+One active license per org (MVP constraint).
+
+```
+licenses:
+  id          UUID PK
+  org_id      FK → organizations
+  plan        String(20)          -- "pro" | "team" | "enterprise"
   features    JSONB               -- ["jira", "confluence", "odoo", "gitlab"]
   seats       Integer             -- max active members
-  status      String(20)          -- "active", "expired", "revoked"
+  status      String(20)          -- "active" | "expired" | "revoked"
   expires_at  DateTime(tz)
   created_at  DateTime(tz)
   updated_at  DateTime(tz)
 ```
 
-### Modified: `raise_server.auth`
+### Dropped: old `api_keys`
 
-Current `verify_api_key` returns `OrgContext(org_id, org_name)`.
-New `verify_member` returns `MemberContext(org_id, org_name, member_id, email, role, plan, features)`.
+Zero users — drop and recreate clean. No migration needed.
 
-The auth flow becomes:
+## Auth Flow
+
 ```
 Bearer rsk_xxx
-  → hash key → lookup in members (not api_keys)
+  → SHA-256(rsk_xxx)
+  → lookup api_keys WHERE key_hash = ? AND is_active = true
+  → load member (WHERE is_active AND deleted_at IS NULL)
   → load org
-  → load active license for org
-  → return MemberContext with plan + features
+  → load license (WHERE org_id = ? AND status = 'active')
+  → return MemberContext(org_id, org_name, member_id, email, role, plan, features)
+  → update api_keys.last_used_at
 ```
 
-### New: `raise_server.middleware.license`
+## API Surface (V1)
 
-Plan-check middleware or dependency:
-```python
-def requires_plan(minimum: str) -> Depends:
-    """FastAPI dependency that checks member's org has sufficient plan."""
-    ...
-```
+### URL Design
 
-Endpoints annotate their required plan:
-```python
-@router.post("/sync")
-async def graph_sync(ctx: Annotated[MemberContext, Depends(requires_plan("team"))]):
-    ...
-```
+Resource-nested under organization. No `/admin/` prefix — authorization
+lives in middleware via role checks, not URL structure.
 
-### New: `raise_server.services.license`
+### Organizations (5 endpoints)
 
-Service layer:
-- `generate_license(session_factory, org_id, plan, features, seats, expires_at) → LicenseInfo`
-- `check_license(session_factory, org_id) → LicenseStatus`
-- `create_member(session_factory, org_id, email, name, role) → MemberInfo` (returns raw API key once)
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| POST | `/api/v1/organizations` | superadmin | Create org |
+| GET | `/api/v1/organizations` | superadmin | List all orgs |
+| GET | `/api/v1/organizations/{id}` | member (own org) | Org details |
+| PATCH | `/api/v1/organizations/{id}` | admin | Update name/settings |
+| DELETE | `/api/v1/organizations/{id}` | superadmin | Soft delete |
 
-### New: `raise_server.api.v1.admin`
+### Members (4 endpoints)
 
-Router `/api/v1/admin` (requires admin role):
-- `POST /license/generate` — create/update license for an org
-- `POST /members` — create member, returns API key
-- `GET /members` — list org members
-- `DELETE /members/{id}` — deactivate member
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| POST | `/api/v1/organizations/{id}/members` | admin | Create member |
+| GET | `/api/v1/organizations/{id}/members` | admin | List members |
+| PATCH | `/api/v1/organizations/{id}/members/{mid}` | admin | Update role |
+| DELETE | `/api/v1/organizations/{id}/members/{mid}` | admin | Soft delete |
 
-### Modified: `raise_server.app.create_app`
+### API Keys (3 endpoints)
 
-Register new router: `admin_router`. Swap `verify_api_key` dependency for
-`verify_member` across all existing routers.
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| POST | `/api/v1/organizations/{id}/api-keys` | admin or self | Create, raw key shown ONCE |
+| GET | `/api/v1/organizations/{id}/api-keys` | admin | List metadata (never raw key) |
+| DELETE | `/api/v1/organizations/{id}/api-keys/{kid}` | admin or owner | Hard delete (revoke) |
+
+### License (2 endpoints)
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| POST | `/api/v1/organizations/{id}/license` | superadmin | Create/replace license |
+| GET | `/api/v1/organizations/{id}/license` | member (own org) | Current license info |
+
+### Existing (unchanged paths, new auth)
+
+| Method | Path | Plan Required |
+|--------|------|---------------|
+| GET | `/health` | none (public) |
+| POST | `/api/v1/graph/sync` | team |
+| GET | `/api/v1/graph/query` | team |
+| POST | `/api/v1/memory/patterns` | team |
+| GET | `/api/v1/memory/patterns` | team |
+| POST | `/api/v1/agent/events` | team |
+| GET | `/api/v1/agent/events` | team |
+
+**Total: 15 new + 7 updated = 22 endpoints**
 
 ## Key Contracts
 
-### Auth Flow (all endpoints)
+### Auth: MemberContext
 
-```
-Request: Authorization: Bearer rsk_abc123...
-
-→ Server resolves:
-  member = lookup(hash(rsk_abc123))
-  org = member.org
-  license = org.active_license
-
-→ Returns MemberContext:
-  {
-    "org_id": "uuid",
-    "org_name": "humansys",
-    "member_id": "uuid",
-    "email": "emilio@humansys.ai",
-    "role": "admin",
-    "plan": "pro",
-    "features": ["jira", "confluence", "odoo", "gitlab"]
-  }
-
-→ Plan check:
-  endpoint requires "pro" → member.plan == "pro" → ✓ 200
-  endpoint requires "team" → member.plan == "pro" → ✗ 403
+```python
+class MemberContext(BaseModel):
+    org_id: uuid.UUID
+    org_name: str
+    member_id: uuid.UUID
+    email: str
+    role: str           # "admin" | "member"
+    plan: str           # "pro" | "team" | "enterprise" | "community"
+    features: list[str] # ["jira", "confluence", ...]
 ```
 
-### POST /api/v1/admin/license/generate (admin only)
+### Plan Check Dependency
 
-```
-Request:
-  {
-    "org_id": "uuid",     -- optional, defaults to caller's org
-    "plan": "pro",
-    "features": ["jira", "confluence", "odoo", "gitlab"],
-    "seats": 5,
-    "expires_at": "2027-03-25T00:00:00Z"
-  }
+```python
+PLAN_RANK = {"community": 0, "pro": 1, "team": 2, "enterprise": 3}
 
-Response 201:
-  {
-    "id": "uuid",
-    "plan": "pro",
-    "features": ["jira", "confluence", "odoo", "gitlab"],
-    "seats": 5,
-    "status": "active",
-    "expires_at": "2027-03-25T00:00:00Z"
-  }
+def requires_plan(minimum: str):
+    """FastAPI dependency — returns 403 if plan insufficient."""
+    async def check(ctx: MemberContext = Depends(verify_member)):
+        if PLAN_RANK.get(ctx.plan, 0) < PLAN_RANK.get(minimum, 0):
+            raise HTTPException(403, detail={
+                "message": f"Requires '{minimum}' plan. Current: '{ctx.plan}'.",
+                "required_plan": minimum,
+                "current_plan": ctx.plan,
+            })
+        return ctx
+    return Depends(check)
 ```
 
-### POST /api/v1/admin/members (admin only)
+### Role Check Dependency
 
-```
-Request:
-  {
-    "email": "fernando@humansys.ai",
-    "name": "Fernando",
-    "role": "member"
-  }
-
-Response 201:
-  {
-    "id": "uuid",
-    "email": "fernando@humansys.ai",
-    "role": "member",
-    "api_key": "rsk_xxxxxxxx..."   ← shown ONCE, never again
-  }
+```python
+def requires_role(role: str):
+    """FastAPI dependency — returns 403 if role insufficient."""
+    ...
 ```
 
-### 403 Response (insufficient plan)
+### POST /organizations/{id}/members → 201
 
-```
+```json
 {
-  "detail": "This feature requires the 'team' plan. Current plan: 'pro'. Contact your admin.",
+  "id": "uuid",
+  "email": "fernando@humansys.ai",
+  "name": "Fernando",
+  "role": "member",
+  "api_key": "rsk_xxxxxxxx..."   // shown ONCE
+}
+```
+
+### POST /organizations/{id}/api-keys → 201
+
+```json
+{
+  "id": "uuid",
+  "key": "rsk_xxxxxxxx...",      // shown ONCE
+  "prefix": "rsk_xxxxxxxx",
+  "scopes": ["full_access"],
+  "created_at": "2026-03-25T..."
+}
+```
+
+### GET /organizations/{id}/api-keys → 200
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "prefix": "rsk_xxxxxxxx",
+      "scopes": ["full_access"],
+      "last_used_at": "2026-03-25T...",
+      "created_at": "2026-03-25T..."
+    }
+  ]
+}
+```
+
+Note: raw key NEVER in GET responses.
+
+### 403 (insufficient plan)
+
+```json
+{
+  "message": "Requires 'team' plan. Current: 'pro'.",
   "required_plan": "team",
-  "current_plan": "pro",
-  "upgrade_url": "https://raise.dev/pricing"
+  "current_plan": "pro"
 }
 ```
 
@@ -230,102 +288,59 @@ Response 201:
 
 ### D1: Always-connected — no offline JWT
 
-raise-pro requires server connectivity for its features (graphs, governance).
-License validation happens server-side on every request. No client-side crypto,
-no embedded keys, no JWT files. Simplifies both server and client.
+raise-pro requires server for features. License validated server-side
+on every request. No client-side crypto.
 
-**Trade-off:** No offline grace period. If server is down, pro features are down.
-Acceptable because those features need the server anyway.
+### D2: API keys separate from members
 
-### D2: Members replace api_keys
+A member can have multiple keys (CLI, CI, different scopes).
+Universal pattern across GitLab, Keygen, Temporal, PostHog.
+Keys have their own lifecycle (create show-once → list metadata → revoke).
 
-Instead of adding a separate identity layer, `members` absorbs `api_keys` with
-added fields (email, name, role). Migration renames and adds columns.
-One API key per member. Admin creates members, gets raw key once.
+### D3: Resource-nested URLs, no /admin/ prefix
 
-**Trade-off:** Breaking change for existing API keys. Mitigated by migration
-that preserves existing keys as "admin" members with placeholder emails.
+`/organizations/{id}/members`, not `/admin/members`.
+Authorization via role in middleware, not URL structure.
+Matches GitLab, Clerk, WorkOS, PostHog patterns.
 
-### D3: Plan hierarchy is linear
+### D4: Plan hierarchy is linear
 
-`community < pro < team < enterprise`. A `team` plan includes all `pro` features.
-No need for set intersection — simple ordinal comparison.
+`community < pro < team < enterprise`. Simple ordinal comparison.
+No set intersection needed.
 
-```python
-PLAN_RANK = {"community": 0, "pro": 1, "team": 2, "enterprise": 3}
+### D5: Soft delete for members/orgs, hard delete for API keys
 
-def has_plan(current: str, required: str) -> bool:
-    return PLAN_RANK.get(current, 0) >= PLAN_RANK.get(required, 0)
-```
+Members and orgs use `deleted_at` timestamp (recoverable, audit trail).
+API keys use hard delete (security — no resurrection of revoked keys).
 
-### D4: One active license per org
+### D6: Scopes on API keys from day 1
 
-MVP constraint. No license stacking, no multiple concurrent plans.
-Simplifies queries: `WHERE org_id = ? AND status = 'active' LIMIT 1`.
+V1 only has `full_access` scope, but the `scopes` JSONB field exists
+from the start. Retrofitting scopes onto existing keys is painful.
 
-### D5: Seat enforcement is member count
+### D7: One active license per org
 
-`seats` = max active members in the org. Checked at member creation time,
-not at request time. If seat limit is 5 and there are 5 active members,
-`POST /admin/members` returns 409 until a member is deactivated.
+MVP constraint. No stacking. Simplifies to:
+`WHERE org_id = ? AND status = 'active' LIMIT 1`.
 
-## Story Breakdown (Revised)
+### D8: Seat enforcement at member creation
 
-### S616.1: Migration + models (members, licenses) (S)
+`seats` = max active members. Checked when creating member (409 on limit).
+Not at request time — simpler, fewer queries per request.
 
-Migration 003: `members` table (absorbing `api_keys`), `licenses` table.
-SQLAlchemy models. Pydantic schemas. Data migration for existing api_keys → members.
+## Deferred (V2+)
 
-**Size:** S
-**Dependencies:** None
-
-### S616.2: Auth refactor + license middleware (M)
-
-Replace `verify_api_key` with `verify_member`. New `MemberContext` with plan/features.
-`requires_plan()` dependency for endpoint-level plan checks. Update all existing
-routers to use new auth. License service: check_license, generate_license.
-
-**Size:** M (touches all routers, but changes are mechanical)
-**Dependencies:** S616.1
-
-### S616.3: Admin API + seed (S)
-
-`/api/v1/admin` router: generate license, CRUD members. Seed script for first
-client org + license + admin member. Deployment docs update.
-
-**Size:** S
-**Dependencies:** S616.2
-
-## Dependency Graph
-
-```
-S616.1 (migration/models)
-    ↓
-S616.2 (auth refactor + license check)
-    ↓
-S616.3 (admin API + seed)
-```
-
-3 stories, linear chain. Each independently testable.
-
-## Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| api_keys → members migration breaks existing clients | Medium | High | Migration preserves key hashes. Existing keys become admin members with placeholder email. Test with current seed data. |
-| Auth refactor touches all endpoints | Low | Medium | Mechanical change: swap dependency type. All endpoints already use `Annotated[OrgContext, Depends(...)]` — change to `MemberContext`. Run full test suite after. |
-| Seat counting at creation vs request time | Low | Low | MVP simplification. If admin deactivates member but they still have cached key, key lookup returns `is_active=False` → 401. |
-
-## Deferred (Parking Lot → V2+)
-
-- **Admin web console** — CRUD members, manage licenses, view usage (promote when >5 clients)
-- **Per-member feature override** — granular entitlements per member (promote for enterprise)
-- **SSO/SAML integration** — enterprise auth (promote when enterprise client requests)
-- **Roles beyond admin/member** — viewer, billing, etc. (promote when needed)
-- **Phone-home / usage telemetry** — track which features are used (promote for billing)
-- **License revocation with grace period** — soft revoke with warning (promote when >20 clients)
-- **Self-service member invitation** — email invite flow (promote when admin console exists)
-- **On-prem deployment guide** — enterprise self-hosted (promote for first enterprise client)
+- Admin web console (promote when >5 clients)
+- Per-member feature override (promote for enterprise)
+- SSO/SAML (promote when enterprise client requests)
+- Roles beyond admin/member (promote when needed)
+- API key rotation endpoint (manual revoke+create works for <10 clients)
+- Email invitation flow (admin-managed onboarding is fine early)
+- Audit log API (log internally from day 1, expose API later)
+- Bulk operations (not needed at small scale)
+- Undelete endpoints (admin can restore via DB)
+- Self-service org creation (admin-managed is safer early)
+- Cursor pagination (offset acceptable for <10 clients, cursor for V2)
 
 ## Plan Hierarchy Reference
 
