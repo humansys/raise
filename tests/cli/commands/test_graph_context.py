@@ -1,4 +1,4 @@
-"""Tests for `raise memory context` CLI command."""
+"""Tests for `rai memory context` CLI command."""
 
 from __future__ import annotations
 
@@ -96,7 +96,7 @@ def _create_arch_graph(tmp_path: Path) -> Path:
 
 
 class TestGraphContextCommand:
-    """Tests for `raise memory context` command."""
+    """Tests for `rai memory context` command."""
 
     def test_context_human_output(self, tmp_path: Path) -> None:
         """Human output shows module, domain, layer, constraints."""

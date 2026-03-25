@@ -273,10 +273,10 @@ CLI toolset providing deterministic operations for skills to call. Replaces Kata
 
 **Commands:**
 ```bash
-raise graph build                    # Build concept graph
-raise context query --task <task>   # Get MVC for task
-raise validate structure <file>     # Check structure
-raise parse <file> --type <type>    # Extract concepts
+rai graph build                    # Build concept graph
+rai context query --task <task>   # Get MVC for task
+rai validate structure <file>     # Check structure
+rai parse <file> --type <type>    # Extract concepts
 ```
 
 **Architecture:** Skills + Toolkit
@@ -508,7 +508,7 @@ total_tokens: 132
 - v2.2: Rule-based (files)
 - v2.6: Concept-based (sections) - 97% token reduction
 
-> **Comando asociado:** `raise context query --task <task>` returns MVC via concept graph (ADR-011)
+> **Comando asociado:** `rai context query --task <task>` returns MVC via concept graph (ADR-011)
 
 ### Observable Workflow
 **[NUEVO v2.0]** Flujo de trabajo donde cada decisión del agente es trazable y auditable. Alineado con el framework MELT (Metrics, Events, Logs, Traces) de observabilidad.
@@ -695,10 +695,10 @@ CLI toolset providing deterministic operations for skills. Component of Governan
 
 **Common commands:**
 ```bash
-raise parse <file> --type <type>     # Extract concepts
-raise validate structure <file>      # Check structure
-raise context query --task <task>    # Get MVC
-raise graph build                    # Build concept graph
+rai parse <file> --type <type>     # Extract concepts
+rai validate structure <file>      # Check structure
+rai context query --task <task>    # Get MVC
+rai graph build                    # Build concept graph
 ```
 
 **Design principle:** Return structured JSON for Claude to interpret, not human-readable text.
