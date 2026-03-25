@@ -8,11 +8,14 @@
 
 ## E616 Deferred Items — 2026-03-25
 
-- [ ] **Phone-home renewal with JWT refresh** — promote when clients report expiry friction
-- [ ] **License revocation list / CRL** — promote when client count > 20
-- [ ] **Usage telemetry per license** — promote when billing needs usage data
-- [ ] **Admin web console for license management** — promote when manual SQL/API becomes burden
-- [ ] **Machine fingerprinting for seat binding** — promote if key sharing becomes a problem
+- [ ] **Admin web console** — CRUD members, manage licenses, view usage. Promote when >5 clients.
+- [ ] **Per-member feature override** — granular entitlements per member. Promote for enterprise tier.
+- [ ] **SSO/SAML integration** — enterprise auth. Promote when first enterprise client requests.
+- [ ] **Roles beyond admin/member** — viewer, billing, etc. Promote when needed.
+- [ ] **Phone-home / usage telemetry** — track which features are used per member. Promote for billing.
+- [ ] **License revocation with grace period** — soft revoke with warning. Promote when >20 clients.
+- [ ] **Self-service member invitation** — email invite flow. Promote when admin console exists.
+- [ ] **On-prem deployment guide** — enterprise self-hosted. Promote for first enterprise client.
 
 ---
 
