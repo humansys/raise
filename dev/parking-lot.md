@@ -6,6 +6,16 @@
 
 ---
 
+## E616 Deferred Items — 2026-03-25
+
+- [ ] **Phone-home renewal with JWT refresh** — promote when clients report expiry friction
+- [ ] **License revocation list / CRL** — promote when client count > 20
+- [ ] **Usage telemetry per license** — promote when billing needs usage data
+- [ ] **Admin web console for license management** — promote when manual SQL/API becomes burden
+- [ ] **Machine fingerprinting for seat binding** — promote if key sharing becomes a problem
+
+---
+
 ## rai-agent Product Vision: Self-Hosted Agent with Guided Onboarding — 2026-03-24
 
 Target: Google Workspace users + Atlassian users. Dream: one-click deploy → guided setup → productive agent.
