@@ -2344,44 +2344,40 @@ name = "rai-agent"
 version = "0.1.0"
 source = { editable = "packages/rai-agent" }
 dependencies = [
+    { name = "aiosqlite" },
     { name = "anthropic" },
+    { name = "apscheduler" },
     { name = "claude-agent-sdk" },
     { name = "cryptography" },
     { name = "fastapi", extra = ["standard"] },
     { name = "instructor" },
     { name = "pydantic" },
-    { name = "raise-core" },
-    { name = "structlog" },
-]
-
-[package.optional-dependencies]
-scheduling = [
-    { name = "aiosqlite" },
-    { name = "apscheduler" },
-    { name = "sqlalchemy" },
-]
-telegram = [
     { name = "python-telegram-bot" },
+    { name = "raise-cli" },
+    { name = "raise-core" },
+    { name = "sqlalchemy" },
+    { name = "structlog" },
     { name = "telegramify-markdown" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "aiosqlite", marker = "extra == 'scheduling'", specifier = ">=0.20" },
+    { name = "aiosqlite", specifier = ">=0.20" },
     { name = "anthropic", specifier = ">=0.40" },
-    { name = "apscheduler", marker = "extra == 'scheduling'", specifier = ">=4.0.0a5" },
+    { name = "apscheduler", specifier = ">=4.0.0a5" },
     { name = "claude-agent-sdk", specifier = "==0.1.48" },
     { name = "cryptography", specifier = ">=43.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115" },
     { name = "instructor", specifier = ">=1.7" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "python-telegram-bot", marker = "extra == 'telegram'", specifier = ">=20.0" },
+    { name = "python-telegram-bot", specifier = ">=20.0" },
+    { name = "raise-cli", editable = "packages/raise-cli" },
     { name = "raise-core", editable = "packages/raise-core" },
-    { name = "sqlalchemy", marker = "extra == 'scheduling'", specifier = ">=2.0" },
+    { name = "sqlalchemy", specifier = ">=2.0" },
     { name = "structlog", specifier = ">=24.0" },
-    { name = "telegramify-markdown", marker = "extra == 'telegram'", specifier = "~=1.1" },
+    { name = "telegramify-markdown", specifier = "~=1.1" },
 ]
-provides-extras = ["telegram", "scheduling", "gchat"]
+provides-extras = ["gchat"]
 
 [[package]]
 name = "raise-cli"
@@ -2492,15 +2488,26 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"] },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.14.0" },
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "fastapi", specifier = ">=0.115.0" },
+    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27" },
     { name = "pydantic-settings", specifier = ">=2.7.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.24" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.34.0" },
 ]
+provides-extras = ["dev"]
 
 [[package]]
 name = "readme-renderer"
