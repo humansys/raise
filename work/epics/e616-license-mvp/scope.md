@@ -82,10 +82,68 @@ S616.2 (auth refactor + license check)
 S616.3 (admin API + seed)
 ```
 
+## Implementation Plan
+
+### Sequencing Strategy: Walking Skeleton
+
+Linear chain — each story builds on the previous. The risk is in S616.2
+(auth refactor touches all existing endpoints), so we build the foundation
+(S616.1) first and validate the migration, then tackle the riskiest story
+(S616.2) while we have maximum time to course-correct.
+
+### Story Sequence
+
+| # | Story | Size | Rationale | Enables |
+|---|-------|------|-----------|---------|
+| 1 | S616.1: Migration + models | S | Foundation — tables and models must exist first | S616.2, S616.3 |
+| 2 | S616.2: Auth refactor + license middleware | M | Riskiest — touches all routers, breaking change to auth flow | S616.3, E621 |
+| 3 | S616.3: Admin API + seed | S | Capstone — admin endpoints + first client seed, validates E2E | Epic close |
+
+**No parallel opportunities** — strict linear dependency chain. Each story
+reads from the previous story's output (models → auth → API).
+
+### Milestones
+
+#### M1: Schema Ready (after S616.1)
+
+- [ ] Migration 003 runs cleanly on existing DB
+- [ ] Existing api_keys data migrated to members (zero data loss)
+- [ ] `MemberRow` and `LicenseRow` models pass unit tests
+- [ ] Pydantic schemas cover all API contracts
+- **Demo:** `alembic upgrade head` on dev DB, query members table
+
+#### M2: Auth Live (after S616.2) — E2E Integration Checkpoint
+
+- [ ] All existing endpoints use `MemberContext` (not `OrgContext`)
+- [ ] `requires_plan()` returns 403 with clear message for insufficient plan
+- [ ] Existing graph/memory/agent endpoints still work with migrated keys
+- [ ] No regression in existing functionality
+- **Demo:** `curl` existing endpoints with migrated API key → 200.
+  `curl` with plan-gated endpoint on community plan → 403.
+- **E2E:** docker compose up, run migrations, seed data, hit all endpoints
+
+#### M3: Epic Complete (after S616.3)
+
+- [ ] Admin can generate license via `POST /admin/license/generate`
+- [ ] Admin can create member via `POST /admin/members` (gets raw key)
+- [ ] Seat limit enforced at member creation (409 on limit)
+- [ ] First client org + license + admin seeded
+- [ ] All done criteria met
+- **Demo:** Full onboarding flow: create org → generate license → create
+  member → member hits graph endpoint → 200 with pro plan
+
+### Sequencing Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| api_keys → members migration breaks existing dev/CI setups | High | Write reversible migration. Test on copy of prod-like data first. Keep api_keys as view or alias during transition. |
+| Auth refactor (S616.2) introduces regressions in graph/memory/agent | Medium | Run full existing test suite after each router change. Mechanical replacement: `OrgContext` → `MemberContext` is additive (MemberContext is superset). |
+| Seed script assumptions don't match real client data | Low | Seed is a starting point. Admin API (S616.3) allows manual adjustments. |
+
 ## Progress Tracking
 
-| Story | Status | Notes |
-| ----- | ------ | ----- |
-| S616.1 Migration + models | pending | |
-| S616.2 Auth + license middleware | pending | |
-| S616.3 Admin API + seed | pending | |
+| Story | Status | Est | Actual | Notes |
+| ----- | ------ | --- | ------ | ----- |
+| S616.1 Migration + models | pending | S | | |
+| S616.2 Auth + license middleware | pending | M | | |
+| S616.3 Admin API + seed | pending | S | | |
