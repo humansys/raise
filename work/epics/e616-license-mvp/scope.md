@@ -70,4 +70,4 @@ S616.1 (models + auth + plan check) → S616.2 (13 endpoints + seed) → S616.3 
 | ----- | ------ | --- | ------ | ----- |
 | S616.1 Models + auth | **done** | M | M (90min) | 33 tests, 1.33x velocity. M1 reached. |
 | S616.2 Endpoints + seed | **done** | M | M (90min) | 68 tests, 14 E2E scenarios, 13 endpoints. M2 reached. |
-| S616.3 E2E integration tests | pending | S | | |
+| S616.3 E2E integration tests | **done** | S | S (45min) | 22 E2E tests, NullPool fix. M3 reached. |
