@@ -12,6 +12,7 @@ from raise_server.api.v1.agent import router as agent_router
 from raise_server.api.v1.graph import router as graph_router
 from raise_server.api.v1.health import router as health_router
 from raise_server.api.v1.memory import router as memory_router
+from raise_server.api.v1.members import router as member_router
 from raise_server.api.v1.organizations import router as org_router
 from raise_server.config import ServerConfig
 from raise_server.db.session import create_engine, create_session_factory
@@ -47,4 +48,5 @@ def create_app(config: ServerConfig | None = None) -> FastAPI:
     app.include_router(agent_router)
     app.include_router(memory_router)
     app.include_router(org_router)
+    app.include_router(member_router)
     return app
