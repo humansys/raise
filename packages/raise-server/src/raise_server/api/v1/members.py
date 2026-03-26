@@ -6,15 +6,13 @@ POST auto-creates first API key per AR-Q2 (value stream).
 
 from __future__ import annotations
 
-import hashlib
-import secrets
 import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Request, Response
 from sqlalchemy import func, select
 
-from raise_server.auth import MemberContext, requires_org_role
+from raise_server.auth import MemberContext, generate_api_key, requires_org_role
 from raise_server.db.models import ApiKeyRow, LicenseRow, MemberRow
 from raise_server.deps import get_session_factory
 from raise_server.schemas.admin import (
@@ -90,9 +88,7 @@ async def create_member(
         await session.flush()
 
         # Auto-create first API key (AR-Q2)
-        raw_key = "rsk_" + secrets.token_hex(32)
-        key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
-        key_prefix = raw_key[:12]
+        raw_key, key_hash, key_prefix = generate_api_key()
         api_key = ApiKeyRow(
             member_id=member.id,
             org_id=org_id,

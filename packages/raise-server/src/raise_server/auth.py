@@ -7,6 +7,7 @@ Auth chain: Bearer rsk_... → SHA-256 → api_keys JOIN members JOIN organizati
 from __future__ import annotations
 
 import hashlib
+import secrets
 import uuid
 from typing import Literal, cast
 
@@ -33,6 +34,20 @@ class MemberContext(BaseModel):
     role: Role
     plan: Plan
     features: list[str]
+
+
+def generate_api_key() -> tuple[str, str, str]:
+    """Generate a new API key. Returns (raw_key, key_hash, key_prefix).
+
+    Security-critical — single source of truth for key generation (AR-R1).
+    raw_key: rsk_ + 64 hex chars (shown once, never stored).
+    key_hash: SHA-256 of raw_key (stored in DB).
+    key_prefix: first 12 chars of raw_key (for identification in logs/UI).
+    """
+    raw_key = "rsk_" + secrets.token_hex(32)
+    key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
+    key_prefix = raw_key[:12]
+    return raw_key, key_hash, key_prefix
 
 
 async def verify_member(request: Request) -> MemberContext:
