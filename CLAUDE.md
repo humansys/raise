@@ -54,10 +54,12 @@ SESSION: /rai-session-start → [work] → /rai-session-close
 - Pydantic Models — Use Pydantic for all data structures (Validation at boundaries, serialization free)
 - Simple First — Simple heuristics over complex solutions (Complexity must earn its place)
 
-## Branch Model
-main (stable) → dev (development) → story/s{N}.{M}/{name}
-Stories branch from and merge to dev
-dev merges to main at release
+## Branch Model (ADR-033)
+main (stable, tags) ← release/{version} ← story/s{N}.{M}/{name}
+Active release branches: release/2.3.x (hotfixes), release/2.4.0 (features), release/3.0.0 (v3.0, when created)
+Stories branch from and merge to their release branch
+Each release branch merges to main at release time, then is deleted
+Hotfixes: cherry-pick from release/2.3.x to other release branches
 Epics are logical containers (directory + tracker), not branches
 
 ## CLI Quick Reference
