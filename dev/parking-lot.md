@@ -6,6 +6,15 @@
 
 ---
 
+## Session/Worktree Integration — 2026-03-25
+
+- [ ] **Session-start worktree awareness** — `/rai-session-start` detects work in progress on dev and asks "¿necesitas aislamiento? (worktree)" as a prompt, not a default. Integration, not coupling.
+- [ ] **Session-close worktree check** — `/rai-session-close` detects active worktree and reminds to merge/cleanup before closing. A check, not a forced action.
+- [ ] **asyncpg pool + last_used_at** — `verify_member` commit for `last_used_at` leaves pool connections dirty. Investigate `pool_reset_on_return="rollback"` or move update to background task. E2E uses NullPool as workaround.
+- [ ] **Extract `_mock_session_factory` to conftest.py** — repeated in 4 test files. Shared fixture before next raise-server story.
+
+---
+
 ## E616 Deferred Items — 2026-03-25
 
 - [ ] **Admin web console** — CRUD members, manage licenses, view usage. Promote when >5 clients.
