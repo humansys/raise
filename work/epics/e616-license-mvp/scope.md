@@ -61,4 +61,4 @@ S616.1 (models + auth + plan check) → S616.2 (15 endpoints + seed)
 | Story | Status | Est | Actual | Notes |
 | ----- | ------ | --- | ------ | ----- |
 | S616.1 Models + auth | **done** | M | M (90min) | 33 tests, 1.33x velocity. M1 reached. |
-| S616.2 Endpoints + seed | pending | M | | |
+| S616.2 Endpoints + seed | **done** | M | M (90min) | 68 tests, 14 E2E scenarios, 13 endpoints. M2 reached. |
