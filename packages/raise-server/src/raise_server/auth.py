@@ -139,3 +139,37 @@ def requires_role(role: str) -> Depends:  # type: ignore[type-arg]
         return ctx
 
     return Depends(check)
+
+
+def requires_org_role(role: str | None = None) -> Depends:  # type: ignore[type-arg]
+    """FastAPI dependency factory — verify org access from path + optional role check.
+
+    Combines org-scoping (ctx.org_id == path org_id) with role gating in a single
+    dependency. Impossible to bypass (Jidoka). See AR-Q1.
+
+    Usage:
+        OrgMember = Annotated[MemberContext, requires_org_role()]
+        OrgAdmin = Annotated[MemberContext, requires_org_role("admin")]
+    """
+
+    async def check(
+        org_id: uuid.UUID,
+        ctx: MemberContext = Depends(verify_member),  # noqa: B008
+    ) -> MemberContext:
+        if ctx.org_id != org_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied to this organization",
+            )
+        if role and ctx.role != role:
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "message": f"Requires '{role}' role. Current: '{ctx.role}'.",
+                    "required_role": role,
+                    "current_role": ctx.role,
+                },
+            )
+        return ctx
+
+    return Depends(check)
