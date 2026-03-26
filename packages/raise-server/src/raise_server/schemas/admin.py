@@ -98,11 +98,11 @@ class ApiKeyCreatedResponse(BaseModel):
 class ApiKeyResponse(BaseModel):
     """GET /api-keys response — no raw key, ever."""
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "populate_by_name": True}
 
     id: uuid.UUID
     member_id: uuid.UUID
-    prefix: str
+    prefix: str = Field(validation_alias="key_prefix")
     scopes: list[str]
     last_used_at: datetime | None
     is_active: bool
