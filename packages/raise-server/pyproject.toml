@@ -33,3 +33,7 @@ packages = ["src/raise_server"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "module"
+markers = [
+    "e2e: End-to-end tests requiring real PostgreSQL (deselect with '-m not e2e')",
+]

@@ -7,6 +7,7 @@ Auth chain: Bearer rsk_... → SHA-256 → api_keys JOIN members JOIN organizati
 from __future__ import annotations
 
 import hashlib
+import secrets
 import uuid
 from typing import Literal, cast
 
@@ -33,6 +34,20 @@ class MemberContext(BaseModel):
     role: Role
     plan: Plan
     features: list[str]
+
+
+def generate_api_key() -> tuple[str, str, str]:
+    """Generate a new API key. Returns (raw_key, key_hash, key_prefix).
+
+    Security-critical — single source of truth for key generation (AR-R1).
+    raw_key: rsk_ + 64 hex chars (shown once, never stored).
+    key_hash: SHA-256 of raw_key (stored in DB).
+    key_prefix: first 12 chars of raw_key (for identification in logs/UI).
+    """
+    raw_key = "rsk_" + secrets.token_hex(32)
+    key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
+    key_prefix = raw_key[:12]
+    return raw_key, key_hash, key_prefix
 
 
 async def verify_member(request: Request) -> MemberContext:
@@ -128,6 +143,40 @@ def requires_role(role: str) -> Depends:  # type: ignore[type-arg]
 
     async def check(ctx: MemberContext = Depends(verify_member)) -> MemberContext:  # noqa: B008
         if ctx.role != role:
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "message": f"Requires '{role}' role. Current: '{ctx.role}'.",
+                    "required_role": role,
+                    "current_role": ctx.role,
+                },
+            )
+        return ctx
+
+    return Depends(check)
+
+
+def requires_org_role(role: str | None = None) -> Depends:  # type: ignore[type-arg]
+    """FastAPI dependency factory — verify org access from path + optional role check.
+
+    Combines org-scoping (ctx.org_id == path org_id) with role gating in a single
+    dependency. Impossible to bypass (Jidoka). See AR-Q1.
+
+    Usage:
+        OrgMember = Annotated[MemberContext, requires_org_role()]
+        OrgAdmin = Annotated[MemberContext, requires_org_role("admin")]
+    """
+
+    async def check(
+        org_id: uuid.UUID,
+        ctx: MemberContext = Depends(verify_member),  # noqa: B008
+    ) -> MemberContext:
+        if ctx.org_id != org_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied to this organization",
+            )
+        if role and ctx.role != role:
             raise HTTPException(
                 status_code=403,
                 detail={

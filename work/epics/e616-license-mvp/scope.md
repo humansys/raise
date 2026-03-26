@@ -34,6 +34,13 @@ Seed script for first client. Deployment docs.
 
 **Dependencies:** S616.1
 
+### S616.3: E2E integration tests (S)
+
+Repeatable pytest E2E suite against real PG. Validates full cross-story flow:
+seed → auth → plan enforcement → CRUD → license replace. Runs with `@pytest.mark.e2e`.
+
+**Dependencies:** S616.1, S616.2
+
 ## Done Criteria
 
 - [ ] `members`, `api_keys` (new), `licenses` tables exist
@@ -50,15 +57,17 @@ Seed script for first client. Deployment docs.
 ## Plan
 
 ```
-S616.1 (models + auth + plan check) → S616.2 (15 endpoints + seed)
+S616.1 (models + auth + plan check) → S616.2 (13 endpoints + seed) → S616.3 (E2E tests)
 ```
 
 **M1 (after S616.1):** Existing endpoints work with new auth + plan enforcement.
-**M2 (after S616.2):** Full admin API. First client seeded. Epic complete.
+**M2 (after S616.2):** Full admin API. First client seeded.
+**M3 (after S616.3):** Cross-story E2E validated. Epic complete.
 
 ## Progress Tracking
 
 | Story | Status | Est | Actual | Notes |
 | ----- | ------ | --- | ------ | ----- |
 | S616.1 Models + auth | **done** | M | M (90min) | 33 tests, 1.33x velocity. M1 reached. |
-| S616.2 Endpoints + seed | pending | M | | |
+| S616.2 Endpoints + seed | **done** | M | M (90min) | 68 tests, 14 E2E scenarios, 13 endpoints. M2 reached. |
+| S616.3 E2E integration tests | **done** | S | S (45min) | 22 E2E tests, NullPool fix. M3 reached. |
