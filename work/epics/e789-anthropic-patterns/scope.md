@@ -114,14 +114,14 @@ Every gap is scored on 4 RaiSE-native dimensions:
 
 ---
 
-## Story Sequencing
+## Story Sequencing & Progress
 
-| Order | Story | Rationale |
-|-------|-------|-----------|
-| 1 | **RAISE-791** Context & Harness | Highest daily impact. Informs RAISE-783 (sessions). Answers effort scaling tension |
-| 2 | **RAISE-790** Evaluation | Strengthens AR/QR skills. High value-to-core |
-| 3 | **RAISE-792** Tool & MCP | Medium impact, some quick wins (tool descriptions) |
-| 4 | **RAISE-793** Multi-Agent | Future-facing. Enterprise roadmap. Lower urgency |
+| Order | Story | Status | Actual | Rationale |
+|-------|-------|--------|--------|-----------|
+| 1 | **RAISE-791** Context & Harness | ✅ Done (2026-03-27) | ~180 min | Highest daily impact. Informs RAISE-783 (sessions). Answers effort scaling tension |
+| 2 | **RAISE-790** Evaluation | Backlog | — | Strengthens AR/QR skills. High value-to-core |
+| 3 | **RAISE-792** Tool & MCP | Backlog | — | Medium impact, some quick wins (tool descriptions) |
+| 4 | **RAISE-793** Multi-Agent | Backlog | — | Future-facing. Enterprise roadmap. Lower urgency |
 
 ## Deliverable Per Story
 
