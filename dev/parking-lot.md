@@ -32,6 +32,23 @@
 
 ---
 
+## RAISE-760 Deferred Items — 2026-03-27
+
+- [ ] **Custom UI panels** — Jira issuePanel, Confluence contentAction. Promote after MVP validation (Phase 2).
+- [ ] **Marketplace listing** — requires review process. Promote when ready for public distribution.
+- [ ] **Compass integration** — component catalog sync, DORA scorecards. Promote for Phase 2.
+- [ ] **Bitbucket adapter** — PR operations, code review integration. Promote for Phase 2.
+- [ ] **Teamwork Graph integration** — cross-product knowledge traversal. Promote when Teamwork Graph exits EAP.
+- [ ] **Scheduled sync triggers** — periodic Confluence → graph sync. Promote after manual sync validation.
+- [ ] **Jira taxonomy redesign** — issue type hierarchy, component/capability classification. Separate story.
+- [ ] **Confluence IA restructuring** — space structure, page tree templates. Separate story.
+- [ ] **Multi-tenant rate limit strategy** — Tier 2 application, per-tenant budgeting. Promote after multi-customer.
+- [ ] **Rovo MCP Server evaluation** — official Atlassian MCP as unified adapter. Promote after MVP.
+- [ ] **Forge CI/CD pipeline** — GitHub Actions deploy. Promote post-MVP.
+- [ ] **atlassian-python-api dependency audit** — may be vestigial in raise-pro. Low priority cleanup.
+
+---
+
 ## rai-agent Product Vision: Self-Hosted Agent with Guided Onboarding — 2026-03-24
 
 Target: Google Workspace users + Atlassian users. Dream: one-click deploy → guided setup → productive agent.
