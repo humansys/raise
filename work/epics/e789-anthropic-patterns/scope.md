@@ -121,7 +121,7 @@ Every gap is scored on 4 RaiSE-native dimensions:
 | 1 | **RAISE-791** Context & Harness | ✅ Done (2026-03-27) | ~180 min | Highest daily impact. Informs RAISE-783 (sessions). Answers effort scaling tension |
 | 2 | **RAISE-790** Evaluation | ✅ Done (2026-03-27) | ~90 min | Strengthens AR/QR skills. High value-to-core. ADR-034 proposed. |
 | 3 | **RAISE-792** Tool & MCP | ✅ Done (2026-03-27) | ~75 min | G7 progressive disclosure highest priority (score 4). G11 validated ADR-034. |
-| 4 | **RAISE-793** Multi-Agent | Backlog | — | Future-facing. Enterprise roadmap. Lower urgency |
+| 4 | **RAISE-793** Multi-Agent | ✅ Done (2026-03-27) | ~55 min | G9/Orchestrator deferred to Enterprise. Specialized roles actionable. ADR-034 3rd test case. |
 
 ## Deliverable Per Story
 
