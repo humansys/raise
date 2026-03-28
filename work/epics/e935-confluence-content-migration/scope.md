@@ -2,7 +2,7 @@
 epic_id: "E935"
 jira_key: "RAISE-935"
 title: "Confluence Content Migration — Filesystem to Single Source of Truth"
-status: "designed"
+status: "planned"
 created: "2026-03-27"
 ---
 
@@ -97,3 +97,67 @@ Session 2026-03-27 completed Phase 1:
 | Confluence API rate limiting on ~1,800 pages | Medium | Medium | Batch with delays, retry logic |
 | Markdown conversion artifacts (tables, code blocks) | Medium | Low | Verify sample before bulk |
 | Misclassification STRAT vs RaiSE1 | Low | Medium | Human review of classification before upload |
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-03-27
+
+### Sequencing Strategy
+
+**Quick-wins + Dependency-driven.** No architectural uncertainty — Confluence API and build-dossier.py patterns are proven from Phase 1. The risk is volume, not technology. S935.4 (RGTM→STRAT) is the quick win: 18 pages, Confluence-to-Confluence, validates migration flow without touching filesystem.
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S935.1 — Target structure | S | None | M1 | Foundation: sections and taxonomy must exist before any classification |
+| 2 | S935.4 — Migrate RGTM → STRAT | S | S935.1 | M1 | Quick win: 18 pages, validates Confluence-to-Confluence flow, no filesystem risk |
+| 3 | S935.2 — Classify raise-commons | M | S935.1 | M2 | Parallel with S935.3: largest batch (~1,800 files), inference-heavy |
+| 3 | S935.3 — Classify raise-gtm | M | S935.1 | M2 | Parallel with S935.2: smaller batch (~560 files), all→STRAT simplifies classification |
+| 4 | S935.5 — Migration script | M | S935.2, S935.3 | M3 | Needs normalized filesystem as input; based on build-dossier.py patterns |
+| 5 | S935.6 — Execute migration | S | S935.5 | M3 | Run script, verify sample, then bulk. HITL gate before bulk upload |
+| 6 | S935.7 — Cleanup & references | S | S935.6 | M4 | Final: delete migrated files, update refs. Only after migration verified |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Structure + Quick Win** | S935.1, S935.4 | New sections exist in STRAT + RaiSE1. RGTM 18 pages migrated and verified in STRAT |
+| **M2: Content Classified** | +S935.2, S935.3 | All docs classified (STRAT vs RaiSE1), filesystem reorganized into staging dirs. HITL review of classification |
+| **M3: Migration Complete** | +S935.5, S935.6 | Script built and executed. All ~1,800 docs published to Confluence. confluence-pages.yaml populated |
+| **M4: Epic Complete** | +S935.7 | Filesystem clean. References updated. raise-gtm evaluated for archival. Done criteria met. Retro done |
+
+### Parallel Work Streams
+
+```
+Time →
+Stream A (Critical): S935.1 ─► S935.4 ─► ··wait·· ─► S935.5 ─► S935.6 ─► S935.7
+                         │                     ▲
+                         ├── S935.2 (commons) ─┤
+                         │                     │
+Stream B (Parallel):     └── S935.3 (gtm) ────┘
+```
+
+**Merge points:**
+- After S935.1: split — S935.4 runs sequentially (quick win), S935.2+S935.3 run in parallel
+- Before S935.5: merge — script needs both classification outputs + RGTM migration done
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Notes |
+|-------|:----:|:------:|:------:|-------|
+| S935.1 — Target structure | S | Pending | — | |
+| S935.4 — Migrate RGTM → STRAT | S | Pending | — | |
+| S935.2 — Classify raise-commons | M | Pending | — | |
+| S935.3 — Classify raise-gtm | M | Pending | — | |
+| S935.5 — Migration script | M | Pending | — | |
+| S935.6 — Execute migration | S | Pending | — | |
+| S935.7 — Cleanup & references | S | Pending | — | |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| Classification takes longer than expected (1,800 files × inference) | M/M | Batch by directory, classify by heuristic first, inference only for ambiguous |
+| RGTM pages have Confluence-specific formatting that doesn't copy cleanly | L/L | Manual fix for 18 pages is acceptable |
+| Script assumes uniform markdown but some docs are non-standard | M/M | Validate with 10-doc sample per directory before bulk run |
