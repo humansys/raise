@@ -88,21 +88,16 @@ def load_auth():
 
 
 def move_page(base_url: str, user: str, token: str, page_id: str, target_space: str, parent_id: str) -> bool:
-    """Move a page to a new space/parent using v2 API."""
-    version = get_page_version(base_url, user, token, page_id)
-    # v2 API supports cross-space moves
+    """Move a page to a new space/parent using Confluence move endpoint."""
     resp = requests.put(
-        f"{base_url}/wiki/api/v2/pages/{page_id}",
+        f"{base_url}/wiki/api/v2/pages/{page_id}/move",
         json={
-            "id": page_id,
-            "status": "current",
-            "spaceId": get_space_id(base_url, user, token, target_space),
-            "parentId": parent_id,
-            "version": {"number": version + 1, "message": "Moved by E935 migration fix"},
+            "targetPageId": parent_id,
+            "position": "append",
         },
         auth=(user, token),
         headers={"Accept": "application/json", "Content-Type": "application/json"},
-        timeout=30,
+        timeout=60,
     )
     return resp.ok
 
