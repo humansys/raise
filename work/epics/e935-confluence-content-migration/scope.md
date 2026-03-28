@@ -151,7 +151,7 @@ Stream B (Parallel):     └── S935.3 (gtm) ────┘
 | S935.2 — Classify raise-commons | M | **Done** | 2026-03-27 | 1,365 files → manifest (967 RaiSE1, 398 STRAT) |
 | S935.3 — Classify raise-gtm | M | **Done** | 2026-03-27 | 255 md + 54 binary → manifest (all STRAT) |
 | S935.5 — Migration script | M | **Done** | 2026-03-27 | migrate-to-confluence.py, dry-run verified |
-| S935.6 — Execute migration | S | Pending | — | |
+| S935.6 — Execute migration | S | **Done** | 2026-03-28 | 1,604 pages, 0 failures, 1,620 registry entries |
 | S935.7 — Cleanup & references | S | Pending | — | |
 
 ### Sequencing Risks
