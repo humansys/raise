@@ -146,7 +146,7 @@ Stream B (Parallel):     └── S935.3 (gtm) ────┘
 
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
-| S935.1 — Target structure | S | Pending | — | |
+| S935.1 — Target structure | S | **Done** | 2026-03-27 | 8 sections, labels, index updated |
 | S935.4 — Migrate RGTM → STRAT | S | Pending | — | |
 | S935.2 — Classify raise-commons | M | Pending | — | |
 | S935.3 — Classify raise-gtm | M | Pending | — | |
