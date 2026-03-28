@@ -343,20 +343,25 @@ Labels in Confluence are consistent with the Jira label taxonomy from S760.2. Th
 
 | Category | Convention | Examples | Purpose |
 |----------|-----------|----------|---------|
-| **Artifact type** | `type:{type}` | `type:policy`, `type:adr`, `type:scope`, `type:design`, `type:retro`, `type:dev-docs` | Filter by artifact kind across the tree |
-| **Epic association** | `epic:{key}` | `epic:RAISE-760`, `epic:RAISE-789` | Find all pages for an epic |
-| **Capability** | `capability:{id}` | `capability:c1-skill-engine`, `capability:c4-cli-dx` | Cross-reference with Compass components |
-| **Release version** | `version:{ver}` | `version:2.4.0`, `version:3.0.0` | Find content relevant to a release |
-| **Confidence** | `confidence:{level}` | `confidence:high`, `confidence:medium` | Research report evidence quality |
-| **Status** | `status:{state}` | `status:accepted`, `status:deprecated`, `status:draft` | ADR lifecycle, governance doc status |
-| **Skill category** | `skill-category:{cat}` | `skill-category:lifecycle`, `skill-category:discovery` | Skill catalog filtering |
-| **Pattern type** | `pattern-type:{type}` | `pattern-type:engineering`, `pattern-type:process` | Pattern catalog filtering |
+| **Artifact type** | `type-{type}` | `type-policy`, `type-adr`, `type-scope`, `type-design`, `type-retro`, `dev-docs` | Filter by artifact kind across the tree |
+| **Epic association** | `epic-{key}` | `epic-raise-760`, `epic-raise-789` | Find all pages for an epic |
+| **Capability** | `capability-{id}` | `capability-c1-skill-engine`, `capability-c4-cli-dx` | Cross-reference with Compass components |
+| **Release version** | `version-{ver}` | `version-2-4-0`, `version-3-0-0` | Find content relevant to a release |
+| **Confidence** | `confidence-{level}` | `confidence-high`, `confidence-medium` | Research report evidence quality |
+| **Status** | `status-{state}` | `status-accepted`, `status-deprecated`, `status-draft` | ADR lifecycle, governance doc status |
+| **Skill category** | `skill-category-{cat}` | `skill-category-lifecycle`, `skill-category-discovery` | Skill catalog filtering |
+| **Pattern type** | `pattern-type-{type}` | `pattern-type-engineering`, `pattern-type-process` | Pattern catalog filtering |
 | **Base types** | (no prefix) | `governance`, `adr`, `research`, `skill`, `pattern`, `module`, `glossary`, `release`, `session`, `epic` | Broad artifact class for simple CQL |
+
+> **Note (2026-03-28):** Confluence Cloud does NOT support colons (`:`) in labels.
+> The original design used `category:value` format but this was rejected by the API
+> during RAISE-863 execution. All structured labels use hyphens instead: `epic-raise-760`
+> not `epic:RAISE-760`. CQL queries updated accordingly.
 
 ### Label Hygiene Rules
 
-1. **Lowercase, hyphenated** -- `type:dev-docs` not `Type:DevDocs`
-2. **Prefixed categories** -- always use `category:value` format for structured labels
+1. **Lowercase, hyphenated** -- `type-dev-docs` not `Type:DevDocs`
+2. **Prefixed categories** -- always use `category-value` format (hyphens, not colons — Confluence rejects colons)
 3. **Base type label always present** -- every page gets at least one base type label (e.g., `adr`, `research`)
 4. **Max 5 labels per page** -- base type + 2-3 structured labels + 1 optional tag
 5. **Consistent with Jira** -- same vocabulary: `research`, `spike`, `refactor` mean the same in both products
