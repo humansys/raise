@@ -1,4 +1,4 @@
-# Knowledge Cartridges — Oportunidad de Producto
+# Pluggable Domains — Oportunidad de Producto
 
 **Para:** Gerardo (Ventas/BD), Eduardo (Marketing/Redes)
 **De:** Emilio + Rai
@@ -17,11 +17,11 @@ Un CEO que usa ChatGPT para preguntar sobre Scaling Up recibe respuestas genéri
 
 ---
 
-## Nuestra solución: Knowledge Cartridges
+## Nuestra solución: Pluggable Domains
 
 Imaginen un **cartucho de conocimiento** — como un cartucho de videojuego, pero de expertise.
 
-Un Knowledge Cartridge es un módulo que le enseña a un agente de IA todo sobre un dominio específico. No de forma genérica (como leer Wikipedia), sino de forma **estructurada, validada y confiable**:
+Un Pluggable Domain es un módulo que le enseña a un agente de IA todo sobre un dominio específico. No de forma genérica (como leer Wikipedia), sino de forma **estructurada, validada y confiable**:
 
 - **Qué conceptos existen** y cómo se relacionan (ontología)
 - **De dónde viene** cada pieza de conocimiento (trazabilidad)
@@ -58,9 +58,9 @@ Hicimos un análisis de 12 competidores directos y 11 plataformas de grafos de c
 Así como los desarrolladores instalan paquetes de código (`npm install react`), las empresas podrían instalar cartuchos de conocimiento en sus agentes:
 
 ```
-rai cartridge install scaling-up
-rai cartridge install gtd-productivity
-rai cartridge install okr-methodology
+rai domain install scaling-up
+rai domain install gtd-productivity
+rai domain install okr-methodology
 ```
 
 Y el agente inmediatamente sabe sobre ese dominio — con la calidad que un experto humano validó.
@@ -96,35 +96,35 @@ La ontología sola no es el producto — el valor está en la **capa de enriquec
 ### Por qué LATAM primero
 
 1. **Mercado desatendido** — los competidores (Mem0, Cognee, Zep) están enfocados en US/EU. No hay player local.
-2. **Consultoría como canal** — LATAM tiene un ecosistema fuerte de consultoras que implementan metodologías (Scaling Up, EOS, OKRs, Lean). Cada una es un cartridge potencial.
+2. **Consultoría como canal** — LATAM tiene un ecosistema fuerte de consultoras que implementan metodologías (Scaling Up, EOS, OKRs, Lean). Cada una es un domain potencial.
 3. **El experto humano es el diferenciador** — en LATAM, las relaciones con coaches y consultores certificados son el canal de distribución. Nuestro modelo HITL (humano-en-el-loop) convierte al consultor en co-creador del producto.
-4. **Costo de creación de cartridges es menor** — el expertise para crear ontologías de dominio es más accesible en LATAM que en Silicon Valley.
+4. **Costo de creación de domains es menor** — el expertise para crear ontologías de dominio es más accesible en LATAM que en Silicon Valley.
 
 ### Modelo de negocio propuesto
 
 ```
 ┌─────────────────────────────────────────────┐
-│           KNOWLEDGE CARTRIDGES              │
+│           PLUGGABLE DOMAINS              │
 │                                             │
 │  Producto Open Core:                        │
-│  ├── Motor de cartridges (OSS, gratuito)    │
-│  ├── CLI + SDK para crear cartridges        │
-│  └── Cartridge de ejemplo (ScaleUp)         │
+│  ├── Motor de domains (OSS, gratuito)    │
+│  ├── CLI + SDK para crear domains        │
+│  └── Domain de ejemplo (ScaleUp)         │
 │                                             │
 │  Revenue streams:                           │
-│  ├── 1. Cartridges premium (por dominio)    │
-│  ├── 2. "Cartridge Studio" (SaaS)           │
-│  │      Tool para crear/curar cartridges    │
-│  ├── 3. Marketplace de cartridges           │
+│  ├── 1. Domains premium (por dominio)    │
+│  ├── 2. "Domain Studio" (SaaS)           │
+│  │      Tool para crear/curar domains    │
+│  ├── 3. Marketplace de domains           │
 │  │      Expertos venden, nosotros cobramos  │
-│  └── 4. Enterprise: cartridges privados     │
+│  └── 4. Enterprise: domains privados     │
 │         Ontologías internas de la empresa   │
 └─────────────────────────────────────────────┘
 ```
 
-### Primeros cartridges objetivo
+### Primeros domains objetivo
 
-| Cartridge | Mercado objetivo | Partner potencial |
+| Domain | Mercado objetivo | Partner potencial |
 | --- | --- | --- |
 | Scaling Up | CEOs, coaches certificados | Gazelles International LATAM |
 | OKRs | Startups, scale-ups | Comunidad OKR LATAM |
@@ -140,14 +140,14 @@ La ontología sola no es el producto — el valor está en la **capa de enriquec
 ### Gerardo (Ventas/BD)
 
 1. **Validar la propuesta de valor** con 3-5 consultores/coaches que usen metodologías estructuradas. ¿Pagarían por un agente que domine su metodología? ¿Cuánto?
-2. **Identificar early adopters** — consultoras que ya tengan contenido estructurado (libros, frameworks, talleres) y quieran "digitalizarlo" como cartridge.
-3. **Explorar el modelo marketplace** — ¿los consultores certificados venderían cartridges de sus metodologías? ¿Qué split esperarían?
+2. **Identificar early adopters** — consultoras que ya tengan contenido estructurado (libros, frameworks, talleres) y quieran "digitalizarlo" como domain.
+3. **Explorar el modelo marketplace** — ¿los consultores certificados venderían domains de sus metodologías? ¿Qué split esperarían?
 
 ### Eduardo (Marketing/Redes)
 
-1. **Posicionar el concepto** — "Knowledge Cartridges" necesita un mensaje claro para audiencia no-técnica. Algo como: "Dale a tu IA el conocimiento de un experto, no de Wikipedia."
-2. **Content strategy** — demos visuales del ScaleUp cartridge en acción. Antes/después: pregunta a ChatGPT genérico vs. pregunta a agente con cartridge.
-3. **Comunidad** — identificar en redes dónde están los consultores y coaches que podrían ser creadores de cartridges. LinkedIn es el canal natural.
+1. **Posicionar el concepto** — "Pluggable Domains" necesita un mensaje claro para audiencia no-técnica. Algo como: "Dale a tu IA el conocimiento de un experto, no de Wikipedia."
+2. **Content strategy** — demos visuales del ScaleUp domain en acción. Antes/después: pregunta a ChatGPT genérico vs. pregunta a agente con domain.
+3. **Comunidad** — identificar en redes dónde están los consultores y coaches que podrían ser creadores de domains. LinkedIn es el canal natural.
 
 ---
 

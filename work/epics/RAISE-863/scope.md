@@ -80,7 +80,7 @@ RaiSE1 (Space Root)                          ← Level 0
 │   │   └── RaiSE Capability Cockpit
 │   ├── RAISE-806: E-PATTERNS (epic brief)
 │   ├── RAISE-839: E-AGENT-PATTERNS (epic brief)
-│   └── RAISE-840: E-CARTRIDGE-ABP (epic brief)
+│   └── RAISE-840: E-DOMAIN-ABP (epic brief)
 │
 ├── Architecture                              ← Level 1
 │   ├── ADR-033: Release Branch Model             ← Level 2

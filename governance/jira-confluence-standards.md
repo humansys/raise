@@ -229,7 +229,7 @@ RaiSE Documentation (RaiSE1)
 
 Examples:
 - `E3: ScaleUp Knowledge Integration — Technical Architecture`
-- `Domain Cartridges — Requirements Brief`
+- `Pluggable Domains — Requirements Brief`
 - `v2.2.4 — Release Notes`
 
 ### Rules

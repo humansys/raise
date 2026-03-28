@@ -19,7 +19,7 @@ RaiSE enfrenta un escenario de desarrollo paralelo en tres líneas de versión:
 | --- | --- | --- | --- |
 | **v2.3.x** | Hotfixes sobre la versión publicada | ~2-3 bugs/día | Alta (usuarios en producción) |
 | **v2.4.0** | Features incrementales (5 épicas planeadas) | Semanas de trabajo | Media |
-| **v3.0.0** | Knowledge Cartridges — cambio arquitectónico mayor | Meses de trabajo | Estratégica |
+| **v3.0.0** | Pluggable Domains — cambio arquitectónico mayor | Meses de trabajo | Estratégica |
 
 El modelo anterior (`main` → `dev` → `story/*`) funciona para una sola línea de desarrollo,
 pero `dev` y `next` son en realidad release branches disfrazadas — el nombre genérico oculta
@@ -45,7 +45,7 @@ main ─────────────────────────
   ├── release/2.4.0 ──────────────── (features v2.4, desarrollo activo)
   │     └── story/s{N}.{M}/{name}    (stories de v2.4)
   │
-  └── release/3.0.0 ──────────────── (v3.0, Knowledge Cartridges)
+  └── release/3.0.0 ──────────────── (v3.0, Pluggable Domains)
         └── story/s{N}.{M}/{name}    (stories de v3.0)
 ```
 
@@ -94,7 +94,7 @@ main ─────────────────────────
 5. Epic close: push release/2.4.0 to origin
 ```
 
-#### `release/3.0.0` — v3.0 Knowledge Cartridges (antes `next`)
+#### `release/3.0.0` — v3.0 Pluggable Domains (antes `next`)
 
 - Rama long-lived para cambios arquitectónicos mayores
 - Se sincroniza periódicamente con `release/2.4.0` para no divergir
@@ -180,7 +180,7 @@ de v2.4. Release branches explícitas eliminan la ambigüedad.
 3. Fix, test, merge a `release/2.3.x`
 4. Cherry-pick a `release/2.4.0` y `release/3.0.0` si aplica
 
-**Si estás trabajando en v3.0 (Knowledge Cartridges):**
+**Si estás trabajando en v3.0 (Pluggable Domains):**
 1. `git checkout release/3.0.0`
 2. Mismo flujo de stories que en release/2.4.0
 3. Periódicamente: merge de release/2.4.0 para no divergir
@@ -226,7 +226,7 @@ git branch -d release/3.0.0  # eliminar rama
 | Sync release/2.4.0 → release/3.0.0 | Semanal o al cerrar épica |
 | Release v2.3.x | Según acumulación (cada 3-5 fixes) |
 | Release v2.4 | Al completar épicas planeadas |
-| Release v3.0 | Cuando Knowledge Cartridges esté listo |
+| Release v3.0 | Cuando Pluggable Domains esté listo |
 
 ## Riesgos y mitigaciones
 
@@ -265,4 +265,4 @@ El modelo de release branches es permanente. Las ramas individuales son temporal
 - Política de versioning: TN-002 — Branching & Versioning Strategy
 - Git flow original: Vincent Driessen (2010)
 - Precedentes: Node.js, Python, Kubernetes usan release branches explícitas
-- Contexto: E650 (Knowledge Cartridges) + MR !39 conflicts evidenciaron la necesidad
+- Contexto: E650 (Pluggable Domains) + MR !39 conflicts evidenciaron la necesidad
