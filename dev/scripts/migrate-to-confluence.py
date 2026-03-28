@@ -160,6 +160,128 @@ def find_page_by_title(auth: ConfluenceAuth, title: str, space_key: str) -> str 
     return results[0]["id"] if results else None
 
 
+def markdown_to_storage(md: str) -> str:
+    """Convert markdown to Confluence storage format (simple HTML).
+
+    Good enough for migration — not perfect but handles headings, code blocks,
+    lists, bold, italic, links, and tables.
+    """
+    import html as html_mod
+    import re as _re
+
+    lines = md.split("\n")
+    result: list[str] = []
+    in_code_block = False
+    in_list = False
+    in_table = False
+
+    for line in lines:
+        # Code blocks
+        if line.strip().startswith("```"):
+            if in_code_block:
+                result.append("</code></pre>")
+                in_code_block = False
+            else:
+                lang = line.strip().removeprefix("```").strip()
+                result.append("<pre><code>")
+                in_code_block = True
+            continue
+
+        if in_code_block:
+            result.append(html_mod.escape(line))
+            continue
+
+        stripped = line.strip()
+
+        # Skip YAML frontmatter
+        if stripped == "---":
+            continue
+
+        # Empty line
+        if not stripped:
+            if in_list:
+                in_list = False
+            if in_table:
+                in_table = False
+            result.append("")
+            continue
+
+        # Headings
+        if stripped.startswith("#"):
+            level = len(stripped) - len(stripped.lstrip("#"))
+            text = stripped.lstrip("#").strip()
+            result.append(f"<h{level}>{html_mod.escape(text)}</h{level}>")
+            continue
+
+        # Table rows
+        if stripped.startswith("|"):
+            cols = [c.strip() for c in stripped.split("|")[1:-1]]
+            # Skip separator rows
+            if all(_re.match(r"^[-:]+$", c) for c in cols):
+                continue
+            if not in_table:
+                result.append("<table><tbody>")
+                in_table = True
+                tag = "th"
+            else:
+                tag = "td"
+            row = "".join(f"<{tag}>{html_mod.escape(c)}</{tag}>" for c in cols)
+            result.append(f"<tr>{row}</tr>")
+            continue
+
+        if in_table and not stripped.startswith("|"):
+            result.append("</tbody></table>")
+            in_table = False
+
+        # List items
+        if stripped.startswith("- ") or stripped.startswith("* "):
+            text = stripped[2:]
+            if not in_list:
+                result.append("<ul>")
+                in_list = True
+            result.append(f"<li>{_inline_format(text)}</li>")
+            continue
+
+        if in_list and not (stripped.startswith("- ") or stripped.startswith("* ")):
+            result.append("</ul>")
+            in_list = False
+
+        # Blockquote
+        if stripped.startswith("> "):
+            text = stripped[2:]
+            result.append(f"<blockquote><p>{_inline_format(text)}</p></blockquote>")
+            continue
+
+        # Regular paragraph
+        result.append(f"<p>{_inline_format(stripped)}</p>")
+
+    # Close open tags
+    if in_list:
+        result.append("</ul>")
+    if in_table:
+        result.append("</tbody></table>")
+    if in_code_block:
+        result.append("</code></pre>")
+
+    return "\n".join(result)
+
+
+def _inline_format(text: str) -> str:
+    """Apply inline markdown formatting (bold, italic, code, links)."""
+    import html as html_mod
+    import re as _re
+
+    # Inline code
+    text = _re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
+    # Bold
+    text = _re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", text)
+    # Italic
+    text = _re.sub(r"\*([^*]+)\*", r"<em>\1</em>", text)
+    # Links
+    text = _re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', text)
+    return text
+
+
 def create_page(
     auth: ConfluenceAuth,
     space_key: str,
@@ -167,24 +289,51 @@ def create_page(
     body_markdown: str,
     parent_id: str | None = None,
 ) -> str:
-    """Create a Confluence page with markdown content. Returns page ID."""
-    space_id = get_space_id(auth, space_key)
+    """Create a Confluence page. Tries storage format, falls back to plain text. Returns page ID."""
+    storage_body = markdown_to_storage(body_markdown)
+    page_id = _create_page_with_body(auth, space_key, title, storage_body, parent_id)
+    if page_id:
+        return page_id
+
+    # Fallback: wrap raw markdown in <pre> for Fabric editor compatibility
+    import html as html_mod
+
+    plain_body = f"<pre>{html_mod.escape(body_markdown)}</pre>"
+    print("  Retrying with plain-text fallback...")
+    page_id = _create_page_with_body(auth, space_key, title, plain_body, parent_id)
+    if page_id:
+        return page_id
+
+    msg = f"Failed to create page '{title}' after storage + plain-text attempts"
+    raise RuntimeError(msg)
+
+
+def _create_page_with_body(
+    auth: ConfluenceAuth,
+    space_key: str,
+    title: str,
+    storage_body: str,
+    parent_id: str | None = None,
+) -> str | None:
+    """Try to create a page. Returns page ID on success, None on 400 error."""
     payload: dict[str, Any] = {
-        "spaceId": space_id,
-        "status": "current",
+        "type": "page",
         "title": title,
+        "space": {"key": space_key},
         "body": {
-            "representation": "wiki",
-            "value": body_markdown,
+            "storage": {
+                "value": storage_body,
+                "representation": "storage",
+            },
         },
     }
     if parent_id:
-        payload["parentId"] = parent_id
+        payload["ancestors"] = [{"id": parent_id}]
 
     for attempt in range(MAX_RETRIES):
         try:
             resp = requests.post(
-                f"{auth.url}/wiki/api/v2/pages",
+                f"{auth.url}/wiki/rest/api/content",
                 json=payload,
                 auth=(auth.user, auth.token),
                 headers={"Accept": "application/json", "Content-Type": "application/json"},
@@ -195,6 +344,8 @@ def create_page(
                 print(f"  Rate limited, waiting {wait}s...")
                 time.sleep(wait)
                 continue
+            if resp.status_code == 400:
+                return None  # signal caller to try fallback
             resp.raise_for_status()
             return resp.json()["id"]
         except requests.exceptions.RequestException as e:
@@ -204,8 +355,7 @@ def create_page(
                 time.sleep(wait)
             else:
                 raise
-    msg = "Max retries exceeded"
-    raise RuntimeError(msg)
+    return None
 
 
 def add_labels(auth: ConfluenceAuth, page_id: str, labels: list[str]) -> None:
