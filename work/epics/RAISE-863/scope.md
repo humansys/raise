@@ -4,12 +4,27 @@
 **Labels:** confluence, governance, documentation
 **Branch:** release/2.4.0
 **Design source:** S760.4 (work/epics/RAISE-760/confluence-ia-design.md)
+**Research:** S863.0 spike (RAISE-865) — 12 sources, grounding adjustments
 
 ## Objective
 
 Apply the Confluence Information Architecture designed in S760.4 to the RaiSE1
-space. Transform ~40+ flat pages into a structured, navigable page tree with
-consistent naming, labels, and index pages.
+space, adjusted by research findings from S863.0. Transform ~40+ flat pages
+into a structured, navigable page tree with consistent naming, labels, and
+index pages.
+
+## Design Constraints (from S863.0 research)
+
+1. **Max 7-9 top-level sections** — community consensus is 6-8; only create
+   sections with existing content (no empty aspirational sections)
+2. **Max 3 levels of depth** — root > section > page. Epic subtrees: epic page
+   > child pages (flat, no sub-sections like Research/ or Stories/)
+3. **Parent pages, not folders** — folders are invisible to search and Rovo;
+   all sections must be parent pages with index content
+4. **Section pages must have content** — index table + brief description;
+   no blank parent pages
+5. **Rovo-friendly** — parent+children scoping works; labels enable CQL
+   retrieval at query time; content quality matters most
 
 ## Current State
 
@@ -24,102 +39,143 @@ consistent naming, labels, and index pages.
 - Release notes (v2.3.0)
 - Sales/client content (Inter BigPicture report)
 
-## Target State (from S760.4)
+## Target State (adjusted from S760.4 per S863.0 research)
 
 ```
-RaiSE1 (Space Root)
-├── Governance
-├── Architecture
-│   ├── ADR Index
-│   ├── ADR-033: Release Branch Model
-│   ├── ADR-034: ...
-│   └── Module Documentation
-├── Epics
-│   ├── RAISE-706: rai-agent Product Discovery
-│   │   └── (phase pages as children)
+RaiSE1 (Space Root)                          ← Level 0
+│
+├── Epics                                     ← Level 1 (section page with index)
+│   ├── RAISE-706: rai-agent Product Discovery    ← Level 2 (epic page)
+│   │   ├── Phase 1: Market Analysis                  ← Level 3 (max depth)
+│   │   ├── Phase 2: User Research
+│   │   ├── Phase 3: Value Proposition
+│   │   ├── Phase 4: MVP Scope
+│   │   └── Phase 5: Go-to-Market
 │   ├── RAISE-760: RaiSE Project Management Model
-│   │   └── (research, design, blueprint as children)
+│   │   ├── Research Summary & Strategic Recommendations
+│   │   ├── R1 — Atlassian API Landscape 2026
+│   │   ├── R2 — Python Atlassian Ecosystem 2026
+│   │   ├── R3 — RaiSE ↔ Atlassian Value Map
+│   │   ├── R4 — Forge Platform Deep-Dive 2026
+│   │   ├── S760.2 — Taxonomy Design
+│   │   ├── S760.3 — Workflow & Lifecycle Mapping
+│   │   ├── S760.4 — Confluence Information Architecture
+│   │   ├── S760.5 — Compass Capability Catalog Design
+│   │   ├── S760.6 — Bitbucket Integration Design
+│   │   ├── S760.7 — Adapter Gap Analysis
+│   │   ├── S760.8 — Reference Blueprint
+│   │   └── Visión de Producto: RaiSE sobre Atlassian
 │   ├── RAISE-783: Session Management Reliability
-│   │   └── (problem brief as child)
+│   │   └── Problem Brief — Session Management Reliability
 │   ├── RAISE-789: E-ANTHROPIC
-│   │   └── (research stories as children)
-│   └── ...
-├── Research
-│   └── (standalone research not under an epic)
-├── Product
-│   ├── rai-agent Product Vision
-│   ├── RaiSE Capability Cockpit
-│   ├── RaiSE Forge Product Brief
-│   └── Visión de Producto: RaiSE sobre Atlassian
-├── Developer Docs
-│   ├── E494: ACLI Jira Adapter
+│   │   ├── E789 Scope — Research Design & Benchmark Framework
+│   │   ├── RaiSE Blueprint — Framework Baseline 2026
+│   │   ├── S789.1 — Context & Harness Patterns Research
+│   │   ├── Research: Context & Harness Patterns (full report)
+│   │   ├── Enterprise Design Implications
+│   │   ├── S789.2 — Evaluation Patterns Research
+│   │   ├── S789.3 — Tool & MCP Patterns Research
+│   │   ├── S789.4 — Multi-Agent Patterns Research
+│   │   ├── Blog: Lo que Anthropic recomienda...
+│   │   └── RaiSE Capability Cockpit
+│   ├── RAISE-806: E-PATTERNS (epic brief)
+│   ├── RAISE-839: E-AGENT-PATTERNS (epic brief)
+│   └── RAISE-840: E-CARTRIDGE-ABP (epic brief)
+│
+├── Architecture                              ← Level 1
+│   ├── ADR-033: Release Branch Model             ← Level 2
+│   └── ADR-034: Reformulación de P1
+│
+├── Product                                   ← Level 1
+│   ├── rai-agent — Product Vision                ← Level 2
+│   └── RaiSE Forge — Product Brief & Epic Structure
+│
+├── Developer Docs                            ← Level 1
+│   ├── E494: ACLI Jira Adapter                   ← Level 2
 │   ├── E654: Session Identity Fix
 │   ├── E680: Release v2.3.0 Prep
 │   └── E478: Pro/Community Boundary
-├── Releases
-│   └── Release Notes — v2.3.0
-├── Operations
-│   └── Instalación de RaiSE en Windows 11
-└── Sales & Delivery
-    └── Inter BigPicture Compliance Report
+│
+├── Operations                                ← Level 1
+│   └── Instalación de RaiSE en Windows 11       ← Level 2
+│
+├── Releases                                  ← Level 1
+│   └── Release Notes — v2.3.0                    ← Level 2
+│
+└── Sales & Delivery                          ← Level 1
+    └── Reporte BigPicture — Inter                ← Level 2
 ```
 
-## Stories
+**Max depth: 3 levels** (root > section > page, or root > section > epic > child)
 
-### S863.1: Create Section Structure (XS)
+### Pages NOT in S760.4 that need placement
 
-Create the top-level section pages that form the page tree backbone:
-- Governance, Architecture, Epics, Research, Product, Developer Docs,
-  Releases, Operations, Sales & Delivery
-- Each section page gets a brief description of what belongs there
+| Page | Decision |
+|------|----------|
+| RaiSE Capability Cockpit | Under Epics/RAISE-789 (produced during that epic) |
+| Visión de Producto: RaiSE sobre Atlassian | Under Epics/RAISE-760 (produced during that epic) |
+| Research: Personal Knowledge Graphs (RAISE-775) | Under Epics (needs parent epic page or standalone) |
+| Research: OpenClaw Gateway Patterns (RAISE-774) | Under Epics (needs parent epic page or standalone) |
+| Research: /rai-epic-docs Skill (RAISE-776) | Under Epics (needs parent epic page or standalone) |
 
-**Deliverable:** 9 section pages created under space root
+### Deferred sections (no content exists yet)
 
-### S863.2: Organize Epics & Their Artifacts (M)
+Governance, Skills, Patterns, Glossary, Sessions, Templates — will be created
+when first content arrives. NOT created as empty sections.
 
-Move epic pages and their related artifacts under `Epics/{KEY}`:
-- RAISE-706 + its 5 phase pages → Epics/RAISE-706
-- RAISE-760 + research (R1-R4), designs (S760.x), blueprint → Epics/RAISE-760
-- RAISE-783 + problem brief → Epics/RAISE-783
-- RAISE-789 + research stories (S789.x), blog, enterprise implications → Epics/RAISE-789
-- RAISE-806, RAISE-839, RAISE-840 (epic briefs) → Epics/{KEY}
+## Stories (revised)
 
-**Deliverable:** All epic content nested under parent epic pages
+### S863.0: Confluence IA Grounding Research (XS) — DONE
 
-### S863.3: Organize Architecture, Product & Developer Docs (S)
+Spike: 12 sources, 3 questions answered. Adjustments to S760.4 documented.
+Branch: story/s863.0/confluence-ia-research
 
-Move remaining pages to their sections:
-- ADR-033, ADR-034 → Architecture
-- rai-agent vision, capability cockpit, Forge brief, visión producto → Product
-- E494, E654, E680, E478 developer docs → Developer Docs
-- Release notes → Releases
-- Windows install guide → Operations
-- Inter report → Sales & Delivery
+### S863.1: Create Section Structure & Organize Epics (M)
 
-**Deliverable:** All non-epic pages in correct sections
+Create the 7 section parent pages with index content, then move all epic-related
+pages (~30 pages) under their parent epic pages in the Epics section.
 
-### S863.4: Create Index Pages & Apply Labels (S)
+Work:
+1. Create 7 section pages (Epics, Architecture, Product, Developer Docs,
+   Operations, Releases, Sales & Delivery) — each with brief description
+2. Move each epic page under Epics section
+3. Move epic child pages under their respective epic parent
+4. Handle orphan research pages (RAISE-774, 775, 776) — create minimal
+   parent epic pages if needed
 
-- Create index tables in each section page (title, status, date)
-- Apply label taxonomy from S760.4:
-  - `type:adr`, `type:research`, `type:design`, `type:epic`, `type:devdoc`
-  - `epic:{key}` for epic-scoped content
-  - `release:{version}` where applicable
+**Deliverable:** 7 sections created, all epic content nested correctly
 
-**Deliverable:** Navigable indexes, consistent labels across all pages
+### S863.2: Organize Non-Epic Pages & Apply Labels (S)
+
+Move remaining pages to their sections and apply label taxonomy.
+
+Work:
+1. Move ADRs → Architecture
+2. Move product docs → Product
+3. Move developer docs → Developer Docs
+4. Move ops guides → Operations
+5. Move release notes → Releases
+6. Move sales content → Sales & Delivery
+7. Apply labels per S760.4 taxonomy:
+   - Base type: `epic`, `adr`, `research`, `design`, `devdoc`, `product`, `release`
+   - Epic association: `epic:RAISE-760`, `epic:RAISE-789`, etc.
+   - Artifact type: `type:scope`, `type:research`, `type:design`, `type:retro`
+8. Update section pages with index tables
+
+**Deliverable:** Zero orphan pages at root, labels applied, indexes populated
 
 ## In Scope (MUST)
 
-- Create section page tree structure
-- Move all existing pages to correct sections
-- Apply naming conventions from S760.4
-- Create basic index pages per section
-- Apply label taxonomy
+- Create 7 section parent pages with index content
+- Move all ~40 existing pages to correct sections
+- Flatten epic subtrees to max 3 levels
+- Apply label taxonomy from S760.4
+- Index tables on each section page
 
 ## In Scope (SHOULD)
 
-- Brief description on each section page
 - Consistent page title format across all pages
+- Verify no broken cross-links after moves
 
 ## Out of Scope
 
@@ -129,11 +185,12 @@ Move remaining pages to their sections:
 - Rovo agent configuration → post-grooming
 - New content creation (only organize existing)
 - Page content edits (only move/rename/label)
+- Empty aspirational sections (Governance, Skills, Patterns, etc.)
 
 ## Done Criteria
 
 - [ ] All existing pages nested under a section (zero orphans at root)
-- [ ] Section pages created with descriptions
-- [ ] Index pages with tables listing contents
-- [ ] Labels applied per taxonomy
-- [ ] Page tree matches S760.4 design (adapted to current content)
+- [ ] 7 section pages created with descriptions and index tables
+- [ ] Max 3 levels of depth respected everywhere
+- [ ] Labels applied per taxonomy (base type + epic association minimum)
+- [ ] Page tree matches adjusted S760.4 design
