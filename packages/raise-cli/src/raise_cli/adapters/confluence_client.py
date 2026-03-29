@@ -110,6 +110,7 @@ class ConfluenceClient:
             result = self._client.get_page_by_title(  # type: ignore[no-untyped-call]
                 space=target_space,
                 title=title,
+                expand="body.storage,version,space",
             )
             if not result:  # None or empty dict
                 return None

@@ -412,7 +412,9 @@ class TestGetPageByTitle:
 
         client.get_page_by_title("X")
 
-        backend.get_page_by_title.assert_called_once_with(space="TEST", title="X")
+        backend.get_page_by_title.assert_called_once_with(
+            space="TEST", title="X", expand="body.storage,version,space",
+        )
 
     def test_uses_space_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
         client, backend = _make_client(monkeypatch)
@@ -420,7 +422,9 @@ class TestGetPageByTitle:
 
         client.get_page_by_title("X", space="OTHER")
 
-        backend.get_page_by_title.assert_called_once_with(space="OTHER", title="X")
+        backend.get_page_by_title.assert_called_once_with(
+            space="OTHER", title="X", expand="body.storage,version,space",
+        )
 
 
 class TestErrorMapping:
