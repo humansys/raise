@@ -393,6 +393,17 @@ class TestGetPageByTitle:
 
         assert result is None
 
+    def test_returns_none_when_empty_dict(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """atlassian-python-api may return {} instead of None for not found."""
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_title.return_value = {}
+
+        result = client.get_page_by_title("nonexistent")
+
+        assert result is None
+
     def test_uses_config_space_by_default(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -470,22 +481,76 @@ class TestErrorMapping:
 
 
 class TestSetLabels:
-    """set_labels calls set_page_label per label."""
+    """set_labels has replace semantics — removes unlisted, adds missing."""
 
-    def test_sets_each_label(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_adds_missing_labels(self, monkeypatch: pytest.MonkeyPatch) -> None:
         client, backend = _make_client(monkeypatch)
+        backend.get_page_labels.return_value = {"results": []}
 
-        client.set_labels("456", ["adr", "v2", "approved"])
+        client.set_labels("456", ["adr", "v2"])
 
-        assert backend.set_page_label.call_count == 3
+        assert backend.set_page_label.call_count == 2
         backend.set_page_label.assert_any_call("456", "adr")
         backend.set_page_label.assert_any_call("456", "v2")
-        backend.set_page_label.assert_any_call("456", "approved")
+        backend.remove_page_label.assert_not_called()
+
+    def test_removes_unlisted_labels(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_labels.return_value = {
+            "results": [
+                {"name": "adr", "prefix": "global"},
+                {"name": "old", "prefix": "global"},
+            ]
+        }
+
+        client.set_labels("456", ["adr", "v2"])
+
+        # "old" removed, "v2" added, "adr" unchanged
+        backend.remove_page_label.assert_called_once_with("456", "old")
+        backend.set_page_label.assert_called_once_with("456", "v2")
+
+    def test_empty_labels_removes_all(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_labels.return_value = {
+            "results": [{"name": "adr", "prefix": "global"}]
+        }
+
+        client.set_labels("456", [])
+
+        backend.remove_page_label.assert_called_once_with("456", "adr")
+        backend.set_page_label.assert_not_called()
+
+    def test_noop_when_labels_match(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_labels.return_value = {
+            "results": [
+                {"name": "adr", "prefix": "global"},
+                {"name": "v2", "prefix": "global"},
+            ]
+        }
+
+        client.set_labels("456", ["adr", "v2"])
+
+        backend.remove_page_label.assert_not_called()
+        backend.set_page_label.assert_not_called()
+
+
+class TestAddLabels:
+    """add_labels is additive — does not remove existing."""
+
+    def test_adds_each_label(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+
+        client.add_labels("456", ["adr", "v2"])
+
+        assert backend.set_page_label.call_count == 2
+        backend.set_page_label.assert_any_call("456", "adr")
+        backend.set_page_label.assert_any_call("456", "v2")
 
     def test_empty_labels_no_calls(self, monkeypatch: pytest.MonkeyPatch) -> None:
         client, backend = _make_client(monkeypatch)
 
-        client.set_labels("456", [])
+        client.add_labels("456", [])
 
         backend.set_page_label.assert_not_called()
 

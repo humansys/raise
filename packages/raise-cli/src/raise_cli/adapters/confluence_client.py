@@ -111,7 +111,7 @@ class ConfluenceClient:
                 space=target_space,
                 title=title,
             )
-            if result is None:
+            if not result:  # None or empty dict
                 return None
             return self._parse_page(result)  # type: ignore[arg-type]
         except ConfluenceError:
@@ -122,14 +122,32 @@ class ConfluenceClient:
     # ── Labels ────────────────────────────────────────────────────────
 
     def set_labels(self, page_id: str, labels: list[str]) -> None:
-        """Set labels on a page."""
+        """Set labels on a page (replace semantics — removes unlisted labels)."""
+        try:
+            existing = set(self.get_labels(page_id))
+            desired = set(labels)
+
+            # Remove labels not in desired set
+            for label in existing - desired:
+                self._client.remove_page_label(page_id, label)  # type: ignore[no-untyped-call]
+
+            # Add labels not yet present
+            for label in desired - existing:
+                self._client.set_page_label(page_id, label)  # type: ignore[no-untyped-call]
+        except ConfluenceError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"set_labels({page_id})") from e
+
+    def add_labels(self, page_id: str, labels: list[str]) -> None:
+        """Add labels to a page (additive — does not remove existing)."""
         try:
             for label in labels:
                 self._client.set_page_label(page_id, label)  # type: ignore[no-untyped-call]
         except ConfluenceError:
             raise
         except Exception as e:
-            raise self._map_error(e, f"set_labels({page_id})") from e
+            raise self._map_error(e, f"add_labels({page_id})") from e
 
     def get_labels(self, page_id: str) -> list[str]:
         """Get labels for a page."""
