@@ -176,3 +176,70 @@ class TestAuthResolution:
 
         token = ConfluenceClient._resolve_token("my-prod")
         assert token == "secret"
+
+
+# ── T3: Constructor + import guard ───────────────────────────────────
+
+
+class TestClientConstructor:
+    """Client wires atlassian.Confluence with correct params."""
+
+    def test_constructor_creates_client(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from unittest.mock import MagicMock, patch
+
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+        from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
+
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "test-token")
+        config = ConfluenceInstanceConfig(
+            url="https://test.atlassian.net/wiki",
+            username="u@test.com",
+            space_key="TEST",
+        )
+
+        mock_confluence_cls = MagicMock()
+        with patch(
+            "raise_cli.adapters.confluence_client.ConfluenceClient.__init__.__module__",
+            create=True,
+        ):
+            # Patch at the import point inside __init__
+            with patch.dict(
+                "sys.modules",
+                {"atlassian": MagicMock(Confluence=mock_confluence_cls)},
+            ):
+                client = ConfluenceClient(config)
+
+        mock_confluence_cls.assert_called_once_with(
+            url="https://test.atlassian.net/wiki",
+            username="u@test.com",
+            password="test-token",
+            cloud=True,
+            backoff_and_retry=True,
+            max_backoff_retries=5,
+            backoff_factor=1.0,
+        )
+        assert client._config is config
+
+    def test_import_guard_raises_on_missing_dep(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import sys
+        from unittest.mock import patch
+
+        from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
+
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "test-token")
+        config = ConfluenceInstanceConfig(
+            url="https://test.atlassian.net/wiki",
+            username="u@test.com",
+            space_key="TEST",
+        )
+
+        # Simulate atlassian not installed
+        with patch.dict(sys.modules, {"atlassian": None}):
+            from raise_cli.adapters.confluence_client import ConfluenceClient
+
+            with pytest.raises(ImportError, match="raise-cli\\[confluence\\]"):
+                ConfluenceClient(config)
