@@ -8,11 +8,13 @@ import pytest
 from pydantic import ValidationError
 
 from raise_cli.adapters.filesystem import FilesystemPMAdapter
-from raise_cli.adapters.models import (
-    AdapterHealth,
+from raise_cli.adapters.filesystem_models import (
     BacklogComment,
     BacklogItem,
     BacklogLink,
+)
+from raise_cli.adapters.models import (
+    AdapterHealth,
     BatchResult,
     CommentRef,
     IssueDetail,

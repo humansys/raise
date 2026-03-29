@@ -48,6 +48,7 @@ class TestPublicAPIExportsAllModels:
             PageContent,
             PageSummary,
             PublishResult,
+            SpaceInfo,
         )
 
         models = [
@@ -65,6 +66,7 @@ class TestPublicAPIExportsAllModels:
             PageContent,
             PageSummary,
             PublishResult,
+            SpaceInfo,
         ]
         for model_cls in models:
             assert issubclass(model_cls, BaseModel)
@@ -92,5 +94,5 @@ class TestDunderAll:
         """Guardrail: __all__ has expected number of exports."""
         from raise_cli import adapters
 
-        # 7 protocols + 2 wrappers + 15 models + 5 registry fns + 5 constants = 34
-        assert len(adapters.__all__) == 34
+        # 7 protocols + 2 wrappers + 16 models + 5 registry fns + 5 constants = 35
+        assert len(adapters.__all__) == 35

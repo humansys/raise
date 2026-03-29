@@ -1,6 +1,6 @@
 """Adapter contracts and registry for raise-cli extensibility.
 
-Public API: 7 Protocols + 15 boundary models + 2 sync wrappers
+Public API: 7 Protocols + 16 boundary models + 2 sync wrappers
 + 5 registry functions + 5 group constants.
 KnowledgeGraphBackend + BackendHealth moved to raise_core (E275).
 
@@ -22,6 +22,7 @@ from raise_cli.adapters.models import (
     PageContent,
     PageSummary,
     PublishResult,
+    SpaceInfo,
 )
 from raise_cli.adapters.protocols import (
     AsyncDocumentationTarget,
@@ -76,6 +77,7 @@ __all__ = [
     "PageContent",
     "PageSummary",
     "PublishResult",
+    "SpaceInfo",
     # Registry functions
     "get_doc_targets",
     "get_governance_parsers",

@@ -16,11 +16,13 @@ from typing import Any
 
 import yaml
 
-from raise_cli.adapters.models import (
-    AdapterHealth,
+from raise_cli.adapters.filesystem_models import (
     BacklogComment,
     BacklogItem,
     BacklogLink,
+)
+from raise_cli.adapters.models import (
+    AdapterHealth,
     BatchResult,
     Comment,
     CommentRef,
