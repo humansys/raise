@@ -9,15 +9,13 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from raise_cli.adapters.confluence_adapter import PythonApiConfluenceAdapter
 from raise_cli.adapters.confluence_config import (
     ArtifactRouting,
     ConfluenceConfig,
     ConfluenceInstanceConfig,
 )
-from raise_cli.adapters.models.docs import PageContent, PageSummary, PublishResult
+from raise_cli.adapters.models.docs import PageContent, PageSummary
 from raise_cli.adapters.models.health import AdapterHealth
 from raise_cli.adapters.protocols import DocumentationTarget
 
@@ -64,7 +62,7 @@ class TestConstructorAndProtocol:
     ) -> None:
         config = _make_config()
         mock_load.return_value = config
-        adapter = PythonApiConfluenceAdapter(project_root=Path("/fake"))
+        _adapter = PythonApiConfluenceAdapter(project_root=Path("/fake"))
         mock_load.assert_called_once_with(Path("/fake"))
         mock_client_cls.assert_called_once_with(config.get_instance())
 
