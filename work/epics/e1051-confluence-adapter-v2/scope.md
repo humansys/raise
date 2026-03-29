@@ -116,6 +116,48 @@ S1051.1 and S1051.3 can run in parallel.
 | 10 | `get_page_by_title(space, title)` | Yes | `get_page_by_title` |
 | 11 | `create_page(space, title, body, parent_id)` | Yes | `create_page` |
 
+## Implementation Plan
+
+### Sequence
+
+| Pos | Story | Size | Status | Strategy | Enables |
+|:---:|-------|:----:|:------:|----------|---------|
+| 1 | S1051.3: Config schema + Pydantic models | S | pending | Quick win, no deps | S1051.2 |
+| 1 | S1051.1: Confluence client wrapper | M | pending | Risk-first — validates library | S1051.2, S1051.4 |
+| 2 | S1051.2: PythonApiConfluenceAdapter | M | pending | Walking skeleton — first E2E | S1051.4, S1051.5 |
+| 3 | S1051.4: Confluence discovery service | S | pending | Unblocks doctor + generator | S1051.5, S1051.6 |
+| 4 | S1051.5: Adapter doctor (Confluence) | S | pending | High user-facing value | S1051.6 |
+| 5 | S1051.6: Config generator skill | M | pending | Last — highest integration | Epic done |
+
+**Parallel:** S1051.1 and S1051.3 run concurrently (position 1).
+**Critical path:** S1051.1 → S1051.2 → S1051.4 → S1051.6
+
+### Milestones
+
+#### M1: Walking Skeleton (after S1051.1 + S1051.3 + S1051.2)
+- [ ] `rai docs publish adr` works via new adapter with routing
+- [ ] Labels applied automatically from config
+- [ ] No Node/MCP dependency for Confluence
+- **Verify:** publish an ADR, confirm parent page + labels correct
+
+#### M2: Discoverable (after S1051.4 + S1051.5)
+- [ ] `rai doctor` validates Confluence config against live backend
+- [ ] Discovery produces structured space map
+- **Verify:** run doctor on current config, get actionable report
+
+#### M3: Self-Service — Epic Complete (after S1051.6)
+- [ ] `/rai-adapter-setup` generates valid config from scratch
+- [ ] New user can set up Confluence in < 5 minutes
+- **Verify:** delete config, run setup, publish an ADR
+
+### Sequencing Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| S1051.1 discovers library gaps | Blocks everything | First story validates all 10 methods against live backend |
+| S1051.2 registry wiring breaks existing MCP adapter | Breaks production | Entry point guarded by optional import; MCP adapter untouched |
+| S1051.6 interactive skill is hard to test | Delays epic close | Separate pure logic (discovery → config generation) from interactive UX |
+
 ## Design References
 
 - ADR-014: `governance/adrs/v2/adr-014-atlassian-transport-backend.md`
