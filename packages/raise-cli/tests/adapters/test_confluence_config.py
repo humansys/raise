@@ -291,3 +291,11 @@ space_key: "TEST"
 
         with pytest.raises(yaml.YAMLError):
             load_confluence_config(tmp_path)
+
+    def test_empty_yaml_raises(self, tmp_path: Path) -> None:
+        config_dir = tmp_path / ".raise"
+        config_dir.mkdir()
+        (config_dir / "confluence.yaml").write_text("")
+
+        with pytest.raises(ValueError, match="empty"):
+            load_confluence_config(tmp_path)

@@ -105,4 +105,7 @@ def load_confluence_config(project_root: Path) -> ConfluenceConfig:
         raise FileNotFoundError(msg)
     with open(config_path) as f:
         data: dict[str, Any] = yaml.safe_load(f)
+    if not data:
+        msg = f"Confluence config is empty: {config_path}"
+        raise ValueError(msg)
     return ConfluenceConfig.from_dict(data)
