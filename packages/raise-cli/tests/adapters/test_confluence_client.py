@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from typing import Any
+from unittest.mock import MagicMock, patch
+
 import pytest
 from pydantic import ValidationError
 
@@ -243,3 +246,231 @@ class TestClientConstructor:
 
             with pytest.raises(ImportError, match="raise-cli\\[confluence\\]"):
                 ConfluenceClient(config)
+
+
+# ── Shared fixture ───────────────────────────────────────────────────
+
+
+def _make_client(monkeypatch: pytest.MonkeyPatch) -> tuple[Any, Any]:
+    """Create a ConfluenceClient with mocked atlassian backend.
+
+    Returns (client, mock_backend) where mock_backend is the
+    mocked atlassian.Confluence instance.
+    """
+    from raise_cli.adapters.confluence_client import ConfluenceClient
+    from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
+
+    monkeypatch.setenv("CONFLUENCE_API_TOKEN", "test-token")
+    config = ConfluenceInstanceConfig(
+        url="https://test.atlassian.net/wiki",
+        username="u@test.com",
+        space_key="TEST",
+    )
+    client = ConfluenceClient(config)
+    mock_backend = MagicMock()
+    client._client = mock_backend
+    return client, mock_backend
+
+
+# ── T4: Publishing methods ───────────────────────────────────────────
+
+
+class TestCreatePage:
+    """create_page → PageContent."""
+
+    def test_create_page_returns_page_content(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.models.docs import PageContent
+
+        client, backend = _make_client(monkeypatch)
+        backend.create_page.return_value = {
+            "id": "456",
+            "title": "ADR-015",
+            "body": {"storage": {"value": "<p>content</p>"}},
+            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "version": {"number": 1},
+            "space": {"key": "TEST"},
+        }
+
+        result = client.create_page("ADR-015", "<p>content</p>", parent_id="123")
+
+        assert isinstance(result, PageContent)
+        assert result.id == "456"
+        assert result.title == "ADR-015"
+        backend.create_page.assert_called_once_with(
+            space="TEST",
+            title="ADR-015",
+            body="<p>content</p>",
+            parent_id="123",
+            type="page",
+        )
+
+    def test_create_page_uses_space_override(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.create_page.return_value = {
+            "id": "1", "title": "T", "body": {"storage": {"value": ""}},
+            "_links": {"base": "", "webui": ""}, "version": {"number": 1},
+            "space": {"key": "OTHER"},
+        }
+
+        client.create_page("T", "<p>b</p>", space="OTHER")
+
+        backend.create_page.assert_called_once()
+        call_kwargs = backend.create_page.call_args
+        assert call_kwargs[1]["space"] == "OTHER" or call_kwargs[0][0] == "OTHER"
+
+
+class TestUpdatePage:
+    """update_page → PageContent."""
+
+    def test_update_page_returns_page_content(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.models.docs import PageContent
+
+        client, backend = _make_client(monkeypatch)
+        backend.update_page.return_value = {
+            "id": "456",
+            "title": "ADR-015 v2",
+            "body": {"storage": {"value": "<p>new</p>"}},
+            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "version": {"number": 2},
+            "space": {"key": "TEST"},
+        }
+
+        result = client.update_page("456", "ADR-015 v2", "<p>new</p>")
+
+        assert isinstance(result, PageContent)
+        assert result.id == "456"
+        assert result.version == 2
+
+
+class TestGetPageById:
+    """get_page_by_id → PageContent."""
+
+    def test_returns_page_content(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from raise_cli.adapters.models.docs import PageContent
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_id.return_value = {
+            "id": "456",
+            "title": "ADR-015",
+            "body": {"storage": {"value": "<p>content</p>"}},
+            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "version": {"number": 1},
+            "space": {"key": "TEST"},
+        }
+
+        result = client.get_page_by_id("456")
+
+        assert isinstance(result, PageContent)
+        assert result.id == "456"
+
+
+class TestGetPageByTitle:
+    """get_page_by_title → PageContent | None."""
+
+    def test_returns_page_when_found(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.models.docs import PageContent
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_title.return_value = {
+            "id": "456",
+            "title": "ADR-015",
+            "body": {"storage": {"value": "<p>content</p>"}},
+            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "version": {"number": 1},
+            "space": {"key": "TEST"},
+        }
+
+        result = client.get_page_by_title("ADR-015")
+
+        assert isinstance(result, PageContent)
+        assert result.title == "ADR-015"
+
+    def test_returns_none_when_not_found(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_title.return_value = None
+
+        result = client.get_page_by_title("nonexistent")
+
+        assert result is None
+
+    def test_uses_config_space_by_default(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_title.return_value = None
+
+        client.get_page_by_title("X")
+
+        backend.get_page_by_title.assert_called_once_with(space="TEST", title="X")
+
+    def test_uses_space_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_title.return_value = None
+
+        client.get_page_by_title("X", space="OTHER")
+
+        backend.get_page_by_title.assert_called_once_with(space="OTHER", title="X")
+
+
+class TestErrorMapping:
+    """isinstance-based error mapping from atlassian exceptions."""
+
+    def test_permission_error_maps_to_auth(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from atlassian.errors import ApiPermissionError
+
+        from raise_cli.adapters.confluence_exceptions import ConfluenceAuthError
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_id.side_effect = ApiPermissionError("403 Forbidden")
+
+        with pytest.raises(ConfluenceAuthError):
+            client.get_page_by_id("123")
+
+    def test_not_found_error_maps(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from atlassian.errors import ApiNotFoundError
+
+        from raise_cli.adapters.confluence_exceptions import ConfluenceNotFoundError
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_id.side_effect = ApiNotFoundError("404 Not Found")
+
+        with pytest.raises(ConfluenceNotFoundError):
+            client.get_page_by_id("123")
+
+    def test_generic_api_error_maps(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from atlassian.errors import ApiError
+
+        from raise_cli.adapters.confluence_exceptions import ConfluenceApiError
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_id.side_effect = ApiError("500 Server Error")
+
+        with pytest.raises(ConfluenceApiError):
+            client.get_page_by_id("123")
+
+    def test_unexpected_error_maps_to_api_error(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.confluence_exceptions import ConfluenceApiError
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_by_id.side_effect = RuntimeError("connection lost")
+
+        with pytest.raises(ConfluenceApiError, match="unexpected"):
+            client.get_page_by_id("123")
