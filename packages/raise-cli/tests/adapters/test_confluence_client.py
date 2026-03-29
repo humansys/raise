@@ -118,3 +118,61 @@ class TestConfluenceInstanceConfig:
         )
         rebuilt = ConfluenceInstanceConfig.model_validate(config.model_dump())
         assert rebuilt == config
+
+
+# ── T2: Auth resolution ──────────────────────────────────────────────
+
+
+class TestAuthResolution:
+    """Token resolution: instance-specific → generic → error."""
+
+    def test_instance_specific_token(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN_HUMANSYS", "instance-secret")
+        monkeypatch.delenv("CONFLUENCE_API_TOKEN", raising=False)
+
+        token = ConfluenceClient._resolve_token("humansys")
+        assert token == "instance-secret"
+
+    def test_generic_token_fallback(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+
+        monkeypatch.delenv("CONFLUENCE_API_TOKEN_HUMANSYS", raising=False)
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "generic-secret")
+
+        token = ConfluenceClient._resolve_token("humansys")
+        assert token == "generic-secret"
+
+    def test_instance_specific_takes_precedence(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN_HUMANSYS", "instance-secret")
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "generic-secret")
+
+        token = ConfluenceClient._resolve_token("humansys")
+        assert token == "instance-secret"
+
+    def test_missing_token_raises_auth_error(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+        from raise_cli.adapters.confluence_exceptions import ConfluenceAuthError
+
+        monkeypatch.delenv("CONFLUENCE_API_TOKEN_HUMANSYS", raising=False)
+        monkeypatch.delenv("CONFLUENCE_API_TOKEN", raising=False)
+
+        with pytest.raises(ConfluenceAuthError, match="CONFLUENCE_API_TOKEN"):
+            ConfluenceClient._resolve_token("humansys")
+
+    def test_instance_name_uppercased(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN_MY_PROD", "secret")
+
+        token = ConfluenceClient._resolve_token("my-prod")
+        assert token == "secret"
