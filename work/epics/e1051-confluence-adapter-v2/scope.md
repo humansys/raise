@@ -12,21 +12,23 @@ reliable from setup to daily use.
 1. **Open-core** — adapter lives in `raise-cli`, same level as filesystem adapter
 2. **API token auth** — url + username in config, token from env var (`CONFLUENCE_API_TOKEN`)
 3. **Multi-instance** — same pattern as jira.yaml (default_instance + instances map)
-4. **Config schema** — instances + routing (artifact-type → parent_title + labels)
+4. **Config schema** — instances + routing per-instance (artifact-type → parent_title + labels)
 5. **No local cache** — API is source of truth for page existence (no confluence-pages.yaml)
-6. **11 methods** — 5 existing Protocol + 6 new (set_labels, get_labels, get_page_children,
-   get_spaces, get_page_by_title, create_page). Validated against ADR-014 function map.
+6. **Sync adapter** — implements `DocumentationTarget` directly (no async wrapper)
+7. **Optional dependency** — `raise-cli[confluence]` for atlassian-python-api; filesystem is default
+8. **Protocol minimal** — only 2 new Protocol methods (set_labels, get_labels); discovery/admin
+   methods stay on ConfluenceClient (concrete class, not Protocol)
 
 ## Stories
 
 ### S1051.1: Confluence client wrapper (M)
 Wrapper over `atlassian.Confluence` with API token auth, multi-instance support,
-rate limiting. Exposes the 11 mapped methods. In `raise-cli/adapters/`.
-Tests with mocks.
+error normalization. 10 methods (concrete class, not Protocol). In `raise-cli/adapters/`.
+Optional dependency (`raise-cli[confluence]`). Tests with mocks.
 
 ### S1051.2: PythonApiConfluenceAdapter (M)
-Implements `AsyncDocumentationTarget` using client from S1051.1. Publish with
-routing from config. Replaces McpConfluenceAdapter in registry as default.
+Implements `DocumentationTarget` (sync, not async) using client from S1051.1.
+Publish with routing from config. Entry point in raise-cli. Filesystem remains default.
 
 ### S1051.3: Config schema + Pydantic models (S)
 `.raise/confluence.yaml` with instances, routing, labels. Pydantic models.
