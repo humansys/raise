@@ -244,3 +244,17 @@ class TestPublish:
         mock_client.create_page.assert_called_once_with(
             "ADR-015", "<p>adr</p>", parent_id=None,
         )
+
+
+# ── T4: Entry point registration ────────────────────────────────────────
+
+
+class TestEntryPoint:
+    """Entry point discoverable via registry."""
+
+    def test_confluence_in_doc_targets(self) -> None:
+        from raise_cli.adapters.registry import get_doc_targets
+
+        targets = get_doc_targets()
+        assert "confluence" in targets
+        assert targets["confluence"] is PythonApiConfluenceAdapter
