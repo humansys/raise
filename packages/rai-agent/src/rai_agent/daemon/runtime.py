@@ -299,10 +299,7 @@ class ClaudeRuntime:
         # GovernanceHooks methods return dict[str, Any] which is
         # structurally compatible with SyncHookJSONOutput at runtime
         # but pyright can't verify TypedDict compatibility.
-        # BUG(RAI-29): hooks cause ProcessTransport crash on SDK shutdown.
-        # Disabled until claude-agent-sdk fixes hook lifecycle timing.
-        # See: S2.11 smoke test logs — "Tool permission stream closed"
-        if self._governance is not None and False:  # noqa: SIM223
+        if self._governance is not None:
             gov = self._governance
             options.hooks = {
                 "PreToolUse": [
