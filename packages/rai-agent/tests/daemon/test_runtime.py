@@ -269,9 +269,6 @@ class TestClaudeRuntime:
 
         assert captured_options[0].hooks is None
 
-    @pytest.mark.skip(
-        reason="BUG(RAI-29): hooks disabled — SDK ProcessTransport crash on shutdown"
-    )
     async def test_governance_builds_hooks_dict(self) -> None:
         """ClaudeRuntime with governance builds hooks dict."""
         from rai_agent.daemon.governance import GovernanceHooks
