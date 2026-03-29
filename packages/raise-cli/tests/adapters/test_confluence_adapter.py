@@ -154,3 +154,93 @@ class TestSearch:
         mock_client.search.return_value = expected
         assert adapter.search("my query", limit=5) == expected
         mock_client.search.assert_called_once_with("my query", limit=5)
+
+
+# ── T3: publish ─────────────────────────────────────────────────────────
+
+
+def _page(
+    page_id: str = "100", title: str = "Test", url: str = "https://x/100"
+) -> PageContent:
+    return PageContent(
+        id=page_id, title=title, content="<p>body</p>",
+        url=url, space_key="TEST", version=1,
+    )
+
+
+class TestPublish:
+    """publish: create/update with routing."""
+
+    def test_creates_new_page_when_not_found(self) -> None:
+        adapter, mock_client = _make_adapter()
+        mock_client.get_page_by_title.return_value = None
+        mock_client.create_page.return_value = _page()
+
+        result = adapter.publish("doc", "<p>hi</p>", {"title": "My Page"})
+
+        assert result.success is True
+        assert result.url == "https://x/100"
+        mock_client.create_page.assert_called_once_with(
+            "My Page", "<p>hi</p>", parent_id=None,
+        )
+
+    def test_updates_existing_page(self) -> None:
+        adapter, mock_client = _make_adapter()
+        existing = _page(page_id="200", title="My Page")
+        mock_client.get_page_by_title.return_value = existing
+        mock_client.update_page.return_value = _page(page_id="200", url="https://x/200")
+
+        result = adapter.publish("doc", "<p>updated</p>", {"title": "My Page"})
+
+        assert result.success is True
+        mock_client.update_page.assert_called_once_with("200", "My Page", "<p>updated</p>")
+
+    def test_applies_labels_from_routing(self) -> None:
+        routing = {"adr": ArtifactRouting(parent_title="ADRs", labels=["adr", "arch"])}
+        adapter, mock_client = _make_adapter(routing=routing)
+        # Parent page found
+        mock_client.get_page_by_title.side_effect = [
+            _page(page_id="10", title="ADRs"),  # parent lookup
+            None,  # title lookup (new page)
+        ]
+        mock_client.create_page.return_value = _page(page_id="50")
+
+        result = adapter.publish("adr", "<p>adr</p>", {"title": "ADR-015"})
+
+        assert result.success is True
+        mock_client.create_page.assert_called_once_with(
+            "ADR-015", "<p>adr</p>", parent_id="10",
+        )
+        mock_client.set_labels.assert_called_once_with("50", ["adr", "arch"])
+
+    def test_publishes_without_routing(self) -> None:
+        adapter, mock_client = _make_adapter()
+        mock_client.get_page_by_title.return_value = None
+        mock_client.create_page.return_value = _page()
+
+        result = adapter.publish("anything", "<p>hi</p>", {"title": "Page"})
+
+        assert result.success is True
+        mock_client.set_labels.assert_not_called()
+
+    def test_requires_title_in_metadata(self) -> None:
+        adapter, mock_client = _make_adapter()
+
+        result = adapter.publish("doc", "<p>hi</p>", {})
+
+        assert result.success is False
+        assert "title" in result.message
+        mock_client.create_page.assert_not_called()
+
+    def test_parent_not_found_creates_without_parent(self) -> None:
+        routing = {"adr": ArtifactRouting(parent_title="ADRs", labels=["adr"])}
+        adapter, mock_client = _make_adapter(routing=routing)
+        mock_client.get_page_by_title.return_value = None  # both parent and page not found
+        mock_client.create_page.return_value = _page()
+
+        result = adapter.publish("adr", "<p>adr</p>", {"title": "ADR-015"})
+
+        assert result.success is True
+        mock_client.create_page.assert_called_once_with(
+            "ADR-015", "<p>adr</p>", parent_id=None,
+        )
