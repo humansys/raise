@@ -1,14 +1,21 @@
-"""Confluence instance configuration.
+"""Confluence configuration — instance, routing, and multi-instance schema.
 
-Minimal Pydantic model for S1051.1. S1051.3 extends with routing,
-labels, and multi-instance config loading from .raise/confluence.yaml.
+Models for .raise/confluence.yaml with loader function.
+Supports full multi-instance and flat minimal formats.
 
-RAISE-1054 (S1051.1)
+RAISE-1054 (S1051.1), RAISE-1056 (S1051.3)
 """
 
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
+
+
+class ArtifactRouting(BaseModel):
+    """Routing config for one artifact type (e.g. adr, roadmap)."""
+
+    parent_title: str = Field(..., description="Parent page title to publish under")
+    labels: list[str] = Field(default_factory=list, description="Labels to apply on publish")
 
 
 class ConfluenceInstanceConfig(BaseModel):
