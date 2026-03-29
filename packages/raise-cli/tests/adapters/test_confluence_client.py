@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import ValidationError
-
 
 # ── T1: Exceptions + Config ──────────────────────────────────────────
 
@@ -190,8 +190,6 @@ class TestClientConstructor:
     def test_constructor_creates_client(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        from unittest.mock import MagicMock, patch
-
         from raise_cli.adapters.confluence_client import ConfluenceClient
         from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
 
@@ -203,16 +201,11 @@ class TestClientConstructor:
         )
 
         mock_confluence_cls = MagicMock()
-        with patch(
-            "raise_cli.adapters.confluence_client.ConfluenceClient.__init__.__module__",
-            create=True,
+        with patch.dict(
+            sys.modules,
+            {"atlassian": MagicMock(Confluence=mock_confluence_cls)},
         ):
-            # Patch at the import point inside __init__
-            with patch.dict(
-                "sys.modules",
-                {"atlassian": MagicMock(Confluence=mock_confluence_cls)},
-            ):
-                client = ConfluenceClient(config)
+            client = ConfluenceClient(config)
 
         mock_confluence_cls.assert_called_once_with(
             url="https://test.atlassian.net/wiki",
@@ -228,9 +221,6 @@ class TestClientConstructor:
     def test_import_guard_raises_on_missing_dep(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        import sys
-        from unittest.mock import patch
-
         from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
 
         monkeypatch.setenv("CONFLUENCE_API_TOKEN", "test-token")

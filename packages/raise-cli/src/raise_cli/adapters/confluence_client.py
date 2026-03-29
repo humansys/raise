@@ -61,7 +61,7 @@ class ConfluenceClient:
         """Create a page. Uses config.space_key unless space is overridden."""
         target_space = space or self._config.space_key
         try:
-            raw = self._client.create_page(  # type: ignore[no-untyped-call]
+            raw: dict[str, Any] = self._client.create_page(  # type: ignore[no-untyped-call]
                 space=target_space,
                 title=title,
                 body=body,
@@ -77,7 +77,7 @@ class ConfluenceClient:
     def update_page(self, page_id: str, title: str, body: str) -> PageContent:
         """Update an existing page by ID."""
         try:
-            raw = self._client.update_page(  # type: ignore[no-untyped-call]
+            raw: dict[str, Any] = self._client.update_page(  # type: ignore[no-untyped-call]
                 page_id=page_id,
                 title=title,
                 body=body,
@@ -91,7 +91,7 @@ class ConfluenceClient:
     def get_page_by_id(self, page_id: str) -> PageContent:
         """Get full page content by ID."""
         try:
-            raw = self._client.get_page_by_id(  # type: ignore[no-untyped-call]
+            raw: dict[str, Any] = self._client.get_page_by_id(  # type: ignore[no-untyped-call]
                 page_id=page_id,
                 expand="body.storage,version,space",
             )
@@ -107,13 +107,13 @@ class ConfluenceClient:
         """Get page by title. Returns None if not found."""
         target_space = space or self._config.space_key
         try:
-            raw = self._client.get_page_by_title(  # type: ignore[no-untyped-call]
+            result = self._client.get_page_by_title(  # type: ignore[no-untyped-call]
                 space=target_space,
                 title=title,
             )
-            if raw is None:
+            if result is None:
                 return None
-            return self._parse_page(raw)
+            return self._parse_page(result)  # type: ignore[arg-type]
         except ConfluenceError:
             raise
         except Exception as e:
@@ -134,8 +134,8 @@ class ConfluenceClient:
     def get_labels(self, page_id: str) -> list[str]:
         """Get labels for a page."""
         try:
-            raw = self._client.get_page_labels(page_id)  # type: ignore[no-untyped-call]
-            return [label["name"] for label in raw.get("results", [])]  # type: ignore[union-attr]
+            raw: dict[str, Any] = self._client.get_page_labels(page_id)  # type: ignore[no-untyped-call]
+            return [label["name"] for label in raw.get("results", [])]
         except ConfluenceError:
             raise
         except Exception as e:
@@ -146,7 +146,7 @@ class ConfluenceClient:
     def get_spaces(self) -> list[SpaceInfo]:
         """List all accessible spaces."""
         try:
-            raw = self._client.get_all_spaces()  # type: ignore[no-untyped-call]
+            raw: dict[str, Any] = self._client.get_all_spaces()  # type: ignore[no-untyped-call]
             return [
                 SpaceInfo(
                     key=s["key"],
@@ -154,7 +154,7 @@ class ConfluenceClient:
                     url=s.get("_links", {}).get("webui", ""),
                     type=s.get("type", "global"),
                 )
-                for s in raw.get("results", [])  # type: ignore[union-attr]
+                for s in raw.get("results", [])
             ]
         except ConfluenceError:
             raise
@@ -164,7 +164,7 @@ class ConfluenceClient:
     def get_page_children(self, page_id: str) -> list[PageSummary]:
         """Get child pages of a page."""
         try:
-            raw = self._client.get_child_pages(page_id)  # type: ignore[no-untyped-call]
+            raw: list[dict[str, Any]] = self._client.get_child_pages(page_id)  # type: ignore[no-untyped-call]
             return [
                 PageSummary(
                     id=str(p["id"]),
@@ -172,7 +172,7 @@ class ConfluenceClient:
                     url=p.get("_links", {}).get("webui", ""),
                     space_key=p.get("space", {}).get("key", ""),
                 )
-                for p in raw  # type: ignore[union-attr]
+                for p in raw
             ]
         except ConfluenceError:
             raise
@@ -184,7 +184,7 @@ class ConfluenceClient:
     def search(self, cql: str, limit: int = 10) -> list[PageSummary]:
         """Search using CQL."""
         try:
-            raw = self._client.cql(cql, limit=limit)  # type: ignore[no-untyped-call]
+            raw: dict[str, Any] = self._client.cql(cql, limit=limit)  # type: ignore[no-untyped-call]
             return [
                 PageSummary(
                     id=str(r["content"]["id"]),
@@ -192,7 +192,7 @@ class ConfluenceClient:
                     url=r.get("url", ""),
                     space_key=r["content"].get("space", {}).get("key", ""),
                 )
-                for r in raw.get("results", [])  # type: ignore[union-attr]
+                for r in raw.get("results", [])
             ]
         except ConfluenceError:
             raise
@@ -240,15 +240,15 @@ class ConfluenceClient:
         body = raw.get("body", {})
         content = body.get("storage", {}).get("value", "") if body else ""
 
-        space = raw.get("space", {})
-        space_key = space.get("key", "") if isinstance(space, dict) else ""
+        space_raw: dict[str, Any] = raw.get("space") or {}
+        space_key: str = str(space_raw.get("key", ""))
 
-        version = raw.get("version", {})
-        version_num = version.get("number", 1) if isinstance(version, dict) else 1
+        version_raw: dict[str, Any] = raw.get("version") or {}
+        version_num: int = int(version_raw.get("number", 1))
 
         return PageContent(
             id=str(raw.get("id", "")),
-            title=raw.get("title", ""),
+            title=str(raw.get("title", "")),
             content=content,
             url=url,
             space_key=space_key,
