@@ -28,3 +28,7 @@ class ConfluenceInstanceConfig(BaseModel):
         default="default",
         description="Instance identifier for token resolution",
     )
+    routing: dict[str, ArtifactRouting] = Field(
+        default_factory=dict,
+        description="Artifact type → routing config (parent page + labels)",
+    )
