@@ -8,6 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+import yaml
 from pydantic import ValidationError
 
 from raise_cli.adapters.confluence_config import (
@@ -16,7 +17,6 @@ from raise_cli.adapters.confluence_config import (
     ConfluenceInstanceConfig,
     load_confluence_config,
 )
-
 
 # ── T1: ArtifactRouting ──────────────────────────────────────────────────
 
@@ -289,5 +289,5 @@ space_key: "TEST"
         config_dir.mkdir()
         (config_dir / "confluence.yaml").write_text("not_valid: [}")
 
-        with pytest.raises(Exception):  # yaml.ScannerError
+        with pytest.raises(yaml.YAMLError):
             load_confluence_config(tmp_path)
