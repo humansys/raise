@@ -5,6 +5,8 @@ S1051.3 (RAISE-1056)
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -12,6 +14,7 @@ from raise_cli.adapters.confluence_config import (
     ArtifactRouting,
     ConfluenceConfig,
     ConfluenceInstanceConfig,
+    load_confluence_config,
 )
 
 
@@ -134,3 +137,157 @@ class TestConfluenceConfig:
                 default_instance="missing",
                 instances={"prod": _make_instance()},
             )
+
+
+# ── T4: Flat config normalization ───────────────────────────────────────
+
+
+class TestFlatConfigNormalization:
+    """Flat {url, username, space_key} normalizes to ConfluenceConfig."""
+
+    def test_flat_dict_normalizes(self) -> None:
+        flat = {
+            "url": "https://x.atlassian.net/wiki",
+            "username": "a@b.com",
+            "space_key": "TEST",
+        }
+        cfg = ConfluenceConfig.from_dict(flat)
+        assert cfg.default_instance == "default"
+        assert "default" in cfg.instances
+        assert cfg.get_instance().url == "https://x.atlassian.net/wiki"
+
+    def test_flat_with_instance_name(self) -> None:
+        flat = {
+            "url": "https://x.atlassian.net/wiki",
+            "username": "a@b.com",
+            "space_key": "TEST",
+            "instance_name": "prod",
+        }
+        cfg = ConfluenceConfig.from_dict(flat)
+        assert cfg.default_instance == "default"
+        assert cfg.get_instance().instance_name == "prod"
+
+    def test_full_dict_passes_through(self) -> None:
+        full = {
+            "default_instance": "prod",
+            "instances": {
+                "prod": {
+                    "url": "https://x.atlassian.net/wiki",
+                    "username": "a@b.com",
+                    "space_key": "TEST",
+                    "instance_name": "prod",
+                },
+            },
+        }
+        cfg = ConfluenceConfig.from_dict(full)
+        assert cfg.default_instance == "prod"
+
+
+# ── T5: resolve_routing ─────────────────────────────────────────────────
+
+
+class TestResolveRouting:
+    """resolve_routing on ConfluenceConfig."""
+
+    def test_known_type_returns_routing(self) -> None:
+        cfg = ConfluenceConfig(
+            default_instance="prod",
+            instances={
+                "prod": ConfluenceInstanceConfig(
+                    url="https://x.atlassian.net/wiki",
+                    username="a@b.com",
+                    space_key="TEST",
+                    instance_name="prod",
+                    routing={
+                        "adr": ArtifactRouting(
+                            parent_title="ADRs", labels=["adr"]
+                        ),
+                    },
+                ),
+            },
+        )
+        r = cfg.resolve_routing("adr")
+        assert r is not None
+        assert r.parent_title == "ADRs"
+
+    def test_unknown_type_returns_none(self) -> None:
+        cfg = ConfluenceConfig(
+            default_instance="prod",
+            instances={"prod": _make_instance(instance_name="prod")},
+        )
+        assert cfg.resolve_routing("nonexistent") is None
+
+    def test_routing_on_specific_instance(self) -> None:
+        cfg = ConfluenceConfig(
+            default_instance="prod",
+            instances={
+                "prod": _make_instance(instance_name="prod"),
+                "docs": ConfluenceInstanceConfig(
+                    url="https://docs.atlassian.net/wiki",
+                    username="a@b.com",
+                    space_key="DOCS",
+                    instance_name="docs",
+                    routing={
+                        "roadmap": ArtifactRouting(parent_title="Roadmap"),
+                    },
+                ),
+            },
+        )
+        assert cfg.resolve_routing("roadmap", instance="docs") is not None
+        assert cfg.resolve_routing("roadmap") is None  # not on default
+
+
+# ── T6: load_confluence_config ──────────────────────────────────────────
+
+
+class TestLoadConfluenceConfig:
+    """load_confluence_config reads .raise/confluence.yaml."""
+
+    def test_load_full_yaml(self, tmp_path: Path) -> None:
+        yaml_content = """\
+default_instance: humansys
+instances:
+  humansys:
+    url: "https://humansys.atlassian.net/wiki"
+    username: "emilio@humansys.ai"
+    space_key: "RaiSE1"
+    instance_name: "humansys"
+    routing:
+      adr:
+        parent_title: "Architecture Decision Records"
+        labels: ["adr", "architecture"]
+"""
+        config_dir = tmp_path / ".raise"
+        config_dir.mkdir()
+        (config_dir / "confluence.yaml").write_text(yaml_content)
+
+        cfg = load_confluence_config(tmp_path)
+        assert cfg.default_instance == "humansys"
+        assert cfg.get_instance().space_key == "RaiSE1"
+        assert cfg.resolve_routing("adr") is not None
+
+    def test_load_flat_yaml(self, tmp_path: Path) -> None:
+        yaml_content = """\
+url: "https://x.atlassian.net/wiki"
+username: "a@b.com"
+space_key: "TEST"
+"""
+        config_dir = tmp_path / ".raise"
+        config_dir.mkdir()
+        (config_dir / "confluence.yaml").write_text(yaml_content)
+
+        cfg = load_confluence_config(tmp_path)
+        assert cfg.default_instance == "default"
+        assert cfg.get_instance().url == "https://x.atlassian.net/wiki"
+
+    def test_missing_file_raises(self, tmp_path: Path) -> None:
+        with pytest.raises(FileNotFoundError):
+            load_confluence_config(tmp_path)
+
+    def test_invalid_yaml_raises(self, tmp_path: Path) -> None:
+        config_dir = tmp_path / ".raise"
+        config_dir.mkdir()
+        (config_dir / "confluence.yaml").write_text("not_valid: [}")
+
+        with pytest.raises(Exception):  # yaml.ScannerError
+            load_confluence_config(tmp_path)

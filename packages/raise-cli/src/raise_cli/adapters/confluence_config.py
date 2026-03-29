@@ -8,6 +8,10 @@ RAISE-1054 (S1051.1), RAISE-1056 (S1051.3)
 
 from __future__ import annotations
 
+from pathlib import Path
+from typing import Any
+
+import yaml
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -69,3 +73,36 @@ class ConfluenceConfig(BaseModel):
         """Resolve routing for artifact type on instance. Returns None if not configured."""
         inst = self.get_instance(instance)
         return inst.routing.get(artifact_type)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ConfluenceConfig:
+        """Create config from dict, auto-normalizing flat format.
+
+        Flat: {url, username, space_key, ...} → single "default" instance.
+        Full: {default_instance, instances: {...}} → pass through.
+        """
+        if "instances" in data:
+            return cls.model_validate(data)
+        # Flat format — normalize to multi-instance
+        return cls(
+            default_instance="default",
+            instances={"default": ConfluenceInstanceConfig.model_validate(data)},
+        )
+
+
+_CONFLUENCE_YAML_PATH = Path(".raise/confluence.yaml")
+
+
+def load_confluence_config(project_root: Path) -> ConfluenceConfig:
+    """Load and validate .raise/confluence.yaml.
+
+    Supports full multi-instance and flat minimal formats.
+    Raises FileNotFoundError if config file doesn't exist.
+    """
+    config_path = project_root / _CONFLUENCE_YAML_PATH
+    if not config_path.exists():
+        msg = f"Confluence config not found: {config_path}"
+        raise FileNotFoundError(msg)
+    with open(config_path) as f:
+        data: dict[str, Any] = yaml.safe_load(f)
+    return ConfluenceConfig.from_dict(data)
