@@ -474,3 +474,199 @@ class TestErrorMapping:
 
         with pytest.raises(ConfluenceApiError, match="unexpected"):
             client.get_page_by_id("123")
+
+
+# ── T5: Label methods ────────────────────────────────────────────────
+
+
+class TestSetLabels:
+    """set_labels calls set_page_label per label."""
+
+    def test_sets_each_label(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+
+        client.set_labels("456", ["adr", "v2", "approved"])
+
+        assert backend.set_page_label.call_count == 3
+        backend.set_page_label.assert_any_call("456", "adr")
+        backend.set_page_label.assert_any_call("456", "v2")
+        backend.set_page_label.assert_any_call("456", "approved")
+
+    def test_empty_labels_no_calls(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+
+        client.set_labels("456", [])
+
+        backend.set_page_label.assert_not_called()
+
+
+class TestGetLabels:
+    """get_labels returns list[str]."""
+
+    def test_returns_label_names(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_labels.return_value = {
+            "results": [
+                {"name": "adr", "prefix": "global"},
+                {"name": "v2", "prefix": "global"},
+            ]
+        }
+
+        labels = client.get_labels("456")
+
+        assert labels == ["adr", "v2"]
+
+    def test_returns_empty_list_when_no_labels(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_page_labels.return_value = {"results": []}
+
+        labels = client.get_labels("456")
+
+        assert labels == []
+
+
+# ── T6: Discovery methods ────────────────────────────────────────────
+
+
+class TestGetSpaces:
+    """get_spaces returns list[SpaceInfo]."""
+
+    def test_returns_space_info_list(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from raise_cli.adapters.models.docs import SpaceInfo
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_all_spaces.return_value = {
+            "results": [
+                {
+                    "key": "RaiSE1",
+                    "name": "RaiSE Engineering",
+                    "type": "global",
+                    "_links": {"webui": "/spaces/RaiSE1"},
+                },
+                {
+                    "key": "DEV",
+                    "name": "Development",
+                    "type": "global",
+                    "_links": {"webui": "/spaces/DEV"},
+                },
+            ]
+        }
+
+        spaces = client.get_spaces()
+
+        assert len(spaces) == 2
+        assert isinstance(spaces[0], SpaceInfo)
+        assert spaces[0].key == "RaiSE1"
+        assert spaces[1].name == "Development"
+
+    def test_returns_empty_list(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_all_spaces.return_value = {"results": []}
+
+        assert client.get_spaces() == []
+
+
+class TestGetPageChildren:
+    """get_page_children returns list[PageSummary]."""
+
+    def test_returns_page_summary_list(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.models.docs import PageSummary
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_child_pages.return_value = [
+            {
+                "id": "101",
+                "title": "ADR-014",
+                "space": {"key": "RaiSE1"},
+                "_links": {"webui": "/pages/101"},
+            },
+            {
+                "id": "102",
+                "title": "ADR-015",
+                "space": {"key": "RaiSE1"},
+                "_links": {"webui": "/pages/102"},
+            },
+        ]
+
+        children = client.get_page_children("100")
+
+        assert len(children) == 2
+        assert isinstance(children[0], PageSummary)
+        assert children[0].id == "101"
+        assert children[1].title == "ADR-015"
+
+    def test_returns_empty_list(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_child_pages.return_value = []
+
+        assert client.get_page_children("100") == []
+
+
+# ── T7: Search + Health ──────────────────────────────────────────────
+
+
+class TestSearch:
+    """search with CQL returns list[PageSummary]."""
+
+    def test_returns_page_summaries(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.models.docs import PageSummary
+
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {
+            "results": [
+                {
+                    "content": {
+                        "id": "456",
+                        "title": "ADR-015",
+                        "space": {"key": "RaiSE1"},
+                    },
+                    "url": "/wiki/spaces/RaiSE1/pages/456",
+                },
+            ]
+        }
+
+        results = client.search("type=page AND space=RaiSE1", limit=5)
+
+        assert len(results) == 1
+        assert isinstance(results[0], PageSummary)
+        assert results[0].id == "456"
+        backend.cql.assert_called_once_with(
+            "type=page AND space=RaiSE1", limit=5
+        )
+
+    def test_returns_empty_list(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {"results": []}
+
+        assert client.search("nonexistent") == []
+
+
+class TestHealth:
+    """health checks connectivity."""
+
+    def test_healthy(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from raise_cli.adapters.models.health import AdapterHealth
+
+        client, backend = _make_client(monkeypatch)
+        backend.get_all_spaces.return_value = {"results": []}
+
+        result = client.health()
+
+        assert isinstance(result, AdapterHealth)
+        assert result.healthy is True
+        assert result.name == "confluence"
+
+    def test_unhealthy(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        client, backend = _make_client(monkeypatch)
+        backend.get_all_spaces.side_effect = ConnectionError("refused")
+
+        result = client.health()
+
+        assert result.healthy is False
+        assert "refused" in result.message
