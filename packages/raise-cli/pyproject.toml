@@ -49,6 +49,9 @@ observability = [
 csharp = [
     "tree-sitter-c-sharp>=0.23.1",
 ]
+confluence = [
+    "atlassian-python-api>=3.41",
+]
 
 [project.urls]
 Homepage = "https://raiseframework.ai"
