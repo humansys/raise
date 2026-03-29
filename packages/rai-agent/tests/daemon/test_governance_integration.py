@@ -66,9 +66,6 @@ async def _async_gen(items: list[Any]):  # type: ignore[return]
 class TestGovernanceIntegration:
     """Full pipeline: GovernanceHooks + ClaudeRuntime."""
 
-    @pytest.mark.skip(
-        reason="BUG(RAI-29): hooks disabled — SDK ProcessTransport crash on shutdown"
-    )
     async def test_hooks_dict_has_correct_structure(
         self,
     ) -> None:
@@ -137,9 +134,6 @@ class TestGovernanceIntegration:
         assert "daily-briefing" in prompt
         assert "morning briefing" in prompt
 
-    @pytest.mark.skip(
-        reason="BUG(RAI-29): hooks disabled — SDK ProcessTransport crash on shutdown"
-    )
     async def test_full_pipeline_options(self, tmp_path: Any) -> None:
         """Full pipeline: governance + assembler + max_turns."""
         mem = tmp_path / "CLAUDE.md"

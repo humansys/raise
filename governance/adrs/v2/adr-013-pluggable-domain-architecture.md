@@ -1,6 +1,6 @@
 ---
 id: "ADR-013"
-title: "Domain Cartridge Architecture: Data Contracts for Agent Knowledge"
+title: "Pluggable Domain Architecture: Data Contracts for Agent Knowledge"
 date: "2026-03-22"
 status: "Proposed"
 related_to: ["ADR-011", "ADR-012", "ADR-002"]
@@ -9,7 +9,7 @@ story: "RAISE-652"
 research: "RAISE-653"
 ---
 
-# ADR-013: Domain Cartridge Architecture
+# ADR-013: Pluggable Domain Architecture
 
 ## Context
 
@@ -38,29 +38,29 @@ Formal research (RAISE-653, 22 + 52 sources triangulated) validates three claims
 
 ## Decision
 
-### Adopt the Domain Cartridge Architecture
+### Adopt the Pluggable Domain Architecture
 
-A **Domain Cartridge** is a pluggable module that owns a knowledge domain and delivers validated, schema-conformant knowledge to the agent's context. Each cartridge bundles:
+A **Domain** is a pluggable module that owns a knowledge area and delivers validated, schema-conformant knowledge to the agent's context. Each domain bundles:
 
-```
-Cartridge = Schema + Provider + Gates + Skills + Prompting
+```text
+Domain = Schema + Provider + Gates + Skills + Prompting
 ```
 
 The system operates on five design principles, each grounded in research:
 
 ### P1: Schema-as-Contract at the Boundary
 
-Each cartridge declares its data contract in a machine-readable manifest (`cartridge.yaml`). The adapter (provider) validates external data against the schema before producing graph nodes. Invalid data is rejected, not silently ingested.
+Each domain declares its data contract in a machine-readable manifest (`domain.yaml`). The adapter (provider) validates external data against the schema before producing graph nodes. Invalid data is rejected, not silently ingested.
 
 **Grounding:** Data Contract Specification (Dehghani 2022, Jones 2023), PydanticAI RunContext as contract enforcer, Neuro-Symbolic Gap research mandating boundary validation.
 
-**Implementation:** Pydantic models per cartridge. The adapter IS the Anti-Corruption Layer (DDD). Validation happens at ingestion, not at query time.
+**Implementation:** Pydantic models per domain. The adapter IS the Anti-Corruption Layer (DDD). Validation happens at ingestion, not at query time.
 
 ```yaml
-# .raise/cartridges/work/cartridge.yaml
+# .raise/domains/work/domain.yaml
 name: work
 version: "1.0"
-kind: cartridge
+kind: domain
 
 schema:
   node_types: [epic, story, task, bug]
@@ -88,11 +88,11 @@ Each provider owns an isolated namespace of entities. The JiraWorkAdapter owns a
 
 ### P3: Composition over Rigid Schema
 
-The `GraphNode` model is shared across cartridges but extensible via typed metadata. Each cartridge defines which metadata fields are required for its domain. The graph is the union of all cartridge outputs.
+The `GraphNode` model is shared across domains but extensible via typed metadata. Each domain defines which metadata fields are required for its scope. The graph is the union of all domain outputs.
 
 **Grounding:** GitLab work item widgets, Backstage extensible kinds, Notion block properties.
 
-**Implementation:** `GraphNode.metadata: dict[str, Any]` validated per-cartridge by Pydantic discriminated unions.
+**Implementation:** `GraphNode.metadata: dict[str, Any]` validated per-domain by Pydantic discriminated unions.
 
 ### P4: Build-Time Validation (Shift Left)
 
@@ -100,7 +100,7 @@ The `GraphNode` model is shared across cartridges but extensible via typed metad
 
 **Grounding:** Apollo Rover CLI composition validation, Haystack assembly validation, dbt contract enforcement. No existing tool applies build-time composition to agent knowledge.
 
-**Implementation:** Each cartridge registers validators. Build step runs all validators and reports. `--strict` mode fails on warnings.
+**Implementation:** Each domain registers validators. Build step runs all validators and reports. `--strict` mode fails on warnings.
 
 ### P5: Overlay Graph (No Data Copy)
 
@@ -112,13 +112,13 @@ The graph is a **view** over existing data, not a copy. Data stays in Jira, Conf
 
 ### The MVC Compiler (The Moat)
 
-The competitive differentiation is not in the cartridges themselves — it's in the **Minimum Viable Context Compiler** that sits between the knowledge graph and the agent execution layer.
+The competitive differentiation is not in the domains themselves — it's in the **Minimum Viable Context Compiler** that sits between the knowledge graph and the agent execution layer.
 
 Current tools provide access to knowledge (MCP, RAG, grep). They don't curate it. The MVC Compiler:
 
 1. **Trigger**: Agent signals intent (skill invocation, task start)
-2. **Cartridge Assembly**: Compiler identifies relevant domains from task metadata
-3. **MVC Compaction**: Per-cartridge contracts define what to include. Cost-of-not-knowing determines priority. Token budget is respected.
+2. **Domain Assembly**: Compiler identifies relevant domains from task metadata
+3. **MVC Compaction**: Per-domain contracts define what to include. Cost-of-not-knowing determines priority. Token budget is respected.
 4. **JIT Injection**: Compacted payload injected into agent context via dependency injection (PydanticAI RunContext pattern)
 
 **Grounding:** Google ADK minimum-viable-context principle, MVC formalization (Broda 2025), Augment contextual compression (4,456 → 682 sources). Devin's finding that single well-contextualized agent > multi-agent swarms.
@@ -129,34 +129,34 @@ Current tools provide access to knowledge (MCP, RAG, grep). They don't curate it
 
 - **Validated knowledge**: Agent never consumes unvalidated data. Schema contracts catch staleness, missing fields, type errors at ingestion.
 - **Multi-domain unified graph**: Work items, governance docs, and domain knowledge queryable through one graph interface.
-- **Measurable reliability**: Adopt SeekBench/TrustBench epistemic competence dimensions to measure cartridge impact.
-- **Ecosystem play**: Third-party cartridges (code analysis, security, performance) follow the same contract pattern — like Backstage plugins.
-- **Platform agnostic**: Cartridges are YAML + Pydantic. No IDE dependency. Works with Claude Code, Cursor, any MCP-compatible tool.
+- **Measurable reliability**: Adopt SeekBench/TrustBench epistemic competence dimensions to measure domain impact.
+- **Ecosystem play**: Third-party domains (code analysis, security, performance) follow the same contract pattern — like Backstage plugins.
+- **Platform agnostic**: Domains are YAML + Pydantic. No IDE dependency. Works with Claude Code, Cursor, any MCP-compatible tool.
 
 ### Negative
 
-- **Schema maintenance overhead**: Each cartridge requires schema definitions. Mitigated by starting with 2 cartridges (Work + Knowledge) and keeping schemas minimal.
+- **Schema maintenance overhead**: Each domain requires schema definitions. Mitigated by starting with 2 domains (Work + Knowledge) and keeping schemas minimal.
 - **Build time cost**: `rai graph build` queries live sources. Mitigated by caching and incremental builds with change detection.
-- **Ontology alignment remains manual**: Aligning schemas across cartridges is NP-hard in the general case (Euzenat & Shvaiko 2013). We accept this and provide validation tooling, not automation.
-- **Adoption barrier**: Developers must define cartridges for their domains. Mitigated by shipping default cartridges and making creation lightweight.
+- **Ontology alignment remains manual**: Aligning schemas across domains is NP-hard in the general case (Euzenat & Shvaiko 2013). We accept this and provide validation tooling, not automation.
+- **Adoption barrier**: Developers must define domains for their projects. Mitigated by shipping default domains and making creation lightweight.
 
 ### What We Adopt
 
 | Component | From | Why |
 |-----------|------|-----|
-| Contract enforcement | PydanticAI RunContext + Pydantic models | Already in our stack, exact fit for cartridge DI |
+| Contract enforcement | PydanticAI RunContext + Pydantic models | Already in our stack, exact fit for domain DI |
 | External data access | MCP servers | Already in our stack, industry standard |
 | KG storage (evaluate) | LlamaIndex PropertyGraphIndex | Mature, Text2Cypher, self-correction. Evaluate as overlay graph backend |
 | Data ingestion | dlt (data load tool) | Schema inference + normalization for messy API data |
 | Reliability metrics | SeekBench/TrustBench dimensions | Formal epistemic competence measurement |
-| Three-tier context | Codified Context pattern | Hot (constitution) / Warm (cartridge) / Cold (knowledge base) |
+| Three-tier context | Codified Context pattern | Hot (constitution) / Warm (domain) / Cold (knowledge base) |
 | Min-viable-context | Google ADK scoping principle | Every agent call sees minimum required context |
 
 ### What We Build
 
 | Component | Why it doesn't exist |
 |-----------|---------------------|
-| `cartridge.yaml` manifest | Nobody defines domain knowledge schemas for AI agents |
+| `domain.yaml` manifest | Nobody defines domain knowledge schemas for AI agents |
 | Adapter validation layer | Knowledge quality is assumed, not enforced |
 | Build-time composition (`rai graph build --strict`) | No equivalent of Apollo composition for agent knowledge |
 | Overlay graph from heterogeneous live sources | Existing tools copy data or index code only |
@@ -166,33 +166,33 @@ Current tools provide access to knowledge (MCP, RAG, grep). They don't curate it
 
 | Component | Status | Trigger |
 |-----------|--------|---------|
-| Augment Context Engine API | Available as MCP server (Feb 2026) | When we need code-domain cartridge |
+| Augment Context Engine API | Available as MCP server (Feb 2026) | When we need code analysis domain |
 | Standardized agent reliability benchmarks | Emerging (arXiv 2602.16666) | When benchmarks stabilize |
 | LlamaIndex PropertyGraph maturity | Active development | Before committing to graph backend |
 
 ## Implementation Path
 
-### Phase 1: Foundation (2 cartridges)
+### Phase 1: Foundation (2 domains)
 
-1. Define `cartridge.yaml` schema (the manifest format)
-2. Implement Work cartridge (Jira adapter → validated GraphNodes)
-3. Implement Knowledge cartridge (ontology → validated GraphNodes)
-4. Evolve `rai graph build` to consume cartridge manifests
+1. Define `domain.yaml` schema (the manifest format)
+2. Implement Work domain (Jira adapter → validated GraphNodes)
+3. Implement Knowledge domain (ontology → validated GraphNodes)
+4. Evolve `rai graph build` to consume domain manifests
 5. Build-time validation with `--strict` mode
 
 ### Phase 2: MVC Compiler
 
 1. Context routing based on active skill/task metadata
-2. Per-cartridge context extraction rules
+2. Per-domain context extraction rules
 3. Token budget management
 4. Integration with PydanticAI RunContext pattern
 
 ### Phase 3: Ecosystem
 
-1. Governance cartridge (Confluence/filesystem)
-2. Code cartridge (evaluate Augment API vs custom indexing)
-3. Third-party cartridge spec and developer docs
-4. Cartridge marketplace/registry
+1. Governance domain (Confluence/filesystem)
+2. Code domain (evaluate Augment API vs custom indexing)
+3. Third-party domain spec and developer docs
+4. Domain marketplace/registry
 
 ## Prior Art Summary
 
@@ -211,4 +211,4 @@ Current tools provide access to knowledge (MCP, RAG, grep). They don't curate it
 - Research report: `work/research/epistemic-infrastructure/epistemic-infrastructure-report.md`
 - Evidence catalog: `work/research/epistemic-infrastructure/sources/evidence-catalog.md`
 - Gemini research: `work/research/epistemic-infrastructure/sources/epistemic-infrastructure-gemini.md`
-- Prior cartridge research: `work/research/domain-cartridge-architecture/domain-cartridge-architecture-report.md`
+- Prior domain architecture research: `work/research/domain-cartridge-architecture/domain-cartridge-architecture-report.md`

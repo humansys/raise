@@ -23,6 +23,11 @@ CLAUDE.local.md
 # RaiSE adapter configs (contain PII — use .example templates)
 .raise/jira.yaml
 .raise/confluence.yaml
+.raise/adapters/*.yaml
+!.raise/adapters/*.yaml.example
+
+# Dossier output (generated, not committed)
+dev/output/
 
 # RaiSE derived artifacts (rebuild with `rai memory build`)
 .raise/rai/memory/index.json

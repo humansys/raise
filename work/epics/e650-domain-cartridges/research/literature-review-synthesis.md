@@ -1,4 +1,4 @@
-# Knowledge Cartridge Architecture — Literature Review & Market Analysis Synthesis
+# Pluggable Domain Architecture — Literature Review & Market Analysis Synthesis
 
 **Date:** 2026-03-24
 **Context:** S11.9 (RAISE-704) — Knowledge Refactor ideation
@@ -9,7 +9,7 @@
 
 ## 1. The Concept Is Novel — But Built on Proven Foundations
 
-**Claim (HIGH confidence, 8+ sources):** No existing system combines all Knowledge Cartridge features: typed schema (Pydantic) + corpus provenance + domain adapter + validation gates (CQs) + HITL curation + symbolic retrieval + pluggable composition.
+**Claim (HIGH confidence, 8+ sources):** No existing system combines all Pluggable Domain features: typed schema (Pydantic) + corpus provenance + domain adapter + validation gates (CQs) + HITL curation + symbolic retrieval + pluggable composition.
 
 Each individual piece exists:
 
@@ -29,11 +29,11 @@ Each individual piece exists:
 
 ## 2. Six Validated Design Principles
 
-### P1: Orthogonality — Each cartridge owns its concepts exclusively
+### P1: Orthogonality — Each domain owns its concepts exclusively
 **Sources:** OBO Foundry (100+ ontologies), Apollo Federation, MOMo, Schema.org
 **Confidence:** Very High (4+ independent validations across domains)
 
-Each concept belongs to exactly one cartridge. Cross-cartridge references use linking (MIREOT-style: source_id + type_uri + parent_type), never duplication.
+Each concept belongs to exactly one domain. Cross-domain references use linking (MIREOT-style: source_id + type_uri + parent_type), never duplication.
 
 ### P2: Thin Upper Schema — 5-10 shared meta-types as bridge
 **Sources:** Schema.org (~10 top-level types, 45M domains), BFO/DOLCE, Data Mesh semantic layer
@@ -45,19 +45,19 @@ A minimal shared type hierarchy (Entity, Process, Goal, Metric, Role, Artifact, 
 **Sources:** FedX, Apollo router, R1-Router, Agentic RAG patterns
 **Confidence:** Very High
 
-Every successful federated system decomposes queries into source-specific sub-queries. The agent analyzes which cartridges are relevant, generates cartridge-specific sub-queries, and composes results.
+Every successful federated system decomposes queries into source-specific sub-queries. The agent analyzes which domains are relevant, generates domain-specific sub-queries, and composes results.
 
 ### P4: Fail-Fast Composition — Conflicts are errors, not warnings
 **Sources:** Apollo Federation, dbt contracts, OWL module interface proposals
 **Confidence:** High
 
-Conflicting type definitions between cartridges should fail registration. A "draft" status can allow softer validation during development.
+Conflicting type definitions between domains should fail registration. A "draft" status can allow softer validation during development.
 
 ### P5: Separate Review Metadata from Domain Data
 **Sources:** WebProtégé ChAO, Gene Ontology evidence codes, Collaborative Protégé
 **Confidence:** High
 
-Review decisions, gate results, and change history live in a separate linked structure — not embedded in the cartridge. Keeps the domain model clean.
+Review decisions, gate results, and change history live in a separate linked structure — not embedded in the domain. Keeps the domain model clean.
 
 ### P6: PDCA as the Improvement Model
 **Sources:** Deming-based ontology inspection, DILIGENT methodology, Ontology Maturing
@@ -87,7 +87,7 @@ Plan (CQs + schema) → Do (extraction) → Check (gates) → Act (curation). Ea
 
 ## 4. Competitive Landscape — Whitespace Confirmed
 
-### No one builds Knowledge Cartridges
+### No one builds Pluggable Domains
 
 12 competitors analyzed. The market converges from two directions:
 
@@ -98,15 +98,15 @@ Plan (CQs + schema) → Do (extraction) → Check (gates) → Act (curation). Ea
 | **Enterprise KG** | Interloom ($16.5M), Diffbot, Graphlit | Scale, enterprise integration | Pluggability, curation, domain packaging |
 
 **Closest competitors:**
-1. **Cognee** — Pydantic DataPoint + OWL ontologies + pluggable resolvers. Most technically similar. Gap: no HITL curation, no "cartridge" packaging, no module composition.
+1. **Cognee** — Pydantic DataPoint + OWL ontologies + pluggable resolvers. Most technically similar. Gap: no HITL curation, no "domain" packaging, no module composition.
 2. **Zep/Graphiti** — Pydantic schemas + temporal KG + hybrid retrieval. Gap: limited to 10 types, no modularity, no HITL.
 3. **TrustGraph** — OWL-first, versioned "Context Cores." Philosophically most aligned. Gap: 1.5k stars, no Pydantic, low traction.
 
 ### Strategic Positioning: "npm for domain knowledge"
 
-Knowledge Cartridges are **complementary** to memory layers, not competitive. Any agent framework (LangGraph, CrewAI, etc.) could consume cartridges. The value is in the **domain knowledge packaging**, not the memory infrastructure.
+Pluggable Domains are **complementary** to memory layers, not competitive. Any agent framework (LangGraph, CrewAI, etc.) could consume domains. The value is in the **domain knowledge packaging**, not the memory infrastructure.
 
-### Risk: Cognee or Zep could add cartridge-like packaging
+### Risk: Cognee or Zep could add domain-like packaging
 
 Both have the technical foundation. Speed to market matters. Our moat is **ontology quality + HITL curation + domain coverage**, not infrastructure.
 
@@ -128,7 +128,7 @@ $60M+ invested in agent memory/knowledge in 18 months (was $0 before 2024). Mem0
 
 ### KG adoption bottleneck = our opportunity
 
-KG adoption stalled at ~27% despite massive interest. **The bottleneck is building domain models.** Pre-packaged domain cartridges attack this directly.
+KG adoption stalled at ~27% despite massive interest. **The bottleneck is building domain models.** Pre-packaged pluggable domains attack this directly.
 
 ### Verticals that already monetize ontologies
 
@@ -137,7 +137,7 @@ The ontology itself is rarely the product — value accrues to the **enrichment 
 - MSCI ESG: $344M run rate on sustainability taxonomy
 - Wolters Kluwer Health: €1.58B on medical knowledge
 
-**Recommended first vertical: HR/Skills** — proven model, low regulatory barriers, open-base + proprietary-enrichment aligns with cartridge model.
+**Recommended first vertical: HR/Skills** — proven model, low regulatory barriers, open-base + proprietary-enrichment aligns with domain model.
 
 ---
 
@@ -145,7 +145,7 @@ The ontology itself is rarely the product — value accrues to the **enrichment 
 
 Based on the literature review, these are genuinely novel:
 
-1. **Knowledge Cartridge as a formal concept** — self-contained, distributable, schema-validated domain knowledge module with its own adapter, gates, and corpus provenance. No precedent in this combination.
+1. **Pluggable Domain as a formal concept** — self-contained, distributable, schema-validated domain knowledge module with its own adapter, gates, and corpus provenance. No precedent in this combination.
 
 2. **Domain adapter pattern for typed traversal** — a pluggable interpreter that maps query semantics to typed graph traversal strategies. No existing system does this.
 
@@ -160,22 +160,22 @@ Based on the literature review, these are genuinely novel:
 ## 7. Key Tensions to Resolve in S11.9
 
 ### T1: NetworkX vs. Graph DB
-No competitive system uses NetworkX as primary store. All use Neo4j or equivalent. Our scale (hundreds of nodes per cartridge) may not need a DB, but we need a scaling plan.
+No competitive system uses NetworkX as primary store. All use Neo4j or equivalent. Our scale (hundreds of nodes per domain) may not need a DB, but we need a scaling plan.
 
 **Recommendation:** Start with NetworkX, design for pluggable backend. Validate at 10K nodes.
 
 ### T2: Prescribed vs. Emergent Schemas
-Literature is split: Graphiti/Cognee support both prescribed (typed) and emergent (learned) schemas. Our cartridges are prescribed-first.
+Literature is split: Graphiti/Cognee support both prescribed (typed) and emergent (learned) schemas. Our domains are prescribed-first.
 
 **Recommendation:** Prescribed core types + extension mechanism for emergent additions. Follow R2 evidence.
 
-### T3: Where Does the Cartridge Runtime Live?
+### T3: Where Does the Domain Runtime Live?
 This is the S11.9 question. Options:
 - **raise-core**: protocols only (DomainAdapter, SchemaRef, GateResult)
 - **raise-cli**: runtime (engine, gates, discovery, CLI commands)
-- **New package**: dedicated `raise-knowledge` or `raise-cartridge`
+- **New package**: dedicated `raise-knowledge` or `raise-domain`
 
-**Recommendation:** Based on market positioning ("npm for domain knowledge"), the cartridge runtime deserves clear identity. At minimum, protocols in raise-core + runtime in raise-cli. A future dedicated package is possible if the concept grows.
+**Recommendation:** Based on market positioning ("npm for domain knowledge"), the domain runtime deserves clear identity. At minimum, protocols in raise-core + runtime in raise-cli. A future dedicated package is possible if the concept grows.
 
 ### T4: Hybrid Retrieval
 Evidence strongly supports adding a vector similarity signal to complement symbolic retrieval (HybridRAG, SYNAPSE triple hybrid).

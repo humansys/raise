@@ -1,0 +1,1754 @@
+# Migration Manifest — raise-gtm
+# Generated: 2026-03-27 by S935.3
+# Total files: 255 (md entries) + 54 (binary/non-md assets) = 309 total
+# Skipped: dev/parking-lot.md (active working doc), work/rescued/* (legacy), sites/*, .raise/*, .claude/*, .roo/*, .github/*
+
+entries:
+  # ============================================================
+  # governance/* → 11. GTM Operations
+  # ============================================================
+  - source: "governance/vision.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Solution Vision: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/prd.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "PRD: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/guardrails.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Guardrails: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/deployment.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Deployment Guide: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/backlog.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Backlog: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/git-conventions.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Git Conventions — raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/architecture.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Technical Architecture: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/architecture/system-context.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "System Context: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/architecture/system-design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "System Design: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/architecture/domain-model.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Domain Model: raise-gtm"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "governance/humansys-brief-v2 (1).md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "humansys.ai — Brand & Design Brief v2.0"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  # ============================================================
+  # dev/decisions/* → 11. GTM Operations
+  # ============================================================
+  - source: "dev/decisions/adr-001-naming-architecture.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-001: Three-Layer Naming Architecture"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-002-starlight-integration.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-002: Starlight as Subroute in Existing Astro Site"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-003-i18n-strategy.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-003: Dual i18n Strategy (Astro Native + Starlight Native)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-004-waitlist-backend.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-004: Waitlist Backend (CF Worker + D1 + Jira)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-005-humansys-ai-stack.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-005: Astro + Tailwind for humansys.ai"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-006-humansys-contact-backend.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-006: Cloudflare Workers + D1 for Contact Form"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-007-docs-site-split.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-007: Docs/Marketing Site Split"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-008-monorepo-structure.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-008: GTM Monorepo Structure"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-009-path-based-cicd.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-009: Path-Based CI/CD per Site"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "dev/decisions/adr-010-hybrid-branch-protection.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "ADR-010: Hybrid Branch Protection"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  # ============================================================
+  # content/docs/* → 12. GTM Content
+  # ============================================================
+  - source: "content/docs/gtm-methodology.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "RaiSE Lean GTM Methodology"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "content/docs/gtm-validation-plan.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "GTM Validation Plan — Template"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  # ============================================================
+  # content/drafts/* → 12. GTM Content
+  # ============================================================
+  - source: "content/drafts/texto-jc-raise.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "RaiSE: Software confiable, no solo software rapido"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  # ============================================================
+  # content/research/* → 10. Research
+  # ============================================================
+  - source: "content/research/evidence-catalogs/ai-speed-vs-reliability-2024-2025.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: AI-Assisted Development — Speed vs. Reliability"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence-catalogs/evidence-catalog-spec-ratios.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: Specification-to-Code Ratios"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence-catalogs/pre-ai-reliability-investment-constraints.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: Pre-AI Era Reliability Investment — Resource Constraints in Human-Only Teams"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence-catalogs/software-quality-metrics-benchmarks.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: Software Quality Metrics Industry Benchmarks"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence/cursor-rules-key-talking-points.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Key Talking Points: Why Cursor Rules Don't Scale"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence/cursor-rules-quick-reference.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Quick Reference: Cursor Rules Scalability Evidence"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence/cursor-rules-scalability-limits.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: Why Cursor Rules Don't Scale"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence/llm-training-data-quality.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: LLM Training Data Quality and the Median Code Problem"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "content/research/evidence/SUMMARY.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog Summary"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  # ============================================================
+  # content/sources/* (md files) → 13. Sources & Transcripts
+  # ============================================================
+  - source: "content/sources/Coppel/demo-presentation.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "RaiSE — Governance que fluye con el trabajo"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/Coppel/demo-script.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Guion de Demo — Coppel 2026-02-20"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/Coppel/intelligence-brief.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Coppel Intelligence Brief — Demo Prep"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/Coppel/post-demo-analysis.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Post-Demo Analysis — Coppel"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/Coppel/stakeholder-profiles.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Stakeholder Profiles — Demo Coppel 2026-02-20"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/lean marketing/01_Modulo_Diagnostico_LeanAgileMarketing.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Modulo Diagnostico LeanAgileMarketing"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/lean marketing/02_Modulo_Semilla_ModeloExperiencia.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Modulo Semilla ModeloExperiencia"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/lean marketing/meta_andromeda_guia_completa_2025 (1).md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Meta Andromeda: Guia Completa 2025"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/lean marketing/meta_gem_guia_completa.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Meta GEM (Generative Ads Model) - Guia Completa 2025"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  - source: "content/sources/lean marketing/Módulo 3 Completo Alquimia Digital.md"
+    space: "STRAT"
+    section: "13. Sources & Transcripts"
+    title: "Modulo 3: Germinacion - Validacion y Experimentacion en Marketing Digital"
+    labels: [dossier-sources, migrated, source-raise-gtm]
+
+  # ============================================================
+  # work/backlog.md → 11. GTM Operations (operational doc)
+  # ============================================================
+  - source: "work/backlog.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "Backlog de Epicas — RaiSE GTM"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  # ============================================================
+  # work/briefs/* → 12. GTM Content
+  # ============================================================
+  - source: "work/briefs/eduardo-gtm-brief-2026-02-27.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Brief Ejecutivo: Estrategia Go-to-Market RaiSE"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/briefs/uam-propuesta-1-gobernanza-determinista.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Propuesta de Investigacion: Gobernanza Determinista"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/briefs/uam-propuesta-2-add-coding-agents.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Propuesta de Investigacion: ADD Coding Agents"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  # ============================================================
+  # work/content/blog/* → 12. GTM Content
+  # ============================================================
+  - source: "work/content/blog/BP-01-arneses-deterministas-es.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Arneses Deterministas para Mentes Probabilisticas"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-01-deterministic-harnesses-DRAFT.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Deterministic Harnesses for Probabilistic Minds (DRAFT)"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-01-deterministic-harnesses.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-01: Deterministic Harnesses for Probabilistic Minds"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-01-deterministic-harnesses-v2.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Deterministic Harnesses for Probabilistic Minds (v2)"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-01-deterministic-harnesses-web-ready.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Deterministic Harnesses for Probabilistic Minds (web-ready)"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-02-software-is-culture.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-02: Software Is Culture"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-03-one-story-per-session.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-03: One Story Per Session"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-04-entity-not-tool.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-04: Entity, Not Tool"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-05-review-is-where-you-learn.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-05: The Review Is Where You Learn"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-06-humans-shouldnt-code.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-06: Why I Stopped Letting Humans Write Code"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-07-brownfield-first.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-07: Brownfield First"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-08-shu-ha-ri.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-08: Shu-Ha-Ri: Teaching AI to Teach Developers"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-09-fourier-transform.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-09: The Fourier Transform of Software Development"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-10-software-artisans.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-10: Software Artisans in the Age of Machines"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-11-memory-tax.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-11: The Memory Tax"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-12-governance-is-freedom.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-12: Governance Is Freedom"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-13-what-your-ai-wishes-you-knew.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-13: What Your AI Partner Wishes You Knew"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-14-inference-economy.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-14: Inference Economy: Less Is More"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/BP-15-i-dont-know.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "BP-15: I Don't Know What I Don't Know (And That's Dangerous)"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/CITATION-STYLE-GUIDE.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Citation Style Guide — RaiSE Blog"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/INDEX.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Content Backlog: Blog Posts"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/blog/personal-de-hopfield-a-ad-astra.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Personal: De Hopfield a Ad Astra"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/hypotheses/TEMPLATE.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Hypothesis Template"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/linkedin-post-emilio-webinar-2026-03-26.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "LinkedIn Post — Emilio — Webinar 26 de marzo 2026"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/linkedin-post-webinar-2026-03-26-draft-v1.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "LinkedIn Post — Webinar 26 de marzo 2026"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/pages/mission-en.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Mission: Reliable Software for Everyone"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/pages/mission.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Mission: Software Confiable para Todos"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/content/voice-profile-emilio.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Voice Profile: Emilio Osorio"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  # ============================================================
+  # work/epics/* → 11. GTM Operations
+  # ============================================================
+  - source: "work/epics/e03-pitch-demo/presentacion-es.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E3: Demo de Producto RaiSE — Presentacion"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e03-pitch-demo/presentation.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E3: RaiSE Product Demo — Presentation Deck"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e03-pitch-demo/runbook-es.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E3: Guion del Demo en Vivo"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e03-pitch-demo/runbook.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E3: Live Demo Runbook"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e05-onboarding/stories/s5.1-jumpstart-alignment/alignment-agenda.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E5: Jumpstart Alignment Session — Kurigage"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e05-onboarding/stories/s5.1-jumpstart-alignment/discovery-framework.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E5: Discovery Framework — Kurigage Jumpstart"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e05-onboarding/stories/s5.1-jumpstart-alignment/jumpstart-kurigage-presentacion.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E5: Jumpstart RaiSE — Kurigage Business Solutions"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e05-onboarding/stories/s5.1-jumpstart-alignment/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E5: S5.1 Jumpstart Client Alignment Session"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e05-onboarding/stories/s5.1-jumpstart-alignment/workshop-csf-miro.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E5: Workshop Factores Criticos de Exito — Sesion 02"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e05-onboarding/stories/s5.2-brownfield-onboarding/onboarding-procedure.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E5: Brownfield Onboarding — Kurigage Tech Leads"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e06-launch-campaign/launch-strategy.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E6: Launch Campaign — Strategy"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e06-launch-campaign/linkedin-post-spanish-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E6: LinkedIn Post — Soft Launch (Spanish)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e06-launch-campaign/reddit-python-post-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E6: Reddit r/Python Post — Community Launch"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e06-launch-campaign/show-hn-post-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E6: Show HN Post — Community Launch"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Pre-Launch Open Core — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/rollout-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Pre-Launch v2 Open Core — Rollout Plan"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.1-repo-readiness/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Implementation Plan S7.1 Repo Readiness"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.3-bp01-finalize/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Implementation Plan S7.3 BP-01 Finalize"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.3-bp01-finalize/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Retrospective S7.3 BP-01 Finalize"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.8-visual-asset-plan/asset-brief.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Brief para Disenador — Activos Visuales RaiSE"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.8-visual-asset-plan/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Diseno S7.8 Plan de Activos Visuales"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.8-visual-asset-plan/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Plan de Implementacion S7.8 Plan de Activos Visuales"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.8-visual-asset-plan/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Retrospective S7.8 Visual Asset Plan"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.8-visual-asset-plan/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Feature Scope S7.8 Visual Asset Plan"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.9-website-foundation/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Diseno S7.9 Website Foundation"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.9-website-foundation/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Plan de Implementacion S7.9 Website Foundation"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.9-website-foundation/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: Retrospective S7.9 Website Foundation"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e07-prelaunch-open-core/stories/s7.9-website-foundation/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E7: S7.9 Website Foundation"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-prelaunch-atlassian-pro/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Pre-Launch Atlassian PRO"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/SCOPE.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Website v1 + Documentacion"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.1-i18n-infrastructure/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Design S8.1 — i18n Infrastructure"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.1-i18n-infrastructure/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Implementation Plan S8.1 — i18n Infrastructure"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.1-i18n-infrastructure/progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Progress S8.1 — i18n Infrastructure"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.1-i18n-infrastructure/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Retrospective S8.1 — i18n Infrastructure"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.1-i18n-infrastructure/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Story S8.1 i18n Infrastructure"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.2-starlight-docs-setup/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Design S8.2 — Starlight Docs Setup"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.2-starlight-docs-setup/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Implementation Plan S8.2 — Starlight Docs Setup"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.2-starlight-docs-setup/progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Progress S8.2 — Starlight Docs Setup"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.2-starlight-docs-setup/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Retrospective S8.2 — Starlight Docs Setup"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.2-starlight-docs-setup/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Story S8.2 Starlight Docs Setup"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.3-homepage-update/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Implementation Plan S8.3 Homepage Update"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.3-homepage-update/progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: S8.3 Homepage Update"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.3-homepage-update/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Retrospective S8.3 Homepage Update"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.4-pricing-page/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Design S8.4 Pricing Page"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.4-pricing-page/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Implementation Plan S8.4 Pricing Page"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.4-pricing-page/progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: S8.4 Pricing Page"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.4-pricing-page/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Retrospective S8.4 Pricing Page"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.5-waitlist-backend/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Design S8.5 — Waitlist Backend"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.5-waitlist-backend/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Implementation Plan S8.5 — Waitlist Backend"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.5-waitlist-backend/progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Progress S8.5 — Waitlist Backend"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.5-waitlist-backend/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Story Scope S8.5 — Waitlist Backend"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.6-docs-getting-started-cli/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Design S8.6 — Docs: Getting Started + CLI Reference"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.6-docs-getting-started-cli/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Implementation Plan S8.6 — Docs: Getting Started + CLI Reference"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.6-docs-getting-started-cli/progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Progress S8.6 — Docs: Getting Started + CLI Reference"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.6-docs-getting-started-cli/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Retrospective S8.6 — Docs: Getting Started + CLI Reference"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.6-docs-getting-started-cli/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Story Scope S8.6 — Docs: Getting Started + CLI Reference"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.7-docs-concepts-guides/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Design S8.7 — Docs: Concepts + Guides"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.7-docs-concepts-guides/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Implementation Plan S8.7 — Docs: Concepts + Guides"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.7-docs-concepts-guides/progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Progress S8.7 — Docs: Concepts + Guides"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.7-docs-concepts-guides/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Retrospective S8.7 — Docs: Concepts + Guides"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.7-docs-concepts-guides/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Story Scope S8.7 — Docs: Concepts + Guides"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e08-website-v1-docs/stories/s8.9-docs-redirect/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E8: Retrospective S8.9 — Docs Redirect"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e09-enterprise/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E9: Enterprise Edition"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e10-brand-identity-naming/brand-brief.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E10: Brand Brief — Product Naming"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e10-brand-identity-naming/candidates.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E10: Name Candidates — Divergence Output"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e10-brand-identity-naming/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E10: Brand Identity & Naming — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e10-brand-identity-naming/stories/s10.1-brand-brief.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E10: S10.1 Brand Brief"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e10-brand-identity-naming/stories/s10.2-divergence.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E10: S10.2 Divergence"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/competitive-alternatives.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Competitive Alternatives Landscape — RaiSE Framework"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/research-gtm-sota.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Research SOTA Go-to-Market for B2B Enterprise Tech Micro-Firms"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Epic Retrospective — Lean GTM Discipline"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Lean GTM Discipline — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: S11.0 Design — Positioning Exercise (Dunford)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/market-category-landscape.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Market Category Landscape — AI Development Tools (2025-2026)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Implementation Plan S11.0 — Positioning (Dunford)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/positioning.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: RaiSE Positioning"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.0 — Positioning (Dunford)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: S11.0 Define Positioning (Dunford Exercise)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/t2-competitive-alternatives.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: T2 Competitive Alternatives — Validated"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/t3-capabilities-matrix.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: T3 Differentiated Capabilities Matrix"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/t4-differentiated-value.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: T4 Differentiated Value — Customer Language"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.0-positioning/t5-best-fit-customers.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: T5 Best-Fit Customers"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.1-document-lean-gtm-process/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Design S11.1 — Document Lean GTM Process"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.1-document-lean-gtm-process/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Implementation Plan S11.1 — Document Lean GTM Process"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.1-document-lean-gtm-process/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.1 — Document Lean GTM Process"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.1-document-lean-gtm-process/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Story Scope S11.1 — Document Lean GTM Process"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.2-prospect-research-skill/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Design S11.2 — /prospect-research Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.2-prospect-research-skill/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Implementation Plan S11.2 — /prospect-research Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.2-prospect-research-skill/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.2 — /prospect-research Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.2-prospect-research-skill/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: S11.2 — /prospect-research Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.3-prospect-brief-template/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Design S11.3 — Prospect Brief Confluence Template"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.3-prospect-brief-template/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.3 — Prospect Brief Confluence Template"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.3-prospect-brief-template/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Story S11.3 Create Prospect Brief Confluence Template"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.4-validation-plan/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Implementation Plan S11.4 — Adapt Validation Plan"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.4-validation-plan/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.4 — Adapt Validation Plan"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.4-validation-plan/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Story Scope S11.4 — Adapt Validation Plan for GTM Experiments"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.5-experiment-tracking/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.5 — Experiment Tracking Framework"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.5-experiment-tracking/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Story Scope S11.5 — Create Experiment Tracking Framework"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.6-customer-forces/customer-forces.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Customer Forces — Arquetipos de Comprador RaiSE"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.6-customer-forces/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Design S11.6 — Customer Forces (Moesta)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.6-customer-forces/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Implementation Plan S11.6 — Customer Forces (Moesta)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.6-customer-forces/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.6 — Customer Forces (Moesta)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.6-customer-forces/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Story Scope S11.6 — Customer Forces (Moesta)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.7-content-hypothesis/design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Design /content-hypothesis Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.7-content-hypothesis/plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Implementation Plan /content-hypothesis Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.7-content-hypothesis/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: Retrospective S11.7 — /content-hypothesis Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e11-lean-marketing-process/stories/s11.7-content-hypothesis/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E11: S11.7 Content Hypothesis Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/coppel-demo-pt1-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Coppel Demo pt1"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/coppel-demo-pt2-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Coppel Demo pt2"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/coppel-pre-demo-1-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Coppel Pre-Demo 1"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/coppel-pre-demo-2-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Coppel Pre-Demo 2"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/coppel-presentacion-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Coppel Presentacion"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/faf-demo-1-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — F&F Demo 1"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/faf-demo-2-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — F&F Demo 2"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/humansys-onboarding-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Humansys Raise Onboarding"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/interware-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — InterWare"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/interware-onboard-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — InterWare-Onboard"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/kurigage-s01-alt-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Kurigage S01 (Alt Transcript)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/extracts/kurigage-workshop-s01-draft.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Extract Draft — Kurigage Workshop S01"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/messaging-patterns.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Messaging Pattern Catalog"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Epic Retrospective — Transcript Intelligence Pipeline"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Transcript Intelligence Pipeline — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.1-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.1 Plan — Messaging Pattern Schema + Catalog"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.1-retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.1 Retrospective — Messaging Pattern Schema + Catalog"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.1-story.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.1 Messaging Pattern Schema + Catalog"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.2-design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.2 Design — Transcript Extract Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.2-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.2 Plan — Transcript Extract Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.2-retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.2 Retrospective — Transcript Extract Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.2-story.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.2 Transcript Extract Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.3-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.3 Plan — Transcript Load Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.3-retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.3 Retrospective — Transcript Load Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.3-story.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.3 Transcript Load Skill"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.4-design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.4 Design — Voice Calibration Profile"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.4-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.4 Plan — Voice Calibration Profile"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.4-retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: S13.4 Retrospective — Voice Calibration Profile"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/stories/s13.4-story.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Story S13.4 Voice Calibration Profile"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e13-transcript-intelligence/transcript-intelligence-report.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E13: Transcript Intelligence Report"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e15-strat-model/SCOPE.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E15: Strategic Alignment Model (STRAT) — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e15-strat-model/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E15: Epic Retrospective — Strategic Alignment Model (STRAT)"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e16-brand-architecture/SCOPE.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E16: Brand Architecture — SH + HumanSys AI + RaiSE"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/SCOPE.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: HumanSys AI Website — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.1-design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: F17.1 Project Setup + Design System — Design"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.1-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: Implementation Plan F17.1 — Project Setup + Design System"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.1-retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: Retrospective F17.1 — Project Setup + Design System"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.1-story.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: Feature Scope F17.1 — Project Setup + Design System"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.2-retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: Retrospective F17.2 — Homepage"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.2-story.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: Feature Scope F17.2 — Homepage"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.7-design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: F17.7 Design — Visual Polish"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.7-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: F17.7 Plan — Visual Polish"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.7-retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: F17.7 Retrospective — Visual Polish"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.7-story.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: F17.7 — Visual Polish"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.9-design.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: F17.9 Design — Visual Depth & Motion"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.9-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: Implementation Plan F17.9 — Visual Depth & Motion"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e17-humansys-ai-website/stories/f17.9-progress.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E17: Progress F17.9 — Visual Depth & Motion"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e18-repo-reorganization/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E18: Repo Reorganization — Marketing Monorepo"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e18-repo-reorganization/stories/f18.1-plan.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E18: Implementation Plan F18.1 Site Migration"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e18-repo-reorganization/stories/f18.1-site-migration.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E18: Feature Scope F18.1 Site Migration"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e19-git-governance/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E19: Git Governance & Branch Normalization — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e19-git-governance/retrospective.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E19: Epic Retrospective — Git Governance & Branch Normalization"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/e20-monorepo-normalization/scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E20: GTM Monorepo Normalization"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/launch/community-research.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM Launch: Community Research — RaiSE Open Source Launch"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/launch/e12-launch-command-center-scope.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM E12: Launch Command Center — Scope"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  - source: "work/epics/launch/message-crafting.md"
+    space: "STRAT"
+    section: "11. GTM Operations"
+    title: "GTM Launch: Message Crafting — RaiSE Launch"
+    labels: [dossier-gtm-ops, migrated, source-raise-gtm]
+
+  # ============================================================
+  # work/gtm/* → 12. GTM Content
+  # ============================================================
+  - source: "work/gtm/experiments/index.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Experiment Index"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/gtm/experiments/TEMPLATE.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Experiment Report Template"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/gtm/reviews/TEMPLATE.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Quarterly GTM Review Template"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  - source: "work/gtm/scorecard.md"
+    space: "STRAT"
+    section: "12. GTM Content"
+    title: "Lean GTM Scorecard"
+    labels: [dossier-gtm-content, migrated, source-raise-gtm]
+
+  # ============================================================
+  # work/research/* → 10. Research
+  # ============================================================
+  - source: "work/research/claude-code-web-design/design-brief-f17.9.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Design Brief — F17.9 Visual Polish"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/claude-code-web-design/sources/evidence-catalog.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog — Claude Code as Web Design Agent"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/reddit-community-analysis.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Reddit Community Analysis for RaiSE Launch"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-ai-content-identity/ai-content-identity-report.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Research Report: AI Content Humanization & AI-as-Identity Strategy"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-ai-content-identity/sources/AI Authenticity_ Identity Over Humanization.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "AI Authenticity: Identity Over Humanization"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-ai-content-identity/sources/AI Partner Branding Research for LATAM.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "AI Partner Branding Research for LATAM"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-ai-content-identity/sources/evidence-catalog.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: AI Content Humanization & AI-as-Identity"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-ai-content-identity/sources/Humanizing AI Content_ Evidence-Based Research.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Humanizing AI Content: Evidence-Based Research"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-problem-definition-frameworks/problem-definition-report.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Research Report: Problem Definition Frameworks"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-problem-definition-frameworks/sources/evidence-catalog.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog — Problem Definition Frameworks"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/RES-waitlist-lead-management/sources/evidence-catalog.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Evidence Catalog: Waitlist Lead Management"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/UAM Research Collaboration/brief-junta-cervantes.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "Brief: Vinculacion RaiSE x UAM-Iztapalapa"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+  - source: "work/research/UAM Research Collaboration/raise-research-backlog-v1.md"
+    space: "STRAT"
+    section: "10. Research"
+    title: "RaiSE Research Backlog"
+    labels: [dossier-research, migrated, source-raise-gtm]
+
+# ============================================================
+# Binary / non-md assets in content/sources/
+# ============================================================
+binary_assets:
+  # Logo assets — RaiSE
+  - source: "content/sources/Assets/Logo/Recurso 4.png"
+    type: "image/png"
+    note: "RaiSE logo variant — consider uploading as Confluence attachment"
+  - source: "content/sources/Assets/Logo/Recurso 5.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 6.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 7.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 8.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 9.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 10.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 11.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 12.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 13.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 14.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 15.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 16.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 17.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 18.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/Recurso 19.png"
+    type: "image/png"
+    note: "RaiSE logo variant"
+  - source: "content/sources/Assets/Logo/RaiSE-Logo-con-fondo.pdf"
+    type: "application/pdf"
+    note: "RaiSE logo with background — PDF source"
+  - source: "content/sources/Assets/Logo/RaiSE-SVG.svg"
+    type: "image/svg+xml"
+    note: "RaiSE logo — SVG source"
+
+  # Logo assets — humansys.ai
+  - source: "content/sources/Assets/humansys.ai/PNG/Recurso 9.png"
+    type: "image/png"
+    note: "HumanSys AI logo variant"
+  - source: "content/sources/Assets/humansys.ai/PNG/Recurso 10.png"
+    type: "image/png"
+    note: "HumanSys AI logo variant"
+  - source: "content/sources/Assets/humansys.ai/PNG/Recurso 11.png"
+    type: "image/png"
+    note: "HumanSys AI logo variant"
+  - source: "content/sources/Assets/humansys.ai/PNG/Recurso 12.png"
+    type: "image/png"
+    note: "HumanSys AI logo variant"
+  - source: "content/sources/Assets/humansys.ai/PNG/Recurso 14.png"
+    type: "image/png"
+    note: "HumanSys AI logo variant"
+  - source: "content/sources/Assets/humansys.ai/PNG/Recurso 15.png"
+    type: "image/png"
+    note: "HumanSys AI logo variant"
+  - source: "content/sources/Assets/humansys.ai/PNG/Recurso 16.png"
+    type: "image/png"
+    note: "HumanSys AI logo variant"
+  - source: "content/sources/Assets/humansys.ai/PNG/teal-blanco-hz.png"
+    type: "image/png"
+    note: "HumanSys AI teal-white horizontal logo"
+  - source: "content/sources/Assets/humansys.ai/SVG/Recurso 1.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI logo variant — SVG"
+  - source: "content/sources/Assets/humansys.ai/SVG/Recurso 2.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI logo variant — SVG"
+  - source: "content/sources/Assets/humansys.ai/SVG/Recurso 3.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI logo variant — SVG"
+  - source: "content/sources/Assets/humansys.ai/SVG/Recurso 4.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI logo variant — SVG"
+  - source: "content/sources/Assets/humansys.ai/SVG/Recurso 5.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI logo variant — SVG"
+  - source: "content/sources/Assets/humansys.ai/SVG/Recurso 7.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI logo variant — SVG"
+  - source: "content/sources/Assets/humansys.ai/SVG/Recurso 8.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI logo variant — SVG"
+  - source: "content/sources/Assets/humansys.ai/SVG/teal-blanco-horz.svg"
+    type: "image/svg+xml"
+    note: "HumanSys AI teal-white horizontal logo — SVG"
+
+  # Transcript text files
+  - source: "content/sources/Coppel/Demo_ IA aplicada al ciclo de desarrollo_19feb2025_pt1.txt"
+    type: "text/plain"
+    note: "Coppel demo transcript pt1 — consider as Confluence attachment on extract page"
+  - source: "content/sources/Coppel/Demo_ IA aplicada al ciclo de desarrollo_19feb2025_pt2.txt"
+    type: "text/plain"
+    note: "Coppel demo transcript pt2"
+  - source: "content/sources/Coppel/Pre-Demo-1.txt"
+    type: "text/plain"
+    note: "Coppel pre-demo transcript 1"
+  - source: "content/sources/Coppel/Pre-Demo-2.txt"
+    type: "text/plain"
+    note: "Coppel pre-demo transcript 2"
+  - source: "content/sources/FAF Demo Transcripts/RaiSE v2.0.0alpha0 F&F Demo.txt"
+    type: "text/plain"
+    note: "Friends & Family demo transcript 1"
+  - source: "content/sources/FAF Demo Transcripts/RaiSE v2.0.0alpha0 F&F Demo 2 _Ahora si_.txt"
+    type: "text/plain"
+    note: "Friends & Family demo transcript 2"
+  - source: "content/sources/Interware/RaiSE - InterWare.txt"
+    type: "text/plain"
+    note: "InterWare session transcript"
+  - source: "content/sources/Interware/RaiSE - InterWare-Onboard.txt"
+    type: "text/plain"
+    note: "InterWare onboarding transcript"
+  - source: "content/sources/Key Transcripts/Coppel - Presentacion de Sistemas Humanos.txt"
+    type: "text/plain"
+    note: "Coppel presentation transcript"
+  - source: "content/sources/Key Transcripts/Humansys Raise Onboarding.txt"
+    type: "text/plain"
+    note: "HumanSys Raise onboarding transcript"
+  - source: "content/sources/Kurigage Jumpstart/Kurigage - S01 - Raise AI agent Workshop.txt"
+    type: "text/plain"
+    note: "Kurigage workshop S01 transcript"
+  - source: "content/sources/Kurigage Jumpstart/Raise AI agent Workshop S01.txt"
+    type: "text/plain"
+    note: "Kurigage workshop S01 alt transcript"
+
+  # Strategy documents (PDF + DOCX exports from Confluence)
+  - source: "content/sources/strategy/STRAT-Blog_ Como disenamos la integracion RaiSE + Atlassian en una sesion.pdf"
+    type: "application/pdf"
+    note: "Confluence export — Blog integration RaiSE + Atlassian"
+  - source: "content/sources/strategy/Blog_+Como+disenamos+la+integracion+RaiSE+++Atlassian+en+una+sesion.docx"
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    note: "Confluence export — Blog integration RaiSE + Atlassian (DOCX)"
+  - source: "content/sources/strategy/RaiSE1-RaiSE Forge — Product Brief & Epic Structure-280326-011752.pdf"
+    type: "application/pdf"
+    note: "Confluence export — RaiSE Forge Product Brief"
+  - source: "content/sources/strategy/RaiSE+Forge+—+Product+Brief+&+Epic+Structure.docx"
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    note: "Confluence export — RaiSE Forge Product Brief (DOCX)"
+  - source: "content/sources/strategy/STRAT-Sesion Estrategica 2026-03-27.pdf"
+    type: "application/pdf"
+    note: "Confluence export — Strategic session raise-forge + Webinar + Roadmap v3.0"
+  - source: "content/sources/strategy/Sesion+Estrategica+2026-03-27.docx"
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    note: "Confluence export — Strategic session (DOCX)"
+  - source: "content/sources/strategy/STRAT-Session Report_ E-ANTHROPIC Complete + Positioning Estrategico (2026-03-27).pdf"
+    type: "application/pdf"
+    note: "Confluence export — E-ANTHROPIC session report"
+  - source: "content/sources/strategy/Session+Report_+E-ANTHROPIC+Complete+++Positioning+Estrategico+(2026-03-27).docx"
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    note: "Confluence export — E-ANTHROPIC session report (DOCX)"
+
+# ============================================================
+# Skipped files (documented for traceability)
+# ============================================================
+# - dev/parking-lot.md → SKIP (active working doc)
+# - work/rescued/* → SKIP (legacy snippets, only contains .ts file)
+# - sites/* → SKIP (deployable code)
+# - .raise/*, .claude/*, .roo/*, .github/* → SKIP (framework/tooling)
+# - README.md, CLAUDE.md, CONTRIBUTING.md, AGENTS.md → SKIP (repo-level)

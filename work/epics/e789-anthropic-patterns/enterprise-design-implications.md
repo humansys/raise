@@ -30,7 +30,7 @@ RaiSE OSS and RaiSE Enterprise serve fundamentally different users:
 **Enterprise position:** Explicitly configurable effort profiles by story type, team maturity, and organizational risk level.
 
 **Enterprise feature implication:**
-- `effort_profile` per team or project, defined in org cartridge
+- `effort_profile` per team or project, defined in org domain
 - Profiles: `strict` (full ceremony, for juniors/regulated domains), `standard` (current OSS), `lean` (Anthropic-style, for senior teams)
 - Gate configuration per profile — some gates waived for senior-flagged teams
 - Audit trail of which profile was applied and why (observability requirement)
@@ -45,7 +45,7 @@ RaiSE OSS and RaiSE Enterprise serve fundamentally different users:
 **Enterprise position:** Role-specialized agents (Critic, Architect, Security Reviewer) operating within the Rai identity framework, orchestrated by an enterprise orchestrator.
 
 **Enterprise feature implication:**
-- Enterprise cartridges can define specialized skill sets per role (`security-review.cartridge`, `architecture-review.cartridge`)
+- Enterprise domains can define specialized skill sets per role (`security-review.domain`, `architecture-review.domain`)
 - Specialized agents inherit Rai's core identity (values, boundaries) but have domain-specific knowledge and tools
 - Orchestrator-worker model for multi-team coordination (Anthropic Art.6 pattern — 1 agent for simple, 10+ for complex research)
 - Multi-repo knowledge graph federates memory across teams without losing per-project isolation
@@ -101,11 +101,11 @@ Configurable ceremony profiles per team/maturity. Gates always, ceremony varies.
 - Dependency: S789.1 (RAISE-797 — rule #3 refinement must ship first in OSS)
 - Key stories: Effort profile config, per-team skill set assignment, profile audit trail
 
-### E9-B: Specialized Agent Roles via Cartridges
-Security reviewer, architecture reviewer, compliance checker as domain cartridges.
+### E9-B: Specialized Agent Roles via Domains
+Security reviewer, architecture reviewer, compliance checker as pluggable domains.
 - Size: L
-- Dependency: RAISE-650 (Domain Cartridges — the runtime must exist first)
-- Key stories: Security cartridge, architecture cartridge, multi-cartridge orchestration
+- Dependency: RAISE-650 (Pluggable Domains — the runtime must exist first)
+- Key stories: Security domain, architecture domain, multi-domain orchestration
 
 ### E9-C: Automated Evaluation & LLM-as-Judge
 Scoring rubrics, evaluation corpus, iterative auto-fix loops, production tracing.
@@ -141,7 +141,7 @@ These stay in OSS regardless of enterprise:
 |-------|------|------|
 | Now (2.4.0) | RAISE-794 (context policy), RAISE-797 (rule #3) | This sprint |
 | Next (2.4.0) | RAISE-795 (scope fence), RAISE-796 (test guide) | Next sprint |
-| Q2 2026 | RAISE-650 (Domain Cartridges) — enterprise foundation | Before E9 |
+| Q2 2026 | RAISE-650 (Pluggable Domains) — enterprise foundation | Before E9 |
 | H1 2026 | E9-C (Automated Evaluation) — highest value enterprise feature | After 650 |
 | H2 2026 | E9-B (Specialized Roles), E9-D (Governance Telemetry) | After Coppel pilot |
 
