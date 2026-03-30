@@ -65,26 +65,41 @@ def _resolve_artifact_path(artifact_type: str) -> Path:
 @docs_app.command()
 def publish(
     artifact_type: Annotated[
-        str, typer.Argument(help="Governance artifact type (e.g., roadmap, adr)")
+        str, typer.Argument(help="Artifact type (e.g., roadmap, adr, story-design)")
     ],
     title: Annotated[
         str | None, typer.Option("--title", help="Page title (default: artifact type)")
     ] = None,
+    file: Annotated[
+        Path | None,
+        typer.Option("--file", "-f", help="Read content from file (skips governance/ convention)"),
+    ] = None,
     target: TargetOption = None,
 ) -> None:
-    """Publish a governance artifact to a documentation target."""
-    path = _resolve_artifact_path(artifact_type)
-    content = path.read_text(encoding="utf-8")
+    """Publish an artifact to a documentation target."""
+    if file is not None:
+        if not file.exists():
+            console.print(f"[red]Error:[/red] File not found: {file}")
+            raise typer.Exit(1)
+        content = file.read_text(encoding="utf-8")
+        path = str(file)
+    else:
+        resolved = _resolve_artifact_path(artifact_type)
+        content = resolved.read_text(encoding="utf-8")
+        path = str(resolved)
+
     doc_target = resolve_docs_target(target)
 
     page_title = title or artifact_type
-    metadata = {"title": page_title, "path": str(path)}
+    metadata = {"title": page_title, "path": path}
 
     result = doc_target.publish(
         doc_type=artifact_type, content=content, metadata=metadata
     )
     if result.success:
         console.print(f"Published: {artifact_type} → {result.url}")
+        if result.message and "sync pending" in result.message:
+            console.print(f"[yellow]Warning:[/yellow] {result.message}")
     else:
         console.print(f"[red]Error:[/red] {result.message}")
         raise typer.Exit(1)

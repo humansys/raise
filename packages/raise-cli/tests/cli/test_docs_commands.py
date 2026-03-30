@@ -151,6 +151,76 @@ class TestPublish:
         assert "Confluence auth failed" in result.output
 
 
+class TestPublishWithFile:
+    """--file flag reads content from arbitrary path."""
+
+    def test_publish_from_file(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        artifact = tmp_path / "work" / "epics" / "design.md"
+        artifact.parent.mkdir(parents=True)
+        artifact.write_text("# Design\nContent here.")
+        monkeypatch.chdir(tmp_path)
+
+        mock_target = _MockDocsTarget()
+        with _patch_target(mock_target):
+            result = runner.invoke(
+                app,
+                ["docs", "publish", "story-design", "--file", str(artifact), "--title", "S1 Design"],
+            )
+
+        assert result.exit_code == 0
+        assert "Published: story-design" in result.output
+        assert mock_target.last_publish_call is not None
+        assert mock_target.last_publish_call["content"] == "# Design\nContent here."
+        assert mock_target.last_publish_call["metadata"]["title"] == "S1 Design"
+        assert mock_target.last_publish_call["metadata"]["path"] == str(artifact)
+
+    def test_file_not_found_raises(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(
+            app,
+            ["docs", "publish", "story-design", "--file", "nonexistent.md"],
+        )
+
+        assert result.exit_code == 1
+        assert "not found" in result.output.lower()
+
+    def test_file_bypasses_governance_convention(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """--file skips governance/ dir — no governance/story-design.md needed."""
+        artifact = tmp_path / "custom" / "doc.md"
+        artifact.parent.mkdir()
+        artifact.write_text("Custom content")
+        monkeypatch.chdir(tmp_path)
+
+        with _patch_target(_MockDocsTarget()):
+            result = runner.invoke(
+                app,
+                ["docs", "publish", "story-design", "--file", str(artifact)],
+            )
+
+        assert result.exit_code == 0
+
+    def test_without_file_uses_governance(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Backwards compat: no --file → governance/{type}.md."""
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir()
+        (gov_dir / "roadmap.md").write_text("# Roadmap")
+        monkeypatch.chdir(tmp_path)
+
+        with _patch_target(_MockDocsTarget()):
+            result = runner.invoke(app, ["docs", "publish", "roadmap"])
+
+        assert result.exit_code == 0
+
+
 class TestGet:
     def test_get_page(self) -> None:
         """Get retrieves page and displays content."""
