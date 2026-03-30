@@ -1,0 +1,74 @@
+# Confluence Configuration — raise-commons
+# Identity (username, token) resolved from env vars:
+#   CONFLUENCE_USERNAME or CONFLUENCE_USERNAME_{INSTANCE}
+#   CONFLUENCE_API_TOKEN or CONFLUENCE_API_TOKEN_{INSTANCE}
+
+default_instance: humansys
+
+instances:
+  humansys:
+    url: "https://humansys.atlassian.net/wiki"
+    space_key: "RaiSE1"
+    instance_name: "humansys"
+    routing:
+      # ── Manual publish types ──
+      adr:
+        parent_title: "Architecture"
+        labels: ["adr", "architecture"]
+      developer:
+        parent_title: "Developer Docs"
+        labels: ["developer-docs"]
+
+      # ── Story lifecycle artifacts ──
+      story-story:
+        parent_title: "Epics"
+        labels: ["story"]
+      story-scope:
+        parent_title: "Epics"
+        labels: ["story", "scope"]
+      story-design:
+        parent_title: "Epics"
+        labels: ["story", "design"]
+      story-plan:
+        parent_title: "Epics"
+        labels: ["story", "plan"]
+      story-retrospective:
+        parent_title: "Epics"
+        labels: ["story", "retrospective"]
+
+      # ── Epic lifecycle artifacts ──
+      epic-brief:
+        parent_title: "Epics"
+        labels: ["epic", "brief"]
+      epic-scope:
+        parent_title: "Epics"
+        labels: ["epic", "scope"]
+      epic-design:
+        parent_title: "Epics"
+        labels: ["epic", "design"]
+      epic-plan:
+        parent_title: "Epics"
+        labels: ["epic", "plan"]
+      epic-retrospective:
+        parent_title: "Epics"
+        labels: ["epic", "retrospective"]
+
+      # ── Operational artifacts ──
+      arch-review:
+        parent_title: "Architecture"
+        labels: ["review", "architecture"]
+      quality-review:
+        parent_title: "Developer Docs"
+        labels: ["review", "quality"]
+      research-report:
+        parent_title: "Developer Docs"
+        labels: ["research"]
+      debug-analysis:
+        parent_title: "Developer Docs"
+        labels: ["debug", "analysis"]
+      problem-brief:
+        parent_title: "Product"
+        labels: ["problem-brief"]
+      architecture-docs:
+        parent_title: "Architecture"
+        labels: ["architecture", "module-docs"]

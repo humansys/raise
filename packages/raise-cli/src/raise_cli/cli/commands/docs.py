@@ -13,6 +13,7 @@ Architecture: E301 (Agent Tool Abstraction), ADR-034 (Governance)
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -65,26 +66,64 @@ def _resolve_artifact_path(artifact_type: str) -> Path:
 @docs_app.command()
 def publish(
     artifact_type: Annotated[
-        str, typer.Argument(help="Governance artifact type (e.g., roadmap, adr)")
+        str, typer.Argument(help="Artifact type (e.g., roadmap, adr, story-design)")
     ],
     title: Annotated[
         str | None, typer.Option("--title", help="Page title (default: artifact type)")
     ] = None,
+    file: Annotated[
+        Path | None,
+        typer.Option("--file", "-f", help="Read content from file (skips governance/ convention)"),
+    ] = None,
+    path: Annotated[
+        str | None,
+        typer.Option("--path", "-p", help="Local file path for filesystem target (used with --stdin)"),
+    ] = None,
+    stdin: Annotated[
+        bool,
+        typer.Option("--stdin", help="Read content from stdin (requires --path)"),
+    ] = False,
     target: TargetOption = None,
 ) -> None:
-    """Publish a governance artifact to a documentation target."""
-    path = _resolve_artifact_path(artifact_type)
-    content = path.read_text(encoding="utf-8")
+    """Publish an artifact to a documentation target.
+
+    Content sources (in priority order):
+    1. --file PATH — read from existing file
+    2. --stdin — read from stdin (pipe or heredoc), requires --path
+    3. governance/{type}.md — default convention
+    """
+    if file is not None:
+        if not file.exists():
+            console.print(f"[red]Error:[/red] File not found: {file}")
+            raise typer.Exit(1)
+        content = file.read_text(encoding="utf-8")
+        effective_path = path or str(file)
+    elif stdin:
+        content = sys.stdin.read()
+        if not content.strip():
+            console.print("[red]Error:[/red] No content received from stdin")
+            raise typer.Exit(1)
+        if not path:
+            console.print("[red]Error:[/red] --path is required when reading from stdin")
+            raise typer.Exit(1)
+        effective_path = path
+    else:
+        resolved = _resolve_artifact_path(artifact_type)
+        content = resolved.read_text(encoding="utf-8")
+        effective_path = path or str(resolved)
+
     doc_target = resolve_docs_target(target)
 
     page_title = title or artifact_type
-    metadata = {"title": page_title, "path": str(path)}
+    metadata = {"title": page_title, "path": effective_path}
 
     result = doc_target.publish(
         doc_type=artifact_type, content=content, metadata=metadata
     )
     if result.success:
         console.print(f"Published: {artifact_type} → {result.url}")
+        if result.message and "sync pending" in result.message:
+            console.print(f"[yellow]Warning:[/yellow] {result.message}")
     else:
         console.print(f"[red]Error:[/red] {result.message}")
         raise typer.Exit(1)
