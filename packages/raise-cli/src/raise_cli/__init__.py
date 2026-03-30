@@ -17,7 +17,9 @@ from raise_cli.exceptions import (
     ValidationError,
 )
 
-__version__ = "2.4.0a1"
+from importlib.metadata import version as _pkg_version
+
+__version__ = _pkg_version("raise-cli")
 __author__ = "Emilio Osorio"
 __license__ = "MIT"
 
