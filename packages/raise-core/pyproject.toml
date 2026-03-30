@@ -1,6 +1,6 @@
 [project]
 name = "raise-core"
-version = "2.3.0"
+version = "2.4.0a1"
 description = "RaiSE Core — protocols, models, and graph engine for the RaiSE framework"
 authors = [
     {name = "Emilio Osorio", email = "emilio@humansys.ai"}

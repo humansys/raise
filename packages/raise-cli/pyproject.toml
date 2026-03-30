@@ -1,6 +1,6 @@
 [project]
 name = "raise-cli"
-version = "2.3.0"
+version = "2.4.0a1"
 description = "RaiSE CLI - Reliable AI Software Engineering governance framework"
 authors = [
     {name = "Emilio Osorio", email = "emilio@humansys.ai"}
