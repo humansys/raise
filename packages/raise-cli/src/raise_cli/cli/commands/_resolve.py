@@ -179,25 +179,35 @@ def resolve_docs_target(target_name: str | None) -> DocumentationTarget:
         )
 
     # 2+ targets — auto-compose into CompositeDocTarget
+    # Order: local targets first (durability), remote targets last (URL preferred)
     from raise_cli.adapters.composite_docs import CompositeDocTarget
+    from raise_cli.adapters.filesystem_docs import FilesystemDocsTarget
 
-    instances: list[Any] = []
+    local_instances: list[Any] = []
+    remote_instances: list[Any] = []
     for name, cls in entries.items():
         try:
             instance = cls()
             if inspect.iscoroutinefunction(getattr(instance, "get_page", None)):
                 instance = SyncDocsAdapter(instance)
-            instances.append(instance)
+            if isinstance(instance, FilesystemDocsTarget):
+                local_instances.append(instance)
+            else:
+                remote_instances.append(instance)
         except Exception as exc:
             logger.warning("Skipping docs target '%s': %s", name, exc)
+
+    instances = local_instances + remote_instances
 
     if not instances:
         console.print("[red]Error:[/red] All docs targets failed to initialize.")
         sys.exit(1)
 
     logger.debug(
-        "Auto-composing %d docs targets: %s",
+        "Auto-composing %d docs targets (local=%d, remote=%d): %s",
         len(instances),
+        len(local_instances),
+        len(remote_instances),
         ", ".join(entries.keys()),
     )
     return CompositeDocTarget(instances)
