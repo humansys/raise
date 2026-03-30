@@ -45,21 +45,35 @@ Report mismatches with actionable suggestions.
 ### S1051.6: Config generator — `/rai-adapter-setup` Confluence (M)
 Interactive skill: discovery → present → human selects → generate valid YAML.
 
+### S1051.7: FilesystemDocsTarget + CompositeDocTarget (M)
+`FilesystemDocsTarget` writes artifacts as markdown to `work/epics/` structure.
+`CompositeDocTarget` wraps N targets — resolver auto-composes when multiple
+targets found. Routing config for all lifecycle artifact types.
+
+### S1051.8: Story lifecycle skills → docs adapter (M)
+Adapt story skills (start/design/plan/implement/review/close) to publish via
+`rai docs publish` instead of direct file writes. Dogfood from this story onward.
+
+### S1051.9: Epic lifecycle skills → docs adapter (S)
+Adapt epic skills (start/design/plan/close) to publish via `rai docs publish`.
+Same pattern as S1051.8 applied to epic-level artifacts.
+
 ## Dependencies
 
 ```
 S1051.1 Client wrapper ──┐
-                         ├──→ S1051.2 Adapter
-S1051.3 Config schema ───┘        │
-                                  ↓
-                           S1051.4 Discovery
-                                  │
-                         ┌────────┴────────┐
-                         ↓                 ↓
-                  S1051.5 Doctor    S1051.6 Generator
+                         ├──→ S1051.2 Adapter ──┐
+S1051.3 Config schema ───┘        │              │
+                                  ↓              ├──→ S1051.7 Composite + FS
+                           S1051.4 Discovery     │         │
+                                  │              │    ┌────┴────┐
+                         ┌────────┴────────┐     │    ↓         ↓
+                         ↓                 ↓     │  S1051.8   S1051.9
+                  S1051.5 Doctor    S1051.6 Gen   │  Stories   Epics
 ```
 
 S1051.1 and S1051.3 can run in parallel.
+S1051.8 and S1051.9 can run in parallel after S1051.7.
 
 ## In Scope
 
