@@ -30,8 +30,8 @@ packages = ["src/rai_pro"]
 [project.entry-points."rai.adapters.pm"]
 jira = "rai_pro.adapters.acli_jira:AcliJiraAdapter"
 
-[project.entry-points."rai.docs.targets"]
-confluence = "rai_pro.adapters.mcp_confluence:McpConfluenceAdapter"
+# MCP Confluence adapter superseded by raise-cli PythonApiConfluenceAdapter (E1051)
+# Code preserved in rai_pro.adapters.mcp_confluence for reference.
 
 [project.entry-points."rai.doctor.checks"]
 acli = "rai_pro.doctor.acli:AcliCheck"

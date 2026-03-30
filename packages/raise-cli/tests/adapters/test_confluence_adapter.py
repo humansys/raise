@@ -260,6 +260,4 @@ class TestEntryPoint:
 
         targets = get_doc_targets()
         assert "confluence" in targets
-        # May resolve to PythonApiConfluenceAdapter or McpConfluenceAdapter
-        # depending on which packages are installed. Both are valid.
-        assert targets["confluence"] is not None
+        assert targets["confluence"] is PythonApiConfluenceAdapter
