@@ -1,0 +1,176 @@
+---
+title: rai graph
+description: Build, query, and manage the knowledge graph.
+---
+
+Build, query, and manage the knowledge graph. The graph is a unified index of all context sources: governance, memory (patterns, calibration, sessions), skills, work tracking, and discovered components.
+
+## `rai graph build`
+
+Build the graph index from all sources. By default, diffs against the previous build and saves the diff to `.raise/rai/personal/last-diff.json`.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--output` | `-o` | Path to save index JSON |
+| `--no-diff` | | Skip diff computation |
+
+```bash
+# Build index to default location
+rai graph build
+
+# Build without diff
+rai graph build --no-diff
+
+# Save to custom location
+rai graph build --output custom_index.json
+```
+
+**Exit codes:** 0 success.
+
+---
+
+## `rai graph query`
+
+Search the knowledge graph for relevant concepts.
+
+| Argument | Description |
+|----------|-------------|
+| `QUERY_STR` | Query string — keywords or concept ID (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+| `--output` | `-o` | Output file path (default: stdout) |
+| `--strategy` | `-s` | Query strategy: `keyword_search`, `concept_lookup` |
+| `--types` | `-t` | Filter by types (comma-separated: `pattern`, `calibration`, `principle`, etc.) |
+| `--edge-types` | | Filter by edge types (comma-separated: `constrained_by`, `depends_on`, etc.) |
+| `--limit` | `-l` | Maximum number of results. Default: `10` |
+| `--index` | `-i` | Graph index path |
+
+```bash
+# Search by keywords
+rai graph query "planning estimation"
+
+# Filter to patterns only
+rai graph query "testing" --types pattern,calibration
+
+# Lookup specific concept by ID
+rai graph query "PAT-001" --strategy concept_lookup
+
+# Compact JSON output
+rai graph query "velocity" --format json
+```
+
+---
+
+## `rai graph context`
+
+Show full architectural context for a module. Returns bounded context (domain), architectural layer, guardrails, and dependencies.
+
+| Argument | Description |
+|----------|-------------|
+| `MODULE_ID` | Module ID, e.g. `mod-memory` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+| `--index` | `-i` | Graph index path |
+
+```bash
+# Show context for memory module
+rai graph context mod-memory
+
+# JSON output
+rai graph context mod-memory --format json
+```
+
+---
+
+## `rai graph validate`
+
+Validate graph index structure and relationships. Checks for cycles in `depends_on` relationships, valid relationship types, and that all edge targets exist as nodes.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--index` | `-i` | Path to index JSON file |
+
+```bash
+# Validate default index
+rai graph validate
+
+# Validate specific index file
+rai graph validate --index custom_index.json
+```
+
+**Exit codes:** 0 valid, 1 validation errors found.
+
+---
+
+## `rai graph extract`
+
+Extract concepts from governance markdown files. Without arguments, extracts from all standard governance locations (`governance/prd.md`, `governance/vision.md`, `framework/reference/constitution.md`).
+
+| Argument | Description |
+|----------|-------------|
+| `FILE_PATH` | Path to governance file (optional — extracts all if omitted) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Extract from all governance files
+rai graph extract
+
+# Extract from specific file
+rai graph extract governance/prd.md
+```
+
+---
+
+## `rai graph list`
+
+List concepts in the knowledge graph.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`, `table`. Default: `table` |
+| `--output` | `-o` | Output file path (default: stdout) |
+| `--index` | `-i` | Graph index path |
+| `--memory-only` / `--all` | | Show only memory types (pattern, calibration, session) or all. Default: `--all` |
+
+```bash
+# Show summary table
+rai graph list
+
+# Show only patterns/calibrations/sessions
+rai graph list --memory-only
+
+# Export as JSON
+rai graph list --format json --output graph.json
+```
+
+---
+
+## `rai graph viz`
+
+Generate an interactive HTML visualization of the knowledge graph. Creates a self-contained HTML file with a D3.js force-directed graph. Nodes are color-coded by type, filterable, zoomable, and searchable.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--output` | `-o` | Output HTML file path |
+| `--index` | `-i` | Graph index path |
+| `--open` / `--no-open` | | Open in browser after generating. Default: `--open` |
+
+```bash
+# Generate and open in browser
+rai graph viz
+
+# Generate to specific path
+rai graph viz --output graph.html
+
+# Generate without opening
+rai graph viz --no-open
+```
+
+**See also:** [`rai graph build`](#rai-graph-build), [`rai pattern`](pattern.md/
