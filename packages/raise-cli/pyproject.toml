@@ -95,6 +95,7 @@ developer = "raise_cli.doctor.checks.developer:DeveloperCheck"
 filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"
 
 [project.entry-points."rai.docs.targets"]
+filesystem = "raise_cli.adapters.filesystem_docs:FilesystemDocsTarget"
 confluence = "raise_cli.adapters.confluence_adapter:PythonApiConfluenceAdapter"
 
 [project.entry-points."rai.graph.backends"]

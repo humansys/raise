@@ -24,6 +24,7 @@ from raise_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
+from raise_cli.adapters.composite_docs import CompositeDocTarget
 from raise_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
 from raise_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
 
@@ -254,18 +255,18 @@ class TestResolveDocsTarget:
         target = resolve_docs_target(None)
         assert isinstance(target, DocumentationTarget)
 
-    def test_multiple_targets_without_flag_raises(
+    def test_multiple_targets_auto_composes(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
-            f"{_RESOLVE_MOD}.get_doc_targets",
-            lambda: {"confluence": _StubDocs, "notion": _StubDocs},
+            f"{_RESOLVE_MOD}._discover_docs",
+            lambda: {"filesystem": _StubDocs, "confluence": _StubDocs},
         )
         from raise_cli.cli.commands._resolve import resolve_docs_target
 
-        with pytest.raises(SystemExit) as exc_info:
-            resolve_docs_target(None)
-        assert exc_info.value.code == 1
+        target = resolve_docs_target(None)
+        assert isinstance(target, CompositeDocTarget)
+        assert isinstance(target, DocumentationTarget)
 
     def test_flag_override_selects_named(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(
