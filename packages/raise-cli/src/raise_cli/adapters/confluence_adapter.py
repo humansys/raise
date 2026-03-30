@@ -36,11 +36,8 @@ class PythonApiConfluenceAdapter:
         self._client: ConfluenceClient = ConfluenceClient(instance)
 
     def can_publish(self, doc_type: str, metadata: dict[str, Any]) -> bool:
-        """True if routing is configured for doc_type, or no routing at all."""
-        instance = self._config.get_instance()
-        if not instance.routing:
-            return True
-        return doc_type in instance.routing
+        """True only if routing is explicitly configured for doc_type."""
+        return self._config.resolve_routing(doc_type) is not None
 
     def publish(
         self, doc_type: str, content: str, metadata: dict[str, Any]
@@ -54,15 +51,26 @@ class PythonApiConfluenceAdapter:
             )
 
         routing = self._config.resolve_routing(doc_type)
-        parent_id: str | None = None
-        labels: list[str] = []
+        if not routing:
+            return PublishResult(
+                success=False,
+                message=f"No routing configured for doc_type '{doc_type}'",
+            )
 
-        if routing:
-            labels = routing.labels
-            # Resolve parent page by title
-            parent_page = self._client.get_page_by_title(routing.parent_title)
-            if parent_page:
-                parent_id = parent_page.id
+        labels = routing.labels
+        parent_id: str | None = None
+
+        # Resolve parent page — fail if not found (reliability over convenience)
+        parent_page = self._client.get_page_by_title(routing.parent_title)
+        if not parent_page:
+            return PublishResult(
+                success=False,
+                message=(
+                    f"Parent page '{routing.parent_title}' not found in Confluence. "
+                    "Create it first or fix routing config."
+                ),
+            )
+        parent_id = parent_page.id
 
         # Check if page already exists
         existing = self._client.get_page_by_title(title)
