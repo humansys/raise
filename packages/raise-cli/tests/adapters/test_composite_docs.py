@@ -43,14 +43,15 @@ class TestCompositeDocTarget:
         t1.publish.assert_called_once_with("adr", "content", {"title": "ADR"})
         t2.publish.assert_called_once_with("adr", "content", {"title": "ADR"})
 
-    def test_publish_returns_primary_result(self) -> None:
-        t1 = _mock_target("primary")
-        t2 = _mock_target("secondary")
+    def test_publish_returns_last_successful_result(self) -> None:
+        """Last success = remote URL (preferred over local path)."""
+        t1 = _mock_target("fs")  # first = filesystem
+        t2 = _mock_target("confluence")  # last = remote
         composite = CompositeDocTarget([t1, t2])
 
         result = composite.publish("adr", "content", {"title": "ADR"})
 
-        assert result.url == "https://primary"
+        assert result.url == "https://confluence"
 
     def test_publish_skips_targets_that_cant_publish(self) -> None:
         t1 = _mock_target("fs", can_publish=True)
@@ -83,32 +84,71 @@ class TestCompositeDocTarget:
 
         assert composite.can_publish("adr", {}) is False
 
-    def test_get_page_delegates_to_primary(self) -> None:
-        t1 = _mock_target("primary")
-        t2 = _mock_target("secondary")
+    def test_get_page_delegates_to_remote(self) -> None:
+        t1 = _mock_target("fs")
+        t2 = _mock_target("confluence")
         composite = CompositeDocTarget([t1, t2])
 
         composite.get_page("123")
 
-        t1.get_page.assert_called_once_with("123")
-        t2.get_page.assert_not_called()
+        t2.get_page.assert_called_once_with("123")
+        t1.get_page.assert_not_called()
 
-    def test_search_delegates_to_primary(self) -> None:
-        t1 = _mock_target("primary")
-        t2 = _mock_target("secondary")
+    def test_search_delegates_to_remote(self) -> None:
+        t1 = _mock_target("fs")
+        t2 = _mock_target("confluence")
         composite = CompositeDocTarget([t1, t2])
 
         composite.search("query", limit=5)
 
-        t1.search.assert_called_once_with("query", limit=5)
-        t2.search.assert_not_called()
+        t2.search.assert_called_once_with("query", limit=5)
+        t1.search.assert_not_called()
 
-    def test_health_delegates_to_primary(self) -> None:
-        t1 = _mock_target("primary")
-        t2 = _mock_target("secondary")
+    def test_health_delegates_to_remote(self) -> None:
+        t1 = _mock_target("fs")
+        t2 = _mock_target("confluence")
         composite = CompositeDocTarget([t1, t2])
 
         h = composite.health()
 
-        assert h.name == "primary"
-        t1.health.assert_called_once()
+        assert h.name == "confluence"
+        t2.health.assert_called_once()
+
+    # ── Reliability scenarios ────────────────────────────────────────────
+
+    def test_fs_ok_confluence_fails_returns_success_with_warning(self) -> None:
+        """Filesystem succeeds, Confluence fails → success + sync pending."""
+        t1 = _mock_target("fs")
+        t2 = _mock_target("confluence")
+        t2.publish.return_value = PublishResult(
+            success=False, message="Confluence unreachable"
+        )
+        composite = CompositeDocTarget([t1, t2])
+
+        result = composite.publish("adr", "content", {"title": "ADR"})
+
+        assert result.success is True
+        assert "sync pending" in result.message
+
+    def test_fs_ok_confluence_exception_returns_success_with_warning(self) -> None:
+        """Filesystem succeeds, Confluence throws → success + sync pending."""
+        t1 = _mock_target("fs")
+        t2 = _mock_target("confluence")
+        t2.publish.side_effect = ConnectionError("Network down")
+        composite = CompositeDocTarget([t1, t2])
+
+        result = composite.publish("adr", "content", {"title": "ADR"})
+
+        assert result.success is True
+        assert "sync pending" in result.message
+
+    def test_both_fail_returns_failure(self) -> None:
+        t1 = _mock_target("fs")
+        t1.publish.return_value = PublishResult(success=False, message="disk full")
+        t2 = _mock_target("confluence")
+        t2.publish.return_value = PublishResult(success=False, message="unreachable")
+        composite = CompositeDocTarget([t1, t2])
+
+        result = composite.publish("adr", "content", {"title": "ADR"})
+
+        assert result.success is False
