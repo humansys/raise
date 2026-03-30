@@ -221,6 +221,49 @@ class TestPublishWithFile:
         assert result.exit_code == 0
 
 
+class TestPublishFromStdin:
+    """--stdin flag + --path reads content from stdin."""
+
+    def test_publish_from_stdin(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        mock_target = _MockDocsTarget()
+        with _patch_target(mock_target):
+            result = runner.invoke(
+                app,
+                ["docs", "publish", "story-design", "--stdin", "--path", "work/design.md", "--title", "Design"],
+                input="# Design\nFrom stdin.",
+            )
+
+        assert result.exit_code == 0
+        assert mock_target.last_publish_call is not None
+        assert mock_target.last_publish_call["content"] == "# Design\nFrom stdin."
+        assert mock_target.last_publish_call["metadata"]["path"] == "work/design.md"
+
+    def test_stdin_requires_path(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        with _patch_target(_MockDocsTarget()):
+            result = runner.invoke(
+                app,
+                ["docs", "publish", "story-design", "--stdin", "--title", "Design"],
+                input="# Content",
+            )
+
+        assert result.exit_code == 1
+        assert "path" in result.output.lower()
+
+    def test_empty_stdin_raises(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(tmp_path)
+        with _patch_target(_MockDocsTarget()):
+            result = runner.invoke(
+                app,
+                ["docs", "publish", "story-design", "--stdin", "--path", "work/design.md"],
+                input="",
+            )
+
+        assert result.exit_code == 1
+        assert "no content" in result.output.lower()
+
+
 class TestGet:
     def test_get_page(self) -> None:
         """Get retrieves page and displays content."""
