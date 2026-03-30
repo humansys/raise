@@ -38,10 +38,11 @@ class ConfluenceClient:
             ) from exc
 
         token = self._resolve_token(config.instance_name)
+        username = config.username or self._resolve_username(config.instance_name)
         self._config = config
         self._client = Confluence(
             url=config.url,
-            username=config.username,
+            username=username,
             password=token,
             cloud=True,
             backoff_and_retry=True,
@@ -247,6 +248,23 @@ class ConfluenceClient:
                 "CONFLUENCE_API_TOKEN environment variable."
             )
         return token
+
+    @staticmethod
+    def _resolve_username(instance_name: str) -> str:
+        """Resolve username (email) from environment.
+
+        Order: CONFLUENCE_USERNAME_{INSTANCE} → CONFLUENCE_USERNAME → error.
+        """
+        env_suffix = instance_name.upper().replace("-", "_")
+        instance_var = f"CONFLUENCE_USERNAME_{env_suffix}"
+
+        username = os.environ.get(instance_var) or os.environ.get("CONFLUENCE_USERNAME")
+        if not username:
+            raise ConfluenceAuthError(
+                f"No Confluence username found. Set {instance_var} or "
+                "CONFLUENCE_USERNAME environment variable, or set username in config."
+            )
+        return username
 
     @staticmethod
     def _parse_page(raw: dict[str, Any]) -> PageContent:

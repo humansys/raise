@@ -94,13 +94,13 @@ class TestConfluenceInstanceConfig:
                 username="u@x.com", space_key="DEV"
             )  # type: ignore[call-arg]
 
-    def test_missing_username_raises(self) -> None:
+    def test_username_optional_defaults_none(self) -> None:
         from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
 
-        with pytest.raises(ValidationError):
-            ConfluenceInstanceConfig(
-                url="https://x.atlassian.net/wiki", space_key="DEV"
-            )  # type: ignore[call-arg]
+        config = ConfluenceInstanceConfig(
+            url="https://x.atlassian.net/wiki", space_key="DEV"
+        )
+        assert config.username is None
 
     def test_missing_space_key_raises(self) -> None:
         from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
@@ -179,6 +179,54 @@ class TestAuthResolution:
 
         token = ConfluenceClient._resolve_token("my-prod")
         assert token == "secret"
+
+
+class TestUsernameResolution:
+    """Username resolution: instance-specific → generic → error."""
+
+    def test_instance_specific_username(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+
+        monkeypatch.setenv("CONFLUENCE_USERNAME_HUMANSYS", "inst@x.com")
+        monkeypatch.delenv("CONFLUENCE_USERNAME", raising=False)
+
+        username = ConfluenceClient._resolve_username("humansys")
+        assert username == "inst@x.com"
+
+    def test_generic_username_fallback(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+
+        monkeypatch.delenv("CONFLUENCE_USERNAME_HUMANSYS", raising=False)
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "generic@x.com")
+
+        username = ConfluenceClient._resolve_username("humansys")
+        assert username == "generic@x.com"
+
+    def test_missing_username_raises_auth_error(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+        from raise_cli.adapters.confluence_exceptions import ConfluenceAuthError
+
+        monkeypatch.delenv("CONFLUENCE_USERNAME_HUMANSYS", raising=False)
+        monkeypatch.delenv("CONFLUENCE_USERNAME", raising=False)
+
+        with pytest.raises(ConfluenceAuthError, match="CONFLUENCE_USERNAME"):
+            ConfluenceClient._resolve_username("humansys")
+
+    def test_config_username_takes_precedence(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """When username is in config, _resolve_username is not called."""
+        from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
+
+        config = ConfluenceInstanceConfig(
+            url="https://x.atlassian.net/wiki",
+            username="config@x.com",
+            space_key="TEST",
+        )
+        # config.username is truthy → `or _resolve_username()` short-circuits
+        assert config.username == "config@x.com"
 
 
 # ── T3: Constructor + import guard ───────────────────────────────────

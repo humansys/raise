@@ -1,0 +1,22 @@
+# Confluence Configuration — raise-commons
+# Identity (username, token) resolved from env vars:
+#   CONFLUENCE_USERNAME or CONFLUENCE_USERNAME_{INSTANCE}
+#   CONFLUENCE_API_TOKEN or CONFLUENCE_API_TOKEN_{INSTANCE}
+
+default_instance: humansys
+
+instances:
+  humansys:
+    url: "https://humansys.atlassian.net/wiki"
+    space_key: "RaiSE1"
+    instance_name: "humansys"
+    routing:
+      adr:
+        parent_title: "Architecture"
+        labels: ["adr", "architecture"]
+      epic:
+        parent_title: "Epics"
+        labels: ["epic"]
+      developer:
+        parent_title: "Developer Docs"
+        labels: ["developer-docs"]

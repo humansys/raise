@@ -20,9 +20,8 @@ CLAUDE.local.md
 .raise/confluence-pages.yaml
 .raise/backlog/
 
-# RaiSE adapter configs (contain PII — use .example templates)
-.raise/jira.yaml
-.raise/confluence.yaml
+# RaiSE adapter configs (declarative, PII-free — identity in env vars)
+# .raise/jira.yaml and .raise/confluence.yaml are tracked (shared config)
 .raise/adapters/*.yaml
 !.raise/adapters/*.yaml.example
 

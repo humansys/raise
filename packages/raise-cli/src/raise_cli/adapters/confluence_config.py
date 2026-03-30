@@ -26,7 +26,10 @@ class ConfluenceInstanceConfig(BaseModel):
     """Single Confluence instance connection config."""
 
     url: str = Field(..., description="Confluence base URL (e.g. https://x.atlassian.net/wiki)")
-    username: str = Field(..., description="Atlassian account email")
+    username: str | None = Field(
+        default=None,
+        description="Atlassian account email (optional — falls back to env var)",
+    )
     space_key: str = Field(..., description="Default space key")
     instance_name: str = Field(
         default="default",
