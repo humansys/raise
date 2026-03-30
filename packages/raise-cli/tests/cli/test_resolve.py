@@ -11,6 +11,7 @@ from typing import Any
 
 import pytest
 
+from raise_cli.adapters.composite_docs import CompositeDocTarget
 from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
@@ -24,7 +25,6 @@ from raise_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from raise_cli.adapters.composite_docs import CompositeDocTarget
 from raise_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
 from raise_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
 

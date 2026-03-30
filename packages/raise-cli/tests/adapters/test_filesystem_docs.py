@@ -12,7 +12,6 @@ import pytest
 from raise_cli.adapters.filesystem_docs import FilesystemDocsTarget
 from raise_cli.adapters.protocols import DocumentationTarget
 
-
 # ── T1: FilesystemDocsTarget ─────────────────────────────────────────────
 
 

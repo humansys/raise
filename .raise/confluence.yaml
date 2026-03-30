@@ -11,12 +11,44 @@ instances:
     space_key: "RaiSE1"
     instance_name: "humansys"
     routing:
+      # ── Manual publish types ──
       adr:
         parent_title: "Architecture"
         labels: ["adr", "architecture"]
-      epic:
-        parent_title: "Epics"
-        labels: ["epic"]
       developer:
         parent_title: "Developer Docs"
         labels: ["developer-docs"]
+
+      # ── Story lifecycle artifacts ──
+      story-story:
+        parent_title: "Epics"
+        labels: ["story"]
+      story-scope:
+        parent_title: "Epics"
+        labels: ["story", "scope"]
+      story-design:
+        parent_title: "Epics"
+        labels: ["story", "design"]
+      story-plan:
+        parent_title: "Epics"
+        labels: ["story", "plan"]
+      story-retrospective:
+        parent_title: "Epics"
+        labels: ["story", "retrospective"]
+
+      # ── Epic lifecycle artifacts ──
+      epic-brief:
+        parent_title: "Epics"
+        labels: ["epic", "brief"]
+      epic-scope:
+        parent_title: "Epics"
+        labels: ["epic", "scope"]
+      epic-design:
+        parent_title: "Epics"
+        labels: ["epic", "design"]
+      epic-plan:
+        parent_title: "Epics"
+        labels: ["epic", "plan"]
+      epic-retrospective:
+        parent_title: "Epics"
+        labels: ["epic", "retrospective"]
