@@ -554,6 +554,23 @@ class TestGetComments:
         assert result[0]["id"] == "10001"
         backend.issue_get_comments.assert_called_once_with("RAISE-1")
 
+    def test_respects_limit(self) -> None:
+        client, backend = _make_client()
+        backend.issue_get_comments.return_value = {
+            "comments": [
+                {"id": "10001", "body": "First"},
+                {"id": "10002", "body": "Second"},
+                {"id": "10003", "body": "Third"},
+            ],
+            "total": 3,
+        }
+
+        result = client.get_comments("RAISE-1", limit=2)
+
+        assert len(result) == 2
+        assert result[0]["id"] == "10001"
+        assert result[1]["id"] == "10002"
+
     def test_returns_empty_list(self) -> None:
         client, backend = _make_client()
         backend.issue_get_comments.return_value = {"comments": [], "total": 0}

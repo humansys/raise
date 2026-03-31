@@ -7,8 +7,12 @@ JIRA_API_TOKEN is not set in the environment.
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from raise_cli.adapters.jira_client import JiraClient
 
 _skip_no_creds = pytest.mark.skipif(
     not os.environ.get("JIRA_API_TOKEN"),
@@ -20,7 +24,7 @@ _skip_no_creds = pytest.mark.skipif(
 class TestJiraClientIntegration:
     """Live Jira API tests — require JIRA_API_TOKEN env var."""
 
-    def _make_live_client(self) -> object:
+    def _make_live_client(self) -> JiraClient:
         """Create a JiraClient from environment variables."""
         from raise_cli.adapters.jira_client import JiraClient
 
@@ -30,24 +34,18 @@ class TestJiraClientIntegration:
         return JiraClient(url=url, username=username, token=token)
 
     def test_server_info(self) -> None:
-        from raise_cli.adapters.jira_client import JiraClient
-
-        client: JiraClient = self._make_live_client()  # type: ignore[assignment]
+        client = self._make_live_client()
         info = client.server_info()
         assert isinstance(info, dict)
         assert "baseUrl" in info
 
     def test_get_issue(self) -> None:
-        from raise_cli.adapters.jira_client import JiraClient
-
-        client: JiraClient = self._make_live_client()  # type: ignore[assignment]
+        client = self._make_live_client()
         issue = client.get_issue("RAISE-1052")
         assert "fields" in issue
         assert "summary" in issue["fields"]
 
     def test_jql_search(self) -> None:
-        from raise_cli.adapters.jira_client import JiraClient
-
-        client: JiraClient = self._make_live_client()  # type: ignore[assignment]
+        client = self._make_live_client()
         issues = client.jql("project = RAISE ORDER BY created DESC", limit=3)
         assert isinstance(issues, list)
