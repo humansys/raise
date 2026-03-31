@@ -99,6 +99,17 @@ S1052.4 has no dependencies — runs anytime.
 | BacklogSyncHook convention doesn't cover all workflow variants | Low | Low | Convention covers 95%; override via config in RAISE-1130 if needed |
 | Deleting providers/jira/ breaks something unexpected | Low | Medium | Grep all imports before deletion; tests catch consumers |
 
+## Progress Tracking
+
+| Story | Status | Commit | Date |
+|-------|--------|--------|------|
+| S1052.1 | DONE | 672b7b9b | 2026-03-31 |
+| S1052.2 | TODO | — | — |
+| S1052.3 | TODO | — | — |
+| S1052.4 | TODO | — | — |
+| S1052.5 | TODO | — | — |
+| S1052.6 | TODO | — | — |
+
 ## Metrics (targets)
 
 | Metric | Target |
