@@ -27,14 +27,10 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/rai_pro"]
 
-[project.entry-points."rai.adapters.pm"]
-jira = "rai_pro.adapters.acli_jira:AcliJiraAdapter"
-
-# MCP Confluence adapter superseded by raise-cli PythonApiConfluenceAdapter (E1051)
-# Code preserved in rai_pro.adapters.mcp_confluence for reference.
+# Legacy entry points removed in S1052.5:
+# - jira adapter (superseded by raise-cli PythonApiJiraAdapter)
+# - jira-sync hook (superseded by raise-cli backlog commands)
+# - MCP Confluence adapter (superseded by raise-cli PythonApiConfluenceAdapter)
 
 [project.entry-points."rai.doctor.checks"]
 acli = "rai_pro.doctor.acli:AcliCheck"
-
-[project.entry-points."rai.hooks"]
-jira-sync = "rai_pro.hooks.jira_sync:JiraSyncHook"

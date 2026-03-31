@@ -437,11 +437,11 @@ class TestEntryPointDiscovery:
         assert "confluence" in targets
 
     def test_entry_point_loads_correct_class(self) -> None:
-        """Entry point loads McpConfluenceAdapter class."""
-        from rai_pro.adapters.mcp_confluence import McpConfluenceAdapter
+        """Entry point loads PythonApiConfluenceAdapter (E1051 replaced MCP)."""
+        from raise_cli.adapters.confluence_adapter import PythonApiConfluenceAdapter
 
         targets = get_doc_targets()
-        assert targets["confluence"] is McpConfluenceAdapter
+        assert targets["confluence"] is PythonApiConfluenceAdapter
 
 
 class TestProtocolCompliance:

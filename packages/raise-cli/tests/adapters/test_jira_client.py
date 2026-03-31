@@ -442,15 +442,20 @@ class TestGetTransitions:
 
 
 class TestTransitionIssue:
-    """transition_issue delegates to self._client.set_issue_status."""
+    """transition_issue posts directly to /transitions endpoint."""
 
-    def test_delegates_to_set_issue_status(self) -> None:
+    def test_posts_transition_payload(self) -> None:
         client, backend = _make_client()
-        backend.set_issue_status.return_value = None
+        backend.resource_url.return_value = "https://x.atlassian.net/rest/api/2/issue"
+        backend.post.return_value = None
 
         client.transition_issue("RAISE-1", "21")
 
-        backend.set_issue_status.assert_called_once_with("RAISE-1", "21")
+        backend.resource_url.assert_called_once_with("issue")
+        backend.post.assert_called_once_with(
+            "https://x.atlassian.net/rest/api/2/issue/RAISE-1/transitions",
+            data={"transition": {"id": "21"}},
+        )
 
     def test_error_mapped(self) -> None:
         from atlassian.errors import ApiError
@@ -458,7 +463,8 @@ class TestTransitionIssue:
         from raise_cli.adapters.jira_exceptions import JiraApiError
 
         client, backend = _make_client()
-        backend.set_issue_status.side_effect = ApiError("400")
+        backend.resource_url.return_value = "https://x.atlassian.net/rest/api/2/issue"
+        backend.post.side_effect = ApiError("400")
 
         with pytest.raises(JiraApiError, match="transition_issue"):
             client.transition_issue("RAISE-1", "99")
