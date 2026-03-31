@@ -233,3 +233,84 @@ class TestLoadJiraConfig:
         cfg = load_jira_config(tmp_path)
         # Extra fields accessible via model_extra
         assert cfg.default_instance == "humansys"
+
+
+# ── T2: resolve_instance / resolve_site ────────────────────────────────
+
+
+class TestResolveInstance:
+    """JiraConfig.resolve_instance() tests."""
+
+    def test_resolve_known_project(self) -> None:
+        cfg = JiraConfig(
+            default_instance="humansys",
+            instances={"humansys": _make_instance()},
+            projects={"RAISE": JiraProject(instance="humansys", name="RAISE")},
+        )
+        inst = cfg.resolve_instance("RAISE")
+        assert inst.site == "humansys.atlassian.net"
+
+    def test_resolve_unknown_project_falls_back_to_default(self) -> None:
+        cfg = JiraConfig(
+            default_instance="humansys",
+            instances={"humansys": _make_instance()},
+        )
+        inst = cfg.resolve_instance("UNKNOWN")
+        assert inst.site == "humansys.atlassian.net"
+
+    def test_resolve_multi_instance(self) -> None:
+        cfg = JiraConfig(
+            default_instance="humansys",
+            instances={
+                "humansys": _make_instance(),
+                "rai-agent": JiraInstance(site="rai-agent.atlassian.net"),
+            },
+            projects={
+                "RAISE": JiraProject(instance="humansys"),
+                "RAI": JiraProject(instance="rai-agent"),
+            },
+        )
+        assert cfg.resolve_instance("RAISE").site == "humansys.atlassian.net"
+        assert cfg.resolve_instance("RAI").site == "rai-agent.atlassian.net"
+
+
+class TestResolveSite:
+    """JiraConfig.resolve_site() tests."""
+
+    def test_resolve_site_returns_https_url(self) -> None:
+        cfg = JiraConfig(
+            default_instance="humansys",
+            instances={"humansys": _make_instance()},
+        )
+        assert cfg.resolve_site("RAISE") == "https://humansys.atlassian.net"
+
+    def test_resolve_site_multi_instance(self) -> None:
+        cfg = JiraConfig(
+            default_instance="humansys",
+            instances={
+                "humansys": _make_instance(),
+                "other": JiraInstance(site="other.atlassian.net"),
+            },
+            projects={"OTHER": JiraProject(instance="other")},
+        )
+        assert cfg.resolve_site("OTHER") == "https://other.atlassian.net"
+
+
+# ── T2: JiraClient.from_config integration ─────────────────────────────
+
+
+class TestJiraClientFromConfigIntegration:
+    """JiraConfig works with JiraClient.from_config()."""
+
+    def test_config_has_required_attributes(self) -> None:
+        """JiraConfig satisfies JiraClient.from_config duck typing contract."""
+        cfg = JiraConfig(
+            default_instance="humansys",
+            instances={"humansys": _make_instance()},
+        )
+        # Verify the attributes from_config expects
+        assert hasattr(cfg, "default_instance")
+        assert hasattr(cfg, "instances")
+        inst = cfg.instances[cfg.default_instance]
+        assert hasattr(inst, "site")
+        assert hasattr(inst, "email")
