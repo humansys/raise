@@ -174,8 +174,8 @@ class ReleasePublishEvent(HookEvent):
 class WorkLifecycleEvent(HookEvent):
     """Emitted when a work lifecycle signal is recorded.
 
-    Bridges ``rai signal emit-work`` to the hook system so hooks like
-    BacklogHook can react to story/epic lifecycle transitions.
+    Bridges ``rai signal emit-work`` to the hook system so hooks can
+    react to story/epic lifecycle transitions.
     """
 
     event_name: Literal["work:lifecycle"] = field(  # type: ignore[assignment]
