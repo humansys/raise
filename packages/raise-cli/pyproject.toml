@@ -49,8 +49,14 @@ observability = [
 csharp = [
     "tree-sitter-c-sharp>=0.23.1",
 ]
+atlassian = [
+    "atlassian-python-api>=3.41.0",
+]
 confluence = [
-    "atlassian-python-api>=3.41",
+    "atlassian-python-api>=3.41.0",
+]
+jira = [
+    "atlassian-python-api>=3.41.0",
 ]
 
 [project.urls]
@@ -76,7 +82,6 @@ glossary = "raise_cli.governance.parsers.glossary:GlossaryParser"
 [project.entry-points."rai.hooks"]
 telemetry = "raise_cli.hooks.builtin.telemetry:TelemetryHook"
 gate-bridge = "raise_cli.hooks.builtin.gate_bridge:GateBridgeHook"
-backlog = "raise_cli.hooks.builtin.backlog:BacklogHook"
 memory-sync = "raise_cli.hooks.builtin.memory:MemoryMdSyncHook"
 
 [project.entry-points."rai.gates"]
@@ -93,6 +98,7 @@ developer = "raise_cli.doctor.checks.developer:DeveloperCheck"
 
 [project.entry-points."rai.adapters.pm"]
 filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"
+jira = "raise_cli.adapters.jira_adapter:PythonApiJiraAdapter"
 
 [project.entry-points."rai.docs.targets"]
 filesystem = "raise_cli.adapters.filesystem_docs:FilesystemDocsTarget"
