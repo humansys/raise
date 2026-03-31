@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -205,3 +206,166 @@ class TestUsernameResolution:
 
         with pytest.raises(JiraAuthError, match="JIRA_USERNAME"):
             JiraClient._resolve_username("humansys")
+
+
+# ── Shared fixture ───────────────────────────────────────────────────
+
+
+def _make_client() -> tuple[Any, MagicMock]:
+    """Create a JiraClient with mocked atlassian backend.
+
+    Returns (client, mock_backend) where mock_backend is the
+    mocked atlassian.Jira instance.
+    """
+    from raise_cli.adapters.jira_client import JiraClient
+
+    client = JiraClient(
+        url="https://test.atlassian.net",
+        username="u@test.com",
+        token="test-token",
+    )
+    mock_backend = MagicMock()
+    client._client = mock_backend
+    return client, mock_backend
+
+
+# ── T2: CRUD methods + error mapping ────────────────────────────────
+
+
+class TestErrorMapping:
+    """isinstance-based error mapping from atlassian exceptions."""
+
+    def test_permission_error_maps_to_auth(self) -> None:
+        from atlassian.errors import ApiPermissionError
+
+        from raise_cli.adapters.jira_client import JiraClient
+        from raise_cli.adapters.jira_exceptions import JiraAuthError
+
+        result = JiraClient._map_error(
+            ApiPermissionError("403 Forbidden"), "get_issue(RAISE-1)"
+        )
+        assert isinstance(result, JiraAuthError)
+        assert "get_issue(RAISE-1)" in result.message
+
+    def test_not_found_error_maps(self) -> None:
+        from atlassian.errors import ApiNotFoundError
+
+        from raise_cli.adapters.jira_client import JiraClient
+        from raise_cli.adapters.jira_exceptions import JiraNotFoundError
+
+        result = JiraClient._map_error(
+            ApiNotFoundError("404 Not Found"), "get_issue(RAISE-99999)"
+        )
+        assert isinstance(result, JiraNotFoundError)
+        assert "RAISE-99999" in result.message
+
+    def test_generic_api_error_maps(self) -> None:
+        from atlassian.errors import ApiError
+
+        from raise_cli.adapters.jira_client import JiraClient
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        result = JiraClient._map_error(
+            ApiError("500 Server Error"), "create_issue"
+        )
+        assert isinstance(result, JiraApiError)
+        assert "create_issue" in result.message
+
+    def test_unexpected_error_maps_to_api_error(self) -> None:
+        from raise_cli.adapters.jira_client import JiraClient
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        result = JiraClient._map_error(
+            RuntimeError("connection lost"), "get_issue(X)"
+        )
+        assert isinstance(result, JiraApiError)
+        assert "unexpected" in result.message
+
+
+class TestGetIssue:
+    """get_issue delegates to self._client.issue and returns raw dict."""
+
+    def test_returns_raw_dict(self) -> None:
+        client, backend = _make_client()
+        backend.issue.return_value = {
+            "key": "RAISE-1",
+            "fields": {"summary": "Test issue"},
+        }
+
+        result = client.get_issue("RAISE-1")
+
+        assert result["key"] == "RAISE-1"
+        assert result["fields"]["summary"] == "Test issue"
+        backend.issue.assert_called_once_with("RAISE-1")
+
+    def test_not_found_raises_jira_not_found(self) -> None:
+        from atlassian.errors import ApiNotFoundError
+
+        from raise_cli.adapters.jira_exceptions import JiraNotFoundError
+
+        client, backend = _make_client()
+        backend.issue.side_effect = ApiNotFoundError("404")
+
+        with pytest.raises(JiraNotFoundError, match="RAISE-99999"):
+            client.get_issue("RAISE-99999")
+
+    def test_permission_error_raises_auth(self) -> None:
+        from atlassian.errors import ApiPermissionError
+
+        from raise_cli.adapters.jira_exceptions import JiraAuthError
+
+        client, backend = _make_client()
+        backend.issue.side_effect = ApiPermissionError("403")
+
+        with pytest.raises(JiraAuthError):
+            client.get_issue("RAISE-1")
+
+
+class TestCreateIssue:
+    """create_issue delegates to self._client.create_issue."""
+
+    def test_creates_and_returns_raw_dict(self) -> None:
+        client, backend = _make_client()
+        fields = {"project": {"key": "RAISE"}, "summary": "New", "issuetype": {"name": "Task"}}
+        backend.create_issue.return_value = {"key": "RAISE-100", "id": "10100"}
+
+        result = client.create_issue(fields)
+
+        assert result["key"] == "RAISE-100"
+        backend.create_issue.assert_called_once_with(fields)
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiError
+
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        client, backend = _make_client()
+        backend.create_issue.side_effect = ApiError("400 Bad Request")
+
+        with pytest.raises(JiraApiError, match="create_issue"):
+            client.create_issue({"summary": "X"})
+
+
+class TestUpdateIssue:
+    """update_issue delegates to self._client.update_issue."""
+
+    def test_updates_and_returns_raw_dict(self) -> None:
+        client, backend = _make_client()
+        fields = {"summary": "Updated"}
+        backend.update_issue.return_value = {"key": "RAISE-1"}
+
+        result = client.update_issue("RAISE-1", fields)
+
+        assert result["key"] == "RAISE-1"
+        backend.update_issue.assert_called_once_with("RAISE-1", fields)
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiNotFoundError
+
+        from raise_cli.adapters.jira_exceptions import JiraNotFoundError
+
+        client, backend = _make_client()
+        backend.update_issue.side_effect = ApiNotFoundError("404")
+
+        with pytest.raises(JiraNotFoundError, match="RAISE-99"):
+            client.update_issue("RAISE-99", {"summary": "X"})

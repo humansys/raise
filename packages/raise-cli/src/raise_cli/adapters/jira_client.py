@@ -12,9 +12,13 @@ RAISE-1052 (S1052.1)
 from __future__ import annotations
 
 import os
+from typing import Any
 
 from raise_cli.adapters.jira_exceptions import (
+    JiraAdapterError,
+    JiraApiError,
     JiraAuthError,
+    JiraNotFoundError,
 )
 
 
@@ -77,3 +81,50 @@ class JiraClient:
                 "JIRA_USERNAME environment variable, or set email in config."
             )
         return username
+
+    # ── Issue CRUD ───────────────────────────────────────────────────
+
+    def get_issue(self, key: str) -> dict[str, Any]:
+        """Get issue by key. Returns full raw dict."""
+        try:
+            result: dict[str, Any] = self._client.issue(key)  # type: ignore[no-untyped-call]
+            return result
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"get_issue({key})") from e
+
+    def create_issue(self, fields: dict[str, Any]) -> dict[str, Any]:
+        """Create an issue. Returns raw dict with at least key and id."""
+        try:
+            result: dict[str, Any] = self._client.create_issue(fields)  # type: ignore[no-untyped-call]
+            return result
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, "create_issue") from e
+
+    def update_issue(self, key: str, fields: dict[str, Any]) -> dict[str, Any]:
+        """Update an issue by key. Returns raw response dict."""
+        try:
+            result: dict[str, Any] = self._client.update_issue(key, fields)  # type: ignore[no-untyped-call]
+            return result
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"update_issue({key})") from e
+
+    # ── Internal ─────────────────────────────────────────────────────
+
+    @staticmethod
+    def _map_error(error: Exception, context: str) -> JiraAdapterError:
+        """Map atlassian exceptions to our hierarchy using isinstance."""
+        from atlassian.errors import ApiError, ApiNotFoundError, ApiPermissionError
+
+        if isinstance(error, ApiPermissionError):
+            return JiraAuthError(f"{context}: {error}")
+        if isinstance(error, ApiNotFoundError):
+            return JiraNotFoundError(f"{context}: {error}")
+        if isinstance(error, ApiError):
+            return JiraApiError(f"{context}: {error}")
+        return JiraApiError(f"{context}: unexpected error: {error}")
