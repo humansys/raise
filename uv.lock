@@ -2590,11 +2590,17 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+atlassian = [
+    { name = "atlassian-python-api" },
+]
 confluence = [
     { name = "atlassian-python-api" },
 ]
 csharp = [
     { name = "tree-sitter-c-sharp" },
+]
+jira = [
+    { name = "atlassian-python-api" },
 ]
 mcp = [
     { name = "mcp" },
@@ -2605,7 +2611,9 @@ observability = [
 
 [package.metadata]
 requires-dist = [
-    { name = "atlassian-python-api", marker = "extra == 'confluence'", specifier = ">=3.41" },
+    { name = "atlassian-python-api", marker = "extra == 'atlassian'", specifier = ">=3.41.0" },
+    { name = "atlassian-python-api", marker = "extra == 'confluence'", specifier = ">=3.41.0" },
+    { name = "atlassian-python-api", marker = "extra == 'jira'", specifier = ">=3.41.0" },
     { name = "logfire", marker = "extra == 'observability'", specifier = ">=4.0" },
     { name = "logfire-api", specifier = ">=4.0" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.26,<2" },
@@ -2625,7 +2633,7 @@ requires-dist = [
     { name = "tree-sitter-typescript", specifier = ">=0.23.2" },
     { name = "typer", specifier = ">=0.12.0" },
 ]
-provides-extras = ["mcp", "observability", "csharp", "confluence"]
+provides-extras = ["mcp", "observability", "csharp", "atlassian", "confluence", "jira"]
 
 [[package]]
 name = "raise-core"
