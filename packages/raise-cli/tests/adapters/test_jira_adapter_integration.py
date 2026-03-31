@@ -157,16 +157,16 @@ class TestJiraAdapterIntegration:
         assert isinstance(ref, CommentRef)
         assert ref.id  # non-empty
 
-        # Get comments — our comment should be in the list
+        # Get comments — increase limit to catch our new comment
         comments: list[Comment] = _run(
-            adapter.get_comments(_KNOWN_ISSUE, limit=5)
+            adapter.get_comments(_KNOWN_ISSUE, limit=50)
         )
         assert len(comments) > 0
         assert all(isinstance(c, Comment) for c in comments)
 
-        # Find our comment by tag
-        found = any(tag in c.body for c in comments)
-        assert found, f"Comment with tag {tag} not found in recent comments"
+        # Find our comment by ID (body may be ADF-transformed)
+        found = any(c.id == ref.id for c in comments)
+        assert found, f"Comment {ref.id} not found in comments (got {len(comments)})"
 
     # ── Link issues ────────────────────────────────────────────────
 

@@ -142,9 +142,16 @@ class JiraClient:
             raise self._map_error(e, f"get_transitions({key})") from e
 
     def transition_issue(self, key: str, transition_id: str) -> None:
-        """Transition an issue to a new status."""
+        """Execute a transition by numeric ID.
+
+        Posts directly to ``/issue/{key}/transitions`` because the
+        library's ``set_issue_status`` and ``issue_transition`` both
+        route through ``get_transition_id_to_status_name`` which calls
+        ``.lower()`` on the status param — breaks when given a numeric ID.
+        """
         try:
-            self._client.set_issue_status(key, transition_id)  # type: ignore[no-untyped-call]
+            url = f"{self._client.resource_url('issue')}/{key}/transitions"
+            self._client.post(url, data={"transition": {"id": transition_id}})  # type: ignore[no-untyped-call]
         except JiraAdapterError:
             raise
         except Exception as e:
