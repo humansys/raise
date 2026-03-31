@@ -166,6 +166,68 @@ class JiraClient:
         """Set the parent of an issue."""
         self.update_issue(child, {"parent": {"key": parent}})
 
+    # ── Comments ─────────────────────────────────────────────────────
+
+    def add_comment(self, key: str, body: str) -> dict[str, Any]:
+        """Add a comment to an issue."""
+        try:
+            result: dict[str, Any] = self._client.issue_add_comment(key, body)  # type: ignore[no-untyped-call]
+            return result
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"add_comment({key})") from e
+
+    def get_comments(self, key: str, limit: int = 10) -> list[dict[str, Any]]:
+        """Get comments on an issue."""
+        try:
+            raw: dict[str, Any] = self._client.issue_get_comments(key)  # type: ignore[no-untyped-call]
+            comments: list[dict[str, Any]] = raw.get("comments", [])
+            return comments[:limit]
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"get_comments({key})") from e
+
+    # ── Health ───────────────────────────────────────────────────────
+
+    def server_info(self) -> dict[str, Any]:
+        """Get Jira server info for health checks."""
+        try:
+            result: dict[str, Any] = self._client.get_server_info()  # type: ignore[no-untyped-call]
+            return result
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, "server_info") from e
+
+    # ── Factory ──────────────────────────────────────────────────────
+
+    @classmethod
+    def from_config(cls, config: Any, instance: str | None = None) -> JiraClient:
+        """Create a JiraClient from config and environment.
+
+        Args:
+            config: Object with .default_instance and .instances dict.
+                    Each instance has .site and optional .email.
+            instance: Instance name. Uses config.default_instance if None.
+        """
+        instance_name = instance or config.default_instance
+        instances: dict[str, Any] = config.instances
+        if instance_name not in instances:
+            raise JiraApiError(
+                f"Instance {instance_name!r} not found in config. "
+                f"Available: {list(instances.keys())}"
+            )
+
+        inst = instances[instance_name]
+        url = f"https://{inst.site}"
+        token = cls._resolve_token(instance_name)
+        email: str | None = getattr(inst, "email", None)
+        username = email or cls._resolve_username(instance_name)
+
+        return cls(url=url, username=username, token=token)
+
     # ── Internal ─────────────────────────────────────────────────────
 
     @staticmethod

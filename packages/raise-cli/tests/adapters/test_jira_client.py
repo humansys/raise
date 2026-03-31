@@ -503,3 +503,211 @@ class TestSetParent:
         backend.update_issue.assert_called_once_with(
             "RAISE-2", {"parent": {"key": "RAISE-1"}}
         )
+
+
+# ── T4: Comments + health + from_config factory ──────────────────────
+
+
+class TestAddComment:
+    """add_comment delegates to self._client.issue_add_comment."""
+
+    def test_adds_and_returns_raw_dict(self) -> None:
+        client, backend = _make_client()
+        backend.issue_add_comment.return_value = {
+            "id": "10001",
+            "body": "Test comment",
+        }
+
+        result = client.add_comment("RAISE-1", "Test comment")
+
+        assert result["id"] == "10001"
+        backend.issue_add_comment.assert_called_once_with("RAISE-1", "Test comment")
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiNotFoundError
+
+        from raise_cli.adapters.jira_exceptions import JiraNotFoundError
+
+        client, backend = _make_client()
+        backend.issue_add_comment.side_effect = ApiNotFoundError("404")
+
+        with pytest.raises(JiraNotFoundError):
+            client.add_comment("RAISE-99999", "comment")
+
+
+class TestGetComments:
+    """get_comments delegates to self._client.issue_get_comments."""
+
+    def test_returns_comments_list(self) -> None:
+        client, backend = _make_client()
+        backend.issue_get_comments.return_value = {
+            "comments": [
+                {"id": "10001", "body": "First"},
+                {"id": "10002", "body": "Second"},
+            ],
+            "total": 2,
+        }
+
+        result = client.get_comments("RAISE-1")
+
+        assert len(result) == 2
+        assert result[0]["id"] == "10001"
+        backend.issue_get_comments.assert_called_once_with("RAISE-1")
+
+    def test_returns_empty_list(self) -> None:
+        client, backend = _make_client()
+        backend.issue_get_comments.return_value = {"comments": [], "total": 0}
+
+        result = client.get_comments("RAISE-1")
+
+        assert result == []
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiError
+
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        client, backend = _make_client()
+        backend.issue_get_comments.side_effect = ApiError("500")
+
+        with pytest.raises(JiraApiError, match="get_comments"):
+            client.get_comments("RAISE-1")
+
+
+class TestServerInfo:
+    """server_info delegates to self._client.get_server_info."""
+
+    def test_returns_raw_dict(self) -> None:
+        client, backend = _make_client()
+        backend.get_server_info.return_value = {
+            "baseUrl": "https://humansys.atlassian.net",
+            "version": "1001.0.0",
+        }
+
+        result = client.server_info()
+
+        assert result["baseUrl"] == "https://humansys.atlassian.net"
+        backend.get_server_info.assert_called_once()
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiPermissionError
+
+        from raise_cli.adapters.jira_exceptions import JiraAuthError
+
+        client, backend = _make_client()
+        backend.get_server_info.side_effect = ApiPermissionError("401")
+
+        with pytest.raises(JiraAuthError):
+            client.server_info()
+
+
+class TestFromConfig:
+    """from_config factory resolves instance from config + env."""
+
+    def test_creates_client_for_named_instance(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from types import SimpleNamespace
+
+        from raise_cli.adapters.jira_client import JiraClient
+
+        monkeypatch.setenv("JIRA_API_TOKEN_HUMANSYS", "test-token")
+        config = SimpleNamespace(
+            default_instance="humansys",
+            instances={
+                "humansys": SimpleNamespace(
+                    site="humansys.atlassian.net",
+                    email="emilio@humansys.com",
+                ),
+            },
+        )
+
+        mock_jira_cls = MagicMock()
+        with patch.dict(
+            sys.modules,
+            {"atlassian": MagicMock(Jira=mock_jira_cls)},
+        ):
+            client = JiraClient.from_config(config, instance="humansys")
+
+        mock_jira_cls.assert_called_once_with(
+            url="https://humansys.atlassian.net",
+            username="emilio@humansys.com",
+            password="test-token",
+            cloud=True,
+            backoff_and_retry=True,
+            max_backoff_retries=5,
+            backoff_factor=1.0,
+        )
+        assert client._url == "https://humansys.atlassian.net"
+
+    def test_uses_default_instance_when_none(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from types import SimpleNamespace
+
+        from raise_cli.adapters.jira_client import JiraClient
+
+        monkeypatch.setenv("JIRA_API_TOKEN_HUMANSYS", "test-token")
+        config = SimpleNamespace(
+            default_instance="humansys",
+            instances={
+                "humansys": SimpleNamespace(
+                    site="humansys.atlassian.net",
+                    email="emilio@humansys.com",
+                ),
+            },
+        )
+
+        mock_jira_cls = MagicMock()
+        with patch.dict(
+            sys.modules,
+            {"atlassian": MagicMock(Jira=mock_jira_cls)},
+        ):
+            client = JiraClient.from_config(config, instance=None)
+
+        assert client._url == "https://humansys.atlassian.net"
+
+    def test_missing_instance_raises_api_error(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from types import SimpleNamespace
+
+        from raise_cli.adapters.jira_client import JiraClient
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        config = SimpleNamespace(
+            default_instance="humansys",
+            instances={},
+        )
+
+        with pytest.raises(JiraApiError, match="humansys"):
+            JiraClient.from_config(config, instance="humansys")
+
+    def test_resolves_username_from_env_when_no_email(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from types import SimpleNamespace
+
+        from raise_cli.adapters.jira_client import JiraClient
+
+        monkeypatch.setenv("JIRA_API_TOKEN_HUMANSYS", "test-token")
+        monkeypatch.setenv("JIRA_USERNAME_HUMANSYS", "env@humansys.com")
+        config = SimpleNamespace(
+            default_instance="humansys",
+            instances={
+                "humansys": SimpleNamespace(
+                    site="humansys.atlassian.net",
+                    email=None,
+                ),
+            },
+        )
+
+        mock_jira_cls = MagicMock()
+        with patch.dict(
+            sys.modules,
+            {"atlassian": MagicMock(Jira=mock_jira_cls)},
+        ):
+            JiraClient.from_config(config, instance="humansys")
+
+        call_kwargs = mock_jira_cls.call_args
+        assert call_kwargs[1]["username"] == "env@humansys.com"
