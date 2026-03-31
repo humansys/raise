@@ -104,7 +104,7 @@ S1052.4 has no dependencies — runs anytime.
 | Story | Status | Commit | Date |
 |-------|--------|--------|------|
 | S1052.1 | DONE | 672b7b9b | 2026-03-31 |
-| S1052.2 | TODO | — | — |
+| S1052.2 | DONE | 203a158f | 2026-03-31 |
 | S1052.3 | TODO | — | — |
 | S1052.4 | TODO | — | — |
 | S1052.5 | TODO | — | — |
