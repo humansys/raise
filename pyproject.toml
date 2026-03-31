@@ -34,6 +34,7 @@ dev = [
     "mcp>=1.26,<2",
     "import-linter>=2.11",
     "readme-renderer[md]>=44.0",
+    "mkdocs-material>=9.7.6",
 ]
 
 [tool.ruff]

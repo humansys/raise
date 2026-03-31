@@ -1,0 +1,108 @@
+---
+title: Wire a Lifecycle Hook
+description: How to create a RaiSE lifecycle hook — typed events, Protocol contract, entry point registration.
+---
+
+Lifecycle hooks let you react to RaiSE events — session start, graph build, pattern added, work lifecycle, and more. They follow the same extension model as adapters: a Python Protocol contract discovered via entry points.
+
+## The LifecycleHook Protocol
+
+Every hook implements this contract:
+
+```python
+from typing import ClassVar, Protocol, runtime_checkable
+from rai_cli.hooks.events import HookEvent
+from rai_cli.hooks.protocol import HookResult
+
+@runtime_checkable
+class LifecycleHook(Protocol):
+    events: ClassVar[list[str]]   # Events to subscribe to
+    priority: ClassVar[int]       # Higher runs first (default 0)
+
+    def handle(self, event: HookEvent) -> HookResult: ...
+```
+
+Hooks are `@runtime_checkable` — no explicit inheritance needed, just implement the interface.
+
+## Available Events
+
+RaiSE emits 18 typed events as frozen dataclasses:
+
+| Event | Fires when |
+|-------|-----------|
+| `session:start` | Session begins |
+| `session:close` | Session ends |
+| `graph:build` | Knowledge graph rebuilt |
+| `pattern:added` | New pattern recorded |
+| `discover:scan` | Codebase scan completes |
+| `init:complete` | Project initialized |
+| `adapter:loaded` / `adapter:failed` | Adapter discovery |
+| `release:publish` | Release published |
+| `work:start` / `work:close` | Story/epic lifecycle |
+| `mcp:call` | MCP tool invocation |
+| `before:session:close` | Before session close (can abort) |
+| `before:release:publish` | Before release (can abort) |
+
+`before:` events can return `HookResult.abort("reason")` to cancel the operation.
+
+## Example: A Custom Hook
+
+```python
+# my_package/hooks.py
+from typing import ClassVar
+from rai_cli.hooks.events import HookEvent, PatternAddedEvent
+from rai_cli.hooks.protocol import HookResult
+
+class NotifyOnPatternHook:
+    """Send a notification when a new pattern is added."""
+
+    events: ClassVar[list[str]] = ["pattern:added"]
+    priority: ClassVar[int] = 0
+
+    def handle(self, event: HookEvent) -> HookResult:
+        if isinstance(event, PatternAddedEvent):
+            print(f"New pattern: {event.pattern_id}")
+        return HookResult.ok()
+```
+
+## Entry Point Registration
+
+Register your hook in `pyproject.toml`:
+
+```toml
+[project.entry-points."rai.hooks"]
+my-notify = "my_package.hooks:NotifyOnPatternHook"
+```
+
+RaiSE discovers hooks at runtime from the `rai.hooks` entry point group — the same mechanism used for adapters.
+
+## Built-in Hooks
+
+RaiSE ships with 5 built-in hooks:
+
+| Hook | Events | Purpose |
+|------|--------|---------|
+| `TelemetryHook` | All 9 after-events | Records `CommandUsage` signals |
+| `MemoryMdSyncHook` | `graph:build` | Regenerates MEMORY.md |
+| `JiraSyncHook` | `work:start`, `work:close` | Auto-transitions Jira issues |
+| `BacklogHook` | Work lifecycle | Creates/transitions backlog items |
+| `GateBridgeHook` | `before:release:publish` | Runs quality gates before release |
+
+## Error Isolation
+
+Hooks follow strict error isolation:
+
+- A failing hook never crashes the CLI
+- Exceptions are caught, logged, and skipped
+- Each hook has a 5-second timeout (configurable)
+- Even if one hook aborts, all others still run (all-notify semantics)
+
+## Validation
+
+Verify your hook is discovered:
+
+```bash
+rai adapter list    # hooks appear in rai.hooks entry point group
+```
+
+**See also:** [`rai adapter check`](../cli/adapter.md/, [Create a Custom Adapter](create-adapter.md/

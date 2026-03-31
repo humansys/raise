@@ -115,13 +115,16 @@ credentials.json
 .raise/mcp/
 !.raise/mcp/catalog.yaml
 
-# Website (Astro)
+# Website (Astro — legacy, pending removal)
 site/node_modules/
 site/dist/
 site/.astro/
 site/.wrangler/
 docs/node_modules/
 docs/.astro/
+
+# MkDocs build output
+_site/
 
 # Issue analysis artifacts (PDFs, images — binary, no git value)
 dev/issues/**/*.pdf

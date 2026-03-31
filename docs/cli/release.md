@@ -1,0 +1,61 @@
+---
+title: rai release
+description: Release management — quality gates, version bumping, and publishing.
+---
+
+Release management commands. Run quality gates, bump versions, generate changelogs, and publish releases.
+
+## `rai release list`
+
+List releases from the knowledge graph. Shows all release nodes with status, target date, and associated epics.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project root path. Default: `.` |
+
+```bash
+rai release list
+```
+
+---
+
+## `rai release check`
+
+Run all quality gates before publishing. Runs 10 checks: tests, types, lint, security, coverage, build, package validation, changelog, PEP 440 version, and version sync.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project root path. Default: `.` |
+
+```bash
+rai release check
+```
+
+**Exit codes:** 0 all pass, 1 any fail.
+
+---
+
+## `rai release publish`
+
+Orchestrate a full release: check → bump → changelog → commit → tag → push. Either `--bump` or `--version` is required.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--bump` | `-b` | Version bump type: `major`, `minor`, `patch`, `alpha`, `beta`, `rc`, `release` |
+| `--version` | `-v` | Explicit version (overrides `--bump`) |
+| `--dry-run` | | Show what would happen without executing |
+| `--skip-check` | | Skip quality gates (dangerous) |
+| `--project` | `-p` | Project root path. Default: `.` |
+
+```bash
+# Alpha release
+rai release publish --bump alpha
+
+# Minor release (dry run)
+rai release publish --bump minor --dry-run
+
+# Explicit version
+rai release publish --version 2.2.3
+```
+
+**See also:** [`rai gate check`](gate.md/

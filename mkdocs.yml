@@ -1,0 +1,92 @@
+site_name: RaiSE Docs
+site_url: https://docs.raiseframework.ai
+site_dir: _site
+site_description: >-
+  Learn how to use RaiSE — a lean methodology and deterministic toolkit
+  for reliable AI-assisted software engineering.
+
+repo_url: https://github.com/humansys/raise
+repo_name: humansys/raise
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Installation: installation.md
+  - Concepts:
+    - Overview: concepts/index.md
+    - Memory: concepts/memory.md
+    - Skills: concepts/skills.md
+    - Governance: concepts/governance.md
+    - Knowledge Graph: concepts/knowledge-graph.md
+  - Guides:
+    - Your First Story: guides/first-story.md
+    - Setting Up: guides/setting-up.md
+    - Extending: guides/extending.md
+    - Create an Adapter: guides/create-adapter.md
+    - Create a Skill: guides/create-skill.md
+    - Register MCP Server: guides/register-mcp.md
+    - Create a Hook: guides/create-hook.md
+    - Jira Adapter: guides/jira-adapter.md
+    - Jira Architecture: guides/jira-adapter-architecture.md
+    - Skill Sets: guides/skillsets.md
+  - CLI Reference:
+    - Overview: cli/index.md
+    - init: cli/init.md
+    - session: cli/session.md
+    - graph: cli/graph.md
+    - pattern: cli/pattern.md
+    - signal: cli/signal.md
+    - backlog: cli/backlog.md
+    - skill: cli/skill.md
+    - discover: cli/discover.md
+    - adapter: cli/adapter.md
+    - mcp: cli/mcp.md
+    - gate: cli/gate.md
+    - doctor: cli/doctor.md
+    - docs: cli/docs.md
+    - artifact: cli/artifact.md
+    - release: cli/release.md
+    - info: cli/info.md
+    - profile: cli/profile.md
