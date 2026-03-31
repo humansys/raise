@@ -13,14 +13,14 @@ Run `/rai-session-start` to load full context (patterns, coaching, session conti
 - `.raise/` — Framework engine (memory, skills, templates, gates)
 - `framework/` — Public methodology (concepts, reference)
 - `governance/` — Project governance (architecture, vision)
-- `docs/` — Astro/Starlight documentation site
+- `docs/` — MkDocs documentation site (docs.raiseframework.ai)
 - `work/` — Work artifacts (epics, stories, research)
 
 ## Branch Model
 
-- `main` — stable releases
-- `dev` — development (branch stories from here)
-- `story/s{N}.{M}/{name}` — story branches
+- `main` — stable releases (tags)
+- `release/{version}` — release branches (e.g. release/2.4.0)
+- `story/s{N}.{M}/{name}` — story branches (from release branch)
 - Epics are logical containers, not branches
 
 ## Key Commands
@@ -52,7 +52,7 @@ rai release check           # Pre-release quality gates
 
 ## CLI Reference
 
-Full reference at `docs/src/content/docs/docs/cli/` or run `rai <command> --help`.
+Full reference at `docs/cli/` or run `rai <command> --help`.
 
 ## Governance Files
 
