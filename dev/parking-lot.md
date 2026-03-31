@@ -159,7 +159,7 @@ E-C (Plane adapter) ────────────┘
 
 ## E348 Deferred Items — 2026-03-05
 
-- [ ] **MkDocs site migration** — replace Astro with MkDocs + Material for ecosystem alignment (Typer, FastAPI, Pydantic). Promote post-release if Astro maintenance burden grows.
+- [x] **MkDocs site migration** — ~~replace Astro with MkDocs + Material~~ Done (RAISE-1129, 2026-03-30). Site live at docs.raiseframework.ai.
 - [ ] **API reference auto-generation** — mkdocstrings from docstrings. Promote when public API surface stabilizes.
 - [ ] **Spanish translations for new content** — existing docs have es/ mirror. Promote after English content is validated.
 - [ ] **Tutorials (Diataxis)** — step-by-step learning guides beyond getting-started. Promote based on user onboarding feedback.

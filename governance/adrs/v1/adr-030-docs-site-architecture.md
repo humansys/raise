@@ -1,11 +1,16 @@
 ---
 id: ADR-030
 title: Documentation Site Architecture
-status: accepted
+status: superseded
+superseded_by: RAISE-1129
 date: 2026-02-16
 epic: RAISE-153
 decision: Independent Starlight docs site in raise-commons, deployed to docs.raiseframework.ai
 ---
+
+> **Superseded (2026-03-30):** Astro/Starlight replaced by MkDocs + Material (RAISE-1129).
+> The core decision (docs in raise-commons, independent deploy to docs.raiseframework.ai) still holds.
+> Only the rendering engine changed. See `governance/architecture/modules/docs-site.md`.
 
 # ADR-030: Documentation Site Architecture
 
