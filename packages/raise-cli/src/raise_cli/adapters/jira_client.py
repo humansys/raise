@@ -114,6 +114,58 @@ class JiraClient:
         except Exception as e:
             raise self._map_error(e, f"update_issue({key})") from e
 
+    # ── Search ───────────────────────────────────────────────────────
+
+    def jql(self, query: str, limit: int = 50) -> list[dict[str, Any]]:
+        """Run a JQL query. Returns list of issue dicts."""
+        try:
+            raw: dict[str, Any] = self._client.jql(query, limit=limit)  # type: ignore[no-untyped-call]
+            return list(raw.get("issues", []))
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"jql({query!r})") from e
+
+    # ── Transitions ──────────────────────────────────────────────────
+
+    def get_transitions(self, key: str) -> list[dict[str, Any]]:
+        """Get available transitions for an issue."""
+        try:
+            result: list[dict[str, Any]] = self._client.get_issue_transitions(key)  # type: ignore[no-untyped-call]
+            return result
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"get_transitions({key})") from e
+
+    def transition_issue(self, key: str, transition_id: str) -> None:
+        """Transition an issue to a new status."""
+        try:
+            self._client.set_issue_status(key, transition_id)  # type: ignore[no-untyped-call]
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"transition_issue({key}, {transition_id})") from e
+
+    # ── Relationships ────────────────────────────────────────────────
+
+    def create_link(self, source: str, target: str, link_type: str) -> None:
+        """Create an issue link between two issues."""
+        try:
+            self._client.create_issue_link({  # type: ignore[no-untyped-call]
+                "type": {"name": link_type},
+                "inwardIssue": {"key": source},
+                "outwardIssue": {"key": target},
+            })
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"create_link({source}, {target})") from e
+
+    def set_parent(self, child: str, parent: str) -> None:
+        """Set the parent of an issue."""
+        self.update_issue(child, {"parent": {"key": parent}})
+
     # ── Internal ─────────────────────────────────────────────────────
 
     @staticmethod

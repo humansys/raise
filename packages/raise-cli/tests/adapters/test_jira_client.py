@@ -369,3 +369,137 @@ class TestUpdateIssue:
 
         with pytest.raises(JiraNotFoundError, match="RAISE-99"):
             client.update_issue("RAISE-99", {"summary": "X"})
+
+
+# ── T3: Search + transitions + relationships ─────────────────────────
+
+
+class TestJql:
+    """jql delegates to self._client.jql and returns issues list."""
+
+    def test_returns_issues_list(self) -> None:
+        client, backend = _make_client()
+        backend.jql.return_value = {
+            "issues": [
+                {"key": "RAISE-1", "fields": {"summary": "First"}},
+                {"key": "RAISE-2", "fields": {"summary": "Second"}},
+            ],
+            "total": 2,
+        }
+
+        result = client.jql("project = RAISE", limit=10)
+
+        assert len(result) == 2
+        assert result[0]["key"] == "RAISE-1"
+        backend.jql.assert_called_once_with("project = RAISE", limit=10)
+
+    def test_returns_empty_list(self) -> None:
+        client, backend = _make_client()
+        backend.jql.return_value = {"issues": [], "total": 0}
+
+        result = client.jql("project = EMPTY")
+
+        assert result == []
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiError
+
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        client, backend = _make_client()
+        backend.jql.side_effect = ApiError("400")
+
+        with pytest.raises(JiraApiError, match="jql"):
+            client.jql("bad query")
+
+
+class TestGetTransitions:
+    """get_transitions delegates to self._client.get_issue_transitions."""
+
+    def test_returns_transitions_list(self) -> None:
+        client, backend = _make_client()
+        backend.get_issue_transitions.return_value = [
+            {"id": "11", "name": "To Do"},
+            {"id": "21", "name": "In Progress"},
+        ]
+
+        result = client.get_transitions("RAISE-1")
+
+        assert len(result) == 2
+        assert result[0]["id"] == "11"
+        backend.get_issue_transitions.assert_called_once_with("RAISE-1")
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiNotFoundError
+
+        from raise_cli.adapters.jira_exceptions import JiraNotFoundError
+
+        client, backend = _make_client()
+        backend.get_issue_transitions.side_effect = ApiNotFoundError("404")
+
+        with pytest.raises(JiraNotFoundError):
+            client.get_transitions("RAISE-99999")
+
+
+class TestTransitionIssue:
+    """transition_issue delegates to self._client.set_issue_status."""
+
+    def test_delegates_to_set_issue_status(self) -> None:
+        client, backend = _make_client()
+        backend.set_issue_status.return_value = None
+
+        client.transition_issue("RAISE-1", "21")
+
+        backend.set_issue_status.assert_called_once_with("RAISE-1", "21")
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiError
+
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        client, backend = _make_client()
+        backend.set_issue_status.side_effect = ApiError("400")
+
+        with pytest.raises(JiraApiError, match="transition_issue"):
+            client.transition_issue("RAISE-1", "99")
+
+
+class TestCreateLink:
+    """create_link delegates to self._client.create_issue_link."""
+
+    def test_delegates_with_correct_data(self) -> None:
+        client, backend = _make_client()
+        backend.create_issue_link.return_value = None
+
+        client.create_link("RAISE-1", "RAISE-2", "Blocks")
+
+        backend.create_issue_link.assert_called_once_with({
+            "type": {"name": "Blocks"},
+            "inwardIssue": {"key": "RAISE-1"},
+            "outwardIssue": {"key": "RAISE-2"},
+        })
+
+    def test_error_mapped(self) -> None:
+        from atlassian.errors import ApiError
+
+        from raise_cli.adapters.jira_exceptions import JiraApiError
+
+        client, backend = _make_client()
+        backend.create_issue_link.side_effect = ApiError("400")
+
+        with pytest.raises(JiraApiError, match="create_link"):
+            client.create_link("RAISE-1", "RAISE-2", "Blocks")
+
+
+class TestSetParent:
+    """set_parent calls update_issue with parent field."""
+
+    def test_delegates_to_update_issue(self) -> None:
+        client, backend = _make_client()
+        backend.update_issue.return_value = {"key": "RAISE-2"}
+
+        client.set_parent("RAISE-2", "RAISE-1")
+
+        backend.update_issue.assert_called_once_with(
+            "RAISE-2", {"parent": {"key": "RAISE-1"}}
+        )
