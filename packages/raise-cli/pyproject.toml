@@ -52,6 +52,9 @@ csharp = [
 confluence = [
     "atlassian-python-api>=3.41",
 ]
+jira = [
+    "atlassian-python-api>=3.41",
+]
 
 [project.urls]
 Homepage = "https://raiseframework.ai"
@@ -93,6 +96,7 @@ developer = "raise_cli.doctor.checks.developer:DeveloperCheck"
 
 [project.entry-points."rai.adapters.pm"]
 filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"
+jira = "raise_cli.adapters.jira_adapter:PythonApiJiraAdapter"
 
 [project.entry-points."rai.docs.targets"]
 filesystem = "raise_cli.adapters.filesystem_docs:FilesystemDocsTarget"
