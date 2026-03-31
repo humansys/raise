@@ -31,26 +31,6 @@ def file_adapter(backlog_dir: Path) -> FilesystemPMAdapter:
     return FilesystemPMAdapter(project_root=project_root)
 
 
-@pytest.fixture
-def jira_yaml_setup(tmp_path: Path) -> Path:
-    """Write a minimal .raise/jira.yaml for BacklogHook tests."""
-    raise_dir = tmp_path / ".raise"
-    raise_dir.mkdir(exist_ok=True)
-    config: dict[str, Any] = {
-        "projects": {"TEST": {"key": "TEST"}},
-        "workflow": {
-            "lifecycle_mapping": {
-                "story_start": 1,
-                "story_close": 2,
-                "epic_start": 3,
-                "epic_close": 4,
-            }
-        },
-    }
-    config_path = raise_dir / "jira.yaml"
-    config_path.write_text(yaml.safe_dump(config, sort_keys=False), encoding="utf-8")
-    return config_path
-
 
 def _write_yaml_item(path: Path, **fields: Any) -> None:
     """Write a BacklogItem-compatible YAML file to disk."""
