@@ -47,5 +47,5 @@ class TestJiraClientIntegration:
 
     def test_jql_search(self) -> None:
         client = self._make_live_client()
-        issues = client.jql("project = RAISE ORDER BY created DESC", limit=3)
+        issues = client.jql('project = "RAISE" ORDER BY created DESC', limit=3)
         assert isinstance(issues, list)
