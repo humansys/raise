@@ -12,7 +12,10 @@ RAISE-1052 (S1052.1)
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from raise_cli.adapters.jira_config import JiraConfig
 
 from raise_cli.adapters.jira_exceptions import (
     JiraAdapterError,
@@ -204,12 +207,14 @@ class JiraClient:
     # ── Factory ──────────────────────────────────────────────────────
 
     @classmethod
-    def from_config(cls, config: Any, instance: str | None = None) -> JiraClient:
+    def from_config(
+        cls, config: JiraConfig | Any, instance: str | None = None
+    ) -> JiraClient:
         """Create a JiraClient from config and environment.
 
         Args:
-            config: Object with .default_instance and .instances dict.
-                    Each instance has .site and optional .email.
+            config: JiraConfig or any object with .default_instance and
+                    .instances dict. Each instance has .site and optional .email.
             instance: Instance name. Uses config.default_instance if None.
         """
         instance_name = instance or config.default_instance
