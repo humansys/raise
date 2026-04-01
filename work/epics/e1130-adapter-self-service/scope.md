@@ -8,10 +8,11 @@ YAML config. `rai adapter doctor` catches drift before it causes failures.
 
 ## Context
 
-- ADR-015: scoped to 1 session, 1 worktree
 - Absorbs deferred E1051 stories (S1051.4 discovery, S1051.5 doctor, S1051.6 generator)
-- Jira stories depend on RAISE-1052 (transport must exist first)
-- Confluence stories use existing ConfluenceClient from E1051
+- E1051 (Confluence Adapter v2) and E1052 (Jira Adapter v2) both merged — no external blockers
+- Confluence stories build on existing `ConfluenceClient` discovery methods
+- Jira stories require new discovery methods on `JiraClient`
+- Design: `work/epics/e1130-adapter-self-service/design.md`
 
 ## Design Decisions
 
@@ -24,12 +25,12 @@ YAML config. `rai adapter doctor` catches drift before it causes failures.
 
 | # | Story | Size | Description | Origin |
 |---|-------|------|-------------|--------|
-| S1130.1 | Confluence Discovery Service | S | Query spaces, page trees, labels. Structured space map. | ex-S1051.4 |
-| S1130.2 | Jira Backend Discovery | M | Query projects, workflows, transitions, components, versions. | new |
-| S1130.3 | Adapter Doctor — unified | M | Validate config vs live backend. Both Jira + Confluence. Integrate into `rai doctor`. | ex-S1051.5 (expanded) |
-| S1130.4 | Config Generator — Confluence | M | Discovery → present → human selects → generate valid YAML. | ex-S1051.6 |
-| S1130.5 | Config Generator — Jira | M | Same pattern for Jira: discover workflows, transitions → generate jira.yaml. | new |
-| S1130.6 | Unified `/rai-adapter-setup` skill | S | Interactive skill orchestrating S1130.4 + S1130.5. Detects installed backends. | new |
+| S1130.1 | Confluence Discovery Service | S | Wrap `ConfluenceClient` methods into `ConfluenceDiscovery` → `ConfluenceSpaceMap`. | ex-S1051.4 |
+| S1130.2 | Jira Discovery Service | M | Add `list_projects()`, `get_project_workflows()`, `get_issue_types()` to `JiraClient` + `JiraDiscovery` → `JiraProjectMap`. | new |
+| S1130.3 | Adapter Doctor Check | M | `AdapterDoctorCheck` implementing `DoctorCheck` Protocol. Validates config + env vars + live backend for both adapters. | ex-S1051.5 (expanded) |
+| S1130.4 | Config Generator — Confluence | S | `generate_confluence_config(space_map, selections) → dict`. Pure function. | ex-S1051.6 |
+| S1130.5 | Config Generator — Jira | M | `generate_jira_config(project_map, selections) → dict`. Discovers workflows, transitions. | new |
+| S1130.6 | `/rai-adapter-setup` skill | S | Interactive skill: detect backends → run generators → write YAML. 3-4 questions max. | new |
 
 ## Dependencies
 
@@ -45,7 +46,7 @@ S1130.2 ──→ S1130.5 (Jira Generator) ──────┘
 S1130.1 and S1130.2 can run in parallel.
 S1130.4 and S1130.5 can run in parallel after their respective discoveries.
 
-**External:** RAISE-1052 must be merged before S1130.2, S1130.3 (Jira parts), S1130.5.
+**External:** None — E1051 and E1052 both merged.
 
 ## Done Criteria
 
