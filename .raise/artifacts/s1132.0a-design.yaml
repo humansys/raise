@@ -1,0 +1,136 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-04-01T00:00:00Z'
+story: 'S1132.0a'
+epic: 'E1132'
+content:
+  summary: "TypeScriptAnalyzer extracts static import/export relationships from TS/JS files using tree-sitter, mirroring PythonAnalyzer's contract. Enables dependency graph construction for TypeScript codebases. First target: Claude Code (1902 files, 512K LOC)."
+  complexity: moderate
+  acceptance_criteria:
+    - id: AC1
+      description: TypeScriptAnalyzer implements CodeAnalyzer protocol (detect + analyze_modules)
+      verifiable: true
+    - id: AC2
+      description: Extracts named imports (import { X } from './y')
+      verifiable: true
+    - id: AC3
+      description: Extracts default imports (import X from './y')
+      verifiable: true
+    - id: AC4
+      description: Extracts namespace imports (import * as X from './y')
+      verifiable: true
+    - id: AC5
+      description: Extracts re-exports (export { X } from './y')
+      verifiable: true
+    - id: AC6
+      description: Extracts named export declarations (export class X, export function Y)
+      verifiable: true
+    - id: AC7
+      description: Extracts default export declarations (export default class X)
+      verifiable: true
+    - id: AC8
+      description: Handles import type / export type statements
+      verifiable: true
+    - id: AC9
+      description: Barrel files (index.ts) used as module public API source for exports
+      verifiable: true
+    - id: AC10
+      description: Returns ModuleInfo with language='typescript', same field semantics as PythonAnalyzer
+      verifiable: true
+    - id: AC11
+      description: All tests pass, pyright strict passes, ruff passes
+      verifiable: true
+  integration_points:
+    - module: 'context.analyzers'
+      change_type: creation
+      files:
+        - 'packages/raise-cli/src/raise_cli/context/analyzers/typescript.py'
+    - module: 'context.analyzers'
+      change_type: modification
+      files:
+        - 'packages/raise-cli/src/raise_cli/context/analyzers/__init__.py'
+    - module: 'context.builder'
+      change_type: modification
+      files:
+        - 'packages/raise-cli/src/raise_cli/context/builder.py'
+    - module: 'tests'
+      change_type: creation
+      files:
+        - 'packages/raise-cli/tests/context/analyzers/test_typescript.py'
+  decisions:
+    - id: D1
+      choice: Reuse _get_ts_parser from scanner.py for tree-sitter parser creation
+      rationale: Scanner already handles TSLanguage setup for typescript/tsx/javascript with ImportError wrapping. Avoid duplicating parser creation logic.
+      alternatives_considered: ['inline parser creation in TypeScriptAnalyzer', 'create shared parser module']
+    - id: D2
+      choice: Top-level directories under src/ are modules (same heuristic as PythonAnalyzer)
+      rationale: Mirrors PythonAnalyzer's module boundary detection. For Claude Code, src/ contains ~20 top-level dirs that are natural module boundaries.
+      alternatives_considered: ['use tsconfig paths to detect modules', 'use package.json workspaces']
+    - id: D3
+      choice: index.ts is the barrel file (analogous to __init__.py) for export extraction
+      rationale: Standard TS convention. If index.ts exists, its exports define the module public API. Otherwise, aggregate all file-level exports.
+      alternatives_considered: ['always aggregate all exports', 'only use index.ts if it has re-exports']
+    - id: D4
+      choice: Import source resolution maps relative paths to sibling module names, not file names
+      rationale: ModuleInfo.imports contains sibling module names (e.g., "core" not "core/runner"). Same granularity as PythonAnalyzer. '../core/runner' resolves to "core".
+      alternatives_considered: ['file-level import tracking', 'both module and file level']
+    - id: D5
+      choice: detect() checks for tsconfig.json OR package.json with .ts files
+      rationale: tsconfig.json is the canonical TypeScript project marker. package.json alone is ambiguous (could be pure JS). Checking for .ts files in src/ as fallback.
+      alternatives_considered: ['only tsconfig.json', 'only package.json']
+    - id: D6
+      choice: Process .ts, .tsx, .js, .jsx files (skip .d.ts declaration files)
+      rationale: Declaration files define types, not runtime dependencies. Including them would inflate import counts with ambient declarations.
+      alternatives_considered: ['include .d.ts', 'only .ts and .tsx']
+  approach:
+    overview: |
+      Create TypeScriptAnalyzer class in context/analyzers/typescript.py that:
+      1. Implements CodeAnalyzer protocol (detect + analyze_modules)
+      2. Uses tree-sitter-typescript to parse import/export statements
+      3. Resolves relative imports to sibling module names
+      4. Extracts exports from barrel files (index.ts) or aggregates from all files
+      5. Counts components (classes, functions, interfaces, enums) per module
+    tree_sitter_queries: |
+      Import extraction targets these tree-sitter node types:
+      - import_statement: "import { X } from 'y'" / "import X from 'y'" / "import * as X from 'y'"
+      - import_clause + from_clause children contain the import source string
+      - The source is in a string/string_fragment child node
+
+      Export extraction targets:
+      - export_statement: "export { X } from 'y'" (re-export) / "export { X }" (named)
+      - export_declaration wrapping class_declaration, function_declaration, etc.
+      - export_default_declaration: "export default class X {}"
+
+      Component counting targets (top-level only):
+      - class_declaration, function_declaration, interface_declaration, enum_declaration, type_alias_declaration
+    module_detection: |
+      For a project root with src/:
+      1. Find src/ directory (configurable, default "src")
+      2. Each direct subdirectory of src/ is a module
+      3. Unlike Python, no __init__.py required — any directory with .ts/.tsx files qualifies
+      4. Skip node_modules, dist, build, __tests__, .git
+    import_resolution: |
+      Given file src/commands/run.ts with "import { Runner } from '../core/runner'":
+      1. Parse '../core/runner' from the import_statement string node
+      2. Drop quotes and file extension if present
+      3. Resolve relative path: ../core/runner from commands/ = core/runner
+      4. Extract first path segment: "core"
+      5. If "core" != current module name ("commands"), add to imports set
+      6. External packages (no relative prefix, not in src/) are ignored
+    barrel_file_handling: |
+      For exports:
+      1. If src/moduleName/index.ts exists, extract exports from it only
+      2. Re-exports ("export { X } from './foo'") contribute both an export name and an import
+      3. If no index.ts, aggregate exported names from all .ts files in the module
+      4. Export names: class names, function names, interface names, type alias names, enum names, and explicitly exported constants
+refs:
+  backlog_item: 'RAISE-1170'
+  epic_scope: 'work/epics/e1132-claude-code-reconstruction/scope.md'
+  prior_art:
+    - 'packages/raise-cli/src/raise_cli/context/analyzers/python.py'
+    - 'packages/raise-cli/src/raise_cli/context/analyzers/protocol.py'
+    - 'packages/raise-cli/src/raise_cli/discovery/scanner.py'
+metadata:
+  patterns_applied: []
+  tree_sitter_dependency: 'already installed (used by scanner.py)'
