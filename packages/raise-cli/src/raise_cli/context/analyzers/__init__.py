@@ -12,5 +12,6 @@ from __future__ import annotations
 from raise_cli.context.analyzers.models import ModuleInfo
 from raise_cli.context.analyzers.protocol import CodeAnalyzer
 from raise_cli.context.analyzers.python import PythonAnalyzer
+from raise_cli.context.analyzers.typescript import TypeScriptAnalyzer
 
-__all__ = ["CodeAnalyzer", "ModuleInfo", "PythonAnalyzer"]
+__all__ = ["CodeAnalyzer", "ModuleInfo", "PythonAnalyzer", "TypeScriptAnalyzer"]
