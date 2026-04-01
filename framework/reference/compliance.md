@@ -88,7 +88,7 @@ graph TB
 **Mitigación:**
 - `.gitignore` por default incluye patrones de secrets
 - Guardrail `guard-no-secrets` detecta patterns
-- Validación CLI en `raise check --security`
+- Validación CLI en `rai check --security`
 - Pre-commit hooks opcionales
 - Observable Workflow alerta si secret detectado
 
@@ -134,7 +134,7 @@ graph LR
     end
     
     subgraph Analysis["Audit Tools"]
-        R["raise audit"]
+        R["rai audit"]
         E["Export SIEM"]
     end
     
@@ -174,16 +174,16 @@ graph LR
 
 ```bash
 # Ver traces de hoy
-raise audit --date today
+rai audit --date today
 
 # Exportar para compliance
-raise audit --from 2025-01-01 --to 2025-03-31 --format csv
+rai audit --from 2025-01-01 --to 2025-03-31 --format csv
 
 # Buscar escalaciones
-raise audit --filter "action=escalate"
+rai audit --filter "action=escalate"
 
 # Métricas de gates
-raise audit --metrics gates
+rai audit --metrics gates
 ```
 
 ---
@@ -262,9 +262,9 @@ raise compliance --framework eu-ai-act --output report.pdf
 
 | Evento | Datos | Ubicación | Inmutabilidad |
 |--------|-------|-----------|---------------|
-| `raise init` | Timestamp, options, user | Observable Trace | ✅ |
-| `raise pull` | Guardrails actualizados | Observable Trace | ✅ |
-| `raise check` | Results, violations | Observable Trace | ✅ |
+| `rai init` | Timestamp, options, user | Observable Trace | ✅ |
+| `rai pull` | Guardrails actualizados | Observable Trace | ✅ |
+| `rai check` | Results, violations | Observable Trace | ✅ |
 | MCP resource_read | URI, content_hash | Observable Trace | ✅ |
 | MCP tool_call | Tool, input, output | Observable Trace | ✅ |
 | Escalation | Reason, resolution | Observable Trace | ✅ |
@@ -284,7 +284,7 @@ graph LR
 
 **Verificación de integridad:**
 ```bash
-raise audit --verify-integrity --from 2025-01-01
+rai audit --verify-integrity --from 2025-01-01
 ```
 
 ---
@@ -318,13 +318,13 @@ graph LR
 
 ```bash
 # Reconstruir sesión de incidente
-raise audit --session-id <uuid> --full
+rai audit --session-id <uuid> --full
 
 # Timeline de acciones
-raise audit --from "2025-01-15 14:00" --to "2025-01-15 15:00" --timeline
+rai audit --from "2025-01-15 14:00" --to "2025-01-15 15:00" --timeline
 
 # Detectar anomalías
-raise audit --anomaly-detection --threshold 0.95
+rai audit --anomaly-detection --threshold 0.95
 ```
 
 ---
@@ -352,7 +352,7 @@ raise audit --anomaly-detection --threshold 0.95
   run: pip-audit
   
 - name: Guardrail Validation
-  run: raise check --security --strict
+  run: rai check --security --strict
   
 - name: SBOM Generation
   run: raise sbom --output sbom.json
@@ -377,7 +377,7 @@ raise audit --anomaly-detection --threshold 0.95
 2. **Revisar guardrails:** Entender qué guardrails se aplican
 3. **Actualizar:** Mantener raise-kit actualizado
 4. **Revisar escalations:** No ignorar Escalation Gates
-5. **Auditar regularmente:** `raise audit --summary weekly`
+5. **Auditar regularmente:** `rai audit --summary weekly`
 
 ### Configuración de Seguridad Recomendada
 
