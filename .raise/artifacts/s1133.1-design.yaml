@@ -1,0 +1,54 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-04-01T11:45:00'
+story: 'S1133.1'
+epic: 'E1133'
+content:
+  summary: >
+    Define the introspection aspect as cognitive infrastructure — a wrapper protocol
+    (PRIME/JIT/LEARN) that makes learning invisible to skills. Skills just work;
+    the aspect handles graph consultation and learning record production.
+  complexity: moderate
+  acceptance_criteria:
+    - id: AC1
+      description: 'aspects/introspection.md defines complete PRIME/JIT/LEARN protocol'
+      verifiable: true
+    - id: AC2
+      description: 'Learning record schema has 3 sections: process_fidelity, pattern_metrics, downstream_impact'
+      verifiable: true
+    - id: AC3
+      description: 'Chain mapping documents read/enrich relationships for all cognitive skills'
+      verifiable: true
+    - id: AC4
+      description: 'JIT heuristic has concrete trigger and constraints'
+      verifiable: true
+    - id: AC5
+      description: 'LEARN explicitly lists what it does NOT do'
+      verifiable: true
+  integration_points:
+    - module: 'aspects'
+      change_type: new
+      files: ['aspects/introspection.md']
+  decisions:
+    - id: D1
+      choice: 'Aspect as wrapper (stepping stone)'
+      rationale: 'Learning is cognitive infrastructure, not skill responsibility. Today markers, tomorrow rai-agent composes.'
+      alternatives_considered: ['Aspect as reference (each skill reimplements)', 'Aspect as injection (runtime composition now)']
+    - id: D2
+      choice: 'Silent nodes — mechanical skills produce no learning record'
+      rationale: 'Absence is signal. Empty records are waste (Poppendieck: eliminate waste).'
+      alternatives_considered: ['All skills produce records (uniform chain)', 'Distinguish trace vs learning record (two concepts)']
+    - id: D3
+      choice: 'No output_quality in schema'
+      rationale: 'LEARN captures what it knows at execution time. Acceptance is implicit in chain (next skill ran = accepted). Poppendieck: amplify the real.'
+      alternatives_considered: ['HITL gate fills output_quality', 'Next skill infers acceptance as downstream enrichment']
+    - id: D4
+      choice: 'LEARN captures gaps only, not candidate patterns'
+      rationale: 'Triple gate (New + Generalizable + Actionable) requires validation. Capture happens in story-review after implementation proves the approach.'
+      alternatives_considered: ['Capture candidates with validated: false flag']
+refs:
+  backlog_item: 'RAISE-1139'
+  epic_scope: 'work/epics/e1133-skill-introspection/scope.md'
+  adr: 'governance/adrs/v2/adr-014-skill-introspection-aspect.md'
+metadata: {}
