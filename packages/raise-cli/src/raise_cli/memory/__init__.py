@@ -4,7 +4,7 @@ This module provides infrastructure for loading, querying, and managing
 Rai's accumulated memories stored in JSONL format.
 
 For queries, use the Graph from raise_cli.context:
-- CLI: `raise context query "keywords" --types pattern,calibration,session`
+- CLI: `rai context query "keywords" --types pattern,calibration,session`
 - Programmatic: `QueryEngine` from `raise_cli.context.query`
 
 The JSONL files (.raise/rai/memory/*.jsonl) remain the source of truth.

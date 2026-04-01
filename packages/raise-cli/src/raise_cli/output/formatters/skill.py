@@ -273,7 +273,7 @@ def format_scaffold_human(result: ScaffoldResult, console: Console) -> None:
         console.print(f"\n[green]{CHECK} Created skill at:[/green] {result.path}")
         console.print("\n[dim]Next steps:[/dim]")
         console.print("  1. Edit the SKILL.md to add description and steps")
-        console.print("  2. Run [cyan]raise skill validate[/cyan] to check structure")
+        console.print("  2. Run [cyan]rai skill validate[/cyan] to check structure")
         console.print("  3. Test the skill with Claude Code")
     else:
         console.print("\n[red]{CROSS} Failed to create skill[/red]")

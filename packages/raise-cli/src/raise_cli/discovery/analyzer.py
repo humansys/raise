@@ -626,7 +626,7 @@ def analyze(
     categorize → group by module.
 
     Args:
-        scan_result: Raw scan output from raise discover scan.
+        scan_result: Raw scan output from rai discover scan.
         category_map: Optional custom path-to-category mapping.
 
     Returns:

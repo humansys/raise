@@ -1,7 +1,7 @@
 """Base Rai package for distribution.
 
 This package contains the base identity, patterns, and methodology
-that ship with raise-cli. On `raise init`, these files are copied
+that ship with raise-cli. On `rai init`, these files are copied
 to the project's `.raise/rai/` directory.
 
 Contents:

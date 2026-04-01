@@ -1,6 +1,6 @@
 """Init CLI command for RaiSE project initialization.
 
-This module provides the `raise init` command that:
+This module provides the `rai init` command that:
 - Detects if the project is greenfield or brownfield
 - Creates .raise/manifest.yaml with project metadata
 - Loads or creates ~/.rai/developer.yaml for personal profile
@@ -8,11 +8,11 @@ This module provides the `raise init` command that:
 - Supports multiple agents via --agent (repeatable) or --detect
 
 Example:
-    $ raise init                           # defaults to claude
-    $ raise init --agent cursor            # single agent
-    $ raise init --agent claude --agent cursor  # multi-agent
-    $ raise init --detect                  # auto-detect installed agents
-    $ raise init --ide antigravity         # (deprecated) alias for --agent
+    $ rai init                           # defaults to claude
+    $ rai init --agent cursor            # single agent
+    $ rai init --agent claude --agent cursor  # multi-agent
+    $ rai init --detect                  # auto-detect installed agents
+    $ rai init --ide antigravity         # (deprecated) alias for --agent
 """
 
 import sys
@@ -138,16 +138,16 @@ PROJECT_DETECTED_SHU = """
      [dim]→ Loads your context, remembers patterns, proposes focused work[/dim]
 
   [bold]3. Explore the CLI[/bold] (in terminal):
-     [dim]raise --help[/dim]      — see all commands
-     [dim]raise context[/dim]     — query project context
-     [dim]raise memory[/dim]      — query Rai's memory
+     [dim]rai --help[/dim]      — see all commands
+     [dim]rai context[/dim]     — query project context
+     [dim]rai memory[/dim]      — query Rai's memory
 
 [dim]Don't have Claude Code? https://claude.ai/download[/dim]
 """
 
 PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
-[dim]Next:[/dim] {skill_recommendation}   [dim]Then:[/dim] /rai-session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
+[dim]Next:[/dim] {skill_recommendation}   [dim]Then:[/dim] /rai-session-start   [dim]CLI:[/dim] rai --help   [dim](claude.ai/download)[/dim]
 """
 
 
@@ -803,11 +803,11 @@ def init_command(
     and scaffolds skills/workflows for each target agent.
 
     Examples:
-        $ raise init                                 # defaults to claude
-        $ raise init --agent cursor                  # single agent
-        $ raise init --agent claude --agent cursor   # multi-agent
-        $ raise init --detect                        # auto-detect agents
-        $ raise init --ide antigravity               # (deprecated) alias
+        $ rai init                                 # defaults to claude
+        $ rai init --agent cursor                  # single agent
+        $ rai init --agent claude --agent cursor   # multi-agent
+        $ rai init --detect                        # auto-detect agents
+        $ rai init --ide antigravity               # (deprecated) alias
     """
     project_path = (path if path is not None else Path.cwd()).resolve()
     project_name = name if name is not None else project_path.name
