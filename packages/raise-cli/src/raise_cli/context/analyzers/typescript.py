@@ -298,7 +298,7 @@ class TypeScriptAnalyzer:
             resolved = (file_dir / source_str).resolve()
             relative = resolved.relative_to(src_path.resolve())
             parts = relative.parts
-            if parts:
+            if parts and (src_path / parts[0]).is_dir():
                 return parts[0]
         except (ValueError, IndexError):
             pass
