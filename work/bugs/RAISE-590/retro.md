@@ -21,5 +21,5 @@
 4. Capability gained: Distinguishing "dead code" (safe to remove) from "wrong code" (needs fix) under the same S3923 rule.
 
 ### Patterns
-- Added: none (covered by PAT-F-003)
+- Added: none (covered by PAT-F-046)
 - Reinforced: none evaluated

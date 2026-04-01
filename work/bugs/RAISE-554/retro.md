@@ -21,5 +21,5 @@
 4. Capability gained: Pattern for encoding-safe CLI output in Python: detect at module load, expose constants, import everywhere.
 
 ### Patterns
-- Added: PAT-F-006 (see below)
+- Added: PAT-F-049 (see below)
 - Reinforced: none evaluated

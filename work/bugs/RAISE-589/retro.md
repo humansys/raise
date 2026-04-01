@@ -21,5 +21,5 @@
 4. Capability gained: Regex precedence in lookaheads is subtle — `(?=A|B)` vs `(?=(?:A|B))` are semantically different in some engines.
 
 ### Patterns
-- Added: PAT-F-004 (see below)
+- Added: PAT-F-047 (see below)
 - Reinforced: none evaluated

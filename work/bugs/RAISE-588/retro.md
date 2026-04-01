@@ -21,5 +21,5 @@
 4. Capability gained: None new — standard practice reinforced.
 
 ### Patterns
-- Added: none (covered by PAT-F-003 class — SAST noise from missing annotations)
+- Added: none (covered by PAT-F-046 class — SAST noise from missing annotations)
 - Reinforced: none evaluated

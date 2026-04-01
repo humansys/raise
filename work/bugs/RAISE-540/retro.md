@@ -22,5 +22,5 @@
 4. Capability gained: Confidence that umbrella tickets with sub-bugs don't need re-analysis — verify the sub-bug artifacts exist and are correct.
 
 ### Patterns
-- Added: PAT-dogfood-001 (see below)
+- Added: PAT-F-046
 - Reinforced: none evaluated

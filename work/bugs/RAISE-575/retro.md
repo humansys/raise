@@ -15,5 +15,5 @@
 **Pattern:** Same class as RAISE-574 but worse: transitive deps are invisible. Direct deps you control; transitives need workspace constraints.
 
 ### Patterns
-- Added: PAT-F-005 (see below)
+- Added: PAT-F-048 (see below)
 - Reinforced: none evaluated
