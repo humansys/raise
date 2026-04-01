@@ -17,3 +17,9 @@ Después, `load_session_state(project, session_id=SES-N)` busca `sessions/SES-{N
 - `rai session start --context` muestra `current_work`, `narrative`, `next_session_prompt` de la sesión anterior
 - Quick close (`--summary` flag) también funciona (no regresión)
 - Tests del ciclo close→start pasan en verde
+
+TRIAGE:
+  Bug Type:    Functional
+  Severity:    S1-High
+  Origin:      Code
+  Qualifier:   Incorrect

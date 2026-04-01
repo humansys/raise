@@ -15,3 +15,9 @@ EXPECTED:  `rai pattern add` without --scope writes to project scope (.raise/rai
 Done when: `rai pattern add "..."` (no --scope) writes to .raise/rai/memory/patterns.jsonl.
            `rai pattern reinforce <id> --vote 1` (no --scope) can find that pattern.
            All gates pass.
+
+TRIAGE:
+  Bug Type:    Functional
+  Severity:    S2-Medium
+  Origin:      Code
+  Qualifier:   Incorrect
