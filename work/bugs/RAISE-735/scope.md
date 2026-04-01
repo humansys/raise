@@ -5,7 +5,7 @@ EXPECTED:  All references use 'rai' consistently
 Done when: No stale 'raise' command references in codebase
 
 TRIAGE:
-  Bug Type:    UX
+  Bug Type:    Interface
   Severity:    S3-Low
   Origin:      Code
   Qualifier:   Incorrect
