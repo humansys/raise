@@ -42,7 +42,7 @@ console = Console()
 def _validate_work_inputs(
     work_type: str,
     event_type: str,
-    phase: str,
+    phase: str | None,
 ) -> str:
     """Validate work type, event type, and phase. Returns lowercased work_type."""
     valid_work_types: list[Literal["epic", "story"]] = ["epic", "story"]
@@ -64,15 +64,16 @@ def _validate_work_inputs(
             exit_code=7,
         )
 
-    valid_phases: list[
-        Literal["init", "design", "plan", "implement", "review", "close"]
-    ] = ["init", "design", "plan", "implement", "review", "close"]
-    if phase not in valid_phases:
-        cli_error(
-            f"Invalid phase: {phase}",
-            hint=f"Valid phases: {', '.join(valid_phases)}",
-            exit_code=7,
-        )
+    if phase is not None:
+        valid_phases: list[
+            Literal["init", "design", "plan", "implement", "review", "close"]
+        ] = ["init", "design", "plan", "implement", "review", "close"]
+        if phase not in valid_phases:
+            cli_error(
+                f"Invalid phase: {phase}",
+                hint=f"Valid phases: {', '.join(valid_phases)}",
+                exit_code=7,
+            )
 
     return work_type_lower
 
@@ -105,25 +106,26 @@ def _print_work_result(
     work_type_lower: str,
     work_id: str,
     event_type: str,
-    phase: str,
+    phase: str | None,
     blocker_value: str | None,
     result_path: Path | str | None,
 ) -> None:
     """Print formatted output for a successful work lifecycle event."""
     label = f"{work_type_lower.capitalize()} {work_id}"
+    phase_prefix = f"{phase} " if phase else ""
 
     if event_type == "start":
-        console.print(f"\n[green]▶[/green] {label} → {phase} started")
+        console.print(f"\n[green]▶[/green] {label} → {phase_prefix}started")
     elif event_type == "complete":
-        console.print(f"\n[green]✓[/green] {label} → {phase} complete")
+        console.print(f"\n[green]✓[/green] {label} → {phase_prefix}complete")
     elif event_type == "blocked":
-        console.print(f"\n[red]⏸[/red] {label} → {phase} blocked")
+        console.print(f"\n[red]⏸[/red] {label} → {phase_prefix}blocked")
         if blocker_value:
             console.print(f"  Blocker: {blocker_value}")
     elif event_type == "unblocked":
-        console.print(f"\n[green]▶[/green] {label} → {phase} unblocked")
+        console.print(f"\n[green]▶[/green] {label} → {phase_prefix}unblocked")
     elif event_type == "abandoned":
-        console.print(f"\n[yellow]✗[/yellow] {label} → {phase} abandoned")
+        console.print(f"\n[yellow]✗[/yellow] {label} → {phase_prefix}abandoned")
 
     console.print(f"\n[dim]Saved to: {result_path}[/dim]\n")
 
@@ -147,9 +149,9 @@ def emit_work(
         ),
     ] = "start",
     phase: Annotated[
-        str,
+        str | None,
         typer.Option("--phase", "-p", help="Phase (design, plan, implement, review)"),
-    ] = "design",
+    ] = None,
     blocker: Annotated[
         str,
         typer.Option(
@@ -204,12 +206,15 @@ def emit_work(
             "[yellow]Warning:[/yellow] No blocker description provided for blocked event"
         )
 
+    # Use "init" as neutral phase for telemetry when not specified
+    schema_phase = phase or "init"
+
     lifecycle_event = WorkLifecycle(
         timestamp=datetime.now(UTC),
         work_type=work_type_lower,  # type: ignore[arg-type]
         work_id=work_id,
         event=event_type,  # type: ignore[arg-type]
-        phase=phase,  # type: ignore[arg-type]
+        phase=schema_phase,  # type: ignore[arg-type]
         blocker=blocker_value,
     )
 
@@ -220,7 +225,7 @@ def emit_work(
     result = emit(lifecycle_event, session_id=session_id)
 
     if result.success:
-        _dispatch_work_hook(work_type_lower, work_id, event_type, phase)
+        _dispatch_work_hook(work_type_lower, work_id, event_type, schema_phase)
         _print_work_result(
             work_type_lower, work_id, event_type, phase, blocker_value, result.path
         )
