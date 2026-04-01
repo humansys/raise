@@ -2569,7 +2569,7 @@ provides-extras = ["gchat"]
 
 [[package]]
 name = "raise-cli"
-version = "2.4.0a1"
+version = "2.4.0a2"
 source = { editable = "packages/raise-cli" }
 dependencies = [
     { name = "logfire-api" },

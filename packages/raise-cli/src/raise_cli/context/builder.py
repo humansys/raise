@@ -217,8 +217,12 @@ class GraphBuilder:
         """
         from raise_cli.context.analyzers.models import ModuleInfo
         from raise_cli.context.analyzers.python import PythonAnalyzer
+        from raise_cli.context.analyzers.typescript import TypeScriptAnalyzer
 
-        analyzers = [PythonAnalyzer(src_dir="src/raise_cli")]
+        analyzers = [
+            PythonAnalyzer(src_dir="src/raise_cli"),
+            TypeScriptAnalyzer(src_dir="src"),
+        ]
 
         code_modules: list[ModuleInfo] = []
         for analyzer in analyzers:
