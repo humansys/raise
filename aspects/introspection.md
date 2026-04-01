@@ -371,6 +371,48 @@ No relevant pattern exists in the graph. The gap is real.
 
 ---
 
+## Guided Query Templates by Phase
+
+These are **suggestions** — the LLM refines each query using execution context. Variables in `{braces}` are resolved from the skill's metadata and current work scope.
+
+### Epic lifecycle
+
+| Phase | Suggested Tier 1 Queries | Context |
+|-------|-------------------------|---------|
+| **epic.design** | `"patterns for {affected_modules} architecture decisions"` | Scope boundaries, ADR precedents |
+| | `"risks and failure modes in {domain} epics"` | Risk assessment |
+| | `"prior epic designs with similar scope ({story_count} stories)"` | Sizing calibration |
+| **epic.plan** | `"sequencing patterns for {strategy} ordering"` | Risk-first, walking skeleton, etc. |
+| | `"estimation patterns for {size} epics"` | Velocity calibration |
+| | `"milestone patterns for multi-story epics"` | Integration checkpoints |
+| **epic.close** | `"retrospective patterns for {domain} epics"` | What to look for in retro |
+| | `"process improvement patterns from similar epics"` | Meta-learning |
+
+### Story lifecycle
+
+| Phase | Suggested Tier 1 Queries | Context |
+|-------|-------------------------|---------|
+| **story.design** | `"patterns for {affected_modules} design decisions"` | Approach selection |
+| | `"prior designs for similar scope in {phase}"` | Precedent |
+| | `"risks and lessons from related epics"` | Avoid known pitfalls |
+| **story.plan** | `"decomposition patterns for {complexity} stories"` | Task granularity |
+| | `"TDD patterns for {affected_modules}"` | Test strategy |
+| | `"estimation calibration for {size} stories"` | Sizing accuracy |
+| **story.implement** | `"implementation patterns for {affected_modules}"` | Code patterns, idioms |
+| | `"testing patterns for {test_type} in {language}"` | Test approach |
+| | `"integration patterns for {upstream_dependencies}"` | Contract alignment |
+| **story.review** | `"evaluation patterns for {affected_modules}"` | What to look for |
+| | `"process patterns from recent stories"` | Meta-learning |
+
+### Notes
+
+- Each skill uses 2-3 queries from its phase (not all of them)
+- The LLM selects the most relevant queries based on the specific work context
+- If a query template doesn't apply to the current work, skip it — don't force relevance
+- JIT queries are NOT templated — they emerge from decision bifurcations during execution
+
+---
+
 ## Downstream Impact Fields by Phase
 
 ### Epic lifecycle
