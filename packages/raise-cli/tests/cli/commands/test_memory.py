@@ -80,7 +80,7 @@ class TestMemoryHelp:
 
 
 class TestMemoryAddPatternCommand:
-    """Tests for `raise memory add-pattern` command."""
+    """Tests for `rai memory add-pattern` command."""
 
     def test_add_pattern_basic(self, tmp_path: Path) -> None:
         """Test basic add-pattern command."""
@@ -303,7 +303,7 @@ class TestMemoryReinforceCommand:
 
 
 class TestMemoryEmitWorkCommand:
-    """Tests for `raise memory emit-work` command."""
+    """Tests for `rai memory emit-work` command."""
 
     def test_emit_work_start(self, tmp_path: Path) -> None:
         """Test emit-work start event."""
@@ -642,7 +642,7 @@ class TestEmitSessionRouting:
 
 
 class TestMemoryEmitSessionCommand:
-    """Tests for `raise memory emit-session` command."""
+    """Tests for `rai memory emit-session` command."""
 
     def test_emit_session_basic(self, tmp_path: Path) -> None:
         """Test basic emit-session command."""
@@ -709,7 +709,7 @@ class TestMemoryEmitSessionCommand:
 
 
 class TestMemoryEmitCalibrationCommand:
-    """Tests for `raise memory emit-calibration` command."""
+    """Tests for `rai memory emit-calibration` command."""
 
     def test_emit_calibration_basic(self, tmp_path: Path) -> None:
         """Test basic emit-calibration command."""
