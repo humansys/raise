@@ -62,3 +62,66 @@ S1130.4 and S1130.5 can run in parallel after their respective discoveries.
 | Jira workflow discovery returns unexpected structures | Medium | Medium | E494 spike already validated ACLI JSON; new client validates same fields |
 | Doctor false positives annoy users | Low | Medium | Warnings vs errors; only error on confirmed mismatches |
 | Setup skill UX too complex | Medium | Low | Keep it to 3-4 questions; advanced options in YAML directly |
+
+---
+
+## Implementation Plan
+
+### Sequencing Strategy
+
+**Quick wins + dependency-driven.** Confluence discovery (S) is the quick win — existing
+client methods, fast to deliver, unblocks doctor and generator. Jira discovery (M) runs
+in parallel as the higher-risk item (new JiraClient methods).
+
+**Critical path:** S1130.2 → S1130.5 → S1130.6
+
+### Parallel Streams
+
+```
+Stream A (Confluence):  S1130.1 (S) ──→ S1130.4 (S)  ──┐
+                                                         ├──→ S1130.6 (S)
+Stream B (Jira):        S1130.2 (M) ──→ S1130.5 (M)  ──┘
+                                   │                     │
+                                   └──→ S1130.3 (M) ────┘
+                        S1130.1 ───────┘
+```
+
+### Execution Order
+
+| Pos | Story | Size | Rationale | Enables |
+|-----|-------|------|-----------|---------|
+| 1a | S1130.1 Confluence Discovery | S | Quick win — wraps existing methods | S1130.3, S1130.4 |
+| 1b | S1130.2 Jira Discovery | M | Parallel with 1a — highest risk, start early | S1130.3, S1130.5 |
+| 2a | S1130.4 Config Gen Confluence | S | Unblocked by 1a — fast, validates pattern | S1130.6 |
+| 2b | S1130.3 Adapter Doctor | M | Unblocked by 1a+1b — validates both discoveries | S1130.6 |
+| 2c | S1130.5 Config Gen Jira | M | Unblocked by 1b — applies pattern from 2a | S1130.6 |
+| 3 | S1130.6 /rai-adapter-setup | S | Final — orchestrates everything | Done criteria |
+
+### Milestones
+
+#### M1: Discovery (after S1130.1 + S1130.2)
+- [ ] `ConfluenceDiscovery.discover()` returns `ConfluenceSpaceMap` from live backend
+- [ ] `JiraDiscovery.discover()` returns `JiraProjectMap` from live backend
+- [ ] Both services have unit tests with mocked clients + integration tests
+
+#### M2: Doctor + Generators (after S1130.3 + S1130.4 + S1130.5)
+- [ ] `rai doctor` includes adapter checks (config + env vars + live validation)
+- [ ] `generate_confluence_config()` produces valid YAML matching `ConfluenceConfig` schema
+- [ ] `generate_jira_config()` produces valid YAML matching `JiraConfig` schema
+- [ ] Generated configs pass doctor validation without edits
+
+#### M3: Epic Complete (after S1130.6)
+- [ ] `/rai-adapter-setup` on clean repo → 3-4 questions → complete validated config
+- [ ] Existing manually-written configs still work (backwards compat)
+- [ ] Retrospective complete
+
+### Progress Tracking
+
+| Story | Size | Status | Notes |
+|-------|------|--------|-------|
+| S1130.1 Confluence Discovery | S | pending | |
+| S1130.2 Jira Discovery | M | pending | |
+| S1130.3 Adapter Doctor | M | pending | |
+| S1130.4 Config Gen Confluence | S | pending | |
+| S1130.5 Config Gen Jira | M | pending | |
+| S1130.6 /rai-adapter-setup | S | pending | |
