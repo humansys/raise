@@ -8,6 +8,7 @@ Architecture: S1132.0a — TypeScript Import/Export Extraction
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -16,6 +17,8 @@ from raise_cli.context.analyzers.models import ModuleInfo
 from raise_cli.discovery.scanner import (
     _get_ts_parser,  # pyright: ignore[reportPrivateUsage]
 )
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from tree_sitter import Node
@@ -31,6 +34,11 @@ _COMPONENT_NODE_TYPES = frozenset(
         "type_alias_declaration",
     }
 )
+
+
+def _node_text(node: Node, source: bytes) -> str:
+    """Extract the text content of a tree-sitter node."""
+    return source[node.start_byte : node.end_byte].decode("utf-8")
 
 
 class TypeScriptAnalyzer:
@@ -176,7 +184,7 @@ class TypeScriptAnalyzer:
         """
         try:
             return ts_file.read_bytes()
-        except (OSError, UnicodeDecodeError):
+        except OSError:
             return None
 
     def _parse_file(self, ts_file: Path, source: bytes) -> Node | None:
@@ -193,7 +201,8 @@ class TypeScriptAnalyzer:
             parser = _get_ts_parser("typescript", file_path=str(ts_file))
             tree = parser.parse(source)
             return tree.root_node
-        except (ImportError, Exception):
+        except Exception:
+            logger.debug("Failed to parse %s", ts_file, exc_info=True)
             return None
 
     def _extract_imports(
@@ -260,9 +269,7 @@ class TypeScriptAnalyzer:
         """
         for child in node.children:
             if child.type == "string":
-                text = source[child.start_byte : child.end_byte].decode("utf-8")
-                # Strip quotes (single, double, or backtick)
-                return text.strip("'\"`")
+                return _node_text(child, source).strip("'\"`")
         return None
 
     def _resolve_import(
@@ -373,7 +380,7 @@ class TypeScriptAnalyzer:
             source: File contents as bytes.
             exports: Set to add exported names to (mutated).
         """
-        text = source[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
+        text = _node_text(node, source)
         if not text.startswith("export default"):
             return
         for child in node.children:
@@ -394,7 +401,7 @@ class TypeScriptAnalyzer:
         """
         for child in node.children:
             if child.type in ("identifier", "type_identifier"):
-                return source[child.start_byte : child.end_byte].decode("utf-8")
+                return _node_text(child, source)
         return None
 
     def _extract_variable_names(
@@ -411,8 +418,7 @@ class TypeScriptAnalyzer:
             if child.type == "variable_declarator":
                 for sub in child.children:
                     if sub.type == "identifier":
-                        name = source[sub.start_byte : sub.end_byte].decode("utf-8")
-                        exports.add(name)
+                        exports.add(_node_text(sub, source))
                         break
 
     def _extract_export_clause_names(
@@ -438,9 +444,7 @@ class TypeScriptAnalyzer:
                             alias_node = sub
                 target = alias_node if alias_node else name_node
                 if target:
-                    exports.add(
-                        source[target.start_byte : target.end_byte].decode("utf-8")
-                    )
+                    exports.add(_node_text(target, source))
 
     def _count_components(self, root: Node) -> int:
         """Count top-level components: classes, functions, interfaces, enums, type aliases.

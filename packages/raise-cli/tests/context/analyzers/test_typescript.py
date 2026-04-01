@@ -223,6 +223,47 @@ class TestTypeScriptAnalyzerImports:
         assert cmd_info is not None
         assert cmd_info.imports == []
 
+    def test_handles_tsx_files(self, tmp_path: Path) -> None:
+        """Should parse .tsx files and extract imports."""
+        src = tmp_path / "src"
+        components = src / "components"
+        components.mkdir(parents=True)
+        (components / "App.tsx").write_text(
+            "import { Runner } from '../core/runner';\nexport function App() {}\n"
+        )
+        core = src / "core"
+        core.mkdir(parents=True)
+        (core / "runner.ts").write_text("export class Runner {}\n")
+        (tmp_path / "tsconfig.json").write_text("{}")
+
+        analyzer = TypeScriptAnalyzer(src_dir="src")
+        modules = analyzer.analyze_modules(tmp_path)
+
+        comp_info = next((m for m in modules if m.name == "components"), None)
+        assert comp_info is not None
+        assert "core" in comp_info.imports
+        assert "App" in comp_info.exports
+
+    def test_handles_unreadable_file(self, tmp_path: Path) -> None:
+        """Should skip unreadable files gracefully."""
+        src = tmp_path / "src"
+        core = src / "core"
+        core.mkdir(parents=True)
+        f = core / "broken.ts"
+        f.write_text("export class Good {}\n")
+        f.chmod(0o000)
+        (core / "ok.ts").write_text("export class Ok {}\n")
+        (tmp_path / "tsconfig.json").write_text("{}")
+
+        analyzer = TypeScriptAnalyzer(src_dir="src")
+        modules = analyzer.analyze_modules(tmp_path)
+
+        core_info = next((m for m in modules if m.name == "core"), None)
+        assert core_info is not None
+        assert "Ok" in core_info.exports
+        # Restore permissions for cleanup
+        f.chmod(0o644)
+
 
 class TestTypeScriptAnalyzerExports:
     """Tests for export extraction from barrel files (index.ts)."""
@@ -285,6 +326,42 @@ class TestTypeScriptAnalyzerExports:
         assert core_info is not None
         assert "Runner" in core_info.exports
         assert "Config" in core_info.exports
+
+    def test_extracts_aliased_export(self, tmp_path: Path) -> None:
+        """Should use alias name for export { Foo as Bar }."""
+        src = tmp_path / "src"
+        core = src / "core"
+        core.mkdir(parents=True)
+        (core / "index.ts").write_text(
+            "export { InternalRunner as Runner } from './runner';\n"
+        )
+        (core / "runner.ts").write_text("export class InternalRunner {}\n")
+        (tmp_path / "tsconfig.json").write_text("{}")
+
+        analyzer = TypeScriptAnalyzer(src_dir="src")
+        modules = analyzer.analyze_modules(tmp_path)
+
+        core_info = next((m for m in modules if m.name == "core"), None)
+        assert core_info is not None
+        assert "Runner" in core_info.exports
+        # The alias is exported, not the internal name (from index.ts)
+        # But InternalRunner also appears from runner.ts direct export
+        assert "InternalRunner" in core_info.exports
+
+    def test_extracts_default_export_function(self, tmp_path: Path) -> None:
+        """Should extract name from export default function."""
+        src = tmp_path / "src"
+        core = src / "core"
+        core.mkdir(parents=True)
+        (core / "helper.ts").write_text("export default function createApp() {}\n")
+        (tmp_path / "tsconfig.json").write_text("{}")
+
+        analyzer = TypeScriptAnalyzer(src_dir="src")
+        modules = analyzer.analyze_modules(tmp_path)
+
+        core_info = next((m for m in modules if m.name == "core"), None)
+        assert core_info is not None
+        assert "createApp" in core_info.exports
 
     def test_extracts_exported_const(self, tmp_path: Path) -> None:
         """Should extract exported const/let/var declarations."""
