@@ -123,6 +123,30 @@ def load_state_file(path: Path) -> CloseInput:
     )
 
 
+def _resolve_session_id(
+    session_id: str | None,
+    close_input: CloseInput,
+    personal_dir: Path,
+) -> tuple[str, str]:
+    """Resolve session ID and message for close result.
+
+    When caller provides session_id (new S-F-* format), uses it directly
+    and skips legacy append_session. Falls back to SES-NNN for compat.
+
+    Returns:
+        (resolved_id, log_message) tuple.
+    """
+    if session_id:
+        return session_id, f"Session {session_id} recorded"
+    session_input = SessionInput(
+        topic=close_input.summary,
+        session_type=close_input.session_type,
+        outcomes=close_input.outcomes,
+    )
+    session_result = append_session(personal_dir, session_input)
+    return session_result.id, f"Session {session_result.id} recorded"
+
+
 def process_session_close(
     close_input: CloseInput,
     profile: DeveloperProfile,
@@ -144,15 +168,11 @@ def process_session_close(
     memory_dir = project_path / ".raise" / "rai" / "memory"
     personal_dir = project_path / ".raise" / "rai" / "personal"
 
-    # 1. Record session in personal/sessions/index.jsonl
-    session_input = SessionInput(
-        topic=close_input.summary,
-        session_type=close_input.session_type,
-        outcomes=close_input.outcomes,
+    # 1. Resolve session ID (new S-F-* format or legacy SES-NNN fallback)
+    result.session_id, msg = _resolve_session_id(
+        session_id, close_input, personal_dir
     )
-    session_result = append_session(personal_dir, session_input)
-    result.session_id = session_result.id
-    result.messages.append(f"Session {session_result.id} recorded")
+    result.messages.append(msg)
 
     # 2. Append patterns
     pattern_ids: list[str] = []
