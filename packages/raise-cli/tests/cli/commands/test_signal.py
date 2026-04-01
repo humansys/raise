@@ -103,6 +103,25 @@ class TestSignalEmitWork:
         finally:
             os.chdir(original_cwd)
 
+    def test_emit_work_without_phase_omits_phase_in_output(self, tmp_path: Path) -> None:
+        """RAISE-813: no --phase → output should NOT show 'design complete'."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            telemetry_dir = tmp_path / ".raise" / "rai" / "telemetry"
+            telemetry_dir.mkdir(parents=True)
+
+            result = runner.invoke(
+                app,
+                ["signal", "emit-work", "story", "S1.1", "-e", "complete"],
+            )
+
+            assert result.exit_code == 0
+            assert "design complete" not in result.stdout
+            assert "complete" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
     def test_emit_work_invalid_type(self, tmp_path: Path) -> None:
         """Test emit-work with invalid work type."""
         original_cwd = os.getcwd()
