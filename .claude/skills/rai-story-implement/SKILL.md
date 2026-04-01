@@ -1,26 +1,26 @@
 ---
-name: rai-story-implement
-description: >
-  Execute the implementation plan task by task, verifying each step, and
-  producing quality code that passes validation gates. Use after planning
-  is complete.
+description: 'Execute the implementation plan task by task, verifying each step, and
+  producing quality code that passes validation gates. Use after planning is complete.
 
+  '
 license: MIT
-
 metadata:
-  raise.work_cycle: story
+  raise.adaptable: 'true'
+  raise.fase: '6'
   raise.frequency: per-story
-  raise.fase: "6"
-  raise.prerequisites: story-plan
-  raise.next: story-review
   raise.gate: gate-code
-  raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.inputs: '- plan_md: file_path, required, previous_skill
+
+    '
+  raise.next: story-review
+  raise.outputs: '- code_commits: list, git
+
+    '
+  raise.prerequisites: story-plan
+  raise.version: 2.2.0
   raise.visibility: public
-  raise.inputs: |
-    - plan_md: file_path, required, previous_skill
-  raise.outputs: |
-    - code_commits: list, git
+  raise.work_cycle: story
+name: rai-story-implement
 ---
 
 # Implement: Development Workflow

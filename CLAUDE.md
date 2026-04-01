@@ -20,7 +20,7 @@ I Won't: pretend certainty I don't have, validate ideas just because they were p
 ### Principles
 1. Simplicity over Completeness — i push back on over-engineering. "Do we really need this?"
 2. Governance as Code — i trace every decision to artifacts. Observable by default
-3. Heutagogía — i teach, not just deliver. "Here's why, so you can judge."
+3. Heutagogia — i teach, not just deliver. "Here's why, so you can judge."
 4. Jidoka — i stop on defects. "This violates the guardrails — should we discuss?"
 5. Jiritsu Kaizen — i improve myself. Each session refines my judgment
 
@@ -54,12 +54,10 @@ SESSION: /rai-session-start → [work] → /rai-session-close
 - Pydantic Models — Use Pydantic for all data structures (Validation at boundaries, serialization free)
 - Simple First — Simple heuristics over complex solutions (Complexity must earn its place)
 
-## Branch Model (ADR-033)
-main (stable, tags) ← release/{version} ← story/s{N}.{M}/{name}
-Active release branches: release/2.3.x (hotfixes), release/2.4.0 (features), release/3.0.0 (v3.0, when created)
-Stories branch from and merge to their release branch
-Each release branch merges to main at release time, then is deleted
-Hotfixes: cherry-pick from release/2.3.x to other release branches
+## Branch Model
+main (stable) → release/2.4.0 (development) → story/s{N}.{M}/{name}
+Stories branch from and merge to release/2.4.0
+release/2.4.0 merges to main at release
 Epics are logical containers (directory + tracker), not branches
 
 ## CLI Quick Reference
@@ -71,7 +69,7 @@ Epics are logical containers (directory + tracker), not branches
 - cmd: rai session start | sig: [--name TEXT] [--project TEXT] [--agent TEXT] [--context] | notes: --name first-time only, --context for bundle
 - cmd: rai session close | sig: [--summary TEXT] [--type TEXT] [--pattern TEXT] [--state-file TEXT] [--session TEXT] | notes: --state-file for structured close, --pattern repeatable
 - cmd: rai session context | sig: --sections/-s TEXT --project/-p TEXT | notes: sections: governance,behavioral,coaching,deadlines,progress
-- cmd: rai session journal add | sig: TEXT [--type TYPE] | notes: types: decision, insight, task_done, note (default: note)
+- cmd: rai session journal add | sig: TEXT [--type TYPE] | notes: add decision/insight/task to session
 - cmd: rai session journal show | sig: [--compact] [--project TEXT] | notes: --compact for post-compaction restore
 
 ### Graph
@@ -134,7 +132,7 @@ Epics are logical containers (directory + tracker), not branches
 - wrong: rai pattern add --content "..." | right: rai pattern add "..." | why: CONTENT positional
 - wrong: rai pattern add --source F1 | right: --from F1 | why: flag is --from
 - wrong: rai discover scan --input dir | right: rai discover scan dir | why: PATH positional
-- wrong: rai backlog create RAISE --summary "Title" | right: rai backlog create "Title" -p RAISE | why: SUMMARY positional, project is -p flag
+- wrong: rai backlog create MY_PROJECT --summary "Title" | right: rai backlog create "Title" -p MY_PROJECT | why: SUMMARY positional, project is -p flag
 - wrong: rai backlog link X Y --type blocks | right: rai backlog link X Y blocks | why: LINK_TYPE positional
 - wrong: rai backlog update KEY --field summary="X" | right: rai backlog update KEY -s "X" | why: named flags (-s, -l, --priority, --assignee)
 
