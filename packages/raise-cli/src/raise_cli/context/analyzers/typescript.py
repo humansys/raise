@@ -13,7 +13,9 @@ from typing import TYPE_CHECKING
 
 from raise_cli.compat import portable_path
 from raise_cli.context.analyzers.models import ModuleInfo
-from raise_cli.discovery.scanner import _get_ts_parser  # pyright: ignore[reportPrivateUsage]
+from raise_cli.discovery.scanner import (
+    _get_ts_parser,  # pyright: ignore[reportPrivateUsage]
+)
 
 if TYPE_CHECKING:
     from tree_sitter import Node
