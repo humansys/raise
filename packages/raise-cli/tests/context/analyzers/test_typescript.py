@@ -244,6 +244,35 @@ class TestTypeScriptAnalyzerImports:
         assert "core" in comp_info.imports
         assert "App" in comp_info.exports
 
+    def test_ignores_imports_resolving_to_root_level_files(
+        self, tmp_path: Path
+    ) -> None:
+        """Imports resolving to root-level .ts files (not directories) are excluded."""
+        src = tmp_path / "src"
+        # "commands" is a directory module
+        commands = src / "commands"
+        commands.mkdir(parents=True)
+        (commands / "index.ts").write_text("export {};\n")
+        # "Tool.ts" is a root-level file (NOT a module)
+        (src / "Tool.ts").write_text("export class Tool {}\n")
+        # core module imports '../Tool' — should NOT resolve as a module
+        core = src / "core"
+        core.mkdir(parents=True)
+        (core / "runner.ts").write_text(
+            "import { Tool } from '../Tool';\nimport { x } from '../commands';\n"
+        )
+        (tmp_path / "tsconfig.json").write_text("{}")
+
+        analyzer = TypeScriptAnalyzer(src_dir="src")
+        modules = analyzer.analyze_modules(tmp_path)
+
+        core_info = next((m for m in modules if m.name == "core"), None)
+        assert core_info is not None
+        # "commands" is a directory → valid import
+        assert "commands" in core_info.imports
+        # "Tool" resolves to root file, not a directory → excluded
+        assert "Tool" not in core_info.imports
+
     def test_handles_unreadable_file(self, tmp_path: Path) -> None:
         """Should skip unreadable files gracefully."""
         src = tmp_path / "src"
