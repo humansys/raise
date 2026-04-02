@@ -163,6 +163,18 @@ class ConfluenceClient:
 
     # ── Discovery ─────────────────────────────────────────────────────
 
+    def get_space_homepage_id(self, space_key: str) -> str | None:
+        """Get the homepage page ID for a space. Returns None if not found."""
+        try:
+            raw: Any = self._client.get_home_page_of_space(space_key)  # type: ignore[no-untyped-call]
+            if isinstance(raw, dict) and "id" in raw:
+                return str(raw["id"])  # type: ignore[no-untyped-call]
+            return None
+        except ConfluenceError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"get_space_homepage_id({space_key})") from e
+
     def get_spaces(self) -> list[SpaceInfo]:
         """List all accessible spaces."""
         try:
@@ -225,9 +237,7 @@ class ConfluenceClient:
             self._client.get_all_spaces(limit=1)  # type: ignore[no-untyped-call]
             return AdapterHealth(name="confluence", healthy=True)
         except Exception as e:
-            return AdapterHealth(
-                name="confluence", healthy=False, message=str(e)
-            )
+            return AdapterHealth(name="confluence", healthy=False, message=str(e))
 
     # ── Internal ──────────────────────────────────────────────────────
 
