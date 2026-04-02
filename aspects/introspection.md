@@ -6,6 +6,8 @@ This aspect defines the protocol that wraps lifecycle skills with graph-informed
 
 **Design basis:** ADR-014, Poppendieck (amplify learning), MetaHarness (traces over summaries), MCE (skill evolution).
 
+**CC SAR alignment (E1132):** Validated against Claude Code architecture — deterministic context assembly (F14), compaction resilience (F7), error isolation (F2), hard limits (F15).
+
 ---
 
 ## Participation
@@ -35,10 +37,12 @@ In the skill's `SKILL.md` frontmatter:
 metadata:
   raise.aspects: introspection
   raise.introspection:
-    phase: story.design           # lifecycle phase identifier
-    context_source: scope doc     # primary input the skill works from
-    affected_modules: [mod-backlog, mod-graph]  # graph modules to query
-    tier1_queries:                 # suggested queries (LLM refines)
+    phase: story.design
+    context_source: scope doc
+    affected_modules: [mod-backlog, mod-graph]
+    max_tier1_queries: 3             # enforceable limit (G)
+    max_jit_queries: 3               # enforceable limit (G)
+    tier1_queries:                    # deterministic templates (B)
       - "patterns for {affected_modules} design decisions"
       - "prior designs for similar scope in {phase}"
       - "risks and lessons from related epics"
@@ -77,19 +81,21 @@ Before the first step of the skill. Triggered by the `> **PRIME**` marker.
 
 1. **Chain read** — Check if the previous skill in the chain produced a learning record. If it exists, read it for downstream context (see § Chain Mapping).
 
-2. **Graph query** — Execute Tier 1 queries from the skill's metadata:
+2. **Graph query** — Execute Tier 1 queries from the skill's metadata **deterministically**:
    - Read `tier1_queries` from skill frontmatter
-   - Refine each query using execution context (epic scope, story scope, current work)
-   - The LLM adapts the suggested query — guidance, not template (bitter lesson)
-   - Execute: `rai graph query "{refined_query}" --types {types} --limit 5`
+   - Substitute context variables (`{affected_modules}`, `{phase}`, etc.) from execution context
+   - Execute queries **as-is** after substitution — no LLM refinement
+   - Execute: `rai graph query "{substituted_query}" --types {types} --limit 5`
 
 3. **Present context** — Surface retrieved patterns as context for skill execution. Do not inject blindly — present with source and relevance.
 
+> **Design decision (B):** PRIME is deterministic. Queries are fixed templates with variable substitution, not LLM-refined. The bitter lesson applies to the outer loop (self-improvement), not the inner loop (execution). CC (E1132 F14) loads CLAUDE.md deterministically — the LLM decides what to *do* with context, not what context to *receive*. JIT remains adaptive.
+
 ### Constraints
 
-- Maximum 3 Tier 1 queries per skill execution
+- Maximum queries per skill: declared in metadata (`max_tier1_queries`, default 3)
 - Maximum 5 patterns per query
-- Time budget: <3s total for all queries
+- **Hard limit: 1200 tokens total for PRIME + JIT + LEARN output. If exceeded, truncate results (fewest-results queries first), do not fail.**
 - 0 results is valid — it means the graph has no relevant context (not a failure)
 
 ### Example
@@ -100,14 +106,15 @@ Context: E1133 (skill introspection), affected modules: mod-skills, mod-graph
 
 Chain read: No previous learning record (story-start is silent)
 
-Query 1 (suggested): "patterns for {affected_modules} design decisions"
-Query 1 (refined):   "patterns for cross-cutting concerns in skill architecture"
+Query 1 (template): "patterns for {affected_modules} design decisions"
+Query 1 (substituted): "patterns for mod-skills, mod-graph design decisions"
 Result: PAT-E-590 (hook extension pattern) — 1 pattern
 
-Query 2 (suggested): "risks and lessons from related epics"
-Query 2 (refined):   "lessons from skill modification epics"
+Query 2 (template): "risks and lessons from related epics"
+Query 2 (substituted): "risks and lessons from related epics"
 Result: 1 pattern about drift risk
 
+No LLM refinement. Template + substitution + execute.
 Context presented to skill: 2 patterns, both relevant to aspect design approach.
 ```
 
@@ -141,15 +148,15 @@ Non-triggers (do NOT query):
 
 ### Steps
 
-1. Formulate query from the decision context
+1. Formulate query from the decision context (LLM-adaptive — this is where refinement happens)
 2. Execute: `rai graph query "{query}" --types approach,risk --limit 3`
 3. If results: consider patterns before deciding
 4. If 0 results: this is a **gap signal** — record in learning record, proceed with best judgment
 
 ### Constraints
 
-- Maximum 3 JIT queries per skill execution
-- Time budget: <2s per query
+- Maximum queries per skill: declared in metadata (`max_jit_queries`, default 3)
+- **Hard limit: included in the 1200 token total budget for introspection**
 - 0 results = gap (captured in learning record), not failure
 - JIT never blocks execution — if graph is unavailable, proceed and note in learning record
 
@@ -173,29 +180,34 @@ Action: Gap recorded. Proceeded with exploration of both options.
 
 ### Purpose
 
-Produce a learning record — the structured trace of what happened during skill execution. Measurement IS operation (Poppendieck: amplify learning).
+Produce a learning record — a structured summary that **points to** the execution traces (git history, artifacts on disk, conversation transcript). Measurement IS operation (Poppendieck: amplify learning).
+
+> **Design decision (E):** The learning record is a **summary with pointers**, not the trace itself. The conversation transcript IS the raw trace. Git log IS the change trace. The learning record indexes them — it does not duplicate them. When the future `rai-skill-improve` needs raw traces, it reads git + artifacts. The record tells it *where to look* and *what was notable*.
 
 ### When
 
 After the last step of the skill completes. Triggered by the `> **LEARN**` marker.
 
+### Compaction resilience
+
+> **Design decision (C):** LEARN produces the record from **artefacts on disk** (scope docs, design files, plan files, git diff) and **skill metadata** — NOT from conversational memory. If context has been compacted during a long skill execution, the learning record is still fully producible. This is compaction-proof by design.
+
 ### Steps
 
 1. **Evaluate process fidelity**
-   - Did PRIME run? What queries, what results?
-   - Did JIT fire? At what triggers? Results or gaps?
-   - What artifacts were produced?
+   - Did PRIME run? How many queries, how many results?
+   - Did JIT fire? How many times?
+   - What artifacts were produced? (read from disk)
 
 2. **Vote on primed patterns**
    - For each pattern surfaced by PRIME: +1 (used), 0 (seen, not relevant), -1 (misleading)
-   - Include `why` — the reason is the trace, not the vote
+   - Include `why` — the reason is the signal, not the vote
    - This enables recall failure vs use failure distinction (Governed Memory):
      - Pattern not retrieved but would have helped → **recall failure** (improve queries)
      - Pattern retrieved but not useful → **use failure** (improve pattern quality)
 
 3. **Identify gaps**
-   - Decisions made without graph context
-   - JIT queries that returned 0 results
+   - JIT queries that returned 0 results at decision points
    - Moments where "I wish I had a pattern for X"
    - Gaps are the highest-value signal — they tell us what the graph is missing
 
@@ -205,70 +217,62 @@ After the last step of the skill completes. Triggered by the `> **LEARN**` marke
 
 5. **Enrich previous skill's learning record** (if applicable)
    - Read the upstream skill's learning record
-   - Fill the `downstream_impact` fields with factual observations
+   - Fill empty fields in `downstream` with factual observations
    - See § Downstream Enrichment
 
 ### What LEARN does NOT do
 
-- **Does not capture new patterns.** Only records gaps. Pattern capture is story-review's responsibility, after implementation validates the approach. Rationale: triple gate (New + Generalizable + Actionable) requires evidence from execution.
-
-- **Does not evaluate output quality.** Acceptance is implicit in the chain: if the next skill executes, the previous output was accepted. No ceremony for what can be inferred. Rationale: LEARN captures what it knows at execution time (Poppendieck: eliminate waste).
-
-- **Does not produce summaries.** The learning record IS the trace. Summaries lose information — MetaHarness Table 3 shows raw traces outperform summaries by 15+ points.
+- **Does not capture new patterns.** Only records gaps. Pattern capture is story-review's responsibility.
+- **Does not duplicate traces.** Git history and artifacts ARE the traces. The record points to them.
+- **Does not produce summaries of conversation.** The record captures structured signals (votes, gaps, pointers), not prose.
 
 ---
 
 ## Learning Record Schema
 
+> **Design decision (H):** Flat schema with ~10 fields. Extend with evidence from dogfood, not upfront speculation.
+
 ```yaml
 # .raise/rai/learnings/{skill}/{work_id}/record.yaml
 
-skill: rai-story-design           # skill that produced this record
-version: "2.4.0"                  # skill version at execution time
-work_id: S1133.1                  # story or epic work ID
-timestamp: 2026-04-01T11:30:00    # ISO 8601
+skill: rai-story-design
+work_id: S1133.1
+version: "2.4.0"
+timestamp: 2026-04-01T09:15:00
 
-process_fidelity:
-  tier1_primed: true              # did PRIME execute?
-  tier1_queries:                  # what was queried (the trace)
-    - query: "patterns for cross-cutting concerns in skill architecture"
-      types: [approach, risk]     # graph query types filter
-      results: 1                  # number of patterns returned
-      useful: true                # was the result used in the work?
-    - query: "prior story designs for docs/protocol stories"
-      results: 0                  # 0 results = no gap signal from query itself
-  jit_queries:                    # JIT queries during execution
-    - query: "patterns for aspect-oriented design"
-      trigger: "Step 3 — two valid approaches with structural consequences"
-      results: 0
-      gap: true                   # 0 results at a decision point = gap signal
-  artifacts_produced:             # what the skill created
-    - s1133.1-design.md
-    - s1133.1-design.yaml
+# PRIME trace
+primed_patterns: [PAT-E-590]
+tier1_queries: 2
+tier1_results: 2
+jit_queries: 1
 
-pattern_metrics:
-  primed:                         # evaluation of patterns from PRIME
-    - id: PAT-E-590               # pattern identifier
-      vote: 1                     # +1 used, 0 not relevant, -1 misleading
-      why: "hook extension pattern directly informed stepping stone design"
-  gaps:                           # what the graph was missing
-    - "No patterns for aspect-oriented composition in skill systems"
-    - "No prior designs for protocol/docs-type stories"
+# Pattern evaluation
+pattern_votes:
+  PAT-E-590: {vote: 1, why: "hook extension pattern informed stepping stone design"}
 
-downstream_impact:                # filled by the NEXT skill in the chain
-  next_skill: rai-story-plan      # which skill fills these
-  plan_derivable: null            # could story-plan derive tasks from this design?
-  tasks_clear: null               # were the tasks clear and executable?
-  design_gaps_found: null         # did implementation reveal design gaps?
+# Gaps (highest-value signal)
+gaps:
+  - "No patterns for aspect-oriented composition in skill systems"
+
+# Artifacts produced (pointers, not content)
+artifacts: [s1133.1-design.md]
+
+# Trace pointers (where to find raw data)
+commit: null  # filled at commit time
+branch: story/s1133.1/introspection-aspect
+
+# Downstream (filled by next skill in chain)
+downstream: {}
 ```
 
 ### Schema rules
 
-1. **All fields present, nulls explicit.** A null downstream_impact field means "not yet filled" — distinct from "not applicable."
-2. **`why` is mandatory on votes.** The reason is the trace. A vote without `why` is noise.
-3. **`gap: true` only on JIT queries with 0 results at decision points.** Tier 1 queries with 0 results are normal (the topic may not have patterns yet).
+1. **Flat structure.** No nesting beyond one level (`pattern_votes`, `downstream`).
+2. **`why` is mandatory on votes.** A vote without `why` is noise.
+3. **Gaps only from JIT 0-result queries at decision points.** Tier 1 with 0 results is normal.
 4. **Timestamps are UTC ISO 8601.**
-5. **One record per skill execution.** If a skill runs twice for the same work_id (rework), the second record overwrites the first.
+5. **One record per skill execution.** Rework overwrites.
+6. **Extend with evidence.** New fields added only when dogfood proves they're needed.
 
 ---
 
@@ -280,67 +284,49 @@ The learning chain defines how records flow between skills. Each participating s
 
 ```
 epic-design ──record──→ epic-plan ──record──→ epic-close
-                ↑                     ↑              │
                 │                     │              │
                 └─ epic-plan reads:   └─ epic-close  └─ reads all records,
-                   design_coherent?      reads:         produces aggregate
-                   scope_clear?          plan_held?
-                                         estimates_accurate?
+                   design coherent?      reads:         produces aggregate
+                   scope clear?          plan held?
+                                         estimates accurate?
 ```
-
-| Upstream | Downstream | What downstream reads | What downstream enriches |
-|----------|------------|----------------------|------------------------|
-| epic-design | epic-plan | gaps, approach decisions | `design_coherent`, `scope_clear` |
-| epic-plan | epic-close | sizing, risk predictions | `plan_held`, `estimates_accurate` |
 
 ### Story chain
 
 ```
 story-design ──record──→ story-plan ──record──→ story-implement ──record──→ story-review
-                 ↑                      ↑               │                       │
                  │                      │               │                       │
-                 └─ story-plan reads:   │               └─ enriches             └─ reads all,
-                    plan_derivable?     └─ implement        story-design:           aggregates,
-                    tasks_clear?           reads:           design_gaps_found       captures patterns
-                                           tasks_executable?
-                                           estimate_accurate?
+                 └─ story-plan reads:   └─ implement    └─ enriches             └─ reads all,
+                    plan derivable?        reads:          story-design:            aggregates
+                    tasks clear?           tasks exec?     design_gaps_found
 ```
-
-| Upstream | Downstream | What downstream reads | What downstream enriches |
-|----------|------------|----------------------|------------------------|
-| story-design | story-plan | gaps, approach, examples | `plan_derivable`, `tasks_clear` |
-| story-plan | story-implement | task breakdown, estimates | `tasks_executable`, `estimate_accurate` |
-| story-design | story-implement | (skip-read) design decisions | `design_gaps_found`, `ac_testable_rate` |
-| story-implement | story-review | execution gaps, rework signals | (story-review reads, does not enrich — it's the chain end) |
 
 ### Downstream enrichment mechanics
 
 To enrich an upstream learning record:
 
 1. Locate the upstream record: `.raise/rai/learnings/{upstream_skill}/{work_id}/record.yaml`
-2. Read the `downstream_impact` section
-3. Fill null fields with factual observations (not opinions)
+2. Read the `downstream` section
+3. Fill empty fields with factual observations (not opinions)
 4. Write the updated record back
+
+> **Design decision (F):** Downstream enrichment is **best-effort**. If the upstream record doesn't exist, is corrupted, or is locked: log a warning, continue without blocking. Empty fields in `downstream` are valid signal ("not yet enriched" or "upstream didn't execute"). Enrichment failure NEVER blocks skill execution.
 
 Example — story-plan enriches story-design's record:
 ```yaml
 # Before (written by story-design LEARN):
-downstream_impact:
-  next_skill: rai-story-plan
-  plan_derivable: null
-  tasks_clear: null
+downstream: {}
 
 # After (enriched by story-plan PRIME):
-downstream_impact:
-  next_skill: rai-story-plan
+downstream:
   plan_derivable: true
   tasks_clear: true
 ```
 
 **Rules:**
-- Only fill null fields — never overwrite existing values
+- Only fill empty fields — never overwrite existing values
 - Only write factual observations: "I could/couldn't derive tasks" not "the design was good/bad"
-- If the upstream record doesn't exist (silent node or execution gap), skip enrichment silently
+- If the upstream record doesn't exist (silent node or execution gap), skip enrichment silently and log warning
 
 ---
 
@@ -352,7 +338,7 @@ When a primed pattern is not useful, the learning record helps distinguish two f
 
 The graph had a relevant pattern, but PRIME didn't retrieve it. The queries missed it.
 
-**Signal:** Gap in learning record ("no patterns for X") + pattern later found manually or by JIT.
+**Signal:** Gap in learning record + pattern later found manually or by JIT.
 **Action:** Improve Tier 1 query templates for that phase.
 
 ### Use failure (pattern quality gap)
@@ -373,12 +359,12 @@ No relevant pattern exists in the graph. The gap is real.
 
 ## Guided Query Templates by Phase
 
-These are **suggestions** — the LLM refines each query using execution context. Variables in `{braces}` are resolved from the skill's metadata and current work scope.
+These are **deterministic templates** — variable substitution only, no LLM refinement. Variables in `{braces}` are resolved from the skill's metadata and current work scope.
 
 ### Epic lifecycle
 
-| Phase | Suggested Tier 1 Queries | Context |
-|-------|-------------------------|---------|
+| Phase | Tier 1 Query Templates | Context |
+|-------|----------------------|---------|
 | **epic.design** | `"patterns for {affected_modules} architecture decisions"` | Scope boundaries, ADR precedents |
 | | `"risks and failure modes in {domain} epics"` | Risk assessment |
 | | `"prior epic designs with similar scope ({story_count} stories)"` | Sizing calibration |
@@ -390,8 +376,8 @@ These are **suggestions** — the LLM refines each query using execution context
 
 ### Story lifecycle
 
-| Phase | Suggested Tier 1 Queries | Context |
-|-------|-------------------------|---------|
+| Phase | Tier 1 Query Templates | Context |
+|-------|----------------------|---------|
 | **story.design** | `"patterns for {affected_modules} design decisions"` | Approach selection |
 | | `"prior designs for similar scope in {phase}"` | Precedent |
 | | `"risks and lessons from related epics"` | Avoid known pitfalls |
@@ -406,44 +392,38 @@ These are **suggestions** — the LLM refines each query using execution context
 
 ### Notes
 
-- Each skill uses 2-3 queries from its phase (not all of them)
-- The LLM selects the most relevant queries based on the specific work context
-- If a query template doesn't apply to the current work, skip it — don't force relevance
+- Each skill uses 2-3 queries from its phase (declared in metadata)
+- Templates are extended to domain types (e.g., `ontology-tool`) when domain cartridges are active
+- If a template variable can't be resolved, skip that query
 - JIT queries are NOT templated — they emerge from decision bifurcations during execution
-
----
-
-## Downstream Impact Fields by Phase
-
-### Epic lifecycle
-
-| Phase | downstream_impact fields |
-|-------|------------------------|
-| epic.design | `design_coherent`: bool, `scope_clear`: bool, `stories_derivable`: bool |
-| epic.plan | `plan_held`: bool, `estimates_accurate`: bool, `risk_predictions_useful`: bool |
-
-### Story lifecycle
-
-| Phase | downstream_impact fields |
-|-------|------------------------|
-| story.design | `plan_derivable`: bool, `tasks_clear`: bool, `design_gaps_found`: str or null, `ac_testable_rate`: float or null |
-| story.plan | `tasks_executable`: bool, `estimate_accurate`: bool, `blocked_by_missing_task`: bool |
-| story.implement | `rework_needed`: bool, `rework_type`: str or null (minor/major), `patterns_applied`: int |
 
 ---
 
 ## Token Budget
 
+> **Design decision (D):** Hard limit, not target. Truncate, don't fail.
+
 The introspection aspect adds tokens to each skill execution:
 
-| Component | Estimated tokens | Notes |
-|-----------|-----------------|-------|
-| PRIME (queries + results) | 200-400 | 3 queries × ~5 patterns × ~25 tokens each |
-| JIT (0-3 queries) | 0-300 | Only at decision bifurcations |
-| LEARN (record production) | 200-400 | Structured YAML, not prose |
-| **Total overhead** | **400-1100** | Target: <1200 tokens |
+| Component | Estimated tokens | Hard limit |
+|-----------|-----------------|------------|
+| PRIME (queries + results) | 200-400 | — |
+| JIT (0-3 queries) | 0-300 | — |
+| LEARN (record production) | 100-200 | — |
+| **Total overhead** | **300-900** | **1200 tokens** |
+
+**If total exceeds 1200 tokens:** truncate PRIME results (drop queries with fewest matches first), then cap JIT results. LEARN is never truncated — it's the measurement.
 
 Chain reads (previous skill's learning record) are included in PRIME budget.
+
+---
+
+## Changes Log
+
+| Version | Date | Changes |
+|---------|------|---------|
+| v1 | 2026-04-01 | Initial protocol design |
+| v2 | 2026-04-01 | CC SAR alignment: 7 changes (B,C,D,E,F,G,H) — deterministic PRIME, compaction resilience, hard token cap, summary+pointers records, enrichment failure modes, enforceable metadata limits, flat schema |
 
 ---
 
@@ -451,9 +431,10 @@ Chain reads (previous skill's learning record) are included in PRIME budget.
 
 - ADR-014: `governance/adrs/v2/adr-014-skill-introspection-aspect.md`
 - Epic scope: `work/epics/e1133-skill-introspection/scope.md`
+- **E1132: Claude Code Architecture Reconstruction** — SAR findings that informed v2 changes
 - Research: `work/research/skill-memory-integration/`
 - Governed Memory: arxiv 2603.17787 (recall failure vs use failure)
 - MetaHarness: arxiv 2603.28052 (traces over summaries)
 - MCE: arxiv 2601.21557 (skill evolution, bi-level optimization)
 - Poppendieck: Amplify Learning — measurement IS operation
-- Bitter Lesson: Sutton 2019 — guidance over rigid templates
+- Bitter Lesson: Sutton 2019 — guidance over rigid templates (outer loop, not inner)
