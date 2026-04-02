@@ -18,6 +18,14 @@
 
 ---
 
+## E1132 Deferred Items — 2026-04-01
+
+- [ ] **rai-discover integration** — Architecture Reconstruction playbook as rai-discover feature for external repos → post-E1132, depends on playbook
+- [ ] **Competitive analysis** — Compare Claude Code architecture with Cursor, Windsurf, Aider → separate epic if valuable
+- [ ] **buddy/ easter egg analysis** — Companion sprite system, curiosity only → no business value
+
+---
+
 ## Session/Worktree Integration — 2026-03-25
 
 - [ ] **Session-start worktree awareness** — `/rai-session-start` detects work in progress on dev and asks "¿necesitas aislamiento? (worktree)" as a prompt, not a default. Integration, not coupling.
