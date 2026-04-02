@@ -1,6 +1,6 @@
 # Epic E1132: Claude Code Architecture Reconstruction — Scope
 
-> **Status:** IN PROGRESS
+> **Status:** DONE
 > **Release:** 3.0.0
 > **Created:** 2026-04-01
 > **Jira:** RAISE-1162
@@ -21,15 +21,16 @@ Reconstruir la arquitectura de Claude Code desde su source code filtrado para ex
 | S1132.0c | RAISE-1172 | Signal scanner | S | Pending | TODOs, HACKs, feature flags, dead code markers |
 | S1132.0d | RAISE-1173 | Entry point detection | XS | Pending | Detectar entry points desde package.json, pyproject.toml |
 | **Analysis (release/3.0.0)** | | | | | |
-| S1132.1 | RAISE-1163 | Reconnaissance — Architecture Map | L | In Progress | Barrido completo de 35 módulos usando tooling mejorado |
-| S1132.2 | RAISE-1164 | Wave 1 — Extension Points | M | Pending | Deep dive: skills/, hooks/, tools/, commands/, Tool.ts, commands.ts |
-| S1132.3 | RAISE-1165 | Wave 2 — Agent Infrastructure | M | Pending | Deep dive: coordinator/, tasks/, QueryEngine.ts, query.ts, context/ |
-| S1132.4 | RAISE-1166 | Wave 3 — Integration Layer | M | Pending | Deep dive: services/mcp/, bridge/, plugins/, services/ |
-| S1132.5 | RAISE-1167 | Wave 4 — State & Persistence | S | Pending | Deep dive: memdir/, state/, services/compact/, migrations/ |
-| S1132.6 | RAISE-1168 | Wave 5 — UI & Rendering | S | Pending | Deep dive: components/, ink/, screens/, outputStyles/ |
-| S1132.7 | RAISE-1169 | Synthesis & Roadmap | M | Pending | Consolidar hallazgos → backlog priorizado, playbook rai-discover |
+| S1132.1 | RAISE-1163 | Reconnaissance — Architecture Map | L | Done ✓ | Barrido completo de 35 módulos usando tooling mejorado |
+| S1132.2 | RAISE-1164 | Wave 1 — Extension Points | M | Done ✓ | Deep dive: skills/, hooks/, tools/, commands/, Tool.ts, commands.ts |
+| S1132.3 | RAISE-1165 | Wave 2 — Agent Infrastructure | M | Done ✓ | Deep dive: coordinator/, tasks/, QueryEngine.ts, query.ts, context/ |
+| S1132.4 | RAISE-1166 | Wave 3 — Integration Layer | M | Done ✓ | Deep dive: services/mcp/, bridge/, plugins/, services/ |
+| S1132.5 | RAISE-1167 | Wave 4 — State & Persistence | S | Done ✓ | Deep dive: memdir/, state/, services/compact/, migrations/ |
+| S1132.6 | RAISE-1168 | Wave 5 — UI & Rendering | S | Skipped | Deprioritized — low business value for RaiSE |
+| S1132.7 | RAISE-1169 | Synthesis & Roadmap | M | Done ✓ | Consolidar hallazgos → backlog priorizado, playbook rai-discover |
+| S1132.8 | RAISE-1186 | Riding the Horse Report | L | Done ✓ | 20-chapter interpreted analysis from Rai's perspective |
 
-**Total:** 11 stories (4 tooling + 7 analysis)
+**Total:** 12 stories (4 tooling + 8 analysis)
 
 ## Scope
 
