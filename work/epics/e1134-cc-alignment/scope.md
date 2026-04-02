@@ -22,10 +22,10 @@ Pre-design research completed (see `research/` subdirectory):
 
 | ID | Story | Size | Description | Deps |
 |----|-------|:----:|-------------|------|
-| S1134.1 | Description optimization | M | Rewrite all 35+ descriptions: verb-first, <100 chars, trigger phrases, within 250-char truncation budget | — |
-| S1134.2 | allowed-tools declaration | M | Add allowed-tools with Bash glob patterns to all 35+ skills. Principle of least privilege. | — |
-| S1134.3 | Invocation control | S | Add disable-model-invocation: true to skills with side effects (~7-10 skills) | — |
-| S1134.4 | Validation & report | S | Before/after metrics: description lengths, tool coverage, invocation control coverage | S1134.1, S1134.2, S1134.3 |
+| S1134.1 | Description optimization | M | Rewrite 35 descriptions: verb-first, <100 chars, trigger phrases | — |
+| S1134.2 | allowed-tools declaration | M | Add allowed-tools with Bash globs to 35 skills (5-tier classification) | — |
+| S1134.3 | Invocation control | S | Add disable-model-invocation: true to 9 side-effect/orchestration skills | — |
+| S1134.4 | Validation & report | S | Before/after metrics report across all dimensions | S1134.1, S1134.2, S1134.3 |
 
 ## Done Criteria
 
