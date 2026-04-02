@@ -11,6 +11,26 @@ from __future__ import annotations
 from typing import Any
 
 from raise_cli.adapters.jira_discovery import JiraProjectMap
+from raise_cli.adapters.models.pm import WorkflowState
+
+
+def _slugify(name: str) -> str:
+    """Convert status name to mapping key: lowercase, spaces → hyphens."""
+    return name.strip().lower().replace(" ", "-")
+
+
+def _merge_workflows(
+    project_map: JiraProjectMap,
+    selected_keys: set[str],
+) -> list[WorkflowState]:
+    """Merge and deduplicate workflow states across selected projects."""
+    seen: dict[tuple[str, str], WorkflowState] = {}
+    for key in sorted(selected_keys):
+        for ws in project_map.workflows.get(key, []):
+            dedup_key = (ws.name, ws.status_category)
+            if dedup_key not in seen:
+                seen[dedup_key] = ws
+    return list(seen.values())
 
 
 def generate_jira_config(
@@ -63,8 +83,25 @@ def generate_jira_config(
             "name": info.name,
         }
 
-    return {
+    result: dict[str, Any] = {
         "default_instance": instance_name,
         "instances": instances,
         "projects": projects,
     }
+
+    # Workflow section — merge states across selected projects
+    selected_keys = {p.key for p in selected_infos}
+    merged_states = _merge_workflows(project_map, selected_keys)
+    if merged_states:
+        states_list: list[dict[str, Any]] = [
+            {"name": ws.name, "category": ws.status_category} for ws in merged_states
+        ]
+        status_mapping: dict[str, str] = {
+            _slugify(ws.name): ws.name for ws in merged_states
+        }
+        result["workflow"] = {
+            "states": states_list,
+            "status_mapping": status_mapping,
+        }
+
+    return result

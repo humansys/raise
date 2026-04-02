@@ -104,3 +104,158 @@ class TestCoreGenerator:
             site="humansys.atlassian.net",
         )
         assert result["instances"]["humansys"]["projects"] == ["RAISE", "RTEST"]
+
+
+# ── T2: Workflow states + status mapping ─────────────────────────────
+
+
+class TestWorkflowGeneration:
+    """Workflow states and status mapping from discovery data."""
+
+    def test_workflow_states_included(self) -> None:
+        """Discovered workflow states appear in output."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(
+                    name="In Progress", status_category="indeterminate", transitions=[]
+                ),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows=workflows,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        assert "workflow" in result
+        states = result["workflow"]["states"]
+        assert len(states) == 3
+        names = [s["name"] for s in states]
+        assert "Backlog" in names
+        assert "In Progress" in names
+        assert "Done" in names
+
+    def test_status_mapping_generated(self) -> None:
+        """Status mapping keys derived from state names (slugified)."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(
+                    name="In Progress", status_category="indeterminate", transitions=[]
+                ),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows=workflows,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        mapping = result["workflow"]["status_mapping"]
+        assert "backlog" in mapping
+        assert "in-progress" in mapping
+        assert "done" in mapping
+
+    def test_status_category_in_states(self) -> None:
+        """Each state includes its category."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows=workflows,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        state = result["workflow"]["states"][0]
+        assert state["category"] == "new"
+
+    def test_empty_workflows_omits_section(self) -> None:
+        """No workflow section when no states discovered."""
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows={"RAISE": []},
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        assert "workflow" not in result
+
+    def test_multi_project_merges_workflows(self) -> None:
+        """Workflows from multiple selected projects are merged (deduped)."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+            "RTEST": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(
+                    name="In Review", status_category="indeterminate", transitions=[]
+                ),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+        }
+        pm = _make_project_map(workflows=workflows)
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE", "RTEST"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        states = result["workflow"]["states"]
+        names = {s["name"] for s in states}
+        # Union of both projects, deduplicated
+        assert names == {"Backlog", "Done", "In Review"}
+
+    def test_schema_validates_with_workflow(self) -> None:
+        """Full config with workflow still passes JiraConfig.model_validate()."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows=workflows,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        # JiraConfig has extra="allow", so workflow passes through
+        config = JiraConfig.model_validate(result)
+        assert config.default_instance == "humansys"
