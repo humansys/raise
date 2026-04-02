@@ -1,4 +1,4 @@
-"""Tests for raise session commands."""
+"""Tests for rai session commands."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ runner = CliRunner()
 
 
 class TestSessionStart:
-    """Tests for raise session start command."""
+    """Tests for rai session start command."""
 
     def test_start_first_time_requires_name(self) -> None:
         """First-time user without --name should get helpful error."""
@@ -217,7 +217,7 @@ class TestSessionStart:
 
 
 class TestSessionClose:
-    """Tests for raise session close command."""
+    """Tests for rai session close command."""
 
     def test_close_no_profile_errors(self) -> None:
         """Close without profile gives error."""
@@ -512,7 +512,7 @@ class TestSessionClose:
 
 
 class TestSessionContext:
-    """Tests for raise session context command."""
+    """Tests for rai session context command."""
 
     def test_context_returns_formatted_sections(self) -> None:
         """Session context --sections returns formatted output."""
@@ -758,7 +758,7 @@ class TestSessionStartCreatesDir:
 
 
 class TestSessionStartWithAgent:
-    """Tests for raise session start --agent flag (RAISE-137)."""
+    """Tests for rai session start --agent flag (RAISE-137)."""
 
     def test_start_with_agent_flag(self, tmp_path: Path) -> None:
         """Session start --agent includes agent in output."""
@@ -972,7 +972,7 @@ class TestSessionCloseCwdGuard:
 
 
 class TestSessionCloseWithSessionFlag:
-    """Tests for raise session close --session flag (RAISE-137)."""
+    """Tests for rai session close --session flag (RAISE-137)."""
 
     def test_close_with_session_flag(self, tmp_path: Path) -> None:
         """Session close --session uses resolver to identify session."""
@@ -1241,7 +1241,7 @@ class TestSessionStartContextLoadsState:
 
 
 class TestSessionList:
-    """Tests for raise session list command."""
+    """Tests for rai session list command."""
 
     def test_list_empty_registry(self) -> None:
         """No sessions should show helpful message."""

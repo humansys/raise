@@ -363,7 +363,7 @@ Observable Workflow captura trazas de cada interacción para habilitar:
 │                                   │                                         │
 │                                   ▼                                         │
 │                    ┌─────────────────────────────────┐                      │
-│                    │   `raise audit` → Reflexión     │                      │
+│                    │   `rai audit` → Reflexión     │                      │
 │                    └─────────────────────────────────┘                      │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -400,7 +400,7 @@ Observable Workflow habilita métricas que indican crecimiento del Orquestador:
 │                         │                                                   │
 │                         ▼                                                   │
 │   2. OBSERVAR                                                               │
-│      `raise audit --session <id>` genera reporte                            │
+│      `rai audit --session <id>` genera reporte                            │
 │      Métricas: re-prompting, escalations, gate failures                     │
 │                         │                                                   │
 │                         ▼                                                   │
@@ -464,7 +464,7 @@ En RaiSE, Kaizen opera en dos niveles simultáneos:
 3. **Verificar** (Check)
 
    - Validation Gates validan calidad
-   - `raise audit` genera reporte de sesión
+   - `rai audit` genera reporte de sesión
    - Identificar fricciones y obstáculos **con datos**
 4. **Actuar** (Act)
 

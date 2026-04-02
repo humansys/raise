@@ -60,7 +60,7 @@ class TestProfileShowCommand:
         assert result.exit_code == 0
         # Should show helpful message, not error
         assert "no developer profile found" in result.output.lower()
-        assert "raise init" in result.output.lower()
+        assert "rai init" in result.output.lower()
 
     def test_show_includes_all_profile_fields(self, mock_home: Path) -> None:
         """Show includes all profile fields in output."""

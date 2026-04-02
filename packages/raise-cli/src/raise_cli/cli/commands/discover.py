@@ -6,8 +6,8 @@ information, and integrate discovered components into the unified context graph.
 Supports Python, TypeScript, JavaScript, PHP, Svelte, and C#.
 
 Example:
-    $ raise discover scan src/
-    $ raise discover scan . --language typescript --output json
+    $ rai discover scan src/
+    $ rai discover scan . --language typescript --output json
 """
 
 from __future__ import annotations
@@ -108,16 +108,16 @@ def scan_command(
 
     Examples:
         # Scan current directory (auto-detect languages)
-        raise discover scan
+        rai discover scan
 
         # Scan Python files only
-        raise discover scan src/ --language python
+        rai discover scan src/ --language python
 
         # Scan TypeScript project
-        raise discover scan ./app --language typescript --output json
+        rai discover scan ./app --language typescript --output json
 
         # Auto-detect but exclude tests
-        raise discover scan . --exclude "**/test_*" --exclude "**/__tests__/**"
+        rai discover scan . --exclude "**/test_*" --exclude "**/__tests__/**"
     """
     lang = _validate_language(language)
     exclude_patterns = exclude if exclude else None
@@ -149,7 +149,7 @@ def _read_scan_json(input_file: Path | None) -> str:
         if not input_file.exists():
             cli_error(
                 f"Input file not found: {input_file}",
-                hint="Run 'raise discover scan --output json' first",
+                hint="Run 'rai discover scan --output json' first",
                 exit_code=4,
             )
         return input_file.read_text(encoding="utf-8")
@@ -157,8 +157,8 @@ def _read_scan_json(input_file: Path | None) -> str:
     if sys.stdin.isatty():
         cli_error(
             "No input provided",
-            hint="Pipe from scan: raise discover scan -o json | raise discover analyze\n"
-            "Or use --input: raise discover analyze --input scan-result.json",
+            hint="Pipe from scan: rai discover scan -o json | rai discover analyze\n"
+            "Or use --input: rai discover analyze --input scan-result.json",
             exit_code=7,
         )
     return sys.stdin.read()
@@ -181,7 +181,7 @@ def _parse_scan_json(scan_json: str) -> ScanResult:
     except (json.JSONDecodeError, KeyError, ValueError) as e:
         cli_error(
             f"Invalid scan result JSON: {e}",
-            hint="Input must be JSON from 'raise discover scan --output json'",
+            hint="Input must be JSON from 'rai discover scan --output json'",
             exit_code=7,
         )
         raise  # unreachable, satisfies pyright
@@ -240,7 +240,7 @@ def analyze_command(
 ) -> None:
     """Analyze scan results with confidence scoring and module grouping.
 
-    Takes raw scan output (from `raise discover scan --output json`) and
+    Takes raw scan output (from `rai discover scan --output json`) and
     produces an analysis with confidence scores, auto-categorization,
     hierarchical folding, and module grouping for parallel AI synthesis.
 
@@ -248,16 +248,16 @@ def analyze_command(
 
     Examples:
         # Analyze from file
-        raise discover analyze --input scan-result.json
+        rai discover analyze --input scan-result.json
 
         # Pipe from scan
-        raise discover scan src/ -l python -o json | raise discover analyze
+        rai discover scan src/ -l python -o json | rai discover analyze
 
         # JSON output
-        raise discover analyze --input scan-result.json --output json
+        rai discover analyze --input scan-result.json --output json
 
         # Summary only
-        raise discover analyze --input scan-result.json --output summary
+        rai discover analyze --input scan-result.json --output summary
     """
     from raise_cli.discovery.analyzer import analyze
 
@@ -388,13 +388,13 @@ def drift_command(
 
     Examples:
         # Check entire project
-        raise discover drift
+        rai discover drift
 
         # Check specific directory
-        raise discover drift src/new_module/
+        rai discover drift src/new_module/
 
         # Output as JSON
-        raise discover drift --output json
+        rai discover drift --output json
     """
     from raise_cli.discovery.drift import DriftWarning, detect_drift
 

@@ -1,4 +1,4 @@
-"""Tests for the raise init command."""
+"""Tests for the rai init command."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def brownfield_project(tmp_path: Path) -> Path:
 
 
 class TestInitCommand:
-    """Tests for raise init command."""
+    """Tests for rai init command."""
 
     def test_init_creates_manifest(
         self, greenfield_project: Path, mock_home: Path
@@ -460,7 +460,7 @@ class Handler{i}:
 
 
 class TestInitBootstrap:
-    """Tests for bootstrap integration in raise init."""
+    """Tests for bootstrap integration in rai init."""
 
     def test_init_creates_identity_files(
         self, greenfield_project: Path, mock_home: Path
@@ -671,7 +671,7 @@ class TestInitMemoryMdBranches:
 
 
 class TestInitSkillScaffolding:
-    """Tests for skill scaffolding integration in raise init."""
+    """Tests for skill scaffolding integration in rai init."""
 
     def test_init_creates_skill_files(
         self, greenfield_project: Path, mock_home: Path
@@ -732,7 +732,7 @@ class TestInitSkillScaffolding:
 
 
 class TestInitGovernanceScaffolding:
-    """Tests for governance scaffolding integration in raise init."""
+    """Tests for governance scaffolding integration in rai init."""
 
     def test_init_creates_governance_directory(
         self, greenfield_project: Path, mock_home: Path

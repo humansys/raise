@@ -31,7 +31,7 @@ Copy or clone the `.raise/` engine from raise-commons:
 cp -r /path/to/raise-commons/.raise/* .raise/
 
 # Option B: Use raise-kit (when available)
-raise init
+rai init
 ```
 
 ### Step 3: Initialize Governance Index

@@ -6,3 +6,9 @@ WHERE:     `packages/raise-pro/src/rai_pro/adapters/acli_jira.py:220` (ADF→str
            `src/raise_cli/cli/commands/backlog.py:231` (hard-cap 500 chars truncates the repr)
 EXPECTED:  Description renders as plain text (paragraphs, lists, code blocks as readable text)
 Done when: `rai backlog get RAISE-663` shows the description as human-readable text, not ADF repr
+
+TRIAGE:
+  Bug Type:    Data
+  Severity:    S2-Medium
+  Origin:      Code
+  Qualifier:   Incorrect

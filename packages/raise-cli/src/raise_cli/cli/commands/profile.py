@@ -59,7 +59,7 @@ def show() -> None:
 
     if profile is None:
         typer.echo(
-            "No developer profile found. Run `raise init` in a project to create one."
+            "No developer profile found. Run `rai init` in a project to create one."
         )
         return
 

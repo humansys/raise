@@ -1,6 +1,6 @@
 """CLI commands for session management.
 
-This module provides the `raise session` command group for managing
+This module provides the `rai session` command group for managing
 working sessions — the lifecycle of a developer's focused work period.
 
 Sessions are first-class workflow state, distinct from:
@@ -8,9 +8,9 @@ Sessions are first-class workflow state, distinct from:
 - Memory (persistent knowledge)
 
 Example:
-    $ raise session start              # Start a new session
-    $ raise session start --context   # Start with context bundle
-    $ raise session close              # End the current session
+    $ rai session start              # Start a new session
+    $ rai session start --context   # Start with context bundle
+    $ rai session close              # End the current session
 """
 
 from __future__ import annotations
@@ -214,10 +214,10 @@ def start(  # noqa: C901
     assembled from the developer profile, session state, and memory graph.
 
     Examples:
-        $ raise session start                    # Start session
-        $ raise session start --name "Alice"    # First-time setup
-        $ raise session start --project /my/proj # Start with project path
-        $ raise session start --project . --context  # Context bundle
+        $ rai session start                    # Start session
+        $ rai session start --name "Alice"    # First-time setup
+        $ rai session start --project /my/proj # Start with project path
+        $ rai session start --project . --context  # Context bundle
     """
     profile = load_developer_profile()
 
@@ -226,7 +226,7 @@ def start(  # noqa: C901
         if name is None:
             cli_error(
                 _ERR_NO_PROFILE,
-                hint="Provide --name for first-time setup: raise session start --name 'Your Name'",
+                hint="Provide --name for first-time setup: rai session start --name 'Your Name'",
             )
             return  # cli_error raises, but this helps pyright
 
@@ -257,7 +257,7 @@ def start(  # noqa: C901
             validation = validate_session_index(personal_dir)
             if not validation.is_valid:
                 typer.echo(f"Warning: {validation.summary()}")
-                typer.echo("Run `raise memory validate` to fix data quality issues.\n")
+                typer.echo("Run `rai memory validate` to fix data quality issues.\n")
 
     # Auto-sync skills if CLI was upgraded
     if project is not None:
@@ -387,8 +387,8 @@ def context(
     Available sections: governance, behavioral, coaching, deadlines, progress.
 
     Examples:
-        $ raise session context --sections governance,behavioral --project .
-        $ raise session context --sections coaching --project /my/proj
+        $ rai session context --sections governance,behavioral --project .
+        $ rai session context --sections coaching --project /my/proj
     """
     profile = load_developer_profile()
     if profile is None:
@@ -482,9 +482,9 @@ def close(  # noqa: C901
     NOT call separate telemetry/memory commands.
 
     Examples:
-        $ raise session close
-        $ raise session close --summary "Session protocol design" --type feature
-        $ raise session close --state-file /tmp/session-output.yaml --project .
+        $ rai session close
+        $ rai session close --summary "Session protocol design" --type feature
+        $ rai session close --state-file /tmp/session-output.yaml --project .
     """
     profile = load_developer_profile()
 
@@ -719,9 +719,9 @@ def list_sessions(
     Reads from the committed session index that travels with the repo.
 
     Examples:
-        $ raise session list
-        $ raise session list --limit 5
-        $ raise session list --project /my/project
+        $ rai session list
+        $ rai session list --limit 5
+        $ rai session list --project /my/project
     """
     profile = load_developer_profile()
     if profile is None:

@@ -1,7 +1,7 @@
 """Bootstrap bundled base Rai assets into a project.
 
 Copies identity, patterns, and methodology from the raise_cli.rai_base
-package to the project's .raise/rai/ directory during `raise init`.
+package to the project's .raise/rai/ directory during `rai init`.
 
 Uses importlib.resources to read bundled files (Python 3.9+).
 Per-file idempotency: existing files are never overwritten.

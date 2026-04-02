@@ -961,6 +961,105 @@ class TestProcessSessionCloseProgress:
         mp.undo()
 
 
+class TestProcessSessionCloseUsesCallerSessionId:
+    """Regression tests for RAISE-1160: dual session ID system."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_uses_caller_session_id_instead_of_legacy(self, tmp_path: Path) -> None:
+        """RAISE-1160: result.session_id must be caller's S-F-* ID, not SES-NNN."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="test session")
+
+        caller_id = "S-F-260401-0900"
+        result = process_session_close(
+            close_input, profile, project, session_id=caller_id
+        )
+
+        assert result.success
+        assert result.session_id == caller_id
+        mp.undo()
+
+    def test_skips_legacy_index_when_session_id_provided(self, tmp_path: Path) -> None:
+        """RAISE-1160: no write to personal/sessions/index.jsonl when caller provides ID."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="test session")
+
+        legacy_index = (
+            project / ".raise" / "rai" / "personal" / "sessions" / "index.jsonl"
+        )
+        # Ensure file doesn't exist before close
+        assert not legacy_index.exists()
+
+        process_session_close(
+            close_input, profile, project, session_id="S-F-260401-0900"
+        )
+
+        # Legacy index should NOT have been created
+        assert not legacy_index.exists()
+        mp.undo()
+
+    def test_session_state_uses_caller_id(self, tmp_path: Path) -> None:
+        """RAISE-1160: LastSession.id in session-state.yaml uses caller's ID."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="test session")
+
+        caller_id = "S-F-260401-0900"
+        process_session_close(
+            close_input, profile, project, session_id=caller_id
+        )
+
+        from raise_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.last_session.id == caller_id
+        mp.undo()
+
+    def test_legacy_fallback_when_no_session_id(self, tmp_path: Path) -> None:
+        """Without session_id, falls back to legacy SES-NNN (backward compat)."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="legacy session")
+
+        result = process_session_close(close_input, profile, project)
+
+        assert result.success
+        assert result.session_id.startswith("SES-")
+        mp.undo()
+
+
 class TestProcessSessionCloseRemovesActiveSession:
     """Regression tests for RAISE-327 and RAISE-155."""
 

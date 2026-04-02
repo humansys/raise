@@ -78,4 +78,4 @@ def info_command() -> None:
     if installed:
         typer.echo(f"Status: Installed in {project_root}")
     else:
-        typer.echo("Status: Not installed (run `raise init` to bootstrap)")
+        typer.echo("Status: Not installed (run `rai init` to bootstrap)")

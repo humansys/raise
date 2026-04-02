@@ -1,4 +1,4 @@
-"""Tests for raise memory build --diff integration.
+"""Tests for rai memory build --diff integration.
 
 Tests the CLI wiring: old graph loading, diff computation,
 persistence to personal dir, and --no-diff flag.

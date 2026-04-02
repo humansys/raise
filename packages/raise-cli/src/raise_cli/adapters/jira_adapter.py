@@ -226,7 +226,14 @@ class PythonApiJiraAdapter:
     async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
         """Update issue fields via REST API."""
         client = self._client_for(self._project_key_from_issue(key))
-        client.update_issue(key, fields)
+        normalized = dict(fields)
+        assignee = normalized.get("assignee")
+        if isinstance(assignee, str):
+            users = client.search_users(assignee)
+            if not users:
+                raise JiraApiError(f"No Jira user found for '{assignee}'")
+            normalized["assignee"] = {"accountId": users[0]["accountId"]}
+        client.update_issue(key, normalized)
         return IssueRef(key=key, url=self._build_url(key))
 
     async def transition_issue(self, key: str, status: str) -> IssueRef:

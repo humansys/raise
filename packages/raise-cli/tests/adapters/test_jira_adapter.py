@@ -399,6 +399,23 @@ class TestUpdateIssue:
             "RAISE-1", {"summary": "Updated"}
         )
 
+    @pytest.mark.asyncio
+    async def test_assignee_normalized_to_account_id(self) -> None:
+        """RAISE-1152: assignee email → {"accountId": "..."} before reaching Jira."""
+        adapter, mock_client = _make_adapter_with_client()
+        mock_client.search_users.return_value = [
+            {"accountId": "abc123", "emailAddress": "fer@test.com"}
+        ]
+        mock_client.update_issue.return_value = {}
+
+        await adapter.update_issue(
+            "RAISE-1", {"summary": "Updated", "assignee": "fer@test.com"}
+        )
+
+        mock_client.update_issue.assert_called_once_with(
+            "RAISE-1", {"summary": "Updated", "assignee": {"accountId": "abc123"}}
+        )
+
 
 # ── T3: transition_issue + batch_transition + search ────────────────
 

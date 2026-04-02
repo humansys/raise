@@ -6,6 +6,18 @@
 
 ---
 
+## BacklogHook: auto-crear issues sin assignee — 2026-03-24
+
+**Origen:** Ishikawa de RAISE-717 (S-F-260324-1457).
+
+**Problema:** `BacklogHook.handle()` en `packages/raise-cli/src/raise_cli/hooks/builtin/backlog.py:184-193` crea `IssueSpec` sin `assignee`. Toda issue auto-creada nace huérfana en el board.
+
+**Fix propuesto:** Cargar developer profile en `BacklogHook` y pasar `assignee` al crear `IssueSpec`. Requiere que `IssueSpec` soporte campo `assignee`.
+
+**Prioridad:** Alta — afecta workflow de tracking en cualquier story/epic start.
+
+---
+
 ## Session/Worktree Integration — 2026-03-25
 
 - [ ] **Session-start worktree awareness** — `/rai-session-start` detects work in progress on dev and asks "¿necesitas aislamiento? (worktree)" as a prompt, not a default. Integration, not coupling.

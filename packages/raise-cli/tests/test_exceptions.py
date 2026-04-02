@@ -31,10 +31,10 @@ class TestRaiError:
 
     def test_with_hint(self) -> None:
         """RaiError accepts an optional hint."""
-        error = RaiError("Config not found", hint="Run 'raise init' first")
+        error = RaiError("Config not found", hint="Run 'rai init' first")
 
         assert error.message == "Config not found"
-        assert error.hint == "Run 'raise init' first"
+        assert error.hint == "Run 'rai init' first"
 
     def test_with_details(self) -> None:
         """RaiError accepts optional details dict."""

@@ -12,3 +12,9 @@ Done when: `extract_csharp_symbols()` returns class Symbols with `depends_on`
            containing the type names of constructor parameters.
            `build_hierarchy()` passes `depends_on` through to `AnalyzedComponent`.
            Regression tests green.
+
+TRIAGE:
+  Bug Type:    Functional
+  Severity:    S2-Medium
+  Origin:      Code
+  Qualifier:   Missing

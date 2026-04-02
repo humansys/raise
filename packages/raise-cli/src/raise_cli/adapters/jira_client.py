@@ -179,6 +179,18 @@ class JiraClient:
         """Set the parent of an issue."""
         self.update_issue(child, {"parent": {"key": parent}})
 
+    # ── Users ───────────────────────────────────────────────────────
+
+    def search_users(self, query: str) -> list[dict[str, Any]]:
+        """Search Jira users by email or display name."""
+        try:
+            result: list[dict[str, Any]] = self._client.user_find_by_user_string(query=query)  # type: ignore[no-untyped-call]
+            return result
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"search_users({query!r})") from e
+
     # ── Comments ─────────────────────────────────────────────────────
 
     def add_comment(self, key: str, body: str) -> dict[str, Any]:
@@ -274,7 +286,10 @@ class JiraClient:
             raw_dict: dict[str, Any] = (
                 cast("dict[str, Any]", raw) if isinstance(raw, dict) else {}
             )
-            values: list[dict[str, Any]] = list(raw_dict.get("values", []))
+            # API v2 returns "issueTypes", v3 returns "values"
+            values: list[dict[str, Any]] = list(
+                raw_dict.get("issueTypes", raw_dict.get("values", []))
+            )
             return [
                 IssueTypeInfo(
                     id=str(it["id"]),
