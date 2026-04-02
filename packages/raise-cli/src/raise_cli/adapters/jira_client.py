@@ -286,7 +286,10 @@ class JiraClient:
             raw_dict: dict[str, Any] = (
                 cast("dict[str, Any]", raw) if isinstance(raw, dict) else {}
             )
-            values: list[dict[str, Any]] = list(raw_dict.get("values", []))
+            # API v2 returns "issueTypes", v3 returns "values"
+            values: list[dict[str, Any]] = list(
+                raw_dict.get("issueTypes", raw_dict.get("values", []))
+            )
             return [
                 IssueTypeInfo(
                     id=str(it["id"]),
