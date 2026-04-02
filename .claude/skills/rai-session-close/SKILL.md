@@ -3,6 +3,7 @@ name: rai-session-close
 description: >
   Close a working session by reflecting on outcomes and feeding structured data to CLI.
   CLI does all writes atomically; skill does inference reflection.
+disable-model-invocation: true
 
 license: MIT
 

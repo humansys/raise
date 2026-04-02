@@ -5,6 +5,7 @@ description: >
   architecture review → quality review → review → close) in one
   invocation. Resumes from last completed phase using git-derived
   artifact detection. Delegation profile controls pause behavior.
+disable-model-invocation: true
 
 license: MIT
 

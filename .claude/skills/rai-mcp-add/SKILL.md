@@ -4,6 +4,7 @@ description: >
   Guided MCP server registration. Collects intent conversationally,
   resolves package details, and delegates to `rai mcp install` or
   `rai mcp scaffold`. Human never constructs CLI commands.
+disable-model-invocation: true
 
 license: MIT
 
