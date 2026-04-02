@@ -120,7 +120,7 @@ Stream B (Jira):        S1130.2 (M) ──→ S1130.5 (M)  ──┘
 | Story | Size | Status | Notes |
 |-------|------|--------|-------|
 | S1130.1 Confluence Discovery | S | done | QR caught page_id bug, 9 tests, 2 patterns |
-| S1130.2 Jira Discovery | M | pending | |
+| S1130.2 Jira Discovery | M | done | 21 tests, AR/QR found dedup + best-effort fixes, 2 patterns |
 | S1130.3 Adapter Doctor | M | pending | |
 | S1130.4 Config Gen Confluence | S | pending | |
 | S1130.5 Config Gen Jira | M | pending | |
