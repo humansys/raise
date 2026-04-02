@@ -216,15 +216,15 @@ S1133.2 (parallel — no deps)
 
 ## Done Criteria
 
-- [ ] `aspects/introspection.md` defines complete PRIME/JIT/LEARN protocol
-- [ ] Learning record schema is flat (~10 fields) with pointers to traces
+- [x] `aspects/introspection.md` defines complete PRIME/JIT/LEARN protocol
+- [x] Learning record schema is flat (~10 fields) with pointers to traces
 - [ ] All 7 cognitive lifecycle skills reference introspection aspect
 - [ ] Each skill produces a learning record in `.raise/rai/learnings/{skill}/{work_id}/`
 - [ ] Learning chain works: each skill reads previous skill's learning record
 - [ ] Downstream enrichment is best-effort with failure logging
-- [ ] PRIME is deterministic (template + variable substitution, no LLM refinement)
+- [x] PRIME is deterministic (template + variable substitution, no LLM refinement)
 - [ ] Token overhead measured and within 1200 hard limit
-- [ ] Metadata includes `max_tier1_queries` and `max_jit_queries`
+- [x] Metadata includes `max_tier1_queries` and `max_jit_queries`
 - [ ] At least 1 epic cycle completed with full learning chain
 - [ ] Schema extended only with evidence from dogfood
 
