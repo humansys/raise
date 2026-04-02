@@ -187,7 +187,7 @@ Run 1 complete epic cycle (2-3 stories) with introspection active. Measure:
 | ID | Story | Size | Deps | Description |
 |----|-------|------|------|-------------|
 | S1133.1 | Introspection aspect definition | M | — | `aspects/introspection.md` with PRIME/JIT/LEARN, flat schema, hard limits |
-| S1133.2 | Graph schema + learning infrastructure | S | — | Pattern types, story metadata, `.raise/rai/learnings/` |
+| S1133.2 | Graph schema + learning infrastructure | S | — | Pattern types, story metadata, `.raise/rai/learnings/` ✓ |
 | S1133.3 | Epic lifecycle integration | M | S1133.1 | Integrate aspect into epic-design, epic-plan, epic-close |
 | S1133.4 | Story lifecycle integration | M | S1133.1 | Integrate aspect into story-design, story-plan, story-implement, story-close |
 | S1133.5 | Story-review refactor | S | S1133.4 | Aggregate learning records, learning metrics |
