@@ -9,7 +9,7 @@ import pytest
 from pydantic import ValidationError
 
 from raise_cli.adapters.jira_client import JiraClient
-from raise_cli.adapters.jira_exceptions import JiraAuthError
+from raise_cli.adapters.jira_exceptions import JiraAuthError, JiraNotFoundError
 from raise_cli.adapters.models.pm import (
     IssueTypeInfo,
     ProjectInfo,
@@ -173,3 +173,125 @@ class TestJiraClientGetIssueTypes:
         client._client.issue_createmeta_issuetypes.return_value = RAW_ISSUE_TYPES  # noqa: SLF001
         client.get_issue_types("RAISE")
         client._client.issue_createmeta_issuetypes.assert_called_once_with("RAISE")  # noqa: SLF001
+
+
+# ── T3: JiraDiscovery service ───────────────────────────────────────
+
+SAMPLE_PROJECTS = [
+    ProjectInfo(key="RAISE", name="RaiSE", project_type_key="software"),
+    ProjectInfo(key="OPS", name="Operations", project_type_key="business"),
+]
+
+SAMPLE_WORKFLOWS = [
+    WorkflowState(name="To Do", status_category="new", transitions=[]),
+    WorkflowState(name="In Progress", status_category="indeterminate", transitions=[]),
+    WorkflowState(name="Done", status_category="done", transitions=[]),
+]
+
+SAMPLE_ISSUE_TYPES = [
+    IssueTypeInfo(id="10001", name="Story", subtask=False),
+    IssueTypeInfo(id="10002", name="Bug", subtask=False),
+]
+
+
+def _make_mock_jira_client(
+    projects: list[ProjectInfo] | None = None,
+    workflows: dict[str, list[WorkflowState]] | None = None,
+    issue_types: dict[str, list[IssueTypeInfo]] | None = None,
+) -> MagicMock:
+    """Create a mock JiraClient with discovery methods configured."""
+    mock = MagicMock(spec=JiraClient)
+    mock.list_projects.return_value = projects or SAMPLE_PROJECTS
+
+    wf = workflows or {"RAISE": SAMPLE_WORKFLOWS, "OPS": SAMPLE_WORKFLOWS}
+    mock.get_project_workflows.side_effect = lambda key: wf.get(key, [])
+
+    it = issue_types or {"RAISE": SAMPLE_ISSUE_TYPES, "OPS": SAMPLE_ISSUE_TYPES}
+    mock.get_issue_types.side_effect = lambda key: it.get(key, [])
+
+    return mock
+
+
+class TestJiraDiscoveryDiscoverAll:
+    def test_returns_all_projects(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        result = discovery.discover()
+        assert len(result.projects) == 2
+        assert result.projects[0].key == "RAISE"
+        assert result.projects[1].key == "OPS"
+
+    def test_populates_workflows_per_project(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        result = discovery.discover()
+        assert "RAISE" in result.workflows
+        assert len(result.workflows["RAISE"]) == 3
+        names = {s.name for s in result.workflows["RAISE"]}
+        assert names == {"To Do", "In Progress", "Done"}
+
+    def test_populates_issue_types_per_project(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        result = discovery.discover()
+        assert "RAISE" in result.issue_types
+        assert len(result.issue_types["RAISE"]) == 2
+        assert result.issue_types["RAISE"][0].name == "Story"
+
+
+class TestJiraDiscoverySpecificProject:
+    def test_filters_to_single_project(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        result = discovery.discover(project_key="RAISE")
+        assert len(result.projects) == 1
+        assert result.projects[0].key == "RAISE"
+        # Only RAISE workflows/types, not OPS
+        assert "RAISE" in result.workflows
+        assert "OPS" not in result.workflows
+
+    def test_not_found_raises(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        with pytest.raises(JiraNotFoundError, match="NONEXISTENT"):
+            discovery.discover(project_key="NONEXISTENT")
+
+
+class TestJiraDiscoveryAuthFailure:
+    def test_auth_error_propagated(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+        mock_client.list_projects.side_effect = JiraAuthError("Forbidden")
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        with pytest.raises(JiraAuthError):
+            discovery.discover()
+
+
+class TestJiraDiscoveryBestEffort:
+    def test_workflow_failure_does_not_block_other_projects(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+
+        def workflow_side_effect(key: str) -> list[WorkflowState]:
+            if key == "RAISE":
+                raise RuntimeError("API timeout")
+            return SAMPLE_WORKFLOWS
+
+        mock_client.get_project_workflows.side_effect = workflow_side_effect
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        result = discovery.discover()
+        # RAISE workflows empty due to failure, OPS still populated
+        assert result.workflows["RAISE"] == []
+        assert len(result.workflows["OPS"]) == 3
