@@ -9,13 +9,63 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 # Shared field descriptions
 _DESC_ISSUE_TITLE = "Issue title"
 _DESC_PARENT_KEY = "Parent issue key"
 _DESC_CREATED_TS = "ISO 8601 creation timestamp"
 _DESC_UPDATED_TS = "ISO 8601 last update timestamp"
+
+
+# ── Discovery models (S1130.2) ──────────────────────────────────────
+
+
+class TransitionInfo(BaseModel):
+    """A workflow transition available from a status."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(..., description="Transition numeric ID")
+    name: str = Field(..., description="Transition display name")
+    to_status: str = Field(..., description="Target status name")
+
+
+class WorkflowState(BaseModel):
+    """A status in a project workflow."""
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str = Field(..., description="Status name (e.g. 'In Progress')")
+    status_category: str = Field(..., description="Category: new, indeterminate, done")
+    transitions: list[TransitionInfo] = Field(
+        ..., description="Transitions available from this status"
+    )
+
+
+class ProjectInfo(BaseModel):
+    """Summary of a Jira project for discovery."""
+
+    model_config = ConfigDict(frozen=True)
+
+    key: str = Field(..., description="Project key (e.g. 'RAISE')")
+    name: str = Field(..., description="Project display name")
+    project_type_key: str = Field(
+        ..., description="Project type (e.g. 'software', 'business')"
+    )
+
+
+class IssueTypeInfo(BaseModel):
+    """An issue type available in a project."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(..., description="Issue type ID")
+    name: str = Field(..., description="Issue type name (e.g. 'Story', 'Bug')")
+    subtask: bool = Field(..., description="Whether this is a subtask type")
+
+
+# ── Issue CRUD models ───────────────────────────────────────────────
 
 
 class IssueSpec(BaseModel):

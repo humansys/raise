@@ -12,10 +12,11 @@ RAISE-1052 (S1052.1)
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from raise_cli.adapters.jira_config import JiraConfig
+    from raise_cli.adapters.models.pm import IssueTypeInfo, ProjectInfo, WorkflowState
 
 from raise_cli.adapters.jira_exceptions import (
     JiraAdapterError,
@@ -162,11 +163,13 @@ class JiraClient:
     def create_link(self, source: str, target: str, link_type: str) -> None:
         """Create an issue link between two issues."""
         try:
-            self._client.create_issue_link({  # type: ignore[no-untyped-call]
-                "type": {"name": link_type},
-                "inwardIssue": {"key": source},
-                "outwardIssue": {"key": target},
-            })
+            self._client.create_issue_link(
+                {  # type: ignore[no-untyped-call]
+                    "type": {"name": link_type},
+                    "inwardIssue": {"key": source},
+                    "outwardIssue": {"key": target},
+                }
+            )
         except JiraAdapterError:
             raise
         except Exception as e:
@@ -198,6 +201,92 @@ class JiraClient:
             raise
         except Exception as e:
             raise self._map_error(e, f"get_comments({key})") from e
+
+    # ── Discovery (S1130.2) ───────────────────────────────────────────
+
+    def list_projects(self) -> list[ProjectInfo]:
+        """List all accessible projects."""
+        from raise_cli.adapters.models.pm import ProjectInfo
+
+        try:
+            raw: list[dict[str, Any]] = self._client.projects()  # type: ignore[no-untyped-call]
+            return [
+                ProjectInfo(
+                    key=p["key"],
+                    name=p["name"],
+                    project_type_key=p.get("projectTypeKey", "unknown"),
+                )
+                for p in raw
+            ]
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, "list_projects") from e
+
+    def get_project_workflows(self, project_key: str) -> list[WorkflowState]:
+        """Get unique workflow states for a project.
+
+        Calls ``/project/{key}/statuses`` which returns statuses grouped by
+        issue type. This method deduplicates across issue types and returns
+        unique WorkflowState objects (without transitions — transitions are
+        per-issue, discovered separately by config generator).
+        """
+        from raise_cli.adapters.models.pm import WorkflowState
+
+        try:
+            raw: Any = self._client.get_status_for_project(project_key)  # type: ignore[no-untyped-call]
+            groups: list[dict[str, Any]] = (
+                cast("list[dict[str, Any]]", raw) if isinstance(raw, list) else []
+            )
+            seen: dict[tuple[str, str], WorkflowState] = {}
+            for itg in groups:
+                statuses: list[dict[str, Any]] = list(itg.get("statuses", []))
+                for status in statuses:
+                    name: str = str(status.get("name", ""))
+                    if not name:
+                        continue
+                    cat_raw: Any = status.get("statusCategory", {})
+                    cat_dict: dict[str, str] = (
+                        cast("dict[str, str]", cat_raw)
+                        if isinstance(cat_raw, dict)
+                        else {}
+                    )
+                    category: str = str(cat_dict.get("key", "unknown"))
+                    key = (name, category)
+                    if key not in seen:
+                        seen[key] = WorkflowState(
+                            name=name,
+                            status_category=category,
+                            transitions=[],
+                        )
+            return list(seen.values())
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"get_project_workflows({project_key})") from e
+
+    def get_issue_types(self, project_key: str) -> list[IssueTypeInfo]:
+        """Get issue types available for a project."""
+        from raise_cli.adapters.models.pm import IssueTypeInfo
+
+        try:
+            raw: Any = self._client.issue_createmeta_issuetypes(project_key)  # type: ignore[no-untyped-call]
+            raw_dict: dict[str, Any] = (
+                cast("dict[str, Any]", raw) if isinstance(raw, dict) else {}
+            )
+            values: list[dict[str, Any]] = list(raw_dict.get("values", []))
+            return [
+                IssueTypeInfo(
+                    id=str(it["id"]),
+                    name=str(it["name"]),
+                    subtask=bool(it.get("subtask", False)),
+                )
+                for it in values
+            ]
+        except JiraAdapterError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"get_issue_types({project_key})") from e
 
     # ── Health ───────────────────────────────────────────────────────
 
