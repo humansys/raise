@@ -75,7 +75,7 @@ S1134.1 and S1134.2 modify different frontmatter fields in the same files — me
 
 | Story | Status | Commit | Notes |
 |-------|--------|--------|-------|
-| S1134.3 | Pending | — | — |
+| S1134.3 | **Done** | `c5aa8af6` | 13 skills (9 original + 4 from QR). PAT-E-701. |
 | S1134.1 | Pending | — | — |
 | S1134.2 | Pending | — | — |
 | S1134.4 | Pending | — | — |
