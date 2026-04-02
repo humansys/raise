@@ -95,6 +95,7 @@ format = "raise_cli.gates.builtin.format:FormatGate"
 environment = "raise_cli.doctor.checks.environment:EnvironmentCheck"
 project = "raise_cli.doctor.checks.project:ProjectCheck"
 developer = "raise_cli.doctor.checks.developer:DeveloperCheck"
+adapters = "raise_cli.doctor.checks.adapters:AdapterDoctorCheck"
 
 [project.entry-points."rai.adapters.pm"]
 filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"

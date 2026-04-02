@@ -163,10 +163,38 @@ class ConfluenceClient:
 
     # ── Discovery ─────────────────────────────────────────────────────
 
-    def get_spaces(self) -> list[SpaceInfo]:
-        """List all accessible spaces."""
+    def get_space_homepage_id(self, space_key: str) -> str | None:
+        """Get the homepage page ID for a space. Returns None if not found."""
         try:
-            raw: dict[str, Any] = self._client.get_all_spaces()  # type: ignore[no-untyped-call]
+            raw: Any = self._client.get_home_page_of_space(space_key)  # type: ignore[no-untyped-call]
+            if isinstance(raw, dict) and "id" in raw:
+                return str(raw["id"])  # type: ignore[no-untyped-call]
+            return None
+        except ConfluenceError:
+            raise
+        except Exception as e:
+            raise self._map_error(e, f"get_space_homepage_id({space_key})") from e
+
+    def get_spaces(self) -> list[SpaceInfo]:
+        """List all accessible spaces.
+
+        Paginates through all results — ``get_all_spaces()`` returns only
+        one page (default limit=50), which misses spaces beyond that page.
+        RAISE-1187: discovered during S1130.4 dogfood.
+        """
+        try:
+            all_results: list[dict[str, Any]] = []
+            start = 0
+            limit = 100
+            while True:
+                raw: dict[str, Any] = self._client.get_all_spaces(  # type: ignore[no-untyped-call]
+                    start=start, limit=limit
+                )
+                results: list[dict[str, Any]] = raw.get("results", [])
+                all_results.extend(results)
+                if len(results) < limit:
+                    break
+                start += limit
             return [
                 SpaceInfo(
                     key=s["key"],
@@ -174,7 +202,7 @@ class ConfluenceClient:
                     url=s.get("_links", {}).get("webui", ""),
                     type=s.get("type", "global"),
                 )
-                for s in raw.get("results", [])
+                for s in all_results
             ]
         except ConfluenceError:
             raise
@@ -201,10 +229,25 @@ class ConfluenceClient:
 
     # ── Search & Health ───────────────────────────────────────────────
 
+    @staticmethod
+    def _ensure_cql(query: str) -> str:
+        """Wrap plain text in CQL siteSearch if not already CQL.
+
+        CQL queries contain operators like ~, =, AND, OR, or known
+        predicates like type=, space=, text~. Plain text does not.
+        """
+        cql_indicators = ("~", "=", " AND ", " OR ", " ORDER BY ")
+        if any(op in query for op in cql_indicators):
+            return query
+        # Escape double quotes in user query
+        escaped = query.replace('"', '\\"')
+        return f'siteSearch ~ "{escaped}"'
+
     def search(self, cql: str, limit: int = 10) -> list[PageSummary]:
-        """Search using CQL."""
+        """Search using CQL. Plain text queries are auto-wrapped."""
+        effective_cql = self._ensure_cql(cql)
         try:
-            raw: dict[str, Any] = self._client.cql(cql, limit=limit)  # type: ignore[no-untyped-call]
+            raw: dict[str, Any] = self._client.cql(effective_cql, limit=limit)  # type: ignore[no-untyped-call]
             return [
                 PageSummary(
                     id=str(r["content"]["id"]),
@@ -217,7 +260,7 @@ class ConfluenceClient:
         except ConfluenceError:
             raise
         except Exception as e:
-            raise self._map_error(e, f"search({cql!r})") from e
+            raise self._map_error(e, f"search({effective_cql!r})") from e
 
     def health(self) -> AdapterHealth:
         """Check connectivity by listing 1 space."""
@@ -225,9 +268,7 @@ class ConfluenceClient:
             self._client.get_all_spaces(limit=1)  # type: ignore[no-untyped-call]
             return AdapterHealth(name="confluence", healthy=True)
         except Exception as e:
-            return AdapterHealth(
-                name="confluence", healthy=False, message=str(e)
-            )
+            return AdapterHealth(name="confluence", healthy=False, message=str(e))
 
     # ── Internal ──────────────────────────────────────────────────────
 
