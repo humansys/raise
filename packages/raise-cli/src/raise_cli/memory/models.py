@@ -55,12 +55,16 @@ class PatternSubType(StrEnum):
         PROCESS: Process/workflow patterns.
         ARCHITECTURE: Architectural patterns.
         TECHNICAL: Technical discoveries.
+        APPROACH: Design approaches, patterns for solving.
+        RISK: Known risks, failure modes, pitfalls.
     """
 
     CODEBASE = "codebase"
     PROCESS = "process"
     ARCHITECTURE = "architecture"
     TECHNICAL = "technical"
+    APPROACH = "approach"
+    RISK = "risk"
 
 
 class MemoryRelationshipType(StrEnum):

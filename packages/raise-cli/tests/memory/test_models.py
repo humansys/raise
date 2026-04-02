@@ -42,6 +42,16 @@ class TestPatternSubType:
         assert PatternSubType.PROCESS.value == "process"
         assert PatternSubType.ARCHITECTURE.value == "architecture"
         assert PatternSubType.TECHNICAL.value == "technical"
+        assert PatternSubType.APPROACH.value == "approach"
+        assert PatternSubType.RISK.value == "risk"
+
+    def test_approach_subtype(self) -> None:
+        """Approach subtype has correct value."""
+        assert PatternSubType.APPROACH == "approach"
+
+    def test_risk_subtype(self) -> None:
+        """Risk subtype has correct value."""
+        assert PatternSubType.RISK == "risk"
 
 
 class TestMemoryRelationshipType:

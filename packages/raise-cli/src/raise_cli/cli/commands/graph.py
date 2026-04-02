@@ -156,6 +156,13 @@ def query(
             help="Filter by types (comma-separated: pattern,calibration,principle,etc.)",
         ),
     ] = None,
+    subtypes: Annotated[
+        str | None,
+        typer.Option(
+            "--subtypes",
+            help="Filter by pattern subtypes (comma-separated: approach,risk,codebase,etc.)",
+        ),
+    ] = None,
     edge_types: Annotated[
         str | None,
         typer.Option(
@@ -202,6 +209,7 @@ def query(
         strategy=query_strategy,
         max_depth=1,
         types=_parse_comma_list(types),
+        subtypes=_parse_comma_list(subtypes),
         edge_types=_parse_comma_list(edge_types),
         limit=limit,
     )
