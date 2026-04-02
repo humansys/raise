@@ -78,6 +78,10 @@ class Query(BaseModel):
         default=None,
         description="Filter by edge types (concept_lookup only)",
     )
+    subtypes: list[str] | None = Field(
+        default=None,
+        description="Filter by pattern subtypes (approach, risk, etc.)",
+    )
     limit: int = Field(
         default=10,
         ge=1,
@@ -311,6 +315,10 @@ class QueryEngine:
             if query.types and concept.type not in query.types:
                 continue
 
+            # Apply subtype filter
+            if query.subtypes and concept.metadata.get("sub_type") not in query.subtypes:
+                continue
+
             # Check if any keyword matches (include node type in searchable text)
             searchable = f"{concept.type} {concept.content}".lower()
             if not any(kw in searchable for kw in keywords):
@@ -355,6 +363,8 @@ class QueryEngine:
         # Apply type filter to main concept
         if query.types and concept.type not in query.types:
             concepts: list[GraphNode] = []
+        elif query.subtypes and concept.metadata.get("sub_type") not in query.subtypes:
+            concepts = []
         else:
             concepts = [concept]
 
@@ -365,6 +375,8 @@ class QueryEngine:
             )
             for neighbor in neighbors:
                 if query.types and neighbor.type not in query.types:
+                    continue
+                if query.subtypes and neighbor.metadata.get("sub_type") not in query.subtypes:
                     continue
                 if neighbor.id not in [c.id for c in concepts]:
                     concepts.append(neighbor)

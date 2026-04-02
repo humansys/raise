@@ -163,7 +163,7 @@ def add_pattern(
         typer.Option(
             "--type",
             "-t",
-            help="Pattern type (codebase, process, architecture, technical)",
+            help="Pattern type (codebase, process, architecture, technical, approach, risk)",
         ),
     ] = "process",
     learned_from: Annotated[
@@ -220,7 +220,7 @@ def add_pattern(
     except ValueError:
         cli_error(
             f"Invalid pattern type: {sub_type}",
-            hint="Valid types: codebase, process, architecture, technical",
+            hint="Valid types: codebase, process, architecture, technical, approach, risk",
             exit_code=7,
         )
         return
