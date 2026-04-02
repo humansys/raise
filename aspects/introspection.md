@@ -149,7 +149,7 @@ Non-triggers (do NOT query):
 ### Steps
 
 1. Formulate query from the decision context (LLM-adaptive — this is where refinement happens)
-2. Execute: `rai graph query "{query}" --types approach,risk --limit 3`
+2. Execute: `rai graph query "{query}" --types pattern --subtypes approach,risk --limit 3`
 3. If results: consider patterns before deciding
 4. If 0 results: this is a **gap signal** — record in learning record, proceed with best judgment
 
@@ -396,6 +396,23 @@ These are **deterministic templates** — variable substitution only, no LLM ref
 - Templates are extended to domain types (e.g., `ontology-tool`) when domain cartridges are active
 - If a template variable can't be resolved, skip that query
 - JIT queries are NOT templated — they emerge from decision bifurcations during execution
+
+---
+
+## Context Tag Taxonomy
+
+Context tags on patterns are free-form strings, but the following domains provide guidance for consistency. Tags are **not enforced** — this taxonomy is guidance, refined through dogfood.
+
+| Domain | Example Tags | Used For |
+|--------|-------------|----------|
+| **Architecture** | `module-design`, `layering`, `boundaries`, `contracts` | Structural decisions |
+| **Testing** | `tdd`, `pytest`, `fixtures`, `mocking`, `coverage` | Test strategy |
+| **Process** | `workflow`, `git`, `review`, `estimation`, `planning` | Workflow patterns |
+| **Security** | `auth`, `secrets`, `validation`, `sanitization` | Security concerns |
+| **Code** | `python`, `pydantic`, `typing`, `error-handling` | Implementation idioms |
+| **Infrastructure** | `ci`, `deployment`, `monitoring`, `configuration` | Operational concerns |
+
+Tags are organic — new domains emerge from usage. Enforce only with evidence from dogfood (S1133.6+).
 
 ---
 
