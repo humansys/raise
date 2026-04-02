@@ -43,3 +43,39 @@ Pre-design research completed (see `research/` subdirectory):
 | allowed-tools too restrictive breaks skill execution | Medium | Medium | Test each skill after adding restrictions |
 | Description too short loses trigger accuracy | Low | Medium | Include key trigger phrases; test auto-selection |
 | 35+ skills exceed CC description budget even after optimization | Low | High | Use disable-model-invocation to remove ~10 skills from budget |
+
+## Implementation Plan
+
+### Sequencing Strategy: Quick Wins
+
+No architectural uncertainty. No hard external blockers. Sequence for momentum and de-risking: start with the smallest story that validates CC frontmatter parsing, then tackle the two larger stories with confidence.
+
+### Story Sequence
+
+| # | Story | Size | Strategy | Rationale |
+|---|-------|:----:|----------|-----------|
+| 1 | S1134.3 (Invocation control) | S | Quick win + de-risk | 9 skills, 1 field each. Validates CC parses new frontmatter correctly. Frees ~900 chars of description budget. |
+| 2 | S1134.1 (Descriptions) | M | Leverage | Budget freed by S1134.3 gives more room. 35 rewrites requiring judgment. |
+| 3 | S1134.2 (allowed-tools) | M | Core value | Most laborious: read each SKILL.md body, classify tier, declare tools. Parallel-safe with S1134.1 if desired. |
+| 4 | S1134.4 (Validation) | S | Gate | Depends on S1134.1-3. Script + before/after report. |
+
+### Parallelism
+
+S1134.1 and S1134.2 modify different frontmatter fields in the same files — merge-safe if run in parallel. With a single developer, sequential is simpler.
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|-----------------|
+| **M1: Quick Win** | S1134.3 | 9 side-effect skills have `disable-model-invocation: true`. CC no longer auto-invokes them. |
+| **M2: Core Complete** | S1134.1 + S1134.2 | 35 skills have descriptions <100 chars AND allowed-tools declared. |
+| **M3: Epic Complete** | S1134.4 | Before/after report shows 100% coverage. Retrospective done. |
+
+### Progress Tracking
+
+| Story | Status | Commit | Notes |
+|-------|--------|--------|-------|
+| S1134.3 | Pending | — | — |
+| S1134.1 | Pending | — | — |
+| S1134.2 | Pending | — | — |
+| S1134.4 | Pending | — | — |
