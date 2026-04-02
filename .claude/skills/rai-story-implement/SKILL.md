@@ -17,9 +17,20 @@ metadata:
 
     '
   raise.prerequisites: story-plan
-  raise.version: 2.2.0
+  raise.version: 2.3.0
   raise.visibility: public
   raise.work_cycle: story
+  raise.aspects: introspection
+  raise.introspection:
+    phase: story.implement
+    context_source: plan doc
+    affected_modules: []
+    max_tier1_queries: 3
+    max_jit_queries: 3
+    tier1_queries:
+      - "implementation patterns for {affected_modules}"
+      - "testing patterns for {test_type} in {language}"
+      - "integration patterns for {upstream_dependencies}"
 name: rai-story-implement
 ---
 
@@ -45,7 +56,13 @@ Execute the implementation plan task by task with TDD, producing verified code t
 
 ## Steps
 
+> **PRIME**: Before Step 1, follow PRIME protocol in `aspects/introspection.md`.
+> Chain read: read story-plan's learning record at `.raise/rai/learnings/rai-story-plan/{work_id}/record.yaml`.
+
 ### Step 1: Load Plan & Context
+
+> **JIT**: Before loading context, query graph for implementation patterns in affected modules
+> → `aspects/introspection.md § JIT Protocol`
 
 Load the implementation plan and query relevant patterns:
 
@@ -111,6 +128,10 @@ If verification fails: fix and re-verify (max 3 attempts before escalating).
 | Implemented code | Per project architecture |
 | Progress log | `work/epics/.../stories/{story_id}/progress.md` |
 | Next | `/rai-story-review` |
+
+> **LEARN**: After completing Step 5, follow LEARN protocol in `aspects/introspection.md`.
+> Record path: `.raise/rai/learnings/rai-story-implement/{work_id}/record.yaml`
+> Enrich story-design's record with `downstream: {design_gaps_found: list[str]}`.
 
 ## Quality Checklist
 
