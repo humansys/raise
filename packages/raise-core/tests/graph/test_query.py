@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from raise_core.graph.engine import Graph
-from raise_core.graph.models import GraphNode
+from raise_core.graph.models import GraphEdge, GraphNode
 from raise_core.graph.query import Query, QueryEngine, QueryStrategy
 
 
@@ -158,3 +158,28 @@ class TestConceptLookupSubtypesFilter:
         )
         assert len(result.concepts) == 1
         assert result.concepts[0].id == "PAT-001"
+
+    def test_concept_lookup_filters_neighbors_by_subtype(self) -> None:
+        """Concept lookup with depth > 0 filters neighbors by subtype (QR-R3)."""
+        g = _make_graph_with_patterns()
+        # PAT-001 (approach) -> PAT-002 (risk) and PAT-003 (codebase)
+        g.add_relationship(
+            GraphEdge(source="PAT-001", target="PAT-002", type="related_to")
+        )
+        g.add_relationship(
+            GraphEdge(source="PAT-001", target="PAT-003", type="related_to")
+        )
+        engine = QueryEngine(g)
+        # Lookup PAT-001 with depth=1, filter to approach+risk only
+        result = engine.query(
+            Query(
+                query="PAT-001",
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
+                max_depth=1,
+                subtypes=["approach", "risk"],
+            )
+        )
+        ids = {c.id for c in result.concepts}
+        assert "PAT-001" in ids  # approach — matches
+        assert "PAT-002" in ids  # risk — matches
+        assert "PAT-003" not in ids  # codebase — filtered out

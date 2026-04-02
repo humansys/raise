@@ -111,5 +111,5 @@ def read_record(skill: str, work_id: str, base_dir: Path) -> LearningRecord | No
             return None
         return LearningRecord.model_validate(data)
     except Exception:
-        logger.debug("Failed to read learning record at %s", record_path, exc_info=True)
+        logger.warning("Failed to parse learning record at %s", record_path, exc_info=True)
         return None

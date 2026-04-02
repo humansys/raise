@@ -228,18 +228,7 @@ class TestReadRecord:
         loaded = read_record("rai-story-design", "S1133.1", tmp_path)
 
         assert loaded is not None
-        assert loaded.skill == original.skill
-        assert loaded.work_id == original.work_id
-        assert loaded.version == original.version
-        assert loaded.primed_patterns == original.primed_patterns
-        assert loaded.tier1_queries == original.tier1_queries
-        assert loaded.pattern_votes["PAT-E-590"].vote == 1
-        assert loaded.pattern_votes["PAT-E-590"].why == "useful pattern"
-        assert loaded.gaps == original.gaps
-        assert loaded.artifacts == original.artifacts
-        assert loaded.commit == original.commit
-        assert loaded.branch == original.branch
-        assert loaded.downstream == original.downstream
+        assert loaded == original
 
     def test_returns_none_on_corrupted_file(self, tmp_path: Path) -> None:
         """read_record returns None for corrupted YAML."""
