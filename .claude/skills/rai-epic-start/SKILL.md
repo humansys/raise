@@ -4,6 +4,7 @@ description: >
   Initialize an epic with scope artifacts and tracker entry.
   Epics are logical containers — no epic branch is created.
   Story branches are created directly from the development branch.
+disable-model-invocation: true
 
 license: MIT
 

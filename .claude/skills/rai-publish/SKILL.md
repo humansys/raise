@@ -3,6 +3,7 @@ name: rai-publish
 description: >
   Guide the human through a structured release workflow with quality gates,
   version bumping, changelog management, and PyPI publishing via GitHub Actions.
+disable-model-invocation: true
 
 license: MIT
 

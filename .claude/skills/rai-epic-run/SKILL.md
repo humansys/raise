@@ -5,6 +5,7 @@ description: >
   pausing at story iteration for human-driven /rai-story-run execution.
   Resumes from last completed phase. Delegation profile controls pause
   behavior at natural gates.
+disable-model-invocation: true
 
 license: MIT
 

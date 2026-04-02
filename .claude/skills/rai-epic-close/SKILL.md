@@ -5,6 +5,7 @@ description: >
   merge request creation, and tracking update. Epics are logical containers —
   stories merge locally to dev during story-close, then epic-close pushes
   dev and creates the MR.
+disable-model-invocation: true
 
 license: MIT
 
