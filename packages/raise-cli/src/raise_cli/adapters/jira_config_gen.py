@@ -76,8 +76,9 @@ def generate_jira_config(
             raise ValueError(msg)
 
     # Find full ProjectInfo for selected projects
+    selected_keys = set(selected_projects)
     selected_infos = [
-        p for p in project_map.projects if p.key in set(selected_projects)
+        p for p in project_map.projects if p.key in selected_keys
     ]
 
     # Build instances section
@@ -101,9 +102,6 @@ def generate_jira_config(
         "instances": instances,
         "projects": projects,
     }
-
-    # Workflow section — merge states across selected projects
-    selected_keys = {p.key for p in selected_infos}
     merged_states = _merge_workflows(project_map, selected_keys)
     if merged_states:
         states_list: list[dict[str, Any]] = [
