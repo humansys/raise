@@ -37,9 +37,7 @@ class WorkflowState(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     name: str = Field(..., description="Status name (e.g. 'In Progress')")
-    status_category: str = Field(
-        ..., description="Category: new, indeterminate, done"
-    )
+    status_category: str = Field(..., description="Category: new, indeterminate, done")
     transitions: list[TransitionInfo] = Field(
         ..., description="Transitions available from this status"
     )
