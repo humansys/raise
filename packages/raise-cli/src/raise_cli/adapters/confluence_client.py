@@ -176,9 +176,25 @@ class ConfluenceClient:
             raise self._map_error(e, f"get_space_homepage_id({space_key})") from e
 
     def get_spaces(self) -> list[SpaceInfo]:
-        """List all accessible spaces."""
+        """List all accessible spaces.
+
+        Paginates through all results — ``get_all_spaces()`` returns only
+        one page (default limit=50), which misses spaces beyond that page.
+        RAISE-1187: discovered during S1130.4 dogfood.
+        """
         try:
-            raw: dict[str, Any] = self._client.get_all_spaces()  # type: ignore[no-untyped-call]
+            all_results: list[dict[str, Any]] = []
+            start = 0
+            limit = 100
+            while True:
+                raw: dict[str, Any] = self._client.get_all_spaces(  # type: ignore[no-untyped-call]
+                    start=start, limit=limit
+                )
+                results: list[dict[str, Any]] = raw.get("results", [])
+                all_results.extend(results)
+                if len(results) < limit:
+                    break
+                start += limit
             return [
                 SpaceInfo(
                     key=s["key"],
@@ -186,7 +202,7 @@ class ConfluenceClient:
                     url=s.get("_links", {}).get("webui", ""),
                     type=s.get("type", "global"),
                 )
-                for s in raw.get("results", [])
+                for s in all_results
             ]
         except ConfluenceError:
             raise
