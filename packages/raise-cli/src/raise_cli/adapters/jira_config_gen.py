@@ -77,9 +77,7 @@ def generate_jira_config(
 
     # Find full ProjectInfo for selected projects
     selected_keys = set(selected_projects)
-    selected_infos = [
-        p for p in project_map.projects if p.key in selected_keys
-    ]
+    selected_infos = [p for p in project_map.projects if p.key in selected_keys]
 
     # Build instances section
     instances: dict[str, dict[str, Any]] = {
