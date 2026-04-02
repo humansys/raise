@@ -10,10 +10,13 @@ RAISE-1130 (S1130.3)
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import ClassVar
 
 from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+
+logger = logging.getLogger(__name__)
 
 _JIRA_CONFIG = Path(".raise") / "jira.yaml"
 _CONFLUENCE_CONFIG = Path(".raise") / "confluence.yaml"
@@ -46,6 +49,13 @@ class AdapterDoctorCheck:
         )
         if conf_exists:
             self._check_confluence_env(results)
+
+        # Live health checks (online mode only)
+        if context.online:
+            if jira_exists:
+                self._check_jira_health(results, context.working_dir)
+            if conf_exists:
+                self._check_confluence_health(results, context.working_dir)
 
         return results
 
@@ -172,5 +182,78 @@ class AdapterDoctorCheck:
                     status=CheckStatus.WARN,
                     message="CONFLUENCE_USERNAME is not set (will fall back to instance-specific var)",
                     fix_hint="Set CONFLUENCE_USERNAME environment variable with your Atlassian email",
+                )
+            )
+
+    def _check_jira_health(self, results: list[CheckResult], working_dir: Path) -> None:
+        """Check Jira backend connectivity via list_projects()."""
+        try:
+            from raise_cli.adapters.jira_client import JiraClient
+            from raise_cli.adapters.jira_config import load_jira_config
+
+            config = load_jira_config(working_dir)
+            client = JiraClient.from_config(config, config.default_instance)
+            projects = client.list_projects()
+            site = config.instances[config.default_instance].site
+            results.append(
+                CheckResult(
+                    check_id="adapter-jira-health",
+                    category="adapters",
+                    status=CheckStatus.PASS,
+                    message=f"Jira backend reachable ({site}, {len(projects)} projects)",
+                )
+            )
+        except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+            logger.debug("Jira health check failed", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-jira-health",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Jira backend unreachable: {exc}",
+                    fix_hint="Check JIRA_API_TOKEN and network connectivity",
+                )
+            )
+
+    def _check_confluence_health(
+        self, results: list[CheckResult], working_dir: Path
+    ) -> None:
+        """Check Confluence backend connectivity via health()."""
+        try:
+            from raise_cli.adapters.confluence_client import ConfluenceClient
+            from raise_cli.adapters.confluence_config import load_confluence_config
+
+            config = load_confluence_config(working_dir)
+            inst = config.instances[config.default_instance]
+            client = ConfluenceClient(inst)
+            health = client.health()
+            if health.healthy:
+                results.append(
+                    CheckResult(
+                        check_id="adapter-confluence-health",
+                        category="adapters",
+                        status=CheckStatus.PASS,
+                        message=f"Confluence backend reachable ({inst.url})",
+                    )
+                )
+            else:
+                results.append(
+                    CheckResult(
+                        check_id="adapter-confluence-health",
+                        category="adapters",
+                        status=CheckStatus.ERROR,
+                        message=f"Confluence backend unreachable: {health.message}",
+                        fix_hint="Check CONFLUENCE_API_TOKEN and network connectivity",
+                    )
+                )
+        except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+            logger.debug("Confluence health check failed", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-health",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence health check failed: {exc}",
+                    fix_hint="Check Confluence config and credentials",
                 )
             )

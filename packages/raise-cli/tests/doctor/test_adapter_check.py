@@ -139,3 +139,57 @@ class TestEnvVarChecks:
             or "username" in r.check_id
         ]
         assert len(env_results) == 0
+
+
+# ── T3: Live health checks ──────────────────────────────────────────
+
+
+class TestLiveHealthChecks:
+    """Online mode health checks for adapter backends."""
+
+    def test_offline_skips_health(self, tmp_path: Path) -> None:
+        """Offline mode does not produce health check results."""
+        _setup_configs(tmp_path)
+        ctx = _make_context(tmp_path, online=False)
+        check = AdapterDoctorCheck()
+        results = check.evaluate(ctx)
+        health_results = [r for r in results if "health" in r.check_id]
+        assert len(health_results) == 0
+
+    def test_online_calls_health_checks(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Online mode invokes health check methods."""
+        from unittest.mock import MagicMock, patch
+
+        _setup_configs(tmp_path)
+        monkeypatch.setenv("JIRA_API_TOKEN", "test")
+        monkeypatch.setenv("JIRA_EMAIL", "test@test.com")
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "test")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "test@test.com")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_jira = MagicMock()
+        mock_conf = MagicMock()
+        with (
+            patch.object(check, "_check_jira_health", mock_jira),
+            patch.object(check, "_check_confluence_health", mock_conf),
+        ):
+            check.evaluate(ctx)
+
+        mock_jira.assert_called_once()
+        mock_conf.assert_called_once()
+
+    def test_health_error_on_exception(self, tmp_path: Path) -> None:
+        """Health check exception produces ERROR result (never crashes)."""
+        _setup_configs(tmp_path)
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        # Health checks will fail because no real config/credentials
+        # but should produce ERROR results, not raise
+        results = check.evaluate(ctx)
+        health_results = [r for r in results if "health" in r.check_id]
+        for r in health_results:
+            assert r.status == CheckStatus.ERROR
