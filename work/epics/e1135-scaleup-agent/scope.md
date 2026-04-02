@@ -1,4 +1,4 @@
-# Epic E3: ScaleUp Agent — Knowledge Infrastructure + Ontology Pipeline
+# Epic E1135: ScaleUp Agent — Knowledge Infrastructure + Ontology Pipeline
 
 > **Status:** IN PROGRESS
 > **Jira:** LIFE-90
