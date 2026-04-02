@@ -1,7 +1,6 @@
 """Tests for ConfluenceDiscovery service.
 
-TDD RED phase — S1130.1, Task 1.
-Covers all 4 Gherkin scenarios from s1130.1-story.md.
+S1130.1 — covers all 4 Gherkin scenarios from s1130.1-story.md.
 """
 
 from __future__ import annotations
@@ -23,6 +22,7 @@ from raise_cli.adapters.models.docs import PageSummary, SpaceInfo
 
 def _make_client(
     spaces: list[SpaceInfo] | None = None,
+    homepage_ids: dict[str, str] | None = None,
     children: dict[str, list[PageSummary]] | None = None,
     auth_error: bool = False,
 ) -> MagicMock:
@@ -35,10 +35,17 @@ def _make_client(
 
     client.get_spaces.return_value = spaces or []
 
+    _homepage_ids = homepage_ids or {}
+
+    def _get_homepage_id(space_key: str) -> str | None:
+        return _homepage_ids.get(space_key)
+
+    client.get_space_homepage_id.side_effect = _get_homepage_id
+
+    _children = children or {}
+
     def _get_children(page_id: str) -> list[PageSummary]:
-        if children:
-            return children.get(page_id, [])
-        return []
+        return _children.get(page_id, [])
 
     client.get_page_children.side_effect = _get_children
     return client
@@ -56,13 +63,15 @@ SPACE_B = SpaceInfo(
 PAGE_1 = PageSummary(id="101", title="Page 1", url="/page/101", space_key="SPACEA")
 PAGE_2 = PageSummary(id="102", title="Page 2", url="/page/102", space_key="SPACEA")
 
+HOMEPAGE_IDS = {"SPACEA": "1000", "SPACEB": "2000"}
+
 
 # ── Scenario 1: Discover all accessible spaces ──────────────────────
 
 
 class TestDiscoverAllSpaces:
     def test_returns_all_spaces(self) -> None:
-        client = _make_client(spaces=[SPACE_A, SPACE_B])
+        client = _make_client(spaces=[SPACE_A, SPACE_B], homepage_ids=HOMEPAGE_IDS)
         discovery = ConfluenceDiscovery(client)
 
         result = discovery.discover()
@@ -73,7 +82,7 @@ class TestDiscoverAllSpaces:
         assert result.spaces[1].key == "SPACEB"
 
     def test_spaces_have_required_fields(self) -> None:
-        client = _make_client(spaces=[SPACE_A])
+        client = _make_client(spaces=[SPACE_A], homepage_ids=HOMEPAGE_IDS)
         discovery = ConfluenceDiscovery(client)
 
         result = discovery.discover()
@@ -99,7 +108,7 @@ class TestDiscoverAllSpaces:
 
 class TestDiscoverSpecificSpace:
     def test_filters_to_requested_space(self) -> None:
-        client = _make_client(spaces=[SPACE_A, SPACE_B])
+        client = _make_client(spaces=[SPACE_A, SPACE_B], homepage_ids=HOMEPAGE_IDS)
         discovery = ConfluenceDiscovery(client)
 
         result = discovery.discover(space_key="SPACEA")
@@ -107,19 +116,34 @@ class TestDiscoverSpecificSpace:
         assert len(result.spaces) == 1
         assert result.spaces[0].key == "SPACEA"
 
-    def test_populates_top_level_pages(self) -> None:
+    def test_populates_top_level_pages_via_homepage(self) -> None:
         client = _make_client(
             spaces=[SPACE_A],
-            children={"101": [PAGE_1, PAGE_2]},
+            homepage_ids={"SPACEA": "1000"},
+            children={"1000": [PAGE_1, PAGE_2]},
         )
-        # get_page_children is called with the space's root page ID
-        # For discovery, we call get_page_children on each space homepage
-        # The client mock returns pages for the space
         discovery = ConfluenceDiscovery(client)
 
         result = discovery.discover(space_key="SPACEA")
 
         assert "SPACEA" in result.top_level_pages
+        assert len(result.top_level_pages["SPACEA"]) == 2
+        assert result.top_level_pages["SPACEA"][0].title == "Page 1"
+        assert result.top_level_pages["SPACEA"][1].title == "Page 2"
+        # Verify get_page_children was called with homepage ID, not space key
+        client.get_page_children.assert_called_once_with("1000")
+
+    def test_no_homepage_returns_empty_pages(self) -> None:
+        client = _make_client(
+            spaces=[SPACE_A],
+            homepage_ids={},  # no homepage
+        )
+        discovery = ConfluenceDiscovery(client)
+
+        result = discovery.discover(space_key="SPACEA")
+
+        assert result.top_level_pages["SPACEA"] == []
+        client.get_page_children.assert_not_called()
 
 
 # ── Scenario 3: Handle inaccessible space ────────────────────────────

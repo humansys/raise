@@ -8,6 +8,7 @@ RAISE-1130 (S1130.1)
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -17,6 +18,8 @@ from raise_cli.adapters.models.docs import PageSummary, SpaceInfo
 
 if TYPE_CHECKING:
     from raise_cli.adapters.confluence_client import ConfluenceClient
+
+logger = logging.getLogger(__name__)
 
 
 class ConfluenceSpaceMap(BaseModel):
@@ -66,9 +69,17 @@ class ConfluenceDiscovery:
         top_level_pages: dict[str, list[PageSummary]] = {}
         for space in spaces:
             try:
-                pages = self._client.get_page_children(space.key)
-                top_level_pages[space.key] = pages
+                homepage_id = self._client.get_space_homepage_id(space.key)
+                if homepage_id:
+                    pages = self._client.get_page_children(homepage_id)
+                    top_level_pages[space.key] = pages
+                else:
+                    logger.debug("No homepage found for space %s", space.key)
+                    top_level_pages[space.key] = []
             except Exception:  # noqa: BLE001 — discovery is best-effort per space
+                logger.debug(
+                    "Failed to get pages for space %s", space.key, exc_info=True
+                )
                 top_level_pages[space.key] = []
 
         return ConfluenceSpaceMap(spaces=spaces, top_level_pages=top_level_pages)
