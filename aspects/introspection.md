@@ -57,7 +57,7 @@ Today, skills reference this aspect via markers in their body. No protocol reimp
 
 [... skill steps unchanged ...]
 
-> **JIT**: If multiple valid approaches with consequences beyond this step
+> **JIT**: Before producing decisions that should be grounded in evidence
 > → query graph per `aspects/introspection.md § JIT Protocol`
 
 > **LEARN**: After completing, follow LEARN protocol in `aspects/introspection.md`
@@ -124,27 +124,28 @@ Context presented to skill: 2 patterns, both relevant to aspect design approach.
 
 ### Purpose
 
-Query the graph at decision bifurcations during skill execution. Agent-initiated, not scheduled.
+Ground design decisions in accumulated evidence. Without JIT, the agent produces reasonable-sounding output that is not governed by project experience — functional hallucination. JIT turns "I think" into "evidence suggests."
 
 ### When
 
-During skill steps where a decision bifurcation occurs. Triggered by the `> **JIT**` marker at specific steps, but the LLM can also initiate without a marker when the heuristic applies.
+At any step where the agent is about to produce output that should be **governed by accumulated evidence** — design decisions, risk assessments, architectural choices, sizing estimates, evaluation criteria. Triggered by the `> **JIT**` marker at specific steps, but the LLM can also initiate without a marker when the heuristic applies.
 
 ### Heuristic
 
-> **"Multiple valid approaches exist AND consequences extend beyond this step → query graph before deciding."**
+> **"You are about to produce a decision, assessment, or recommendation that should be grounded in project experience → query graph before generating."**
 
 Concrete triggers:
-- Choosing between architectural patterns (e.g., wrapper vs reference)
-- Selecting a data model when multiple schemas could work
-- Deciding integration strategy when upstream/downstream contracts are unclear
-- Risk assessment when similar risks may have been encountered before
+- Architectural decisions (patterns, approaches, trade-offs)
+- Risk assessments (what has gone wrong before in similar contexts?)
+- Sizing and estimation (what does calibration data say?)
+- Design decomposition (how have similar scopes been broken down?)
+- Evaluation criteria (what patterns exist for assessing this kind of work?)
+- Retrospective analysis (what process improvements emerged from similar epics?)
 
 Non-triggers (do NOT query):
-- Naming decisions
-- Formatting choices
-- Single obvious approach
-- Decisions fully contained within the current step
+- Mechanical operations (branch creation, file formatting, tag commands)
+- Decisions with clear rules (manifest lookup, language detection)
+- Output that is purely descriptive, not prescriptive
 
 ### Steps
 
@@ -163,15 +164,15 @@ Non-triggers (do NOT query):
 ### Example
 
 ```
-Step 3 of story-design: Describe Approach
-Decision: Aspect as reference vs aspect as wrapper
-Heuristic: Two valid approaches, consequences affect all 10 skills → JIT triggers
+Step 2 of epic-design: Assess Architecture
+The agent is about to make architectural decisions for the epic.
+Heuristic: producing decisions that should be grounded in project experience → JIT triggers
 
-Query: "patterns for aspect-oriented design in skill systems, wrapper vs reference"
-Result: 0 patterns
+Query: "architectural risks and patterns for skill systems"
+Result: PAT-E-590 (hook extension pattern), 1 risk pattern
 
-Action: Gap recorded. Proceeded with exploration of both options.
-         Pattern candidate deferred to story-review for capture after validation.
+Action: Patterns considered. Architecture decision grounded in prior experience.
+         Without JIT, this would be a plausible-but-ungrounded recommendation.
 ```
 
 ---

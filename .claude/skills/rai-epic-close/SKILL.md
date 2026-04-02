@@ -16,7 +16,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "3.0.0"
+  raise.version: "3.1.0"
   raise.visibility: public
   raise.inputs: |
     - scope: file_path, required, previous_skill
@@ -25,6 +25,16 @@ metadata:
   raise.outputs: |
     - retrospective: file_path, file
     - tag: string, git
+  raise.aspects: introspection
+  raise.introspection:
+    phase: epic.close
+    context_source: all epic artifacts
+    affected_modules: []
+    max_tier1_queries: 2
+    max_jit_queries: 3
+    tier1_queries:
+      - "retrospective patterns for {domain} epics"
+      - "process improvement patterns from similar epics"
 ---
 
 # Epic Close
@@ -51,6 +61,10 @@ Complete an epic by conducting a retrospective, tagging the milestone, and updat
 
 ## Steps
 
+> **PRIME**: Before Step 1, follow PRIME protocol in `aspects/introspection.md`.
+> Chain read: read ALL learning records from this epic's skills (epic-design, epic-plan, and all story records).
+> This provides the aggregate view for the retrospective.
+
 ### Step 1: Verify Stories Complete
 
 Check all stories are done in the epic scope document:
@@ -63,6 +77,9 @@ grep -E "^\s*-\s*\[ \]" "work/epics/e{N}-{name}/scope.md"
 |-----------|--------|
 | All stories checked | Continue |
 | Incomplete stories | Complete them first or explicitly descope |
+
+> **JIT**: Before descoping decisions, query graph for completion patterns and prior descoping outcomes
+> → `aspects/introspection.md § JIT Protocol`
 
 <verification>
 All stories marked complete in epic scope.
@@ -88,6 +105,9 @@ Determine which test command to run using this priority chain:
 | Unknown | — | Ask developer |
 
 The table is a **fallback** — `project.test_command` always wins when present.
+
+> **JIT**: Before writing retrospective, query graph for process improvement patterns from similar epics
+> → `aspects/introspection.md § JIT Protocol`
 
 Create retrospective at `work/epics/e{N}-{name}/retrospective.md` using `templates/retrospective.md`. Fill from story retrospectives and git history.
 
@@ -192,6 +212,10 @@ Backlog reflects completion. Local context updated.
 | Push | `{dev_branch}` pushed to origin |
 | Merge request | GitLab MR: `{dev_branch}` → `{main_branch}` (if release) |
 | Backlog update | Tracker via `rai backlog` CLI |
+
+> **LEARN**: After completing Step 5, follow LEARN protocol in `aspects/introspection.md`.
+> Record path: `.raise/rai/learnings/rai-epic-close/{work_id}/record.yaml`
+> This is the final record in the epic chain — include aggregate learning summary.
 
 ## Quality Checklist
 
