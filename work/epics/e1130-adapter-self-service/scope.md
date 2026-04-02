@@ -123,5 +123,5 @@ Stream B (Jira):        S1130.2 (M) ──→ S1130.5 (M)  ──┘
 | S1130.2 Jira Discovery | M | done | 21 tests, AR/QR found dedup + best-effort fixes, 2 patterns |
 | S1130.3 Adapter Doctor | M | pending | |
 | S1130.4 Config Gen Confluence | S | done | 7 tests, pure function, schema-validated |
-| S1130.5 Config Gen Jira | M | pending | |
+| S1130.5 Config Gen Jira | M | done | 15 tests, dogfood caught issueTypes key bug, 1 pattern |
 | S1130.6 /rai-adapter-setup | S | pending | |
