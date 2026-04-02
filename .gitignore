@@ -127,3 +127,4 @@ dev/transcripts/
 
 # Prevent symlink artifacts from being tracked at root
 /es/
+work/research/
