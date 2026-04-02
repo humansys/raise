@@ -16,7 +16,8 @@ Contents:
     Onboarding:         rai-project-create, rai-project-onboard, rai-welcome
     Governance:         rai-docs-update
     MCP:                rai-mcp-add, rai-mcp-remove, rai-mcp-status
-    Tools:              rai-research, rai-debug, rai-doctor, rai-problem-shape
+    Tools:              rai-research, rai-debug, rai-doctor, rai-problem-shape,
+                        rai-adapter-setup
 
 Note: Internal skills (rai-framework-sync, rai-publish, rai-skillset-manage,
       rai-bugfix) are excluded from distribution.
