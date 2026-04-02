@@ -15,7 +15,7 @@ metadata:
   raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.3.0"
+  raise.version: "2.4.0"
   raise.visibility: public
   raise.output_type: story-design
   raise.inputs: |
@@ -24,6 +24,17 @@ metadata:
   raise.outputs: |
     - design_yaml: file_path, .raise/artifacts/
     - design_md: file_path, next_skill
+  raise.aspects: introspection
+  raise.introspection:
+    phase: story.design
+    context_source: scope doc
+    affected_modules: []
+    max_tier1_queries: 3
+    max_jit_queries: 5
+    tier1_queries:
+      - "patterns for {affected_modules} design decisions"
+      - "prior designs for similar scope in {phase}"
+      - "risks and lessons from related epics"
 ---
 
 # Story Design
@@ -48,6 +59,9 @@ Create a lean story specification optimized for both human review (clear intent)
 
 ## Steps
 
+> **PRIME**: Before Step 1, follow PRIME protocol in `aspects/introspection.md`.
+> No chain read — story-design is the first skill in the story chain.
+
 ### Step 1: Assess Complexity
 
 | Criterion | Simple | Moderate | Complex |
@@ -63,6 +77,9 @@ Create a lean story specification optimized for both human review (clear intent)
 | Moderate | Core sections only |
 | Complex | Full spec with optional sections |
 
+> **JIT**: Before assessing complexity, query graph for patterns from similar stories
+> → `aspects/introspection.md § JIT Protocol`
+
 **Risk gate:** If story is marked HIGH RISK in epic scope, discuss risks before designing — name concerns, failure modes, and scope boundaries.
 
 **UX gate:** If story touches human interaction (workflows, prompts, DX), recommend `/rai-research` first (~10 min).
@@ -77,6 +94,9 @@ Complexity assessed. Risk/UX/Integration gates evaluated.
 
 Load `story.md` (from `/rai-story-start`) if it exists — use its User Story as starting frame.
 
+> **JIT**: Before framing problem and value, query graph for prior designs with similar scope
+> → `aspects/introspection.md § JIT Protocol`
+
 - **Problem**: What gap does this fill? (1-2 sentences)
 - **Value**: Why does this matter? (1-2 sentences, measurable or observable)
 
@@ -85,6 +105,9 @@ Can explain to non-technical stakeholder in 30 seconds.
 </verification>
 
 ### Step 3: Describe Approach
+
+> **JIT**: Before describing approach, query graph for implementation patterns in affected modules
+> → `aspects/introspection.md § JIT Protocol`
 
 Document WHAT you're building and WHY this approach (not detailed HOW):
 - Solution approach (1-2 sentences)
@@ -122,6 +145,9 @@ Can't envision examples → approach not concrete enough, return to Step 3.
 </if-blocked>
 
 ### Step 5: Define Acceptance Criteria
+
+> **JIT**: Before defining acceptance criteria, query graph for testing patterns and quality standards
+> → `aspects/introspection.md § JIT Protocol`
 
 If `story.md` has Gherkin AC, reference them here — refine, don't duplicate. If no `story.md`, define from scratch:
 
@@ -181,6 +207,9 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 | Typed artifact | `.raise/artifacts/s{N}.{M}-design.yaml` |
 | Design document | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
 | Next | `/rai-story-plan` |
+
+> **LEARN**: After completing Step 5, follow LEARN protocol in `aspects/introspection.md`.
+> Record path: `.raise/rai/learnings/rai-story-design/{work_id}/record.yaml`
 
 ## Quality Checklist
 

@@ -15,13 +15,23 @@ metadata:
   raise.next: story-close
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.version: "2.3.0"
   raise.visibility: public
   raise.inputs: |
     - tests_passing: boolean, required, cli
   raise.outputs: |
     - retrospective_md: file_path, next_skill
     - patterns: list, cli
+  raise.aspects: introspection
+  raise.introspection:
+    phase: story.review
+    context_source: all story artifacts
+    affected_modules: []
+    max_tier1_queries: 2
+    max_jit_queries: 3
+    tier1_queries:
+      - "evaluation patterns for {affected_modules}"
+      - "process patterns from recent stories"
 ---
 
 # Story Review
@@ -43,6 +53,9 @@ Reflect on the completed story to extract learnings, persist patterns, reinforce
 **Inputs:** Completed story, progress log, passing test suite.
 
 ## Steps
+
+> **PRIME**: Before Step 1, follow PRIME protocol in `aspects/introspection.md`.
+> Chain read: read ALL previous story learning records (story-design, story-plan, story-implement). This provides the aggregate view for the retrospective.
 
 ### Step 1: Verify Tests Pass
 
@@ -83,6 +96,9 @@ Project language detected. Tests passing with appropriate runner.
 
 ### Step 2: Gather Data & Reflect
 
+> **JIT**: Before reflecting on development process, query graph for evaluation patterns
+> → `aspects/introspection.md § JIT Protocol`
+
 Review the story development: actual vs estimated time, blockers, plan deviations.
 
 **Heutagogical checkpoint** — answer with specific examples:
@@ -98,6 +114,9 @@ All four questions answered. Improvements identified (or celebrated that none ne
 </verification>
 
 ### Step 3: Persist Patterns & Reinforce
+
+> **JIT**: Before persisting patterns, query graph for existing patterns to avoid duplicates
+> → `aspects/introspection.md § JIT Protocol`
 
 **Add new patterns** worth preserving across sessions:
 
@@ -158,6 +177,9 @@ Calibration event recorded (or skipped if CLI unavailable).
 | Patterns | `.raise/rai/memory/patterns.jsonl` |
 | Calibration | Via `rai signal emit-calibration` |
 | Next | `/rai-story-close` |
+
+> **LEARN**: After completing Step 5, follow LEARN protocol in `aspects/introspection.md`.
+> Record path: `.raise/rai/learnings/rai-story-review/{work_id}/record.yaml`
 
 ## Quality Checklist
 
