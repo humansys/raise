@@ -295,3 +295,20 @@ class TestJiraDiscoveryBestEffort:
         # RAISE workflows empty due to failure, OPS still populated
         assert result.workflows["RAISE"] == []
         assert len(result.workflows["OPS"]) == 3
+
+    def test_issue_type_failure_does_not_block_other_projects(self) -> None:
+        from raise_cli.adapters.jira_discovery import JiraDiscovery
+
+        mock_client = _make_mock_jira_client()
+
+        def issue_type_side_effect(key: str) -> list[IssueTypeInfo]:
+            if key == "RAISE":
+                raise RuntimeError("API timeout")
+            return SAMPLE_ISSUE_TYPES
+
+        mock_client.get_issue_types.side_effect = issue_type_side_effect
+        discovery = JiraDiscovery(mock_client)  # type: ignore[arg-type]
+        result = discovery.discover()
+        # RAISE issue types empty due to failure, OPS still populated
+        assert result.issue_types["RAISE"] == []
+        assert len(result.issue_types["OPS"]) == 2

@@ -238,20 +238,23 @@ class JiraClient:
             groups: list[dict[str, Any]] = (
                 cast("list[dict[str, Any]]", raw) if isinstance(raw, list) else []
             )
-            seen: dict[str, WorkflowState] = {}
+            seen: dict[tuple[str, str], WorkflowState] = {}
             for itg in groups:
                 statuses: list[dict[str, Any]] = list(itg.get("statuses", []))
                 for status in statuses:
                     name: str = str(status.get("name", ""))
-                    if name and name not in seen:
-                        cat_raw: Any = status.get("statusCategory", {})
-                        cat_dict: dict[str, str] = (
-                            cast("dict[str, str]", cat_raw)
-                            if isinstance(cat_raw, dict)
-                            else {}
-                        )
-                        category: str = str(cat_dict.get("key", "unknown"))
-                        seen[name] = WorkflowState(
+                    if not name:
+                        continue
+                    cat_raw: Any = status.get("statusCategory", {})
+                    cat_dict: dict[str, str] = (
+                        cast("dict[str, str]", cat_raw)
+                        if isinstance(cat_raw, dict)
+                        else {}
+                    )
+                    category: str = str(cat_dict.get("key", "unknown"))
+                    key = (name, category)
+                    if key not in seen:
+                        seen[key] = WorkflowState(
                             name=name,
                             status_category=category,
                             transitions=[],
