@@ -229,10 +229,25 @@ class ConfluenceClient:
 
     # ── Search & Health ───────────────────────────────────────────────
 
+    @staticmethod
+    def _ensure_cql(query: str) -> str:
+        """Wrap plain text in CQL siteSearch if not already CQL.
+
+        CQL queries contain operators like ~, =, AND, OR, or known
+        predicates like type=, space=, text~. Plain text does not.
+        """
+        cql_indicators = ("~", "=", " AND ", " OR ", " ORDER BY ")
+        if any(op in query for op in cql_indicators):
+            return query
+        # Escape double quotes in user query
+        escaped = query.replace('"', '\\"')
+        return f'siteSearch ~ "{escaped}"'
+
     def search(self, cql: str, limit: int = 10) -> list[PageSummary]:
-        """Search using CQL."""
+        """Search using CQL. Plain text queries are auto-wrapped."""
+        effective_cql = self._ensure_cql(cql)
         try:
-            raw: dict[str, Any] = self._client.cql(cql, limit=limit)  # type: ignore[no-untyped-call]
+            raw: dict[str, Any] = self._client.cql(effective_cql, limit=limit)  # type: ignore[no-untyped-call]
             return [
                 PageSummary(
                     id=str(r["content"]["id"]),
@@ -245,7 +260,7 @@ class ConfluenceClient:
         except ConfluenceError:
             raise
         except Exception as e:
-            raise self._map_error(e, f"search({cql!r})") from e
+            raise self._map_error(e, f"search({effective_cql!r})") from e
 
     def health(self) -> AdapterHealth:
         """Check connectivity by listing 1 space."""
