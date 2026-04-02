@@ -25,4 +25,6 @@ artifacts:
   - s1133.5-design.md
 commit: null
 branch: story/s1133.5/story-review-refactor
-downstream: {}
+downstream:
+  plan_derivable: true
+  tasks_clear: true
