@@ -259,3 +259,106 @@ class TestWorkflowGeneration:
         # JiraConfig has extra="allow", so workflow passes through
         config = JiraConfig.model_validate(result)
         assert config.default_instance == "humansys"
+
+
+# ── T3: Issue types ──────────────────────────────────────────────────
+
+
+class TestIssueTypeGeneration:
+    """Issue types section from discovery data."""
+
+    def test_issue_types_included(self) -> None:
+        """Discovered issue types appear in output."""
+        issue_types = {
+            "RAISE": [
+                IssueTypeInfo(id="10001", name="Story", subtask=False),
+                IssueTypeInfo(id="10002", name="Bug", subtask=False),
+                IssueTypeInfo(id="10003", name="Sub-task", subtask=True),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            issue_types=issue_types,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        assert "issue_types" in result
+        names = [it["name"] for it in result["issue_types"]]
+        assert "Story" in names
+        assert "Bug" in names
+        assert "Sub-task" in names
+
+    def test_empty_issue_types_omits_section(self) -> None:
+        """No issue_types section when none discovered."""
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            issue_types={"RAISE": []},
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        assert "issue_types" not in result
+
+    def test_multi_project_merges_issue_types(self) -> None:
+        """Issue types from multiple projects are merged (deduped by name)."""
+        issue_types = {
+            "RAISE": [
+                IssueTypeInfo(id="10001", name="Story", subtask=False),
+                IssueTypeInfo(id="10002", name="Bug", subtask=False),
+            ],
+            "RTEST": [
+                IssueTypeInfo(id="10001", name="Story", subtask=False),
+                IssueTypeInfo(id="10004", name="Task", subtask=False),
+            ],
+        }
+        pm = _make_project_map(issue_types=issue_types)
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE", "RTEST"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        names = {it["name"] for it in result["issue_types"]}
+        assert names == {"Story", "Bug", "Task"}
+
+    def test_schema_validates_with_all_extras(self) -> None:
+        """Full config with workflow + issue_types passes JiraConfig.model_validate()."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+        }
+        issue_types = {
+            "RAISE": [
+                IssueTypeInfo(id="10001", name="Story", subtask=False),
+                IssueTypeInfo(id="10002", name="Bug", subtask=False),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows=workflows,
+            issue_types=issue_types,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        config = JiraConfig.model_validate(result)
+        assert config.default_instance == "humansys"
+        assert "RAISE" in config.projects

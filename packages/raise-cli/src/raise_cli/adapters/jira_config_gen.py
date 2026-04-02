@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from raise_cli.adapters.jira_discovery import JiraProjectMap
-from raise_cli.adapters.models.pm import WorkflowState
+from raise_cli.adapters.models.pm import IssueTypeInfo, WorkflowState
 
 
 def _slugify(name: str) -> str:
@@ -30,6 +30,19 @@ def _merge_workflows(
             dedup_key = (ws.name, ws.status_category)
             if dedup_key not in seen:
                 seen[dedup_key] = ws
+    return list(seen.values())
+
+
+def _merge_issue_types(
+    project_map: JiraProjectMap,
+    selected_keys: set[str],
+) -> list[IssueTypeInfo]:
+    """Merge and deduplicate issue types across selected projects by name."""
+    seen: dict[str, IssueTypeInfo] = {}
+    for key in sorted(selected_keys):
+        for it in project_map.issue_types.get(key, []):
+            if it.name not in seen:
+                seen[it.name] = it
     return list(seen.values())
 
 
@@ -103,5 +116,12 @@ def generate_jira_config(
             "states": states_list,
             "status_mapping": status_mapping,
         }
+
+    # Issue types section — merge across selected projects, dedup by name
+    merged_types = _merge_issue_types(project_map, selected_keys)
+    if merged_types:
+        result["issue_types"] = [
+            {"name": it.name, "subtask": it.subtask} for it in merged_types
+        ]
 
     return result
