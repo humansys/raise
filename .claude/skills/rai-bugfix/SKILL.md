@@ -5,6 +5,7 @@ description: >
   (start → analyse → plan → fix → review → close) with the same
   rigor and traceability as a story. Use for tracked bugs that
   need full accountability from reproduction to close.
+disable-model-invocation: true
 
 license: MIT
 

@@ -3,6 +3,7 @@ name: rai-discover
 description: >
   Run the full codebase discovery pipeline: detect languages, extract symbols,
   describe components, generate architecture docs, and build the knowledge graph.
+disable-model-invocation: true
 
 license: MIT
 

@@ -3,6 +3,7 @@ name: rai-mcp-remove
 description: >
   Safe MCP server removal with adapter dependency checking.
   Shows registered servers, warns about references, deletes config.
+disable-model-invocation: true
 
 license: MIT
 
