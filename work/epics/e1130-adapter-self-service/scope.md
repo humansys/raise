@@ -124,4 +124,4 @@ Stream B (Jira):        S1130.2 (M) ──→ S1130.5 (M)  ──┘
 | S1130.3 Adapter Doctor | M | done | 11 tests, three-level checks, entry point registered |
 | S1130.4 Config Gen Confluence | S | done | 7 tests, pure function, schema-validated |
 | S1130.5 Config Gen Jira | M | done | 15 tests, dogfood caught issueTypes key bug, 1 pattern |
-| S1130.6 /rai-adapter-setup | S | pending | |
+| S1130.6 /rai-adapter-setup | S | done | SKILL.md prompt, uses S1130.1-5 pipeline |
