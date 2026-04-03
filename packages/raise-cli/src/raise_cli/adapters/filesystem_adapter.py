@@ -20,10 +20,21 @@ class FilesystemAdapter:
 
     All paths are resolved relative to ``root``. Write operations use
     temp-file-then-rename for atomicity on POSIX systems.
+
+    Path containment is enforced — all resolved paths must stay within
+    the root directory.
     """
 
     def __init__(self, root: Path) -> None:
         self._root = root.resolve()
+
+    def _resolve(self, path: Path) -> Path:
+        """Resolve *path* relative to root with containment check."""
+        target = (self._root / path).resolve()
+        if not target.is_relative_to(self._root):
+            msg = f"Path escapes root: {path}"
+            raise ValueError(msg)
+        return target
 
     def write(self, path: Path, content: str) -> None:
         """Write *content* to *path* atomically.
@@ -32,11 +43,12 @@ class FilesystemAdapter:
         the target directory followed by ``os.rename`` to ensure the
         write is atomic on POSIX (same-filesystem guarantee).
         """
-        target = self._root / path
+        target = self._resolve(path)
         target.parent.mkdir(parents=True, exist_ok=True)
 
         with tempfile.NamedTemporaryFile(
             mode="w",
+            encoding="utf-8",
             dir=target.parent,
             delete=False,
             suffix=".tmp",
@@ -57,9 +69,7 @@ class FilesystemAdapter:
 
         Raises ``FileNotFoundError`` if the file does not exist.
         """
-        target = self._root / path
-        if not target.exists():
-            raise FileNotFoundError(target)
+        target = self._resolve(path)
         return target.read_text(encoding="utf-8")
 
     def list(self, pattern: str) -> list[Path]:
@@ -80,6 +90,9 @@ class FilesystemAdapter:
         Does **not** use ``open('a')`` --- the full file is rewritten
         atomically per DD-3.
         """
-        target = self._root / path
-        existing = target.read_text(encoding="utf-8") if target.exists() else ""
+        target = self._resolve(path)
+        try:
+            existing = target.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            existing = ""
         self.write(path, existing + line + "\n")
