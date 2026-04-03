@@ -20,6 +20,7 @@ from raise_cli.cli.commands.doctor import doctor_app
 from raise_cli.cli.commands.gate import gate_app
 from raise_cli.cli.commands.graph import graph_app
 from raise_cli.cli.commands.info import info_command
+from raise_cli.cli.commands.learn import learn_app
 from raise_cli.cli.commands.init import init_command
 from raise_cli.cli.commands.mcp import mcp_app
 from raise_cli.cli.commands.memory import memory_app
@@ -63,6 +64,7 @@ app.add_typer(docs_app, name="docs")
 app.add_typer(doctor_app, name="doctor")
 app.add_typer(gate_app, name="gate")
 app.add_typer(graph_app, name="graph")
+app.add_typer(learn_app, name="learn")
 app.add_typer(mcp_app, name="mcp")
 app.add_typer(memory_app, name="memory")
 app.add_typer(pattern_app, name="pattern")
