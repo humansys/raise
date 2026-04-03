@@ -194,3 +194,55 @@ Stewards absorb existing Pydantic validation and add the protections that are mi
 | DeveloperSteward | DeveloperProfile model | Defensive merge (don't overwrite fields not in update), coaching level monotonic |
 
 This is primarily a refactoring epic, not a greenfield effort. The bulk of the work is moving existing code into stewards and adding targeted protections where gaps exist.
+
+## DD-7: Extensibility-ready API — stewards accept simple data, build models internally (2026-04-02)
+
+### Context
+
+Future vision: skills become simpler (just generate content via inference), a declarative workflow layer orchestrates what to collect and which steward persists it. For that to work, stewards can't require callers to build complex Pydantic models — they need to accept simple inputs.
+
+### Decision
+
+Steward methods accept primitive data (strings, lists, dicts). The steward builds and validates the domain model internally.
+
+```python
+# NOT this — caller must know the model structure
+session_steward.save_state(SessionState(
+    current_work=CurrentWork(release="2.4.0", epic="E1040", ...),
+    last_session=LastSession(id="SES-032", ...),
+    ...
+))
+
+# THIS — steward accepts simple data, builds model internally
+session_steward.close(
+    summary="migrated persistence layer",
+    patterns=["atomic writes prevent RAISE-697"],
+    coaching=["developer prefers interactive design"],
+)
+```
+
+Similarly, CLI exposes granular flags alongside the existing state-file path:
+
+```bash
+# Power-user path (keep working)
+rai session close --state-file session-output.yaml
+
+# Granular path (workflow-friendly, extensible)
+rai session close \
+  --summary "..." \
+  --pattern "..." \
+  --coaching "..."
+```
+
+### Why
+
+- Enables future declarative workflow layer without steward API changes
+- Reduces coupling between skills and domain models (skill doesn't need to know SessionState structure)
+- Cheaper inference: Claude generates content, not structure
+- Both paths coexist — no breaking change
+
+### What this means for E1040
+
+- S1040.2: Steward methods designed with simple-input signatures
+- S1040.3: CLI adds granular flags (--summary, --pattern, --coaching) as alternative to --state-file
+- No workflow engine built — just API readiness

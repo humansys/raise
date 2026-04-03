@@ -59,6 +59,57 @@ S1040.4 (Docs hardening) ─── independent ───────────
 - [ ] All existing tests pass
 - [ ] File layout identical to current behavior (non-breaking)
 
+## Implementation Plan
+
+### Sequencing Strategy: Walking Skeleton
+
+Architecture is new (Steward + Adapter). Prove the chain works E2E first.
+
+### Story Sequence
+
+| Order | Story | Rationale | Enables |
+|-------|-------|-----------|---------|
+| 1 | S1040.1: FilesystemAdapter | Foundation — all stewards depend on atomic I/O | S1040.2 |
+| 1 // | S1040.4: Docs hardening | Independent, no shared code — runs in parallel | — |
+| 2 | S1040.2: Stewards | Domain layer on top of adapter, proves architecture | S1040.3 |
+| 3 | S1040.3: Migration | Integrates everything, replaces old code, proves value | Epic done |
+
+### Milestones
+
+**M1: Walking Skeleton** — S1040.1 + S1040.4
+- FilesystemAdapter exists with atomic write/append/read/list
+- FilesystemDocsTarget validates frontmatter
+- Verify: test writes atomically, test rejects invalid frontmatter
+- Parallel: both stories run concurrently (no shared code)
+
+**M2: Domain Layer** — S1040.2
+- Three stewards exist, validate, delegate to adapter
+- SessionSteward rejects overwrite with older timestamp
+- Verify: RAISE-697 scenario → error, not corruption
+
+**M3: Epic Complete** — S1040.3
+- CLI uses stewards exclusively, direct-write functions deleted
+- CLI exposes granular flags (--summary, --pattern, --coaching)
+- Verify: grep for direct writes → zero hits
+- All existing tests pass, done criteria met
+
+### Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| S1040.3 touches many files, may break tests | High | Migrate function by function, tests passing between each |
+| DeveloperSteward writes to ~/.rai/ (global) | Medium | FilesystemAdapter accepts different root in constructor |
+| File layout compatibility | High | Golden file tests comparing output before/after |
+
+### Progress
+
+| # | Story | Status | Milestone |
+|---|-------|--------|-----------|
+| 1 | S1040.1: FilesystemAdapter | backlog | M1 |
+| 4 | S1040.4: Docs hardening | backlog | M1 |
+| 2 | S1040.2: Stewards | backlog | M2 |
+| 3 | S1040.3: Migration | backlog | M3 |
+
 ## References
 
 - Design decisions: `design-decisions.md`
