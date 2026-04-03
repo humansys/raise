@@ -11,12 +11,14 @@ from __future__ import annotations
 
 import logging
 import shutil
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
 import yaml
 from pydantic import ValidationError
 
+from raise_cli.adapters.filesystem_adapter import FilesystemAdapter
 from raise_cli.config.paths import get_session_dir
 from raise_cli.schemas.session_state import SessionState
 
@@ -32,6 +34,18 @@ SESSION_STATE_REL_PATH = (
 
 # Legacy path for migration
 _LEGACY_SESSION_STATE_REL_PATH = Path(_RAISE_DIR_NAME) / "rai" / _SESSION_STATE_YAML
+
+
+class StaleWriteError(Exception):
+    """Raised when a session state write would overwrite newer data."""
+
+    def __init__(self, path: Path, on_disk: str, incoming: str) -> None:
+        super().__init__(
+            f"Stale write rejected: {path} (on-disk={on_disk}, incoming={incoming})"
+        )
+        self.path = path
+        self.on_disk_timestamp = on_disk
+        self.incoming_timestamp = incoming
 
 
 def get_session_state_path(project_path: Path, session_id: str | None = None) -> Path:
@@ -192,20 +206,41 @@ def save_session_state(
     When session_id is provided, writes to per-session directory.
     When session_id is None, writes to legacy flat file.
 
-    Creates parent directories if they don't exist.
-    Overwrites any existing file.
+    Uses FilesystemAdapter for atomic write semantics.
+    Includes timestamp protection: rejects writes when the incoming
+    ``last_modified`` is older than the on-disk value (RAISE-697).
 
     Args:
         project_path: Absolute path to the project root.
         state: The session state to save.
         session_id: Optional session ID for per-session isolation.
+
+    Raises:
+        StaleWriteError: If on-disk state has a newer last_modified than incoming.
     """
     state_path = get_session_state_path(project_path, session_id)
-    state_path.parent.mkdir(parents=True, exist_ok=True)
+    rel_path = state_path.relative_to(project_path)
 
+    # Timestamp protection: reject stale overwrites (RAISE-697)
+    if state_path.exists():
+        existing = load_session_state(project_path, session_id)
+        if (
+            existing
+            and existing.last_modified
+            and state.last_modified
+            and state.last_modified < existing.last_modified
+        ):
+            raise StaleWriteError(
+                state_path, existing.last_modified, state.last_modified
+            )
+
+    # Stamp outgoing data
+    state = state.model_copy(update={"last_modified": datetime.now(UTC).isoformat()})
     data = state.model_dump(mode="json")
     content = yaml.dump(
         data, default_flow_style=False, allow_unicode=True, sort_keys=False
     )
-    state_path.write_text(content, encoding="utf-8")
+
+    adapter = FilesystemAdapter(root=project_path)
+    adapter.write(rel_path, content)
     logger.debug("Saved session state: %s", state_path)

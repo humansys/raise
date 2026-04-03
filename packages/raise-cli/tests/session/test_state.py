@@ -16,6 +16,7 @@ from raise_cli.schemas.session_state import (
     SessionState,
 )
 from raise_cli.session.state import (
+    StaleWriteError,
     get_session_state_path,
     load_session_state,
     save_session_state,
@@ -484,3 +485,113 @@ class TestCleanupSessionDir:
         assert (sessions_dir / "SES-101" / "state.yaml").read_text(
             encoding="utf-8"
         ) == "101"
+
+
+class TestSaveSessionStateAdapter:
+    """Tests for save_session_state using FilesystemAdapter (S1040.2 T2)."""
+
+    def test_writes_via_adapter(self, tmp_path: Path) -> None:
+        """save_session_state should delegate to FilesystemAdapter.write."""
+        from unittest.mock import patch
+
+        state = _make_session_state()
+
+        with patch("raise_cli.session.state.FilesystemAdapter") as mock_adapter_cls:
+            save_session_state(tmp_path, state)
+
+            mock_adapter_cls.assert_called_once_with(root=tmp_path)
+            mock_adapter_cls.return_value.write.assert_called_once()
+
+    def test_stamps_last_modified(self, tmp_path: Path) -> None:
+        """Saved state should contain a last_modified timestamp."""
+        state = _make_session_state()
+        save_session_state(tmp_path, state)
+
+        loaded = load_session_state(tmp_path)
+        assert loaded is not None
+        assert loaded.last_modified is not None
+        # Should be a valid ISO timestamp
+        assert "T" in loaded.last_modified
+
+    def test_first_write_succeeds(self, tmp_path: Path) -> None:
+        """First write (no existing file) should succeed without errors."""
+        state = _make_session_state()
+        save_session_state(tmp_path, state)
+
+        loaded = load_session_state(tmp_path)
+        assert loaded is not None
+        assert loaded.current_work.epic == "E15"
+
+    def test_stale_overwrite_rejected(self, tmp_path: Path) -> None:
+        """Write with older last_modified than on-disk should raise StaleWriteError."""
+        state = _make_session_state()
+        # First write - establishes on-disk timestamp
+        save_session_state(tmp_path, state)
+
+        loaded = load_session_state(tmp_path)
+        assert loaded is not None
+        assert loaded.last_modified is not None
+
+        # Try to write with an older timestamp
+        stale_state = state.model_copy(
+            update={"last_modified": "2020-01-01T00:00:00+00:00"}
+        )
+        with pytest.raises(StaleWriteError) as exc_info:
+            save_session_state(tmp_path, stale_state)
+
+        assert exc_info.value.incoming_timestamp == "2020-01-01T00:00:00+00:00"
+        assert exc_info.value.on_disk_timestamp == loaded.last_modified
+
+    def test_fresh_write_succeeds_over_existing(self, tmp_path: Path) -> None:
+        """Write with newer last_modified than on-disk should succeed."""
+        state = _make_session_state()
+        save_session_state(tmp_path, state)
+
+        loaded = load_session_state(tmp_path)
+        assert loaded is not None
+
+        # Write with a future timestamp
+        fresh_state = state.model_copy(
+            update={"last_modified": "2099-12-31T23:59:59+00:00"}
+        )
+        save_session_state(tmp_path, fresh_state)
+
+        reloaded = load_session_state(tmp_path)
+        assert reloaded is not None
+        # last_modified gets re-stamped by save, so it won't be the 2099 value
+        assert reloaded.last_modified is not None
+
+    def test_legacy_file_without_last_modified_succeeds(self, tmp_path: Path) -> None:
+        """Write over a legacy file (no last_modified) should succeed."""
+        # Manually create a legacy state file without last_modified
+        state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
+        state_path.parent.mkdir(parents=True)
+        legacy_data = _make_session_state().model_dump(mode="json")
+        # Ensure no last_modified
+        legacy_data.pop("last_modified", None)
+        state_path.write_text(
+            yaml.dump(legacy_data, default_flow_style=False),
+            encoding="utf-8",
+        )
+
+        # Writing with last_modified=None should succeed (skip check)
+        state = _make_session_state()
+        save_session_state(tmp_path, state)
+
+        loaded = load_session_state(tmp_path)
+        assert loaded is not None
+        assert loaded.last_modified is not None
+
+    def test_stale_write_error_contains_path(self, tmp_path: Path) -> None:
+        """StaleWriteError should include the file path."""
+        state = _make_session_state()
+        save_session_state(tmp_path, state)
+
+        stale_state = state.model_copy(
+            update={"last_modified": "2020-01-01T00:00:00+00:00"}
+        )
+        with pytest.raises(StaleWriteError) as exc_info:
+            save_session_state(tmp_path, stale_state)
+
+        assert exc_info.value.path is not None
+        assert "session-state.yaml" in str(exc_info.value.path)
