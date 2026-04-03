@@ -901,3 +901,51 @@ class TestReinforcePattern:
         # The actual file on disk was updated — not some other path
         data = json.loads(real_file.read_text(encoding="utf-8").splitlines()[0])
         assert data["positives"] == 1
+
+
+class TestAppendJsonlUsesAdapter:
+    """Verify _append_jsonl delegates to FilesystemAdapter.append (S1040.2 T1)."""
+
+    def test_append_jsonl_delegates_to_adapter(self, tmp_path: Path) -> None:
+        """_append_jsonl should use FilesystemAdapter.append internally."""
+        from unittest.mock import patch
+
+        from raise_cli.memory.writer import _append_jsonl
+
+        file_path = tmp_path / "patterns.jsonl"
+        data = {"id": "PAT-001", "content": "test"}
+
+        with patch("raise_cli.memory.writer.FilesystemAdapter") as mock_adapter_cls:
+            _append_jsonl(file_path, data)
+
+            mock_adapter_cls.assert_called_once_with(root=tmp_path)
+            mock_adapter_cls.return_value.append.assert_called_once_with(
+                Path(file_path.name), json.dumps(data)
+            )
+
+    def test_append_jsonl_produces_correct_output(self, tmp_path: Path) -> None:
+        """End-to-end: appended line is valid JSONL with trailing newline."""
+        from raise_cli.memory.writer import _append_jsonl
+
+        file_path = tmp_path / "test.jsonl"
+        data = {"id": "PAT-001", "content": "hello"}
+
+        _append_jsonl(file_path, data)
+
+        content = file_path.read_text(encoding="utf-8")
+        assert content.endswith("\n")
+        parsed = json.loads(content.strip())
+        assert parsed == data
+
+    def test_append_jsonl_creates_parent_dirs(self, tmp_path: Path) -> None:
+        """Adapter handles parent directory creation."""
+        from raise_cli.memory.writer import _append_jsonl
+
+        file_path = tmp_path / "deep" / "nested" / "test.jsonl"
+        data = {"id": "PAT-001"}
+
+        _append_jsonl(file_path, data)
+
+        assert file_path.exists()
+        parsed = json.loads(file_path.read_text(encoding="utf-8").strip())
+        assert parsed["id"] == "PAT-001"

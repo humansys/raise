@@ -16,6 +16,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from raise_cli.adapters.filesystem_adapter import FilesystemAdapter
 from raise_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
 from raise_cli.memory.models import MemoryScope, PatternSubType
 
@@ -375,13 +376,14 @@ def get_next_id(  # noqa: C901
 def _append_jsonl(file_path: Path, data: dict[str, Any]) -> None:
     """Append a JSON object as a line to a JSONL file.
 
+    Uses FilesystemAdapter for atomic append semantics.
+
     Args:
         file_path: Path to JSONL file.
         data: Dictionary to serialize as JSON line.
     """
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    with file_path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(data) + "\n")
+    adapter = FilesystemAdapter(root=file_path.parent)
+    adapter.append(Path(file_path.name), json.dumps(data))
 
 
 def append_pattern(
