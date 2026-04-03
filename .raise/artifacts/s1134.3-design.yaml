@@ -1,0 +1,65 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-04-02T07:55:00-06:00'
+story: 'S1134.3'
+epic: 'E1134'
+content:
+  summary: >-
+    Add disable-model-invocation: true to 9 side-effect/orchestration skills.
+    Prevents CC auto-invocation of destructive operations and frees ~900 chars
+    of description budget.
+  complexity: simple
+  acceptance_criteria:
+    - id: AC1
+      description: '9 skills have disable-model-invocation: true'
+      verifiable: true
+    - id: AC2
+      description: 'Field placement consistent (after description, before license)'
+      verifiable: true
+    - id: AC3
+      description: 'No other frontmatter fields changed'
+      verifiable: true
+    - id: AC4
+      description: 'No skill content changed'
+      verifiable: true
+    - id: AC5
+      description: 'YAML valid (no syntax errors)'
+      verifiable: true
+  integration_points:
+    - module: 'skills.rai-epic-start'
+      change_type: modification
+      files: ['.claude/skills/rai-epic-start/SKILL.md']
+    - module: 'skills.rai-epic-close'
+      change_type: modification
+      files: ['.claude/skills/rai-epic-close/SKILL.md']
+    - module: 'skills.rai-epic-run'
+      change_type: modification
+      files: ['.claude/skills/rai-epic-run/SKILL.md']
+    - module: 'skills.rai-story-start'
+      change_type: modification
+      files: ['.claude/skills/rai-story-start/SKILL.md']
+    - module: 'skills.rai-story-close'
+      change_type: modification
+      files: ['.claude/skills/rai-story-close/SKILL.md']
+    - module: 'skills.rai-story-run'
+      change_type: modification
+      files: ['.claude/skills/rai-story-run/SKILL.md']
+    - module: 'skills.rai-session-close'
+      change_type: modification
+      files: ['.claude/skills/rai-session-close/SKILL.md']
+    - module: 'skills.rai-publish'
+      change_type: modification
+      files: ['.claude/skills/rai-publish/SKILL.md']
+    - module: 'skills.rai-framework-sync'
+      change_type: modification
+      files: ['.claude/skills/rai-framework-sync/SKILL.md']
+  decisions:
+    - id: D1
+      choice: 'Place field after description, before license'
+      rationale: 'Consistent with CC convention — invocation fields near description'
+      alternatives_considered: ['At end of frontmatter', 'Before description']
+refs:
+  backlog_item: 'RAISE-1182'
+  epic_scope: 'work/epics/e1134-cc-alignment/scope.md'
+metadata: {}

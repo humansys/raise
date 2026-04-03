@@ -1,10 +1,14 @@
 ---
 name: rai-project-onboard
-description: >
-  Guide brownfield project onboarding through discovery and conversation. Analyzes
-  existing codebase, detects conventions, fills governance templates with discovered
-  and conversational content, and builds the knowledge graph. Use after rai init --detect
-  on an existing project.
+description: Discover conventions and set up governance. Use after rai init --detect on existing code.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

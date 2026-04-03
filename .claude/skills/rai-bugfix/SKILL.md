@@ -1,10 +1,16 @@
 ---
-description: 'Guide the developer through a formal 7-phase bug fix lifecycle (start
-  → triage → analyse → plan → fix → review → close) with classification in 4 dimensions
-  and process improvement extraction. Use for tracked bugs that need full accountability
-  from reproduction to close.
+name: rai-bugfix
+description: Guide a tracked bug through 6-phase fix lifecycle. Use for bugs needing traceability.
+disable-model-invocation: true
 
-  '
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - Bash
+
 license: MIT
 metadata:
   raise.adaptable: 'true'
@@ -17,7 +23,6 @@ metadata:
   raise.version: 2.0.0
   raise.visibility: internal
   raise.work_cycle: utility
-name: rai-bugfix
 ---
 
 # Bugfix

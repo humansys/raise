@@ -1,8 +1,15 @@
 ---
 name: rai-mcp-remove
-description: >
-  Safe MCP server removal with adapter dependency checking.
-  Shows registered servers, warns about references, deletes config.
+description: Remove an MCP server with dependency checking. Use to unregister a server.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

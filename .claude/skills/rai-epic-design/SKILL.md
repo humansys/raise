@@ -1,10 +1,14 @@
 ---
 name: rai-epic-design
-description: >
-  Design an epic from strategic objective to feature breakdown. Use when
-  starting a new body of work spanning multiple features (3-10), requiring
-  architectural decisions, or when establishing technical direction for
-  significant capability delivery.
+description: Design epic scope, stories, and architecture. Use for work spanning 3-10 features.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

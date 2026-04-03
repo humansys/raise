@@ -1,9 +1,12 @@
 ---
 name: rai-story-plan
-description: >
-  Decompose user stories into atomic executable tasks, identify dependencies,
-  and create a deterministic implementation plan. Use after /rai-story-design
-  has grounded the story's integration decisions.
+description: Decompose story into atomic tasks with TDD verification. Use after story design.
+
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

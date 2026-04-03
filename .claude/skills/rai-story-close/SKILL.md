@@ -1,9 +1,16 @@
 ---
 name: rai-story-close
-description: >
-  Complete a story with retrospective verification, local merge to dev,
-  and tracking update. MRs are created at epic level, not per story.
-  Use after review to formally close the story lifecycle.
+description: Merge story branch to dev and update tracking. Use after story review.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
 
 license: MIT
 

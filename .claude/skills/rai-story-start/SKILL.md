@@ -1,9 +1,16 @@
 ---
 name: rai-story-start
-description: >
-  Initialize a story with verified context, branch, and scope commit.
-  Use at the beginning of story work to ensure proper setup and
-  traceability from the start.
+description: Create story branch and scope commit. Use to begin story work.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
 
 license: MIT
 

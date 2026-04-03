@@ -1,10 +1,15 @@
 ---
 name: rai-epic-run
-description: >
-  Execute epic lifecycle phases (start → design → AR → plan → close),
-  pausing at story iteration for human-driven /rai-story-run execution.
-  Resumes from last completed phase. Delegation profile controls pause
-  behavior at natural gates.
+description: Run the full epic lifecycle with delegation gates. Use to orchestrate an epic.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - Agent
+  - Skill
 
 license: MIT
 

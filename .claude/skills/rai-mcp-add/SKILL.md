@@ -1,9 +1,15 @@
 ---
 name: rai-mcp-add
-description: >
-  Guided MCP server registration. Collects intent conversationally,
-  resolves package details, and delegates to `rai mcp install` or
-  `rai mcp scaffold`. Human never constructs CLI commands.
+description: Register an MCP server conversationally. Use to add a new MCP integration.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 
