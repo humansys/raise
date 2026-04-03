@@ -69,3 +69,17 @@ class FilesystemAdapter:
         for deterministic output.
         """
         return sorted(p.relative_to(self._root) for p in self._root.glob(pattern))
+
+    def append(self, path: Path, line: str) -> None:
+        r"""Append *line* with a trailing newline to *path* atomically.
+
+        Reads existing content (empty string if file does not exist),
+        appends the line with ``\n``, and writes the result atomically
+        via :meth:`write`. Creates parent directories as needed.
+
+        Does **not** use ``open('a')`` --- the full file is rewritten
+        atomically per DD-3.
+        """
+        target = self._root / path
+        existing = target.read_text(encoding="utf-8") if target.exists() else ""
+        self.write(path, existing + line + "\n")

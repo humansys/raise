@@ -80,3 +80,45 @@ class TestList:
         # Verify paths are relative, not absolute
         for p in result:
             assert not p.is_absolute()
+
+
+# ── T2: append operation ─────────────────────────────────────────────────
+
+
+class TestAppend:
+    """append() adds a single line atomically."""
+
+    def test_append_adds_line_to_existing_file(self, tmp_path: Path) -> None:
+        """AC3: append adds exactly one line with trailing newline."""
+        adapter = FilesystemAdapter(root=tmp_path)
+        adapter.write(Path("log.jsonl"), "line1\n")
+        adapter.append(Path("log.jsonl"), "line2")
+        assert adapter.read(Path("log.jsonl")) == "line1\nline2\n"
+
+    def test_append_creates_new_file(self, tmp_path: Path) -> None:
+        """AC4: append to non-existent file creates it."""
+        adapter = FilesystemAdapter(root=tmp_path)
+        adapter.append(Path("new.jsonl"), "first")
+        assert adapter.read(Path("new.jsonl")) == "first\n"
+
+    def test_append_creates_parent_dirs(self, tmp_path: Path) -> None:
+        """AC4: append creates parent directories."""
+        adapter = FilesystemAdapter(root=tmp_path)
+        adapter.append(Path("deep/dir/file.jsonl"), "data")
+        assert (tmp_path / "deep" / "dir" / "file.jsonl").exists()
+
+    def test_append_preserves_existing_content(self, tmp_path: Path) -> None:
+        """AC3: existing content is preserved after append."""
+        adapter = FilesystemAdapter(root=tmp_path)
+        adapter.write(Path("file.jsonl"), "a\nb\n")
+        adapter.append(Path("file.jsonl"), "c")
+        content = adapter.read(Path("file.jsonl"))
+        assert content.startswith("a\nb\n")
+        assert content.endswith("c\n")
+
+    def test_append_adds_trailing_newline(self, tmp_path: Path) -> None:
+        """AC3: appended line always ends with newline."""
+        adapter = FilesystemAdapter(root=tmp_path)
+        adapter.append(Path("file.jsonl"), "no-newline-here")
+        content = adapter.read(Path("file.jsonl"))
+        assert content.endswith("\n")
