@@ -3,6 +3,15 @@ name: rai-story-start
 description: Create story branch and scope commit. Use to begin story work.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
+
 license: MIT
 
 metadata:

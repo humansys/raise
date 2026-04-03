@@ -3,6 +3,14 @@ name: rai-discover
 description: Scan codebase, extract symbols, and build knowledge graph. Use for codebase discovery.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

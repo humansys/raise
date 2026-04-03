@@ -2,6 +2,14 @@
 name: rai-project-onboard
 description: Discover conventions and set up governance. Use after rai init --detect on existing code.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

@@ -2,6 +2,14 @@
 name: rai-debug
 description: Find root cause using 5 Whys, Ishikawa, Gemba. Use when encountering errors or defects.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - Bash
+
 license: MIT
 
 metadata:

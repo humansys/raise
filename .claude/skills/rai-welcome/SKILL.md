@@ -2,6 +2,14 @@
 name: rai-welcome
 description: Onboard a developer to RaiSE interactively. Use for first-time setup.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

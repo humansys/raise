@@ -2,6 +2,14 @@
 name: rai-story-design
 description: Create lean story spec for human review and AI alignment. Use before story plan.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

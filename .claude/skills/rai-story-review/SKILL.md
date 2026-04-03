@@ -2,6 +2,12 @@
 name: rai-story-review
 description: Extract learnings and persist patterns from completed story. Use after implementation.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

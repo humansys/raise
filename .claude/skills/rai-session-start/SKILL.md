@@ -2,6 +2,11 @@
 name: rai-session-start
 description: Load context and propose session focus. Use at the start of every working session.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+
 license: MIT
 
 metadata:

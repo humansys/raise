@@ -3,6 +3,15 @@ name: rai-publish
 description: Run release workflow with quality gates and PyPI publishing. Use for releases.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
+
 license: MIT
 
 metadata:

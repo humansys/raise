@@ -3,6 +3,15 @@ name: rai-epic-start
 description: Initialize epic directory, brief, and tracker entry. Use to begin a new epic.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
+
 license: MIT
 
 metadata:

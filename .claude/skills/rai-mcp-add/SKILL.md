@@ -3,6 +3,14 @@ name: rai-mcp-add
 description: Register an MCP server conversationally. Use to add a new MCP integration.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

@@ -2,6 +2,11 @@
 name: rai-problem-shape
 description: Shape a vague idea into a problem brief. Use before epic design for new initiatives.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+
 license: MIT
 
 metadata:

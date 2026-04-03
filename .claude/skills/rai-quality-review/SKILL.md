@@ -2,6 +2,11 @@
 name: rai-quality-review
 description: Audit code for semantic bugs, type lies, and test muda. Use after implementation.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+
 license: MIT
 
 metadata:

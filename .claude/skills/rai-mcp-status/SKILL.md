@@ -2,6 +2,11 @@
 name: rai-mcp-status
 description: Check health of registered MCP servers. Use to diagnose MCP connectivity.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+
 license: MIT
 
 metadata:

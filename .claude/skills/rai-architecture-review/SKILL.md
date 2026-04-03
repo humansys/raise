@@ -2,6 +2,11 @@
 name: rai-architecture-review
 description: Evaluate design proportionality using Beck's four rules. Use after implementation.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+
 license: MIT
 
 metadata:

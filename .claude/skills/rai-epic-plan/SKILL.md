@@ -2,6 +2,12 @@
 name: rai-epic-plan
 description: Sequence epic stories into milestones and dependencies. Use after epic design.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

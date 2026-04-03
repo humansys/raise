@@ -1,5 +1,14 @@
 ---
 description: Generate architecture docs and publish to Confluence. Use before epic close.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 metadata:
   raise.adaptable: 'true'

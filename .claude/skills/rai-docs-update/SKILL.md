@@ -2,6 +2,14 @@
 name: rai-docs-update
 description: Sync module docs with knowledge graph. Use when architecture docs drift.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

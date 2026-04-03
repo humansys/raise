@@ -2,6 +2,14 @@
 name: rai-story-implement
 description: Execute plan tasks with TDD and validation gates. Use after story plan.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - Bash
+
 license: MIT
 
 metadata:

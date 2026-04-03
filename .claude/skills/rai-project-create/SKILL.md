@@ -2,6 +2,14 @@
 name: rai-project-create
 description: Set up governance for a new project. Use after rai init on a greenfield project.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

@@ -2,6 +2,11 @@
 name: rai-doctor
 description: Run self-diagnostics and guide fixes. Use to troubleshoot RaiSE issues.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+
 license: MIT
 
 metadata:

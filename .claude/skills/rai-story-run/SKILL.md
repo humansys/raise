@@ -3,6 +3,14 @@ name: rai-story-run
 description: Run the full story lifecycle with delegation gates. Use to orchestrate a story.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - Agent
+  - Skill
+
 license: MIT
 
 metadata:

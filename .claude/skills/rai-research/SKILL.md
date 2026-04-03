@@ -2,6 +2,14 @@
 name: rai-research
 description: Research with triangulated evidence to inform decisions. Use before ADRs or evaluations.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(ddgr:*)"
+  - WebFetch
+  - WebSearch
+
 license: MIT
 
 metadata:

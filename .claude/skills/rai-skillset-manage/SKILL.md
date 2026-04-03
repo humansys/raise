@@ -2,6 +2,12 @@
 name: rai-skillset-manage
 description: Manage skill sets via CLI. Use to create, compare, or customize skill sets.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

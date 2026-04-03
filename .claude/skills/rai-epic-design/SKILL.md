@@ -2,6 +2,14 @@
 name: rai-epic-design
 description: Design epic scope, stories, and architecture. Use for work spanning 3-10 features.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

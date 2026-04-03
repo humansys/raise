@@ -3,6 +3,15 @@ name: rai-story-close
 description: Merge story branch to dev and update tracking. Use after story review.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
+
 license: MIT
 
 metadata:

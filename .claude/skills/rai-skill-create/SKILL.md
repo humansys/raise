@@ -2,6 +2,14 @@
 name: rai-skill-create
 description: Create a new skill through guided conversation. Use to add skills to the framework.
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:

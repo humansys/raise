@@ -2,6 +2,11 @@
 name: rai-code-audit
 description: Audit modules against code-standards.md for naming, idioms, and API design.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+
 license: MIT
 
 metadata:

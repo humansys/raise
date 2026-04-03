@@ -3,6 +3,15 @@ name: rai-epic-close
 description: Close epic with retrospective, push, and merge request. Use after all stories done.
 disable-model-invocation: true
 
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
+
 license: MIT
 
 metadata:

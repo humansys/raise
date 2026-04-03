@@ -2,6 +2,12 @@
 name: rai-story-plan
 description: Decompose story into atomic tasks with TDD verification. Use after story design.
 
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 
 metadata:
