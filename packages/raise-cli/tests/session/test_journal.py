@@ -140,3 +140,23 @@ class TestReadJournal:
         assert "Use JSONL" in output
         assert "TASK_DONE:" in output
         assert "T1 complete" in output
+
+
+class TestAppendJournalEntryAdapter:
+    """Verify append_journal_entry uses FilesystemAdapter (S1040.2 T3a)."""
+
+    def test_delegates_to_adapter_append(self, tmp_path: Path) -> None:
+        """append_journal_entry should use FilesystemAdapter.append."""
+        from unittest.mock import patch
+
+        session_dir = tmp_path / "sessions" / "SES-308"
+
+        with patch("raise_cli.session.journal.FilesystemAdapter") as mock_adapter_cls:
+            append_journal_entry(
+                session_dir=session_dir,
+                entry_type=JournalEntryType.DECISION,
+                content="Test decision",
+            )
+
+            mock_adapter_cls.assert_called_once_with(root=session_dir)
+            mock_adapter_cls.return_value.append.assert_called_once()

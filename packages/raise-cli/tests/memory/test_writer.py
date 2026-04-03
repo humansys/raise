@@ -949,3 +949,45 @@ class TestAppendJsonlUsesAdapter:
         assert file_path.exists()
         parsed = json.loads(file_path.read_text(encoding="utf-8").strip())
         assert parsed["id"] == "PAT-001"
+
+
+class TestReinforcePatternUsesAdapter:
+    """Verify reinforce_pattern uses FilesystemAdapter.write (S1040.2 T3b)."""
+
+    def test_reinforce_delegates_to_adapter_write(self, tmp_path: Path) -> None:
+        """reinforce_pattern should use FilesystemAdapter.write for atomic rewrite."""
+        from unittest.mock import patch
+
+        f = tmp_path / "patterns.jsonl"
+        f.write_text(
+            '{"id": "PAT-E-001", "content": "test", "created": "2026-02-01"}\n',
+            encoding="utf-8",
+        )
+
+        with patch("raise_cli.memory.writer.FilesystemAdapter") as mock_adapter_cls:
+            reinforce_pattern(f, "PAT-E-001", vote=1)
+
+            mock_adapter_cls.assert_called_with(root=tmp_path)
+            mock_adapter_cls.return_value.write.assert_called_once()
+
+    def test_reinforce_output_identical_after_migration(self, tmp_path: Path) -> None:
+        """End-to-end: reinforce produces identical JSONL content."""
+        f = tmp_path / "patterns.jsonl"
+        f.write_text(
+            '{"id": "PAT-E-001", "content": "test", "created": "2026-02-01"}\n'
+            '{"id": "PAT-E-002", "content": "second", "created": "2026-02-01"}\n',
+            encoding="utf-8",
+        )
+
+        reinforce_pattern(f, "PAT-E-001", vote=1)
+
+        lines = [
+            json.loads(line)
+            for line in f.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        assert len(lines) == 2
+        assert lines[0]["positives"] == 1
+        assert lines[0]["evaluations"] == 1
+        assert lines[1]["id"] == "PAT-E-002"
+        assert "positives" not in lines[1]
