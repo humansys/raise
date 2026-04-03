@@ -16,6 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from raise_cli.compat import file_lock, file_unlock
 from raise_cli.memory.writer import WriteResult, get_next_id
 from raise_cli.schemas.journal import JournalEntry, JournalEntryType
 
@@ -52,8 +53,6 @@ def append_journal_entry(
         "content": content,
         "tags": tags or [],
     }
-
-    from raise_cli.compat import file_lock, file_unlock
 
     file_path.parent.mkdir(parents=True, exist_ok=True)
     with file_path.open("a", encoding="utf-8") as f:

@@ -8,7 +8,6 @@ Architecture: S347.6 (E347 Backlog Automation)
 
 from __future__ import annotations
 
-import os
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -61,8 +60,10 @@ def sync_backlog(
 
     # Format and write
     timestamp = datetime.now(UTC).isoformat()
+    from raise_cli.core.files import atomic_write
+
     content = _format_markdown(results, adapter_name, timestamp)
-    _atomic_write(output_path, content)
+    atomic_write(output_path, content)
 
     return SyncResult(
         adapter_name=adapter_name,
@@ -101,15 +102,3 @@ def _format_markdown(
     return "\n".join(lines)
 
 
-def _atomic_write(path: Path, content: str) -> None:
-    """Write content to path atomically via temp file + rename.
-
-    Uses ``str(path) + ".tmp"`` to preserve the original suffix
-    (e.g., ``backlog.md.tmp`` not ``backlog.tmp``).
-    Uses :func:`os.replace` instead of :meth:`Path.rename` for
-    cross-platform atomicity (``rename`` fails on Windows when target exists).
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = Path(str(path) + ".tmp")
-    tmp.write_text(content, encoding="utf-8")
-    os.replace(tmp, path)

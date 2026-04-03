@@ -14,6 +14,8 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, ValidationError
 
+from raise_cli.core.files import atomic_write
+
 logger = logging.getLogger(__name__)
 
 
@@ -429,8 +431,6 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
     content = yaml.dump(
         data, default_flow_style=False, allow_unicode=True, sort_keys=False
     )
-    from raise_cli.core.files import atomic_write
-
     atomic_write(profile_path, content)
     logger.debug("Saved developer profile: %s", profile_path)
 

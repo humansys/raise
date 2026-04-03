@@ -18,6 +18,7 @@ import yaml
 from pydantic import ValidationError
 
 from raise_cli.config.paths import get_session_dir
+from raise_cli.core.files import atomic_write
 from raise_cli.schemas.session_state import SessionState
 
 logger = logging.getLogger(__name__)
@@ -201,9 +202,6 @@ def save_session_state(
         session_id: Optional session ID for per-session isolation.
     """
     state_path = get_session_state_path(project_path, session_id)
-    state_path.parent.mkdir(parents=True, exist_ok=True)
-
-    from raise_cli.core.files import atomic_write
 
     data = state.model_dump(mode="json")
     content = yaml.dump(
