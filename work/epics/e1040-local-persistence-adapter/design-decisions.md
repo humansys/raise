@@ -243,6 +243,44 @@ rai session close \
 
 ### What this means for E1040
 
-- S1040.2: Steward methods designed with simple-input signatures
-- S1040.3: CLI adds granular flags (--summary, --pattern, --coaching) as alternative to --state-file
-- No workflow engine built — just API readiness
+- ~~S1040.2: Steward methods designed with simple-input signatures~~
+- ~~S1040.3: CLI adds granular flags~~
+- Revised in DD-8: principle preserved, but vehicle is Domain Gates (3.0), not stewards
+
+## DD-8: No Steward layer — align with Pluggable Domains vision (2026-04-02)
+
+### Context
+
+During S1040.2 design, we revisited the Pluggable Domains vision (RAISE-650) and the CC SAR findings (E1132). Key insight: a Pluggable Domain IS a CC Plugin (6 of 10 capability types map directly). Domains have 5 components: Schema, Gates, Skills, Adapters, Prompts.
+
+The proposed Steward is an amalgama of Gates + Schema + orchestration. In 3.0, when domains are implemented as CC plugins:
+- Steward validation → becomes Domain Gates (hooks/)
+- Steward Pydantic models → becomes Domain Schema
+- FilesystemAdapter → stays as shared infrastructure (correct in both architectures)
+- CLI orchestration → stays in Skills (correct)
+
+Building stewards now means dismantling them in 3.0 to redistribute logic into domain components.
+
+### Decision
+
+**Do not create a Steward layer.** Instead:
+
+1. **FilesystemAdapter** (S1040.1, done) — shared infrastructure, survives 3.0 transition
+2. **Migrate CLI writes to use FilesystemAdapter** (S1040.2) — existing CLI functions gain atomic I/O
+3. **Add protections where needed** (S1040.2) — timestamp check, encoding consistency, directly in CLI functions
+4. **Close S1040.3** — no steward layer means no separate migration story
+
+Domain intelligence stays in CLI functions for 2.4.0. In 3.0 (RAISE-650), it migrates to Domain Gates — a well-defined architectural concept that aligns with CC plugin structure.
+
+### What this preserves
+
+- Atomic writes (FilesystemAdapter) — permanent infrastructure
+- RAISE-697 fix (timestamp protection) — migrates to Work Domain gate
+- Pydantic validation — migrates to Domain Schema
+- All protections we designed for stewards — they just live in CLI, not in a new class
+
+### What this avoids
+
+- A temporary abstraction layer (Steward) that gets dismantled in 3.0
+- Architectural confusion: Skill → CLI → Steward → Adapter vs the eventual Skill → Domain Gate → Adapter
+- 1 story eliminated (S1040.3), S1040.2 simplified from M to S-M
