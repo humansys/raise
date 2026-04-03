@@ -192,13 +192,17 @@ class TestLearnPush:
         assert (record_path.parent / ".pushed").exists()
 
     def test_push_skips_already_pushed(self, tmp_path: Path) -> None:
-        """Already-pushed record is skipped."""
+        """Already-pushed record is skipped, no HTTP call made."""
         record_path = _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
         # Write marker
         (record_path.parent / ".pushed").write_text("fake-id\n2026-04-03\n")
 
+        mock_client = MagicMock()
         env = {"RAI_SERVER_URL": "http://localhost:8000", "RAI_API_KEY": "rsk_test"}
-        with patch.dict("os.environ", env):
+        with (
+            patch.dict("os.environ", env),
+            patch("raise_cli.cli.commands.learn.LearningPushClient", return_value=mock_client),
+        ):
             result = runner.invoke(
                 app,
                 ["learn", "push", str(record_path), "--project", str(tmp_path)],
@@ -208,6 +212,7 @@ class TestLearnPush:
         assert result.exit_code == 0
         combined = _all_output(result)
         assert "skip" in combined or "already" in combined
+        assert mock_client.push.call_count == 0
 
     def test_push_all_pushes_unpushed_only(self, tmp_path: Path) -> None:
         """--all mode pushes unpushed and skips pushed."""
@@ -236,12 +241,13 @@ class TestLearnPush:
         assert mock_client.push.call_count == 1
 
     def test_push_connection_error_exits_1(self, tmp_path: Path) -> None:
-        """Connection error produces clear message."""
+        """Connection error produces clear message and no .pushed marker."""
         import httpx
 
         record_path = _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
 
         mock_client = MagicMock()
+        mock_client.server_url = "http://localhost:8000"
         mock_client.push.side_effect = httpx.ConnectError("Connection refused")
 
         env = {"RAI_SERVER_URL": "http://localhost:8000", "RAI_API_KEY": "rsk_test"}
@@ -258,3 +264,44 @@ class TestLearnPush:
         assert result.exit_code == 1
         combined = _all_output(result)
         assert "reach" in combined or "connect" in combined or "server" in combined
+        # Marker must NOT be created on failure
+        assert not (record_path.parent / ".pushed").exists()
+
+    def test_push_all_continues_on_partial_failure(self, tmp_path: Path) -> None:
+        """--all mode continues pushing after one record fails."""
+        import httpx
+
+        _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
+        _write_record_to_disk(tmp_path, "rai-story-plan", "S100.1")
+
+        call_count = 0
+
+        def side_effect(*_args: object, **_kwargs: object) -> uuid.UUID:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise httpx.ConnectError("Connection refused")
+            return uuid.uuid4()
+
+        mock_client = MagicMock()
+        mock_client.server_url = "http://localhost:8000"
+        mock_client.push.side_effect = side_effect
+
+        env = {"RAI_SERVER_URL": "http://localhost:8000", "RAI_API_KEY": "rsk_test"}
+        with (
+            patch.dict("os.environ", env),
+            patch("raise_cli.cli.commands.learn.LearningPushClient", return_value=mock_client),
+        ):
+            result = runner.invoke(
+                app,
+                ["learn", "push", "--all", "--project", str(tmp_path)],
+                catch_exceptions=False,
+            )
+
+        # Should have attempted BOTH records (not aborted on first)
+        assert mock_client.push.call_count == 2
+        # Exit 1 because there was a failure
+        assert result.exit_code == 1
+        combined = _all_output(result)
+        assert "1 pushed" in combined
+        assert "1 failed" in combined

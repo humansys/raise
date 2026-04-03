@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import os
+import uuid
 from pathlib import Path
 from typing import Annotated
 
@@ -115,54 +116,68 @@ def _get_server_config() -> tuple[str, str]:
     return server_url, api_key
 
 
+_HTTP_ERROR_MESSAGES: dict[int, str] = {
+    401: "Authentication failed. Check RAI_API_KEY.",
+    403: "Server requires 'team' plan. Check license.",
+}
+
+
+def _format_http_error(exc: httpx.HTTPStatusError) -> str:
+    status = exc.response.status_code
+    if status in _HTTP_ERROR_MESSAGES:
+        return _HTTP_ERROR_MESSAGES[status]
+    if status == 422:
+        return f"Server rejected: {exc.response.text}"
+    return f"Server error ({status}): {exc.response.text}"
+
+
+def _try_push(client: LearningPushClient, record: LearningRecord, label: str) -> uuid.UUID | None:
+    """Attempt the HTTP push. Returns server_id or None on failure."""
+    try:
+        return client.push(record)
+    except httpx.ConnectError:
+        console.print(f"[red]✗[/red] Cannot reach server at {client.server_url}: [dim]{label}[/dim]")
+    except httpx.TimeoutException:
+        console.print(f"[red]✗[/red] Request timed out: [dim]{label}[/dim]")
+    except httpx.HTTPStatusError as exc:
+        console.print(f"[red]✗[/red] {_format_http_error(exc)}")
+    except Exception:
+        logger.exception("Unexpected error pushing %s", label)
+        console.print(f"[red]✗[/red] Unexpected error: [dim]{label}[/dim]")
+    return None
+
+
 def _push_single(
     client: LearningPushClient,
     record_path: Path,
-) -> bool:
-    """Push a single record file. Returns True on success, False on failure."""
+) -> str | None:
+    """Push a single record file.
+
+    Returns:
+        "pushed" on success, "skipped" if already pushed, None on failure.
+        Never calls cli_error — callers decide whether to exit or continue.
+    """
     record_dir = record_path.parent
+    label = f"{record_dir.parent.name}/{record_dir.name}"
 
     if is_pushed(record_dir):
-        console.print(
-            f"[yellow]⏭[/yellow] Already pushed: "
-            f"[dim]{record_dir.parent.name}/{record_dir.name}[/dim]"
-        )
-        return True
+        console.print(f"[yellow]⏭[/yellow] Already pushed: [dim]{label}[/dim]")
+        return "skipped"
 
     raw = yaml.safe_load(record_path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         console.print(f"[red]✗[/red] Invalid record: {record_path}")
-        return False
+        return None
 
     try:
         record = LearningRecord.model_validate(raw)
     except ValidationError as exc:
         console.print(f"[red]✗[/red] Validation error: {exc}")
-        return False
+        return None
 
-    try:
-        server_id = client.push(record)
-    except httpx.ConnectError:
-        cli_error(
-            f"Cannot reach server at {client.server_url}. Check RAI_SERVER_URL.",
-            exit_code=1,
-        )
-    except httpx.HTTPStatusError as exc:
-        status = exc.response.status_code
-        if status == 401:
-            cli_error("Authentication failed. Check RAI_API_KEY.", exit_code=1)
-        elif status == 403:
-            cli_error(
-                "Server requires 'team' plan. Check your license.",
-                exit_code=1,
-            )
-        elif status == 422:
-            cli_error(
-                f"Server rejected record: {exc.response.text}",
-                exit_code=7,
-            )
-        else:
-            cli_error(f"Server error ({status}): {exc.response.text}", exit_code=1)
+    server_id = _try_push(client, record, label)
+    if server_id is None:
+        return None
 
     write_push_marker(record_dir, server_id)
     console.print(
@@ -170,7 +185,38 @@ def _push_single(
         f"[bold]{record.skill}[/bold] / [bold]{record.work_id}[/bold] "
         f"[dim](id: {server_id})[/dim]"
     )
-    return True
+    return "pushed"
+
+
+def _push_all(client: LearningPushClient, project: Path) -> None:
+    """Push all unpushed learning records under project root."""
+    learnings_dir = project.resolve() / ".raise" / "rai" / "learnings"
+    if not learnings_dir.exists():
+        console.print("[dim]No learning records found.[/dim]")
+        return
+
+    records = sorted(learnings_dir.glob("*/*/record.yaml"))
+    if not records:
+        console.print("[dim]No learning records found.[/dim]")
+        return
+
+    pushed = 0
+    skipped = 0
+    failed = 0
+    for record_file in records:
+        result = _push_single(client, record_file)
+        if result == "pushed":
+            pushed += 1
+        elif result == "skipped":
+            skipped += 1
+        else:
+            failed += 1
+
+    console.print(
+        f"\n[bold]Summary:[/bold] {pushed} pushed, {skipped} skipped, {failed} failed"
+    )
+    if failed:
+        raise typer.Exit(code=1)
 
 
 @learn_app.command("push")
@@ -211,40 +257,10 @@ def push(
         if path:
             if not path.exists():
                 cli_error(f"File not found: {path}", exit_code=1)
-            _push_single(client, path)
-        else:
-            # --all mode
-            learnings_dir = project.resolve() / ".raise" / "rai" / "learnings"
-            if not learnings_dir.exists():
-                console.print("[dim]No learning records found.[/dim]")
-                return
-
-            records = sorted(learnings_dir.glob("*/*/record.yaml"))
-            if not records:
-                console.print("[dim]No learning records found.[/dim]")
-                return
-
-            pushed = 0
-            skipped = 0
-            failed = 0
-            for record_path in records:
-                if is_pushed(record_path.parent):
-                    skipped += 1
-                    console.print(
-                        f"[yellow]⏭[/yellow] Skip: "
-                        f"[dim]{record_path.parent.parent.name}/{record_path.parent.name}[/dim]"
-                    )
-                    continue
-                success = _push_single(client, record_path)
-                if success:
-                    pushed += 1
-                else:
-                    failed += 1
-
-            console.print(
-                f"\n[bold]Summary:[/bold] {pushed} pushed, {skipped} skipped, {failed} failed"
-            )
-            if failed:
+            result = _push_single(client, path)
+            if result is None:
                 raise typer.Exit(code=1)
+        else:
+            _push_all(client, project)
     finally:
         client.close()
