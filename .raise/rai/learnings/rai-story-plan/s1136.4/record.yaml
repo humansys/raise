@@ -23,6 +23,6 @@ gaps:
   - "No design learning record exists — design was done pre-LEARN protocol"
 artifacts:
   - "work/epics/e1136-introspection-hardening/stories/s1136.4-plan.md"
-commit: null
+commit: f1e869ba
 branch: story/s1136.4/learn-push-server-persistence
 downstream: {}
