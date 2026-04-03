@@ -18,7 +18,7 @@ gaps:
 artifacts:
   - work/epics/e1136-introspection-hardening/stories/s1136.3-retrospective.md
   - .raise/rai/learnings/rai-story-review/s1136.3/record.yaml
-commit: null
+commit: b2bd3618
 branch: story/s1136.3/auto-commit-learnings
 downstream:
   rai-story-plan:
