@@ -1,7 +1,6 @@
 ---
 name: rai-story-close
 description: Merge story branch to dev and update tracking. Use after story review.
-disable-model-invocation: true
 
 allowed-tools:
   - Read
