@@ -107,12 +107,13 @@ class PrefixRegistry(BaseModel):
         Args:
             path: Path to prefixes.yaml.
         """
-        path.parent.mkdir(parents=True, exist_ok=True)
+        from raise_cli.core.files import atomic_write
+
         data = {
             key: {"name": entry.name, "registered": str(entry.registered)}
             for key, entry in self.prefixes.items()
         }
-        path.write_text(
+        atomic_write(
+            path,
             yaml.dump(data, default_flow_style=False, allow_unicode=True),
-            encoding="utf-8",
         )

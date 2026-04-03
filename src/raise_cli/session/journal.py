@@ -53,9 +53,15 @@ def append_journal_entry(
         "tags": tags or [],
     }
 
+    from raise_cli.compat import file_lock, file_unlock
+
     file_path.parent.mkdir(parents=True, exist_ok=True)
     with file_path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(data) + "\n")
+        file_lock(f)
+        try:
+            f.write(json.dumps(data) + "\n")
+        finally:
+            file_unlock(f)
 
     return WriteResult(
         success=True,

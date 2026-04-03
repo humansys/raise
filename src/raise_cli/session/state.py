@@ -203,9 +203,11 @@ def save_session_state(
     state_path = get_session_state_path(project_path, session_id)
     state_path.parent.mkdir(parents=True, exist_ok=True)
 
+    from raise_cli.core.files import atomic_write
+
     data = state.model_dump(mode="json")
     content = yaml.dump(
         data, default_flow_style=False, allow_unicode=True, sort_keys=False
     )
-    state_path.write_text(content, encoding="utf-8")
+    atomic_write(state_path, content)
     logger.debug("Saved session state: %s", state_path)

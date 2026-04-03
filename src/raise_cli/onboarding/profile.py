@@ -429,7 +429,9 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
     content = yaml.dump(
         data, default_flow_style=False, allow_unicode=True, sort_keys=False
     )
-    profile_path.write_text(content, encoding="utf-8")
+    from raise_cli.core.files import atomic_write
+
+    atomic_write(profile_path, content)
     logger.debug("Saved developer profile: %s", profile_path)
 
 
