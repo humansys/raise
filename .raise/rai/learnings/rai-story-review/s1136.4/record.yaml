@@ -1,0 +1,30 @@
+skill: rai-story-review
+work_id: s1136.4
+version: "2.4.0"
+timestamp: "2026-04-03T18:00:00Z"
+primed_patterns:
+  - PAT-E-699
+  - PAT-E-667
+  - guardrail-should-cli-001
+tier1_queries: 2
+tier1_results: 2
+jit_queries: 1
+pattern_votes:
+  PAT-E-699:
+    vote: 1
+    why: "Risk-first task ordering validated — client before CLI was correct sequence"
+  PAT-E-667:
+    vote: 0
+    why: "Not relevant — no dead code or over-engineering found"
+  guardrail-should-cli-001:
+    vote: 1
+    why: "Explicit --project path used in push command, could not reinforce via CLI (graph-only pattern)"
+gaps:
+  - "Missing rai-story-implement learning record — gap in learning chain"
+  - "guardrail patterns from graph cannot be reinforced via rai pattern reinforce (only patterns.jsonl)"
+artifacts:
+  - "work/epics/e1136-introspection-hardening/stories/s1136.4-retrospective.md"
+  - ".raise/rai/learnings/rai-story-review/s1136.4/record.yaml"
+commit: null
+branch: story/s1136.4/learn-push-server-persistence
+downstream: {}
