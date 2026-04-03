@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, ValidationError
 
-from raise_cli.core.files import atomic_write
+from raise_cli.adapters.filesystem_adapter import FilesystemAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -415,15 +415,13 @@ def load_developer_profile() -> DeveloperProfile | None:
 def save_developer_profile(profile: DeveloperProfile) -> None:
     """Save developer profile to ~/.rai/developer.yaml.
 
+    Uses FilesystemAdapter for atomic write semantics.
     Creates ~/.rai/ directory if it doesn't exist.
 
     Args:
         profile: The developer profile to save.
     """
     rai_home = get_rai_home()
-    rai_home.mkdir(parents=True, exist_ok=True)
-
-    profile_path = rai_home / DEVELOPER_PROFILE_FILE
 
     # Convert to dict with proper serialization
     data = profile.model_dump(mode="json")
@@ -431,8 +429,10 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
     content = yaml.dump(
         data, default_flow_style=False, allow_unicode=True, sort_keys=False
     )
-    atomic_write(profile_path, content)
-    logger.debug("Saved developer profile: %s", profile_path)
+
+    adapter = FilesystemAdapter(root=rai_home)
+    adapter.write(Path(DEVELOPER_PROFILE_FILE), content)
+    logger.debug("Saved developer profile: %s", rai_home / DEVELOPER_PROFILE_FILE)
 
 
 def increment_session(

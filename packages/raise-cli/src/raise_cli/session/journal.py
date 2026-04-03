@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from raise_cli.compat import file_lock, file_unlock
+from raise_cli.adapters.filesystem_adapter import FilesystemAdapter
 from raise_cli.memory.writer import WriteResult, get_next_id
 from raise_cli.schemas.journal import JournalEntry, JournalEntryType
 
@@ -54,13 +54,8 @@ def append_journal_entry(
         "tags": tags or [],
     }
 
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    with file_path.open("a", encoding="utf-8") as f:
-        file_lock(f)
-        try:
-            f.write(json.dumps(data) + "\n")
-        finally:
-            file_unlock(f)
+    adapter = FilesystemAdapter(root=session_dir)
+    adapter.append(Path(JOURNAL_FILE), json.dumps(data))
 
     return WriteResult(
         success=True,

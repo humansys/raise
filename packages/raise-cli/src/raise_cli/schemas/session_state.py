@@ -115,3 +115,7 @@ class SessionState(BaseModel):
     )
     progress: EpicProgress | None = None
     completed_epics: list[str] = Field(default_factory=list)
+    last_modified: str | None = Field(
+        default=None,
+        description="ISO 8601 timestamp of last write. Used for stale-overwrite protection.",
+    )

@@ -1,0 +1,34 @@
+skill: rai-epic-plan
+work_id: E1248
+version: "2.4.0"
+timestamp: "2026-04-03T22:30:00Z"
+primed_patterns:
+  - PAT-E-682  # Problem shaping catches orthogonal problems early
+  - PAT-E-666  # Per-epic MRs for solo dev
+  - PAT-E-620  # CLAUDE.local.md for personal prefs, dynamic state from live queries
+  - PAT-E-592  # Dogfood stories need 50% time buffer
+tier1_queries: 1
+tier1_results: 5
+jit_queries: 0
+pattern_votes:
+  PAT-E-682:
+    vote: 1
+    why: "Gemba analysis served as problem shaping — separated state reliability from server vision"
+  PAT-E-666:
+    vote: 1
+    why: "Will use per-epic MR for E1248, consistent with solo dev workflow"
+  PAT-E-620:
+    vote: 1
+    why: "Directly confirmed — killing CLAUDE.local.md is the right call"
+  PAT-E-592:
+    vote: 1
+    why: "Applied to S1248.5 dogfood story — budgeted as separate story, not squeezed into S1248.3"
+gaps:
+  - "No calibration data for protocol-introduction stories — S1248.1 is novel pattern"
+  - "No prior parallel track execution in this project — S1248.2/S1248.3 parallel is untested"
+artifacts:
+  - work/epics/e1248-git-first-session-state/scope.md  # plan section appended
+  - .raise/rai/learnings/rai-epic-design/E1248/record.yaml  # downstream enriched
+commit: null
+branch: release/2.4.0
+downstream: {}
