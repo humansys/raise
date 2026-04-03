@@ -1,8 +1,6 @@
 ---
 name: rai-welcome
-description: >
-  Conversational developer onboarding for RaiSE. Detects scenario,
-  sets up profile and graph, offers optional personalization.
+description: Onboard a developer to RaiSE interactively. Use for first-time setup.
 
 license: MIT
 

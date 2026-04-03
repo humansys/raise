@@ -1,10 +1,6 @@
 ---
 name: rai-epic-close
-description: >
-  Complete an epic with retrospective, metrics capture, push to origin,
-  merge request creation, and tracking update. Epics are logical containers —
-  stories merge locally to dev during story-close, then epic-close pushes
-  dev and creates the MR.
+description: Close epic with retrospective, push, and merge request. Use after all stories done.
 disable-model-invocation: true
 
 license: MIT

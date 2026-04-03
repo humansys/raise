@@ -1,9 +1,6 @@
 ---
 name: rai-story-implement
-description: >
-  Execute the implementation plan task by task, verifying each step, and
-  producing quality code that passes validation gates. Use after planning
-  is complete.
+description: Execute plan tasks with TDD and validation gates. Use after story plan.
 
 license: MIT
 
