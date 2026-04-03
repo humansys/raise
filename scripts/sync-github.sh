@@ -10,18 +10,19 @@
 # This prevents Claude Code from losing track of skills when .claude/ is
 # temporarily removed during sync.
 #
-# Excluded (internal):
+# Excluded (internal/proprietary):
 #   Dirs:  work/, dev/, .raise/, archive/, blog/, governance/, .claude/,
-#          .agent/, scripts/, htmlcov/, dist/, packages/, site/
+#          .agent/, scripts/, htmlcov/, dist/, packages/raise-pro/,
+#          packages/raise-server/, packages/rai-agent/, site/
 #   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md,
 #          .gitlab-ci.yml, .coverage, .envrc, .pre-commit-config.yaml,
 #          .secrets.baseline, DEMO-STRATEGY.md, AGENTS.md,
 #          sonar-project.properties, scope.md, docker-compose.yml, bug-*-*.md
 #
 # Included (public):
-#   src/, tests/, framework/, docs/, .github/, pyproject.toml, uv.lock,
-#   README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, NOTICE,
-#   CHANGELOG.md, SECURITY.md, llms.txt, .gitignore
+#   packages/raise-core/, packages/raise-cli/, framework/, docs/, .github/,
+#   pyproject.toml, uv.lock, README.md, LICENSE, CONTRIBUTING.md,
+#   CODE_OF_CONDUCT.md, NOTICE, CHANGELOG.md, SECURITY.md, llms.txt, .gitignore
 #
 # Usage:
 #   ./scripts/sync-github.sh [source-branch] [target-branch]
@@ -40,7 +41,7 @@ set -euo pipefail
 
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
-EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages" "site")
+EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "governance" ".claude" ".agent" "scripts" "htmlcov" "dist" "packages/raise-pro" "packages/raise-server" "packages/rai-agent" "site")
 EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml" ".coverage" ".envrc" ".pre-commit-config.yaml" ".secrets.baseline" "DEMO-STRATEGY.md" "AGENTS.md" "sonar-project.properties" "scope.md" "docker-compose.yml" "bug-396-retro.md" "bug-396-scope.md" "bug-397-retro.md" "bug-397-scope.md" "bug-398-retro.md" "bug-398-scope.md" ".github/workflows/deploy-site.yml")
 
 # Colors for output
@@ -90,51 +91,44 @@ for file in "${EXCLUDED_FILES[@]}"; do
     git rm --cached --quiet --ignore-unmatch "$file"
 done
 
-# 3b. Remove private source directories and pro tests
-git rm -r --cached --quiet --ignore-unmatch "src/rai_pro"
-info "Excluded src/rai_pro/"
+# 3b. No longer needed — proprietary code now lives in packages/raise-pro/
+# and packages/raise-server/, both excluded as directories above.
+# Tests are colocated per-package, so no selective test exclusion needed.
 
-git rm -r --cached --quiet --ignore-unmatch "tests/providers"
-git rm -r --cached --quiet --ignore-unmatch "tests/rai_server"
-git rm --cached --quiet --ignore-unmatch "tests/adapters/test_mcp_jira.py"
-git rm --cached --quiet --ignore-unmatch "tests/adapters/test_mcp_confluence.py"
-git rm --cached --quiet --ignore-unmatch "tests/test_hooks/test_jira_sync.py"
-info "Excluded pro/server tests (tests/providers/, tests/rai_server/, test_mcp_jira, test_mcp_confluence, test_jira_sync)"
-
-# 4. Patch pyproject.toml — remove workspace references to excluded packages
-#    (raise-server, raise-pro live in packages/ which is excluded from GitHub)
+# 4. Patch pyproject.toml — remove references to excluded proprietary packages
+#    (raise-pro, raise-server are excluded from GitHub mirror)
 TMPTOML=$(mktemp)
 git show :pyproject.toml > "$TMPTOML"
 
-# Remove workspace source entries
+# Remove workspace source entries for proprietary packages
 sed -i.bak '/^raise-server = { workspace = true }/d' "$TMPTOML"
 sed -i.bak '/^raise-pro = { workspace = true }/d' "$TMPTOML"
 
-# Remove workspace members line (packages/*)
-sed -i.bak '/^members = \["packages\/\*"\]/d' "$TMPTOML"
-
-# Remove dev dependency entries for workspace packages
-sed -i.bak '/^    "raise-server",$/d' "$TMPTOML"
+# Remove dev dependency entries for proprietary packages
 sed -i.bak '/^    "raise-pro",$/d' "$TMPTOML"
+sed -i.bak '/^    "raise-server",$/d' "$TMPTOML"
 
-# Remove workspace package paths from pyright include
-sed -i.bak 's|, "packages/raise-pro/src", "packages/raise-server/src"||' "$TMPTOML"
+# Remove proprietary package paths from pyright include
+sed -i.bak '/"packages\/raise-pro\/src"/d' "$TMPTOML"
+sed -i.bak '/"packages\/raise-server\/src"/d' "$TMPTOML"
 
-# Remove workspace package paths from pytest cov
+# Remove proprietary package paths from pytest cov
 sed -i.bak '/--cov=packages\/raise-pro/d' "$TMPTOML"
 sed -i.bak '/--cov=packages\/raise-server/d' "$TMPTOML"
 
-# Remove workspace package paths from coverage source
-sed -i.bak 's|, "packages/raise-pro/src/rai_pro", "packages/raise-server/src/raise_server"||' "$TMPTOML"
+# Remove proprietary package test paths from testpaths
+sed -i.bak '/"packages\/raise-pro\/tests"/d' "$TMPTOML"
+sed -i.bak '/"packages\/raise-server\/tests"/d' "$TMPTOML"
 
-# Remove empty [tool.uv.workspace] section if members line was removed
-sed -i.bak '/^\[tool\.uv\.workspace\]$/{ N; /\n$/d; }' "$TMPTOML"
+# Remove proprietary package paths from coverage source
+sed -i.bak '/"packages\/raise-pro\/src\/rai_pro"/d' "$TMPTOML"
+sed -i.bak '/"packages\/raise-server\/src\/raise_server"/d' "$TMPTOML"
 
 # Write patched pyproject.toml back into the git index
 BLOB=$(git hash-object -w "$TMPTOML")
 git update-index --replace --cacheinfo 100644,"$BLOB",pyproject.toml
 rm -f "$TMPTOML" "$TMPTOML.bak"
-info "Patched pyproject.toml — removed workspace references"
+info "Patched pyproject.toml — removed proprietary package references"
 
 # 5. Write the filtered index as a tree object
 TREE=$(git write-tree)

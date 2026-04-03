@@ -21,3 +21,9 @@ Done when: Pipeline CI verde — los 4 tests que fallaban pasan en GitLab
 Job log: gitlab.com/.../jobs/13553847488
 Error line: FileNotFoundError: [Errno 2] No such file or directory: 'git'
 Pipelines: #2386240089 (f15ae24a), #2386241551 (12589d54)
+
+TRIAGE:
+  Bug Type:    Configuration
+  Severity:    S2-Medium
+  Origin:      Environment
+  Qualifier:   Missing

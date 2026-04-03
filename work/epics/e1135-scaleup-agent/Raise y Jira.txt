@@ -1,0 +1,184 @@
+# Raise y Jira
+
+  Meeting started: 3/18/2026, 10:18:27 AM
+  Duration: 36 minutes
+  Participants: Emilio Osorio (Emilio), Gerardo Osorio
+
+  [View original transcript](https://app.tactiq.io/api/2/u/m/r/VqIYkCgrxCiFozT9ZWyc?o=txt)
+
+    
+
+  
+
+  
+
+  ## Transcript
+
+  00:00 Gerardo Osorio: Qué onda
+00:03 Emilio Osorio (Emilio): Este Qué onda Cómo estás.
+00:04 Gerardo Osorio: Bien, tú qué tal?
+00:08 Emilio Osorio (Emilio): Bien También Bien también un poco este. un poco adormecido porque ayer mandé a comprar nota y el que vende mota estudió la Prepa con Gina Entonces nos mandó unos regalitos unas bolsitas de churro maíz y yo dije. Ah, unas gotitas de churronas, qué chido y qué v**** una hora después me entero de que tenían todos thc y me puse una así que siento que el p*** cerebro lo tengo amilcochado, así feo, Pues o sea, me dormí desde las nueve de la noche hasta las nueve de la mañana, no sé todavía ni cómo me llamo, pero parece ser que ya estoy bien.
+00:49 Gerardo Osorio: Bueno pues este el universo está pidiéndote descanso mental
+00:52 Emilio Osorio (Emilio): Sí sí, sí, eso bueno, eso fue lo que me dijo Gina Dice que hasta se me quitaron las ojeras y Entonces mandó un mensaje Marilú Bueno ayer hablé con ella.
+01:04 Gerardo Osorio: Me dijiste yo yo estaba dando un curso Entonces no.
+01:07 Emilio Osorio (Emilio): Hablé con ella y le dije, mira Marilú esto es en lo que estamos haciendo le expliqué reis le digo que no te quiero vender reis, o sea, pero ya sé que ustedes vale ver ustedes, no desarrollan digo yo lo que quiero es que ver te muestre como él trabaja con sus pendientes y Cómo mueve las tarjetas allí de todo y le agarró el pelo rapidito. Y me dice, pero sí, pero es que no mames, ya les vamos a comprar esto y luego lo de la otra cosa le digo, sí, sí le digo pero es que esto no es como un costo adicional.
+01:36 Emilio Osorio (Emilio): Este me puedo multiplicar por cinco por diez y te acabas de tus pedos de capacity con tus pm de putazo, pues ya se acabó. Me dice Bueno se lo voy a enseñar algo mire que no sé qué entonces ya ya quedamos de que lo que ella primero quiere es que cerremos este edit para poder vender lo demás y está bien, no he tenido chance de meterme a hacer eso ahorita lo iba a hacer.
+01:57 Gerardo Osorio: a ver Espera espera una pausa, nos acaba de notificar hace rato que ya la aceptaron Aunque la de
+02:04 Emilio Osorio (Emilio): la de Samir Pues sí, porque Samir es el que acepta entonces.
+02:11 Gerardo Osorio: Sí pero Samir está pidiendo lo mismo que nos está pidiendo Marilú en cuanto a la propuesta a la que tenemos no, no O sea la que tenemos atorada. Con lo que Samir tiene porque no nos respondió jamás, o sea, buena costumbre
+02:24 Emilio Osorio (Emilio): Claro que sí porque eso es lo oficial Entonces si ya aceptaron Esa esa misa
+02:27 Gerardo Osorio: que tienen los corporativos a enviarles algo y no responder güey Este entiendo que siguió el proceso ya lo aceptaron aún así tenemos que mandar la propuesta modificada. Okay.
+02:46 Emilio Osorio (Emilio): este, pues ya lo que tenemos que hacer es consolidar esa de esa mir, ya con el precio que haya salido ya a estas alturas del partido me viene valiendo madre, no sé con qué precio salió no salió pero con lo que haya salido con eso.
+02:57 Gerardo Osorio: Pues ahí ahorita te digo Tampoco sé güey La verdad que que este a ver aquí vienen unas propuestas y vienen tres. Él te las te las adjuntó.
+03:10 Emilio Osorio (Emilio): A Jaime las adjunto, él me está diciendo Esto es lo que quiero que me venda.
+03:12 Gerardo Osorio: Y entro setenta y cinco mil de una comida 288 de otra y 274 con otro.
+03:23 Emilio Osorio (Emilio): La de 175, cuál es?
+03:25 Gerardo Osorio: La de 175 es de reportero del capacita para prosa. automatización y reporte del capacite para pmo y consta de dos cosas nuevo desarrollo reportes capacity
+03:40 Emilio Osorio (Emilio): Esa fue esa era la que queríamos es esa es la que estaba el costo mal.
+03:47 Gerardo Osorio: Pero mal para nosotros Omar para ellos o será más.
+03:50 Emilio Osorio (Emilio): Para nosotros. Era más eran 243, qué hacemos?
+03:55 Gerardo Osorio: p***
+03:58 Emilio Osorio (Emilio): La verdad es que ahorita ya, o sea, esa madre ya.
+04:00 Gerardo Osorio: No le muevas güey O sea a ver eso fue un error de cálculo y ya, o sea,
+04:04 Emilio Osorio (Emilio): Vale entonces
+04:05 Gerardo Osorio: espérate antes de que o sea, porque creo que esto es importante cara lo que tenemos que hacer Nos faltan ochenta mil pesos, o sea, probablemente no más o menos esos hay que recuperarlos de alguna manera. Tal vez no ahorita en este contrato, si no hay que ir viendo qué cosas podemos hacer De hecho. Yo estoy detectando especialmente en prosa oportunidades de mejora en el tema de slas que debemos de tener y te voy a decir un aprendizaje que tuve con Esteban me costó, que me dejaran, que no me pagara el cabrón Este pero aprendí algo cuando él se quiso meter a producto y a servicio descuido muchísimo la parte de costumbre y la parte del modelo de negocio por estar metiendo toda la edad que se metía al desarrollo de este nuevo producto que Nunca lanzó.
+04:55 Gerardo Osorio: sí, producto que tenía entonces cosas que aprendí Emilia con o sea ahora sí
+04:59 Emilio Osorio (Emilio): ok
+05:02 Gerardo Osorio: que gracias a Esteban Hay que tener mucho cuidado cuando uno pasa a la parte de de producto en que la parte de customer subsés realmente esté bien afilada, güey O sea esa es esa es la parte básica yo en lo que hay que sí, el modelo escalable y la c*******
+05:18 Emilio Osorio (Emilio): Sí, sí.
+05:21 Gerardo Osorio: no hay escalabilidad que te salve de los pedos operativos, o sea, es un tiro en el pie Entonces qué te quiero decir con esto ahorita que no estamos todavía en el tema del licenciamiento, como tal en el tema de reis creo que hay una oportunidad de mejora en el tema de cómo cómo tenemos que encuadrar a nuestros clientes con slaz con un poquito más de estructura porque siento yo sé que tiene nada más que ver con Marilú Pero me imagino que así son los demás que es casi casi este me duele el brazo güey que vengas y está más o menos.
+05:59 Gerardo Osorio: Que no puede entrar a la aplicación que venga sistemas humanos y y yo no veo que esa sea un modelo. Un modelo chido pues falta de educación de los clientes no Entonces no es para que lo definamos ahorita, pero yo ya traigo algunas ideas de cómo cómo retomar Y encuadrar a eso porque eso es justo lo que le estoy haciendo a kurigage. Estoy haciendo que de su relación tóxica con sus clientes hay encuadre.
+06:28 Gerardo Osorio: Entonces si a mí ya me están pagando por hacer eso, güey, pues este, pues tal vez deberíamos de adelantarnos un poco en el proceso para que no nos no nos sangre, pues sobre todo porque no hay no hay este estructura de de soporte que vaya a aguantar el bomberazo jamás, o sea, entonces este Pero bueno, eso lo hablamos luego ahora, okay. Tenemos que enviarle esto a Samir Yo te diría pues
+06:56 Emilio Osorio (Emilio): ahora
+06:59 Gerardo Osorio: este, pues ya, o sea, más bien.
+07:02 Emilio Osorio (Emilio): Yo decir también, o sea, como ya se cerró eso, pues ya mandemos eso ya no hay más que moverle buscarlo ni de nada, O sea ya no hay que hacer.
+07:08 Gerardo Osorio: Sí nada más la confusión que tengo Emilio es que o sea, en la propuesta que le envié de ochocientos y pico mil entonces no es de 800 y pico mil es de menos.
+07:18 Emilio Osorio (Emilio): Es de esta suma de esto que está aquí.
+07:20 Gerardo Osorio: Entonces cambiamos la suma de esto y a chingar su madre, okay, va este Okay este
+07:23 Emilio Osorio (Emilio): exactamente
+07:26 Gerardo Osorio: yo yo voy a ver si hoy porque ayer te digo ayer hablé con Marilú le llamé por teléfono porque dije a ver, ya dejémonos de m******. Le voy a llamar por teléfono cinco minutos, lo resuelvo lo desbloqueo y ya como que me dijo ahora no sé si en la reunión de ayer tocaste este tema también.
+07:44 Emilio Osorio (Emilio): No, no, toque este.
+07:46 Gerardo Osorio: Entonces ella lo vio chingón y lo que quieres es que sean family la c*******. Okay y este y exactamente en qué parte fue que O sea ella le vio potencial al tema de
+08:02 Emilio Osorio (Emilio): Cuando Fer le empezó a Mostrar cómo le podía preguntar a Rey en qué andaba qué tarea le recomendaba hacer Cuál es el iban a vencer? O sea, cuando cuando Mariluz se dio cuenta que su temes iban a poder hablar con sus planes y que Rey les iba a poder aconsejar siguientes acciones y demás.
+08:22 Gerardo Osorio: Es lo que te decía yo ayer Emilio todos. Traemos un pedo de gestión unos por parte disciplina otros por falta de tiempo o por falta de foco Pero la realidad es que yo creo que hay una intencionalidad en utilizar modelos de gestión, pero yo creo que hay dos equipos al que no le está alcanzando la vida y al que No le está alcanzando.
+08:44 Emilio Osorio (Emilio): No les está alcanzando la vida.
+08:46 Gerardo Osorio: Yo creo que ese es el tipo de cliente al que le vale v****, La verdad, ni le pongamos atención, o sea, no hay Inteligencia artificial que más bien eso se los van a chingar pues. Este Ok entonces yo digo aprovechando un poco lo que quiero platicar contigo, o sea, yo no es que no haya querido utilizar gira, sino, o sea ando como en veinte mil cosas un poco como ella y me está costando trabajo entre lo que traigo Yo entre lo que tengo que ver con customer el suceso también como que siento que no he terminado de definir muy bien, en qué cosas ando ocupado este Dávila porque sé que lo tienes ahí como que revisando algunas cosas, pero no.
+09:30 Emilio Osorio (Emilio): En realidad debe estar contigo.
+09:31 Gerardo Osorio: Este entonces necesito aclarar eso como para que por ejemplo este tipo de cositas, no de que oye, la propuesta la madre, o sea, si yo tengo que hacer la propuesta.
+09:41 Emilio Osorio (Emilio): Yo cuando te fuiste, es una semana yo lo que le pedí que trabajara en esa semana que te lo puede presentar a ti y le dije a ver, yo necesito que tu trabajo lo investigues Cómo se hace en internet y me generes unos tableros en gira.
+09:54 Gerardo Osorio: a ver, perfecto Sí porque este, o sea, no O sea a ver yo yo ahorita lo que
+09:55 Emilio Osorio (Emilio): sí
+09:59 Gerardo Osorio: estoy concentrado es en desatorar lo que trae desatorado, No no estoy
+10:03 Emilio Osorio (Emilio): Okay.
+10:05 Gerardo Osorio: concentrado tanto en la estrategia tengo que hacerme espacio para trabajar en la estrategia porque pues eso es lo que vamos a vivir en el futuro, si nada más estoy de bombero, Pues la verdad es que con eso te da ancho de banda Dávila yo tal vez donde ayudo es en el skill de agarrar el p*** problema llamarle a Marilú decirle a ver Marilú vamos a Desbloquear este pedo en este momento y vamos a quedar en acuerdos y vamos a moverlo hacia adelante, digamos que yo entro más en ese rol, si me explico como de ya cuando alguien lo escalan Este pero en el día a día se me está complicando porque pues yo sigo teniendo que facturar güey O sea yo yo sé que va a llegar un momento donde va a haber lana yo yo lo sé, no estoy pidiendo dinero, sino bien, lo que te quiero decir es que estoy concentrado en eso Ahora como estoy concentrado en eso necesito una solución que me ayude a que yo tenga más ritmo en el en la Data que va a quedar registrada en el dira de las cosas que hago Tengo pendientes.
+11:08 Gerardo Osorio: Entonces es lo mismo que tú le dijiste a esta este Marilú Aunque mariluye, lo mismo yo no soy tan dolor de huevos como Mariló o sea, yo no, no ando c******** con pendejadas a la gente, pero si no me está alcanzando entonces. De de Cuéntame un poquito porque a mí me gustaría que no trabajáramos doble en el sentido de Ok si ya lo estás haciendo si ya lo vas a hacer con Marilú uso, lo mismo Pues sí me explico.
+11:37 Emilio Osorio (Emilio): Pues no mira, no, no es tanto que lo vaya a hacer con Marilú es que ese problema que tú tienes ese problema, que yo estoy teniendo.
+11:44 Gerardo Osorio: Sí que todos tenemos pues
+11:46 Emilio Osorio (Emilio): Entonces chécate esta conversación.
+11:55 Gerardo Osorio: ahí es esta esto que me estás enseñando es
+12:02 Emilio Osorio (Emilio): Esto que te estoy enseñando es rey y lo que te estoy enseñando es una sesión que inicia hace un ratito que me levanté. esto es una extensión que le instalas a raíz al al antigravity no, pero esto te lo podría yo poner o Estoy construyendo para podertelo poner en Google chat o en lo que quieras no Aquí
+12:29 Gerardo Osorio: Okay.
+12:30 Emilio Osorio (Emilio): empieza este le digo que inicie sesión, por favor, quiero que revisemos mis pendientes para hoy añadamos algunas cosas a nuestro Entonces este es el protocolo me dice en esto, te quedaste ayer. Le digo todos los borradores enviaron porque me creo borradores, pero me gustaría que leyeras mi input si empezáramos a procesarlos uno a uno para validar, si hay alguna accionarlos o los archivamos y le digo que utilice entonces va y lee todos mis correos.
+13:04 Emilio Osorio (Emilio): que están abiertos, me dice cuáles son y me empieza a preguntar no Oye que un Google Signal yo lo archivo que para archivo que centauri Dreams lo archivo archivo Oye aquí viene de Clara Checa Necesito poner una tarjeta en human, si es proyecto cuentas por cobrar de pagar Clara por el monto que venga allí y una sub tarea de validar, monto fecha y medio de pago para mí. Ya le dije En qué instancia Ya le dije Qué proyecto, entonces va a extraer.
+13:39 Emilio Osorio (Emilio): Dice que no viene el monto. Él digo ponlo y 250 de monto y voy a investigar la fecha pum pum. Me crea en human gira me creó las tarjetas pagar estado de cuenta Clara y me creó la Sub tarea, Dame la liga y yo lo añado no me da la liga. Y esto es lo que aparece en gira. No sé si ahí estás viendo, estás viendo, sí.
+14:11 Emilio Osorio (Emilio): No te escucho
+14:15 Gerardo Osorio: Pues está poca madre, o sea, básicamente es un chat en donde tú en realidad, le dices crea la tarjeta, ya hay un hay una estructura de cómo poner la tarjeta lo que hace la guía. Es que te ayuda a a estructurar de forma correcta la tarjeta para que quede dentro del proceso, no tengas tú que ir a la tarjeta.
+14:36 Emilio Osorio (Emilio): Ajá exactamente la el gira es la base de datos.
+14:40 Gerardo Osorio: Sí, sí, sí, sí sí, entiendo O sea entiendo perfectamente.
+14:41 Emilio Osorio (Emilio): Es una base. Ajá y luego viene Oye que me llegó que hay un desmadre, le digo Oye envíaselo al grupo de devox interno Aquiles no y le hace un mail y me crea el Draft y se lo envía.
+14:56 Gerardo Osorio: Sí claro, puede ser un crm, puede ser lo que sea.
+14:57 Emilio Osorio (Emilio): Y así así hasta que termine yo de revisar mis cosas usa gira y usa cualquier herramienta que yo tenga. Ahorita todavía no tengo productos Gerardo ahorita. Lo estoy haciendo a mano con configuración a mano de gira, pero te voy a decir cuál es el producto. El producto es un generador de odontologías de modelos de gestión.
+15:23 Gerardo Osorio: ok
+15:26 Emilio Osorio (Emilio): estamos es algo donde se le pueda cargar una ontología un modelo de gestión completo y ese modelo de gestión tenga diferentes vacantes Google Drive lo que quieras, pero este grafo de trabajo este grafo, no solamente es el trabajo Eso es lo que tiene gira y Atlas el team work Graph nosotros necesitamos el grafo del modelo de gestión Ese es el tronco del Así se construye la memoria neurosimbólica del modelo de gestión. Yo lo que necesito es generalizar ese algoritmo para que funcione para cualquier modelo de gestión y de salida. Nosotros demos un modelo de gestión para la gente que no tiene modelo de gestión de inicio, esto quiero que trabaje como que el backen se aplace en conformes porque lo conozco y es gratis hasta diez usuarios, o sea, cualquiera puede sacar uno gratis cualquiera puede ajustar su rey y poder a trabajar así esto que ves tú Aquí es tan solo mi Front o sea, esto lo puedes hacer en Cloud code por ejemplo en Cloud ese va a ser la idea, que lo puedas hacer en lo que tú quieras para hacer eso voy a tener que hacer un servidor porque esto además te va a poder contactar a ti. Va a poder checar cosas este lo va a hacer solito.
+16:47 Gerardo Osorio: Sí sí, O sea con que sepas escribir, güey y tener tus pendientes y todo esto ya se hacen las tarjetas. Eso está poca madre güey porque
+16:55 Emilio Osorio (Emilio): te puedes meter al gira y verlo visual y
+16:57 Gerardo Osorio: Claro, a ver sí, O sea a ver, o sea, eso me cae clarísimo que te puedes meter. Mira, pero por ejemplo, una de las cosas que yo estaba viendo Es que llegan notificaciones constantemente al Google chat acerca de que se movieran las tarjetas yo lo que decía. o sea, decía p*** se la pasan trabajando y si algo deben de tener conectado para que cada vez que terminan una tarea se genere el movimiento de la tarjeta y todo esto Me imagino que cuando tú estás trabajando en algo y tú en Ray Avanzas con eso y se identifica de la de la propia tarjeta se identifica no sé si tú le tienes que dar un comando de Okay ya terminamos hasta aquí.
+17:38 Emilio Osorio (Emilio): Eso lo que hice fue conectar el Google con el gira.
+17:43 Gerardo Osorio: Sí sí, pero me refiero no tanto a la conexión, eso me queda claro, sino por ejemplo, vamos a imaginar, que yo estoy, me dice de mis pendientes tienes que terminar la cotización que te pidió Marilú y todo esto Entonces yo en otra instancia o en esa misma instancia le digo y Vamos a ponernos a terminar esta madre, no sé que Oye ya está terminada porque la bajen no sé qué se te paso el link de gama y no sé qué Ya está terminada, qué sigue o más bien? Le digo ya está terminada mueve la
+18:15 Emilio Osorio (Emilio): No ya O sea tú la La idea, es que el rey se acuerde de mover la tarjeta y de
+18:16 Gerardo Osorio: Okay.
+18:21 Emilio Osorio (Emilio): registrar todo tú no? O sea, quién sabe el proceso? Quién sabe el modelo de gestión es tu agente? Es un agente opinionado, no hace lo que tú quieres hace lo que el modelo de gestión que tú y tu agente acordaron que van a hacer así como Reyes viene con una metodología que la gente va a tener que salir con un modelo de gestión por default Oye que yo no quiero eso, que yo quiero gestión basada en pecados, bueno o o gestión basada en humanos Plus lo que quieras papá, o sea, el marco teórico Es cualquiera mientras lo haya Mientras esté modelado.
+19:01 Emilio Osorio (Emilio): Ahora cada uno de esos componentes de conocimiento tiene que tener un storage el trabajo una tarjeta de gira, pero podría ser una tarjeta en Notebook O podría ser una tarjeta en lo que quisieras Entre él. Oye necesitas documentos perfectos puede ser un Google Drive o puede ser un conflicto puede ser lo que quieras tienes diferentes adaptadores para mantener tus documentos?
+19:22 Gerardo Osorio: Sí o sea, a ver, yo lo que entiendo Es que muchos estábamos utilizando la generativa para poder avanzar en pendientes, pero no estaba conectado con la gestión y lo estás generando es el el framework, no solamente de la conexión, sino que ya tiene determinadas las reglas de gobernanza y todo eso para que
+19:42 Emilio Osorio (Emilio): exactamente
+19:45 Gerardo Osorio: Para que trabajemos de acuerdo a a algo que luego nos dé una métrica real.
+19:50 Emilio Osorio (Emilio): Haz de cuenta que me metí un poquito en terrenos de mh Services y el domingo que empecé a trabajar en esta visión dije Bueno tengo hecho un desmadre tengo un montón de áreas de mi vida que he estado negando porque he estado concentrando en esto y eso me está empezando a pagar factura pasar factura Entonces como yo ya sé que la onda es el balance le dije a esta madre le dije sabes qué Este necesito vamos a crear esta visión de esta gente, pero la gente no va a saber ni siquiera en que necesita ayuda Entonces qué te parece hacemos un like audit Entonces el proceso empieza con un Live audit y una serie de preguntas que te hace para poder determinar Cuáles son las áreas de tu vida en Que puedes trabajar a qué me refiero? Esto es totalmente mh.
+20:40 Gerardo Osorio: Por qué?
+20:42 Emilio Osorio (Emilio): Vas a ver? Entonces tengo este proyecto que se llama Life y mi Live tiene un mapa de historias de usuario.
+20:56 Gerardo Osorio: De tu vida no, el trabajo.
+20:59 Emilio Osorio (Emilio): de hecho específicamente este proyecto es para todo lo que No necesariamente es de Reyes Entonces tenemos áreas de vida de hecho el type, si te pones aquí, mira el si lo si lo ves Si lo elige
+21:14 Gerardo Osorio: Ajá
+21:15 Emilio Osorio (Emilio): Es tipo live? Ajá Entonces tienes diferentes Life Area y luego tienes épicas o mini proyectos para tu light y luego tienes historias Entonces esta es la base de tu agente. Tu agente sabe que estás logrando cosas cualquier cosa que estés queriendo lograr, tiene que estar aquí Ajá pues ayer hablé con ayer hablé con con Luna
+21:39 Gerardo Osorio: claro
+21:43 Emilio Osorio (Emilio): no me comprometí con Luna hacerle una primera versión de la su ontología de skate up, Ajá pero esta tarjeta yo no la creé, o sea, esto yo no lo escribí. Nada de eso lo escribí yo, qué fue lo que pasó? Yo estaba trabajando en mi ID Ajá Y aquí mide apareció el correo de apareció el correo de Lalo Ajá Y le dije Oye pues este me comprometí a esto con Lalo
+22:20 Gerardo Osorio: Va a salir eso está poca madre.
+22:21 Emilio Osorio (Emilio): Oye ya lo acepté De hecho, quería generar una épica de World es una ayuda que me pide dar Luna Taca taca TACA que sirve Taca taca y ya entonces yo ya sé pues que va a estar en el tablero O sea que que aquí está la su tarea asignada a mí pues la próxima vez que yo le diga Oye qué tenemos pendiente rey. Va a salir eso, no? Hay un modelo de gestión personal, digamos que va a ir incluido en un principio va a ser gira Pero como va a ser con adaptadores mi objetivo es que pues una vez que lo tenga yo ya modelado, que ya funcione bien con gira porque aparte me da atracción en gira y lo puedo poner en la clase am Force como producto este llegar primero ese mercado, después simplemente quedo quito el adaptador y pongo mis propios componentes y ya puedo hacer algo completamente independiente es esto ya lo podrías empezar a usar, tú que todavía tiene como que cómo te diré.
+23:27 Emilio Osorio (Emilio): o sea, todavía le tienes que saber como para poderlo usar, lo necesito empacar un poco mejor y yo creo estar hasta el lunes, entonces yo te diría ni ni medio, vale Ahorita mucho la pena que te metas al llegar hasta que esté esto lo que sí, vale la pena y que sí, vale la pena que trabajes con con
+23:48 Gerardo Osorio: Claro claro
+23:49 Emilio Osorio (Emilio): Dávila es Cuáles son los los tableros Y cómo quieres modelar customer success? Porque también te tiene que ayudar para eso para el trabajo y la otra es a nivel personal. Tú piensas qué tableros quisieras en tu vida y cuáles son? O sea Avance en tu diseño de tu propio modelo de gestión.
+24:07 Gerardo Osorio: Sí sí, okay. Okay. Okay. Okay, okay.
+24:09 Emilio Osorio (Emilio): Después lo subimos allí ya es más. Te puede hacer el modelo, o sea, te puede crear?
+24:18 Gerardo Osorio: A ver, este, o sea, me parece bien, o sea, si quieres yo yo O sea ahorita voy a ver De hecho ahorita voy a ver con Gerardo Dávila esto. Lo que él está trabajando para que lo podamos diseñar bien, revisemos nada más el tema del que él ya tiene como me imagino que sobre la mesa sobre cómo lo puedo hacer y también yo para que en la parte de costumbres la otra parte es la mía a la mía, que estoy llevando mh, que estoy contigo. Estoy llevando otras cosas, no este y la verdad es que yo lo o sea yo ahorita Emilio o sea de
+24:45 Emilio Osorio (Emilio): Sí, sí.
+24:51 Gerardo Osorio: aquí a probablemente verano, voy a seguir metido mucho en el tema de poder facturarme porque sé lana Pues o sea, mi idea, es que cuando ya tengas maduro esto podamos hacer el rey de de
+25:08 Emilio Osorio (Emilio): es este que hace cuenta que esto que estoy haciendo Gerardo Lo estoy pensando para plug a Ball ontologies
+25:16 Gerardo Osorio: Sí sí, O sea entiendo que a ver si me lo pongo en venta, No mames, güey O sea qué haría yo como link seller, digo no mames, o sea, toda mi base de mi de ahorita de mi viaje del insatis está basado en las transcripciones porque la comunicación no es con gente que está en mi entorno los clientes están en sus entornos. Entonces para que yo pueda ser muy eficiente de cara lo que no está en mi entorno en mi entorno, lo controlo, yo los puedo obligar a que estén en el Google chat yo los puedo obligar a que estén en gira, pero con mis clientes
+25:49 Emilio Osorio (Emilio): Sí, sí.
+25:51 Gerardo Osorio: andan en lo que sea entonces yo Por eso ahorita les, o sea lo que estoy utilizando es todo tipo de transcriptores para que ese canal de Data Entonces yo me lo llevé a mis a mis agentes Y entonces sobre eso trabaje.
+26:05 Emilio Osorio (Emilio): Claro, piensa en todo ese canal de Data Gerardo piensa piensa en un workflow. Piensa que tú puedes hacer los agentes que tú quieras y diseña qué te gustaría que se le hiciera cada transporte.
+26:22 Gerardo Osorio: claro
+26:22 Emilio Osorio (Emilio): Eso es justo lo que estoy trabajando ahorita para mis propios Book más y mis propias cosas, pero tu forma de procesar tus transcripts va a sacar cosas que son diferentes a las mías por ahí podemos empezar y que eso te empiece a popular tu vida.
+26:39 Gerardo Osorio: Claro claro, claro, claro, claro, claro, claro, claro, claro.
+26:41 Emilio Osorio (Emilio): O sea, en la captura y el Discovery de todo lo que haces Y todas las pendientes y todas las ideas que eso se empiece a tener ahí porque, o sea creo que tú y yo no padecemos por falta de creatividad, sino porque simplemente no podemos operar en todas las cosas que vemos.
+26:57 Gerardo Osorio: Exacto no Y a ver, y es o sea y mira, hay dos hay dos cosas uno es No es no es que no podamos avanzar en relación a lo que podemos proponerles a los clientes o las mamás. Yo yo creo que el punto crítico Es que para tipo de perfil es como tú y yo que es el tipo de perfiles con los cuales. Un par de clientes gente en putiza que su mente va muy rápido, que no tiene tiempo o más bien o que desea tener más tiempo.
+27:28 Emilio Osorio (Emilio): Sí, sí.
+27:29 Gerardo Osorio: quiere renunciar a la productividad Sí entonces más bien la quiere elevarlos entonces yo una de las cosas que me pongo a pensar cada vez, por eso estoy obligando a todo mundo usar transcriptores, porque todavía no queda tan claro el tema de que cualquier cosa que comuniques es Data Y en las interpretaciones y todo eso creo que ahí también entra la gestión, o sea.
+27:54 Emilio Osorio (Emilio): sí
+27:55 Gerardo Osorio: Si yo puedo hacer que todo lo que yo me comprometo con mis clientes quede grabado Y eso de lo que yo hablo por los multichanes que son bueno WhatsApp teléfono Main yo con eso teniéndolo bajado en un solo lugar, entonces lo que hago es que optimizo cualquier cosa que veas adelante, luego está la otra cosa.
+28:17 Emilio Osorio (Emilio): No pienses solo bajado. Piensa que esos esas diferentes combinaciones en diferentes canales van a ser, van a entrar a un pipeline Gerardo así como tu pipeline para hacer videos van a entrar un pipeline y el producto a salir de ahí va a ser un documento en un conflicto va a ser una tarjeta en un gira van a ser elementos accionables que tu agente va a recordar.
+28:47 Gerardo Osorio: claro 600
+28:48 Emilio Osorio (Emilio): Ajá, No pienses nada más no te lo imagines como una cubeta no? Imagínate lo que no solamente extraes como si se acabaras, sino también refinas esa información la
+29:01 Gerardo Osorio: Ah no, no, no, Claro claro, claro, no no no no, yo yo me refiero nada más al primer principio de la nota. Yo creo que teniendo la Data luego entra toda la
+29:07 Emilio Osorio (Emilio): Sí, sí.
+29:11 Gerardo Osorio: estructura del framework de a ver güey, hay un proceso para poder no solamente guardar la Data refinarla entenderla leer entre líneas analizarla, si me explico todo A lo mejor, o sea
+29:24 Emilio Osorio (Emilio): Y ahí te conviene pensarlo al revés decir pensar con el artefacto de salida primero O sea tú piensa al final de ese pipeline que me gustaría tener que O sea qué pelos de la mula me gustaría tener en la mano.
+29:41 Gerardo Osorio: Sí, Y ahí, Ahí te adelanto así rapidito una de las cosas que que las que estoy trabajando mucho y a mí me está dando resultado hay gente que me está siguiendo el viaje y hay otra gente como que todavía no me sigue el viaje, pero a mí lo que me está dando resultado. adelantar Me es decir, yo no estoy usando la ia para poder avanzar con mis pendientes con clientes. Yo estoy usando la guía Emilio para que cualquier requerimiento del cliente yo ya llegue sino adelante en el mismo nivel del cliente.
+30:18 Gerardo Osorio: O sea, yo estoy o sea, uno de los pedos que tenemos en ventas, es que siempre vamos atrás del cliente, me pide un requerimiento, entonces me tengo que sentar para hacer el Discovery eso va a seguir igual, pero yo yo lo que estoy haciendo
+30:31 Emilio Osorio (Emilio): Sí, sí.
+30:34 Gerardo Osorio: yo ya llego ya sí me explico con la estructura de las preguntas con esto con la c*******. Claro que hay una parte que la descubres Pero eso no O sea estoy
+30:43 Emilio Osorio (Emilio): Sí, sí.
+30:44 Gerardo Osorio: dejando la improvisación a un lado. Eso es lo que yo le llamo la estructura de mi de mi proceso del insatis, porque no es algo que estés controlando a ver con un cliente tienes que estar siempre preparado ir adelante, porque cuando ya quedas con los pendientes, si tu propio agente no ha venido preparado la línea Entonces vas a tener que volverle a dar contexto.
+31:09 Emilio Osorio (Emilio): Sí, sí.
+31:10 Gerardo Osorio: Entonces yo yo ya no me espero eso, o sea, yo ya yo ya creo mis propias cosas mis propios chats, digo Oye voy a hablar con este cliente, por ejemplo, eso sería algo interesante a nivel de ventas, Cuántas citas, tengo esta semana corres, el de scouting corres. El no sé qué. Prepárame las tarjetas y prepárame dentro de las tarjetas todas las preguntas que tengo que llegar, hazme el scouting pum pum pum pum y dime exactamente Cuáles son las tres cosas que tengo que lograr con las cinco preguntas más importantes a la v****, eso quita Emilio de medio, que luego tengamos que contratar humanos, que no tienen el nivel de creatividad y skills que tenemos nosotros, pues claro, todo mundo depende de nosotros Ay Quiero llevar a Gerardo porque a Gerardo va a ser las buenas preguntas, Pues sí, güey, pero pues tengo 50 años, cabrón, o sea.
+31:59 Emilio Osorio (Emilio): Todo eso ya fue ya Esa es la oportunidad.
+32:00 Gerardo Osorio: Exacto O sea ya exactamente Entonces nada más como para que agarres el viaje en lo que ando yo.
+32:06 Emilio Osorio (Emilio): No, no está bien yo yo, o sea, sé que lo están haciendo bien, nada más te decía yo como es súper importante que podamos capturar bien los datos de entrada y el problema El problema básico de cualquier solución de inteligencia artificiales, que no tenemos suficientes datos de entrada para hacer que el modelo haga lo que queremos entonces empezar con el artefacto en mente es decir con la salida y a partir de ahí ya con el template de salida definido ya investigar qué datos necesitamos con eso nos aseguramos que desde el inicio lleguen todos los datos que necesitemos es en cualquier flujo de cualquier. Tú
+32:41 Gerardo Osorio: claro En cualquier flujo.
+32:45 Emilio Osorio (Emilio): tú piensas tú piensas lo que Cuando tú piensas Dime a ver qué documento Y qué estructura debería tener ese documento que yo lo pudiera revisar para saber si este trabajo se hizo bien
+32:55 Gerardo Osorio: Claro claro, Cuál es el el el el el el el el como el
+32:56 Emilio Osorio (Emilio): y de ahí para atrás.
+33:01 Gerardo Osorio: El logro máximo al que yo aspiraría a tener.
+33:06 Emilio Osorio (Emilio): O el mínimo o lo que yo digo esto es lo mínimo que yo necesito para calidad.
+33:09 Gerardo Osorio: Bueno sí lo mínimo que tengo que tener para decir que esto cumple con los con
+33:14 Emilio Osorio (Emilio): Entonces cada sección de ese documento se convierte en una forma de extraer la
+33:15 Gerardo Osorio: las cosas necesarias.
+33:23 Emilio Osorio (Emilio): información.
+33:24 Gerardo Osorio: Claro, Ajá sí, sí entiendo Entiendo entiendo, sí, O sea.
+33:26 Emilio Osorio (Emilio): Por ejemplo si estás tú estás en un entorno de cómo crm, donde te están contestando en línea A lo mejor el Cuándo se hizo la solicitud y demás no es algo que se le pregunta es algo que viene en el metadato de la conversación y
+33:38 Gerardo Osorio: exactamente
+33:39 Emilio Osorio (Emilio): se extrae pero en un modelo b2b cuando tú no sabes cuándo se inició la petición Pues tú preguntas Oye y cuándo les pidieron esto no? Pues no nos pidieron desde el año pasado es esa esa información viene en la conversación
+33:53 Gerardo Osorio: Por supuesto.
+33:55 Emilio Osorio (Emilio): no vienen los metadatos entonces dependiendo de cada proceso puede haber formas fáciles o difíciles de obtener esos datos y la filosofía es que obtengamos
+34:03 Gerardo Osorio: Totalmente totalmente sí sí.
+34:06 Emilio Osorio (Emilio): los datos con la menor fricción posible. Son como los principios de diseño que yo estoy siguiendo con Rey no le exijas al humano todo lo que le puedas hacer el humano que tenga que ver con logística esa actitud Hazlo decidir, Ponlo a pensar que el Humano piense Que decida las alternativas que te diga cordón de que te corrija la prana, pero no lo pongas a decidir dónde va a guardar el archivo que sí que Temple va a ser esas madres
+34:38 Gerardo Osorio: no, no no no no no
+34:41 Emilio Osorio (Emilio): son ya, no? Pues es allá Tenemos ayuda, no? Entonces hay que pensarlo al revés es Es como un una atracción de Disney no
+34:50 Gerardo Osorio: Sí claro.
+34:50 Emilio Osorio (Emilio): vas a vas a subir a tu mano que vas y lo vas a pasar por los Piratas del Caribe por arriba por abajo, pero tú controlas ese proceso Ese es el aspecto de diseño, no?
+35:02 Gerardo Osorio: Claro claro, baba este Oye pues me voy a mover con con Dávila ahorita porque vamos a hablar.
+35:09 Emilio Osorio (Emilio): Eso empezamos con eso y yo a Gerardo Dávila lo puedo subir antes y en el momento en que tú apruebes el modelo de gestión. Yo me lo cargo para acá y le enseño que haga esto mismo y así.
+35:18 Gerardo Osorio: Perfecto, porque porque lo que quiero es que Gerardo Dávila se empiece a a subir más al tema de las requerimientos puntuales que tiene Marilú y todo esto O sea yo no quiero andar mi pastoreando ni a ver no, porque no pueda ni porque no quiera, sino. Sí, sí sí, Y este yo creo que él puede funcionar muy bien
+35:34 Emilio Osorio (Emilio): Y anda desconectado, o sea, anda, anda, o sea, le hace falta más al gordin. Yo avancemos de por ahí, saquémosle provecho pues Sí definitivamente definitivamente avanza ahí yo termino.
+35:45 Gerardo Osorio: en ese rol porque pues yo a veces ayer toda la tarde, me la pasé en curso, o sea, no puedo atender pues. No, y Aunque no, aunque me dirigí que totalmente a raíz amigo tampoco creo que tengamos que ir hacia allá, Pues o sea tú y yo tenemos que estar moviendo en ese nivel.
+36:03 Emilio Osorio (Emilio): Lo grande lo grande.
+  

@@ -1,0 +1,121 @@
+---
+title: Memoria
+description: Cómo RaiSE recuerda entre sesiones — patrones, calibración e historial de sesiones que se acumulan con el tiempo.
+---
+
+La memoria es lo que hace que tu partner de IA aprenda. Sin ella, cada sesión empieza de cero. Con la memoria de RaiSE, tu IA lleva consigo patrones aprendidos, datos de calibración de trabajo anterior y un historial completo de sesiones — así mejora mientras más trabajas juntos.
+
+## Los Tres Scopes
+
+La memoria vive en tres lugares, cada uno con un propósito diferente:
+
+| Scope | Ubicación | Visibilidad | Qué va aquí |
+|-------|----------|------------|-------------|
+| **Global** | `~/.rai/` | Todos los proyectos | Patrones universales que aplican en todos lados |
+| **Project** | `.raise/rai/memory/` | Compartido (committed al repo) | Patrones del proyecto, calibración, conocimiento del equipo |
+| **Personal** | `.raise/rai/personal/` | Solo tú (gitignored) | Tu historial de sesiones, telemetría, aprendizajes personales |
+
+Cuando el mismo concepto existe en múltiples scopes, **personal sobreescribe project, project sobreescribe global**. Esto significa que un equipo puede compartir patrones del proyecto mientras cada desarrollador mantiene su propio historial.
+
+## Los Tres Tipos
+
+### Patrones
+
+Los patrones son aprendizajes capturados durante el desarrollo. Representan qué funcionó, qué no y qué recordar la próxima vez.
+
+```bash
+rai pattern add "Usar fixtures para setup de base de datos en tests" \
+  -t technical -c "pytest,testing" --from S3.5
+```
+
+Los patrones tienen sub-tipos:
+- **Process** — patrones de workflow y colaboración (ej. "commit después de cada task")
+- **Technical** — técnicas de código y gotchas (ej. "usar capsys para tests de stdout")
+- **Architecture** — decisiones de diseño y patrones de módulos
+- **Codebase** — convenciones específicas del proyecto
+
+### Calibración
+
+La calibración registra cuánto tardan realmente las stories vs. las estimaciones. Con el tiempo, esto construye un perfil de velocidad que ayuda a predecir trabajo futuro con más precisión.
+
+```bash
+rai signal emit-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
+```
+
+Esto registra: la story S3.5 se estimó en 60 minutos (talla M) pero realmente tomó 45 — una velocidad de 1.33x.
+
+### Sesiones
+
+Las sesiones son un registro cronológico de lo que sucedió. Cada sesión captura: en qué trabajaste, qué lograste y qué patrones aprendiste.
+
+```bash
+rai signal emit-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
+```
+
+## Scoring de Patrones
+
+No todos los patrones son iguales. Los patrones validados en implementaciones reales deben aparecer antes que los no probados. RaiSE usa un **score compuesto** para rankear patrones en cada consulta:
+
+```
+score = (0.3 × recencia + 0.7 × relevancia_keywords) × modificador_wilson
+```
+
+La **recencia** decae con el tiempo usando una vida media de 30 días — un patrón de ayer puntúa más alto que uno de hace 3 meses. Los **patrones fundacionales** (marcados `foundational: true`) están exentos del decay y siempre puntúan solo por relevancia de keywords.
+
+El **modificador Wilson** ajusta el score basado en el historial de refuerzo. Los patrones con muchas evaluaciones positivas reciben un boost; los que han sido contradichos en la práctica bajan en el ranking.
+
+### Loop de Refuerzo
+
+En cada revisión de story, evalúa los patrones que fueron cargados al inicio de la sesión:
+
+```bash
+rai pattern reinforce PAT-001 --vote 1 --from S101   # aplicado
+rai pattern reinforce PAT-002 --vote 0 --from S101   # N/A
+rai pattern reinforce PAT-003 --vote -1 --from S101  # contradicho
+```
+
+El voto `0` (N/A) no cuenta hacia las evaluaciones — úsalo libremente. El sistema es deliberadamente conservador con muestras pequeñas: un patrón con 1 evaluación positiva puntúa ~0.21, no 1.0. La confianza se construye gradualmente a través del uso real.
+
+## Cómo la Memoria se Acumula
+
+Esta es la idea clave: la memoria crea un **efecto acumulativo**.
+
+1. **Sesión 1**: Descubres que los fixtures son mejores que el setup inline para tests de base de datos
+2. **Patrón capturado**: "Usar fixtures para setup de base de datos" (patrón técnico)
+3. **Sesión 5**: Tu partner de IA aplica este patrón automáticamente — está en el bundle de contexto
+4. **Sesión 20**: Tu velocidad ha mejorado porque los patrones eliminan descubrimientos repetidos
+
+Mientras más sesiones ejecutas, más inteligente se vuelve el sistema. Esto no es ML ni fine-tuning — es conocimiento estructurado que fluye al contexto de tu IA al inicio de cada sesión.
+
+## El Índice de Memoria
+
+Todas las fuentes de memoria se fusionan en un índice consultable:
+
+```bash
+# Construir el índice unificado
+rai graph build
+
+# Consultarlo
+rai graph query "testing patterns" --types pattern
+
+# Listar todos los conceptos
+rai graph list --memory-only
+```
+
+El índice es un archivo JSON (`.raise/rai/memory/index.json`) que combina patrones, calibración, sesiones, gobernanza, seguimiento de trabajo y skills en un solo grafo. Ver [Knowledge Graph](knowledge-graph.md/ para cómo funciona este grafo.
+
+## Comandos Clave
+
+| Comando | Qué hace |
+|---------|----------|
+| `rai graph build` | Construir índice unificado desde todas las fuentes |
+| `rai graph query` | Buscar conceptos relevantes en la memoria |
+| `rai graph query --format compact` | Salida de alta densidad para ventanas de contexto de IA |
+| `rai pattern reinforce --vote 1\|0\|-1` | Registrar señal de refuerzo para un patrón |
+| `rai graph list` | Listar todos los conceptos en el índice |
+| `rai pattern add` | Registrar un patrón aprendido |
+| `rai signal emit-calibration` | Registrar datos de timing de una story |
+| `rai signal emit-session` | Registrar una sesión |
+| `rai graph validate` | Verificar integridad del índice |
+
+Ver la [Referencia CLI](../cli/index.md/ para detalles completos de cada comando.

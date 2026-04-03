@@ -1,9 +1,14 @@
 ---
 name: rai-project-create
-description: >
-  Guide greenfield project setup through conversation. Fills governance templates
-  with project-specific content and builds the knowledge graph. Use after rai init
-  on a new project.
+description: Set up governance for a new project. Use after rai init on a greenfield project.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

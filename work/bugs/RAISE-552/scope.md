@@ -8,3 +8,9 @@ EXPECTED:  Query plain (e.g. "RAISE-539" o "backlog search error") se convierte 
 Done when: `rai backlog search "RAISE-539"` retorna la issue correcta sin error
            `rai backlog search "issue = RAISE-539"` sigue funcionando (JQL explícito respetado)
            `rai backlog search "backlog error"` convierte a text ~ "backlog error" JQL
+
+TRIAGE:
+  Bug Type:    Functional
+  Severity:    S2-Medium
+  Origin:      Code
+  Qualifier:   Missing

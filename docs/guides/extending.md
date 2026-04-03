@@ -1,0 +1,107 @@
+---
+title: Extending RaiSE
+description: Overview of RaiSE extension points — adapters, skills, MCP servers, and lifecycle hooks.
+---
+
+RaiSE is designed to be extended. There are four extension points, each serving a different purpose.
+
+## Adapters
+
+Adapters connect RaiSE to external services — project management tools, documentation platforms, and knowledge graph backends. They follow Python Protocol contracts with entry point discovery.
+
+RaiSE ships with adapters for Jira and Confluence. You can add your own for any service.
+
+**Entry point groups:**
+- `rai.adapters.pm` — project management (issues, sprints, backlog)
+- `rai.docs.targets` — documentation publishing (pages, search)
+- `rai.governance.schemas` — governance artifact type definitions
+- `rai.governance.parsers` — governance artifact parsers
+- `rai.graph.backends` — knowledge graph storage
+
+[Create a custom adapter](create-adapter.md/
+
+## Skills
+
+Skills are structured instructions that guide your AI assistant through repeatable workflows. They are SKILL.md files with YAML frontmatter and step-by-step sections.
+
+RaiSE ships with lifecycle skills (session, epic, story) and utility skills (debug, research). You can create project-specific skills for your team's workflows.
+
+[Create a custom skill](create-skill.md/
+
+## MCP Servers
+
+MCP (Model Context Protocol) servers give your AI assistant access to external tools — documentation lookups, security scanners, repository operations. RaiSE manages MCP server registration and health checking.
+
+[Register an MCP server](register-mcp.md/
+
+## Lifecycle Hooks
+
+Hooks are shell commands that run on Claude Code events — before tool use, after tool use, or before context compaction. They enable side effects like journal logging without blocking the main workflow.
+
+[Wire a lifecycle hook](create-hook.md/
+
+## CLI Extensions
+
+External packages can register new top-level commands with the `rai` CLI. Extensions are discovered at startup via Python entry points.
+
+### Entry Point Group
+
+Register your command under the `rai.cli.commands` entry point group in your package's `pyproject.toml`:
+
+```toml
+[project.entry-points."rai.cli.commands"]
+knowledge = "my_package.cli:app"
+```
+
+The entry point name becomes the command name. With the example above, `rai knowledge validate ./nodes/` works when your package is installed alongside `raise-cli`.
+
+### Convention
+
+Each extension must expose a `typer.Typer` app. If the loaded object is not a `Typer` instance, it is skipped with a warning.
+
+```python
+# my_package/cli.py
+import typer
+
+app = typer.Typer(help="Knowledge graph utilities.")
+
+@app.command()
+def validate(path: str) -> None:
+    """Validate knowledge graph nodes."""
+    ...
+```
+
+### Protection
+
+The extension loader includes two safety checks:
+
+- **Built-in collision detection** — Extensions cannot shadow built-in commands (`session`, `pattern`, `graph`, etc.). If a collision is detected, the extension is skipped with a warning.
+- **Duplicate extension detection** — If two packages register the same command name, the first one loaded wins and the second is skipped with a warning.
+
+Both cases are logged so you can diagnose registration issues.
+
+### Verification
+
+Once your package is installed, the extension appears in `rai --help`. You can also check extension loading status via debug logging:
+
+```bash
+RAI_LOG_LEVEL=DEBUG rai --help
+```
+
+## Validation
+
+After extending RaiSE, verify your setup:
+
+```bash
+# Check adapter registration and Protocol compliance
+rai adapter check
+
+# Validate a declarative adapter config
+rai adapter validate .raise/adapters/my-adapter.yaml
+
+# Check skill structure
+rai skill validate my-skill
+
+# Verify MCP server health
+rai mcp health my-server
+```

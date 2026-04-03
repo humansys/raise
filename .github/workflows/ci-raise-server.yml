@@ -1,0 +1,25 @@
+name: "CI: raise-server"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/raise-server/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/raise-server/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci-package.yml
+    with:
+      package: raise-server
+      test-path: packages/raise-server/tests/
+      src-path: packages/raise-server/src/

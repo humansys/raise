@@ -1,0 +1,7 @@
+# Confluence adapter config for build-dossier.py
+# Copy to confluence.yaml and fill in your credentials.
+# DO NOT commit confluence.yaml — it contains secrets.
+
+url: https://humansys.atlassian.net
+user: your-email@example.com
+token: your-api-token-here

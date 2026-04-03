@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://raiseframework.ai/sitemap-index.xml

@@ -1,0 +1,20 @@
+[project]
+name = "raise-core"
+version = "2.4.0a1"
+description = "RaiSE Core — protocols, models, and graph engine for the RaiSE framework"
+authors = [
+    {name = "Emilio Osorio", email = "emilio@humansys.ai"}
+]
+license = {text = "Apache-2.0"}
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.6.0",
+    "networkx>=3.6.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raise_core"]

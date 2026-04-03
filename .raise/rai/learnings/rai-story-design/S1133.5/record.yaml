@@ -1,0 +1,30 @@
+skill: rai-story-design
+work_id: S1133.5
+version: "2.4.0"
+timestamp: "2026-04-01T22:20:00"
+primed_patterns:
+  - PAT-E-154
+  - PAT-E-433
+  - PAT-F-054
+tier1_queries: 2
+tier1_results: 10
+jit_queries: 1
+pattern_votes:
+  PAT-E-154:
+    vote: 0
+    why: "design gate pattern — relevant principle but not directly applicable"
+  PAT-E-433:
+    vote: 0
+    why: "scope bloat pattern — good reminder but this is a small refactor"
+  PAT-F-054:
+    vote: 1
+    why: "silent nodes concept confirmed — missing records are valid signal"
+gaps:
+  - "No patterns for learning record aggregation in review skills"
+artifacts:
+  - s1133.5-design.md
+commit: null
+branch: story/s1133.5/story-review-refactor
+downstream:
+  plan_derivable: true
+  tasks_clear: true

@@ -255,7 +255,7 @@ Grafo dirigido de concepts de governance y sus relaciones semánticas. Base del 
 
 **Migration:**
 - Gate definitions → Skills in `.claude/skills/validate-*`
-- Gate validation → `raise validate` CLI commands
+- Gate validation → `rai validate` CLI commands
 - Gate execution → Skills guide Claude through validation
 
 **Rationale:** Skills + toolkit approach provides same functionality with 85% less complexity (29 SP → merged into 9 SP toolkit).
@@ -273,10 +273,10 @@ CLI toolset providing deterministic operations for skills to call. Replaces Kata
 
 **Commands:**
 ```bash
-raise graph build                    # Build concept graph
-raise context query --task <task>   # Get MVC for task
-raise validate structure <file>     # Check structure
-raise parse <file> --type <type>    # Extract concepts
+rai graph build                    # Build concept graph
+rai context query --task <task>   # Get MVC for task
+rai validate structure <file>     # Check structure
+rai parse <file> --type <type>    # Extract concepts
 ```
 
 **Architecture:** Skills + Toolkit
@@ -508,7 +508,7 @@ total_tokens: 132
 - v2.2: Rule-based (files)
 - v2.6: Concept-based (sections) - 97% token reduction
 
-> **Comando asociado:** `raise context query --task <task>` returns MVC via concept graph (ADR-011)
+> **Comando asociado:** `rai context query --task <task>` returns MVC via concept graph (ADR-011)
 
 ### Observable Workflow
 **[NUEVO v2.0]** Flujo de trabajo donde cada decisión del agente es trazable y auditable. Alineado con el framework MELT (Metrics, Events, Logs, Traces) de observabilidad.
@@ -526,7 +526,7 @@ Rol evolucionado del desarrollador en RaiSE. El humano define el "Qué" y el "Po
 Principio que establece que RaiSE funciona donde funciona Git, sin dependencia de GitHub, GitLab, Bitbucket ni ningún proveedor específico.
 
 ### raise-config
-Repositorio central que contiene guardrails, katas y templates compartidos. Los proyectos individuales sincronizan desde raise-config mediante `raise pull`.
+Repositorio central que contiene guardrails, katas y templates compartidos. Los proyectos individuales sincronizan desde raise-config mediante `rai pull`.
 
 ### raise-kit
 CLI local que permite inicializar proyectos, validar compliance y sincronizar guardrails. Interfaz principal del usuario final con RaiSE.
@@ -568,20 +568,20 @@ RaiSE Engineer (Human) ←→ Rai (AI Partner)
 ### pull (comando CLI) [NUEVO v2.1]
 Comando que sincroniza Golden Data desde el repositorio central (raise-config).
 
-**Uso:** `raise pull [--branch <nombre>] [--guardrails-only]`
+**Uso:** `rai pull [--branch <nombre>] [--guardrails-only]`
 
 **Contexto:** Desarrollo + CI/CD (automatizable)
 
-> **Nota de migración:** Reemplaza `raise hydrate` desde v2.1 (ADR-010). El nombre "pull" alinea con la semántica Git y es más intuitivo.
+> **Nota de migración:** Reemplaza `rai hydrate` desde v2.1 (ADR-010). El nombre "pull" alinea con la semántica Git y es más intuitivo.
 
 ### kata (comando CLI) [NUEVO v2.1]
 Comando que ejecuta una Kata (proceso estructurado con Jidoka inline).
 
-**Uso:** `raise kata <nivel> [--verify]`
+**Uso:** `rai kata <nivel> [--verify]`
 
 **Niveles disponibles:** principios, flujo, patrón, técnica (y alias L0, L1, L2, L3)
 
-> **Nota de migración:** Reemplaza `raise validate` desde v2.1 (ADR-010).
+> **Nota de migración:** Reemplaza `rai validate` desde v2.1 (ADR-010).
 
 ### Specification (Spec)
 Documento detallado que describe *qué* construir, incluyendo requisitos funcionales, no-funcionales y criterios de aceptación. Es el contrato entre Orquestador y Agente.
@@ -695,10 +695,10 @@ CLI toolset providing deterministic operations for skills. Component of Governan
 
 **Common commands:**
 ```bash
-raise parse <file> --type <type>     # Extract concepts
-raise validate structure <file>      # Check structure
-raise context query --task <task>    # Get MVC
-raise graph build                    # Build concept graph
+rai parse <file> --type <type>     # Extract concepts
+rai validate structure <file>      # Check structure
+rai context query --task <task>    # Get MVC
+rai graph build                    # Build concept graph
 ```
 
 **Design principle:** Return structured JSON for Claude to interpret, not human-readable text.
@@ -955,7 +955,7 @@ Contexto operacional del Orquestador que agrupa katas aplicables y define la fre
 - **NUEVO**: Entrada `Work Cycle (Ciclo de Trabajo)` con tabla resumen de los 4 ciclos
 - **NUEVO**: Entrada `pull` (comando CLI) — ADR-010
 - **NUEVO**: Entrada `kata` (comando CLI) — ADR-010
-- **ACTUALIZADO**: raise-config usa `raise pull` (antes: hydrate)
+- **ACTUALIZADO**: raise-config usa `rai pull` (antes: hydrate)
 - **NUEVO**: Entrada ShuHaRi
 - **ACTUALIZADO**: Kata con niveles semánticos (Principios/Flujo/Patrón/Técnica)
 - **ACTUALIZADO**: Kata con Jidoka inline

@@ -1,0 +1,17 @@
+skill: rai-story-plan
+work_id: S1133.5
+version: "2.4.0"
+timestamp: "2026-04-01T22:30:00"
+primed_patterns: []
+tier1_queries: 0
+tier1_results: 0
+jit_queries: 0
+pattern_votes: {}
+gaps: []
+artifacts:
+  - s1133.5-plan.md
+commit: null
+branch: story/s1133.5/story-review-refactor
+downstream:
+  plan_derivable: true
+  tasks_clear: true

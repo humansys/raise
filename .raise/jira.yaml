@@ -1,6 +1,9 @@
 # Jira Configuration for raise-commons
 # Multi-instance: humansys (primary), rai-agent (secondary)
 # Schema: S494.4 — named instances with project→instance routing
+# Identity (email, token) resolved from env vars:
+#   JIRA_EMAIL or JIRA_EMAIL_{INSTANCE}
+#   JIRA_API_TOKEN or JIRA_API_TOKEN_{INSTANCE}
 
 # ─── Default Instance ──────────────────────────────────────────────────────
 
@@ -11,13 +14,11 @@ default_instance: humansys
 instances:
   humansys:
     site: humansys.atlassian.net
-    email: emilio@humansys.ai
     projects: [RAISE, RTEST]
 
   # TODO(RAISE-636): validate multi-instance routing before enabling
   # rai-agent:
   #   site: rai-agent.atlassian.net
-  #   email: emilio@humansys.ai
   #   projects: [RAI]
 
 # ─── Projects ────────────────────────────────────────────────────────────────

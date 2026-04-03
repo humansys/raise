@@ -1,6 +1,16 @@
 ---
 name: rai-framework-sync
-description: Sync framework files across locations after architectural decisions. Use when framework governance documents need updating for consistency and traceability.
+description: Sync governance files across locations. Use after architectural decisions.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
 
 license: MIT
 

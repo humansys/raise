@@ -20,9 +20,13 @@ CLAUDE.local.md
 .raise/confluence-pages.yaml
 .raise/backlog/
 
-# RaiSE adapter configs (contain PII — use .example templates)
-.raise/jira.yaml
-.raise/confluence.yaml
+# RaiSE adapter configs (declarative, PII-free — identity in env vars)
+# .raise/jira.yaml and .raise/confluence.yaml are tracked (shared config)
+.raise/adapters/*.yaml
+!.raise/adapters/*.yaml.example
+
+# Dossier output (generated, not committed)
+dev/output/
 
 # RaiSE derived artifacts (rebuild with `rai memory build`)
 .raise/rai/memory/index.json
@@ -101,6 +105,7 @@ dmypy.json
 # Secrets & credentials
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 .pypirc
@@ -110,13 +115,8 @@ credentials.json
 .raise/mcp/
 !.raise/mcp/catalog.yaml
 
-# Website (Astro)
-site/node_modules/
-site/dist/
-site/.astro/
-site/.wrangler/
-docs/node_modules/
-docs/.astro/
+# MkDocs build output
+_site/
 
 # Issue analysis artifacts (PDFs, images — binary, no git value)
 dev/issues/**/*.pdf
@@ -127,3 +127,4 @@ dev/transcripts/
 
 # Prevent symlink artifacts from being tracked at root
 /es/
+work/research/

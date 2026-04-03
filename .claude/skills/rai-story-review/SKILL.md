@@ -1,9 +1,12 @@
 ---
 name: rai-story-review
-description: >
-  Reflect on completed stories to extract learnings, identify process
-  improvements, and update the framework with insights gained. Use after
-  implementation is complete to close the development cycle.
+description: Extract learnings and persist patterns from completed story. Use after implementation.
+
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 
@@ -15,13 +18,23 @@ metadata:
   raise.next: story-close
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.version: "2.5.0"
   raise.visibility: public
   raise.inputs: |
     - tests_passing: boolean, required, cli
   raise.outputs: |
     - retrospective_md: file_path, next_skill
     - patterns: list, cli
+  raise.aspects: introspection
+  raise.introspection:
+    phase: story.review
+    context_source: all story artifacts
+    affected_modules: []
+    max_tier1_queries: 2
+    max_jit_queries: 3
+    tier1_queries:
+      - "evaluation patterns for {affected_modules}"
+      - "process patterns from recent stories"
 ---
 
 # Story Review
@@ -43,6 +56,14 @@ Reflect on the completed story to extract learnings, persist patterns, reinforce
 **Inputs:** Completed story, progress log, passing test suite.
 
 ## Steps
+
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: Read ALL previous story learning records (story-design, story-plan, story-implement). This provides the aggregate view for the retrospective.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Verify Tests Pass
 
@@ -83,6 +104,9 @@ Project language detected. Tests passing with appropriate runner.
 
 ### Step 2: Gather Data & Reflect
 
+> **JIT**: Before reflecting on development process, query graph for evaluation patterns
+> → `aspects/introspection.md § JIT Protocol`
+
 Review the story development: actual vs estimated time, blockers, plan deviations.
 
 **Heutagogical checkpoint** — answer with specific examples:
@@ -97,7 +121,33 @@ Identify concrete improvements to skills, guardrails, or templates. Apply small 
 All four questions answered. Improvements identified (or celebrated that none needed).
 </verification>
 
-### Step 3: Persist Patterns & Reinforce
+### Step 3: Aggregate Learning Records
+
+Read learning records produced during this story's lifecycle:
+- `.raise/rai/learnings/rai-story-design/{work_id}/record.yaml`
+- `.raise/rai/learnings/rai-story-plan/{work_id}/record.yaml`
+- `.raise/rai/learnings/rai-story-implement/{work_id}/record.yaml`
+
+If any record is missing (silent node or execution gap), note it and continue — missing records are valid signal.
+
+Produce aggregate summary with these metrics:
+
+| Metric | Calculation | What it tells us |
+|--------|-------------|-----------------|
+| **Acceptance rate** | Patterns voted +1 / total patterns primed | Are PRIME queries returning useful context? |
+| **Gap rate** | Total gaps / total JIT queries | Is the graph missing knowledge we need? |
+| **Pattern utility** | Patterns +1 / (patterns +1 + patterns -1) | Are stored patterns helping or misleading? |
+
+Include the aggregate in the retrospective (Step 5).
+
+<verification>
+Learning records read (or missing noted). Metrics calculated. Aggregate ready for retrospective.
+</verification>
+
+### Step 4: Persist Patterns & Reinforce
+
+> **JIT**: Before persisting patterns, query graph for existing patterns to avoid duplicates
+> → `aspects/introspection.md § JIT Protocol`
 
 **Add new patterns** worth preserving across sessions:
 
@@ -125,7 +175,7 @@ Only evaluate patterns you consciously considered. `0` is correct for most patte
 New patterns persisted. Behavioral patterns evaluated (or explicitly skipped).
 </verification>
 
-### Step 4: Document Retrospective
+### Step 5: Document Retrospective
 
 Create `work/epics/e{N}-{name}/stories/s{N}.{M}-retrospective.md` with:
 - Summary (story ID, dates, estimated vs actual time)
@@ -133,12 +183,13 @@ Create `work/epics/e{N}-{name}/stories/s{N}.{M}-retrospective.md` with:
 - Heutagogical checkpoint answers
 - Improvements applied
 - Patterns added/reinforced
+- **Learning chain summary** (from Step 3): records found/missing, aggregate metrics, notable gaps, downstream enrichments
 
 <verification>
-Retrospective document created.
+Retrospective document created with learning chain summary.
 </verification>
 
-### Step 5: Emit Calibration Telemetry
+### Step 6: Emit Calibration Telemetry
 
 ```bash
 rai signal emit-calibration S{N}.{M} --size {XS|S|M|L} --estimated {minutes} --actual {minutes}
@@ -159,6 +210,31 @@ Calibration event recorded (or skipped if CLI unavailable).
 | Calibration | Via `rai signal emit-calibration` |
 | Next | `/rai-story-close` |
 
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-story-review/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-story-review
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
+
 ## Quality Checklist
 
 - [ ] Project language detected before running tests
@@ -170,6 +246,7 @@ Calibration event recorded (or skipped if CLI unavailable).
 - [ ] Retrospective document created
 - [ ] NEVER skip pattern reinforce — scoring system depends on it (RAISE-170)
 - [ ] NEVER give vague checkpoint answers — be specific with concrete examples
+- [ ] LEARN record written to `.raise/rai/learnings/rai-story-review/{work_id}/record.yaml`
 
 ## References
 

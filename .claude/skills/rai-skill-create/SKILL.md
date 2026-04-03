@@ -1,8 +1,14 @@
 ---
 name: rai-skill-create
-description: >
-  Guided skill creation through conversation and CLI composition. Walks through
-  purpose definition, naming, lifecycle, design, writing, and validation.
+description: Create a new skill through guided conversation. Use to add skills to the framework.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

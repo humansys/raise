@@ -1,0 +1,41 @@
+[project]
+name = "rai-agent"
+version = "0.1.0"
+description = "Autonomous personal agent on RaiSE infrastructure"
+authors = [{name = "Emilio Osorio", email = "emilio@humansys.ai"}]
+license = {text = "Apache-2.0"}
+requires-python = ">=3.12"
+dependencies = [
+    "raise-core",
+    "raise-cli",
+    "pydantic>=2.0",
+    "fastapi[standard]>=0.115",
+    "cryptography>=43.0",
+    "claude-agent-sdk>=0.1.52",
+    "structlog>=24.0",
+    "instructor>=1.7",
+    "anthropic>=0.40",
+    "python-telegram-bot>=20.0",
+    "telegramify-markdown~=1.1",
+    "apscheduler>=4.0.0a5",
+    "aiosqlite>=0.20",
+    "sqlalchemy>=2.0",
+]
+
+[project.optional-dependencies]
+gchat = []
+
+[project.entry-points."rai.cli.commands"]
+daemon = "rai_agent.daemon.cli:app"
+knowledge = "rai_agent.knowledge.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rai_agent"]
+
+[tool.uv.sources]
+raise-core = { workspace = true }
+raise-cli = { workspace = true }

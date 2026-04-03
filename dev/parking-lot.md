@@ -6,6 +6,114 @@
 
 ---
 
+## BacklogHook: auto-crear issues sin assignee — 2026-03-24
+
+**Origen:** Ishikawa de RAISE-717 (S-F-260324-1457).
+
+**Problema:** `BacklogHook.handle()` en `packages/raise-cli/src/raise_cli/hooks/builtin/backlog.py:184-193` crea `IssueSpec` sin `assignee`. Toda issue auto-creada nace huérfana en el board.
+
+**Fix propuesto:** Cargar developer profile en `BacklogHook` y pasar `assignee` al crear `IssueSpec`. Requiere que `IssueSpec` soporte campo `assignee`.
+
+**Prioridad:** Alta — afecta workflow de tracking en cualquier story/epic start.
+
+---
+
+## E1132 Deferred Items — 2026-04-01
+
+- [ ] **rai-discover integration** — Architecture Reconstruction playbook as rai-discover feature for external repos → post-E1132, depends on playbook
+- [ ] **Competitive analysis** — Compare Claude Code architecture with Cursor, Windsurf, Aider → separate epic if valuable
+- [ ] **buddy/ easter egg analysis** — Companion sprite system, curiosity only → no business value
+
+---
+
+## Session/Worktree Integration — 2026-03-25
+
+- [ ] **Session-start worktree awareness** — `/rai-session-start` detects work in progress on dev and asks "¿necesitas aislamiento? (worktree)" as a prompt, not a default. Integration, not coupling.
+- [ ] **Session-close worktree check** — `/rai-session-close` detects active worktree and reminds to merge/cleanup before closing. A check, not a forced action.
+- [ ] **asyncpg pool + last_used_at** — `verify_member` commit for `last_used_at` leaves pool connections dirty. Investigate `pool_reset_on_return="rollback"` or move update to background task. E2E uses NullPool as workaround.
+- [ ] **Extract `_mock_session_factory` to conftest.py** — repeated in 4 test files. Shared fixture before next raise-server story.
+
+---
+
+## E616 Deferred Items — 2026-03-25
+
+- [ ] **Admin web console** — CRUD members, manage licenses, view usage. Promote when >5 clients.
+- [ ] **Per-member feature override** — granular entitlements per member. Promote for enterprise tier.
+- [ ] **SSO/SAML integration** — enterprise auth. Promote when first enterprise client requests.
+- [ ] **Roles beyond admin/member** — viewer, billing, etc. Promote when needed.
+- [ ] **API key rotation endpoint** — POST .../rotate with overlap window. Manual revoke+create works for <10 clients.
+- [ ] **Email invitation flow** — admin-managed onboarding fine early. Promote when console exists.
+- [ ] **Audit log API** — log internally from day 1, expose API later. Promote when compliance requires.
+- [ ] **Cursor pagination** — offset acceptable for <10 clients. Promote before 50+ clients.
+- [ ] **Bulk operations** — batch create/deactivate. Not needed at small scale.
+- [ ] **Undelete endpoints** — soft delete gives data, admin restores via DB. Promote when console exists.
+- [ ] **Self-service org creation** — admin-managed safer early. Promote for self-serve model.
+- [ ] **On-prem deployment guide** — enterprise self-hosted. Promote for first enterprise client.
+
+---
+
+## RAISE-760 Deferred Items — 2026-03-27
+
+- [ ] **Custom UI panels** — Jira issuePanel, Confluence contentAction. Promote after MVP validation (Phase 2).
+- [ ] **Marketplace listing** — requires review process. Promote when ready for public distribution.
+- [ ] **Compass integration** — component catalog sync, DORA scorecards. Promote for Phase 2.
+- [ ] **Bitbucket adapter** — PR operations, code review integration. Promote for Phase 2.
+- [ ] **Teamwork Graph integration** — cross-product knowledge traversal. Promote when Teamwork Graph exits EAP.
+- [ ] **Scheduled sync triggers** — periodic Confluence → graph sync. Promote after manual sync validation.
+- [ ] **Jira taxonomy redesign** — issue type hierarchy, component/capability classification. Separate story.
+- [ ] **Confluence IA restructuring** — space structure, page tree templates. Separate story.
+- [ ] **Multi-tenant rate limit strategy** — Tier 2 application, per-tenant budgeting. Promote after multi-customer.
+- [ ] **Rovo MCP Server evaluation** — official Atlassian MCP as unified adapter. Promote after MVP.
+- [ ] **Forge CI/CD pipeline** — GitHub Actions deploy. Promote post-MVP.
+- [ ] **atlassian-python-api dependency audit** — may be vestigial in raise-pro. Low priority cleanup.
+
+---
+
+## rai-agent Product Vision: Self-Hosted Agent with Guided Onboarding — 2026-03-24
+
+Target: Google Workspace users + Atlassian users. Dream: one-click deploy → guided setup → productive agent.
+
+### Epic candidates (independent, composable):
+
+**E-A: Google Chat Channel** — adapter for Google Chat (primary channel for target). Service account, webhook receiver, message adapter. Same runtime, different channel than Telegram.
+
+**E-B: Onboarding Wizard** — Web UI at `/setup` in the daemon. Guides: auth → channel → verification. Replaces manual `.env` editing. Detects first-run vs already-configured.
+
+**E-C: Open-Source Adapter Ecosystem** — Plane (issues + wiki + sprints, single self-hosted UI) as the default PM integration for open-source rai-agent. Pro version keeps Jira/Confluence via raise-pro. Docker Compose stack: rai-agent + Plane = complete environment.
+
+**E-D: One-Click Deploy** — Railway/Render templates (RAISE-701, RAISE-702 already created). Wizard (E-B) handles post-deploy onboarding. Zero local setup.
+
+### Dependencies
+```
+E-A (Google Chat) ──────────────┐
+                                ├── E-D (One-Click Deploy)
+E-B (Onboarding Wizard) ───────┤
+                                │
+E-C (Plane adapter) ────────────┘
+```
+
+### Key decisions pending
+- Plane vs alternatives (Taiga, OpenProject) — Plane has issues+wiki in one UI
+- Google Chat API approach (webhook vs bot vs Pub/Sub)
+- rai-agent OSS boundary (D2 from E673, still deferred)
+
+---
+
+## raise-pro Independent Versioning — 2026-03-24
+
+**Origin:** E680 session — discovered 19 Jira tickets are Pro-only with no version target.
+
+**Decision:** raise-pro uses independent semver, starting at `pro-0.1.0`. Compatibility via `raise-cli>=2.3.0,<3.0.0` constraint. Rationale: open-core SOTA (Grafana, PostHog, GitLab EE) — independent cycles give flexibility, each package owns its semver contract.
+
+**Next steps:**
+1. Create `pro-0.1.0` version in Jira
+2. Assign 19 Pro tickets to `pro-0.1.0`
+3. Define Pro release process (separate from Community E688)
+
+**Promote when:** Next Pro-focused session.
+
+---
+
 ## Docs Audience Tagging + Package-Aware Publish — 2026-03-23
 
 **Origin:** E680/S680.3 — discovered Pro/Community docs are mixed in `docs/`.
@@ -71,7 +179,7 @@
 
 ## E348 Deferred Items — 2026-03-05
 
-- [ ] **MkDocs site migration** — replace Astro with MkDocs + Material for ecosystem alignment (Typer, FastAPI, Pydantic). Promote post-release if Astro maintenance burden grows.
+- [x] **MkDocs site migration** — ~~replace Astro with MkDocs + Material~~ Done (RAISE-1129, 2026-03-30). Site live at docs.raiseframework.ai.
 - [ ] **API reference auto-generation** — mkdocstrings from docstrings. Promote when public API surface stabilizes.
 - [ ] **Spanish translations for new content** — existing docs have es/ mirror. Promote after English content is validated.
 - [ ] **Tutorials (Diataxis)** — step-by-step learning guides beyond getting-started. Promote based on user onboarding feedback.

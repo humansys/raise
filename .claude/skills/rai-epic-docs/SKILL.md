@@ -1,10 +1,14 @@
 ---
-description: 'Generate developer and user-facing documentation for a completed epic.
-  Produces technical architecture docs with worked examples, extension guides,
-  data flow diagrams, invariants, and failure mode catalogs. Publishes to Confluence.
-  Run before /rai-epic-close as a documentation gate.
+description: Generate architecture docs and publish to Confluence. Use before epic close.
 
-  '
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+
 license: MIT
 metadata:
   raise.adaptable: 'true'

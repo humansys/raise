@@ -1,8 +1,16 @@
 ---
 name: rai-publish
-description: >
-  Guide the human through a structured release workflow with quality gates,
-  version bumping, changelog management, and PyPI publishing via GitHub Actions.
+description: Run release workflow with quality gates and PyPI publishing. Use for releases.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
+  - "Bash(git:*)"
 
 license: MIT
 

@@ -1,0 +1,4 @@
+{"type":"command_usage","timestamp":"2026-03-25T23:15:33.117499Z","command":"pattern","subcommand":"added"}
+{"type":"command_usage","timestamp":"2026-03-25T23:15:40.047388Z","command":"pattern","subcommand":"added"}
+{"type":"command_usage","timestamp":"2026-03-25T23:15:46.442659Z","command":"pattern","subcommand":"added"}
+{"type":"calibration","timestamp":"2026-03-25T23:16:19.383849Z","story_id":"S616.1","story_size":"M","estimated_min":120,"actual_min":90,"velocity":1.33}

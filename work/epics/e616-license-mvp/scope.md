@@ -1,122 +1,73 @@
 # E616: raise-server License MVP — Scope
 
 **Jira:** RAISE-616
-**Label:** pro-launch
+**Labels:** pro-launch, v2.4
 **Branch:** dev (stories branch from dev)
+**Depends on:** None (E621 depends on this)
+**Design:** [design.md](design.md)
 
 ## Objective
 
-Add license management to raise-server: issuance, activation, and validation.
-Enable raise-pro to check licenses at runtime with graceful degradation.
+Add server-side license and member management to raise-server. Organizations
+have a plan, members inherit plan features, server enforces on every request.
 
-## In Scope
+## Stories
 
-- Alembic migration: `licenses` table (org_id, tier, seats, expires_at, key_hash)
-- `POST /api/v1/license/activate` endpoint (key → signed JWT)
-- `GET /api/v1/license/validate` endpoint (JWT → validity + entitlements)
-- `rai license activate <KEY>` CLI command in raise-cli
-- License check decorator for raise-pro entry points
-- Graceful degradation (no license → stub commands with upgrade message)
-- JWT signing with Ed25519 (offline validation with public key)
-- Deploy raise-server (Docker) for first clients
+### S616.1: Data model, auth, and plan enforcement (M)
 
-## Out of Scope
-
-- Web admin console (seed via API/SQL)
-- Phone-home renewal / automatic refresh
-- Machine fingerprinting
-- Payment/billing integration (Stripe, Paddle)
-- Per-feature entitlements (tier-based only for MVP)
-- License revocation (manual DB update if needed)
-
-## Stories (Planned)
-
-### S616.1: License migration and activation endpoint (M)
-
-Alembic migration 003 for licenses table. `POST /api/v1/license/activate`
-receives key, validates, registers seat, returns signed JWT (Ed25519).
-`GET /api/v1/license/validate` for health checks.
+Migration 003: drop old `api_keys`, create `members`, `api_keys` (new schema),
+`licenses`. SQLAlchemy models + Pydantic schemas. Replace `verify_api_key` →
+`verify_member` returning `MemberContext`. `requires_plan()` and `requires_role()`
+dependencies. Update all existing routers.
 
 **Dependencies:** None
 
-### S616.2: `rai license activate` CLI command (S)
+### S616.2: Organization, member, key, and license endpoints + seed (M)
 
-New CLI command group `rai license`. `activate <KEY>` calls server endpoint,
-stores JWT to `~/.raise/license.key`. `status` shows current license info.
+REST endpoints nested under `/api/v1/organizations/{id}/`:
+- Organizations: POST, GET list, GET one, PATCH, DELETE (soft)
+- Members: POST (create), GET list, PATCH (role), DELETE (soft)
+- API Keys: POST (show-once), GET list (metadata), DELETE (revoke)
+- License: POST (create/replace), GET (current)
 
-**Dependencies:** S616.1
-
-### S616.3: License check on raise-pro entry points (S)
-
-License loader in raise-cli (reads `~/.raise/license.key`, verifies JWT signature
-with embedded public key). Decorator `@requires_license(tier)` for raise-pro
-commands. Stub commands when license missing/expired/insufficient tier.
-
-**Dependencies:** S616.2
-
-### S616.4: raise-server Docker deployment (S)
-
-Production-ready Docker Compose for raise-server. Environment config,
-TLS, seed script for first org + license. Deployment documentation.
+Seed script for first client. Deployment docs.
 
 **Dependencies:** S616.1
+
+### S616.3: E2E integration tests (S)
+
+Repeatable pytest E2E suite against real PG. Validates full cross-story flow:
+seed → auth → plan enforcement → CRUD → license replace. Runs with `@pytest.mark.e2e`.
+
+**Dependencies:** S616.1, S616.2
 
 ## Done Criteria
 
-- [ ] `licenses` table exists with migration
-- [ ] Activation endpoint issues valid signed JWT
-- [ ] `rai license activate` stores JWT locally
-- [ ] `rai license status` shows tier, org, expiry
-- [ ] raise-pro commands check license at invocation time
-- [ ] Missing license shows "upgrade to Pro" message (not crash)
-- [ ] JWT validates offline with public key
-- [ ] raise-server deployed and accessible
-- [ ] First client org + license seeded
+- [ ] `members`, `api_keys` (new), `licenses` tables exist
+- [ ] Auth returns `MemberContext` with plan + features
+- [ ] `requires_plan()` returns 403 with clear message
+- [ ] `requires_role()` gates admin-only endpoints
+- [ ] 15 new endpoints operational (5 org + 4 member + 3 key + 2 license + health)
+- [ ] API key shown once on creation, never in GET
+- [ ] Soft delete for members/orgs, hard delete for keys
+- [ ] Scopes field on API keys (`full_access` default)
+- [ ] Seat limit enforced at member creation
+- [ ] First client org + license + admin seeded
 
-## Architecture Notes
-
-### License JWT Claims
-
-```json
-{
-  "sub": "org:humansys",
-  "tier": "pro",
-  "seats": 10,
-  "iat": 1711000000,
-  "exp": 1742536000
-}
-```
-
-### Validation Flow
+## Plan
 
 ```
-rai license activate <KEY>
-    → POST /api/v1/license/activate {key, machine_id?}
-    ← JWT signed with Ed25519 private key
-    → stored at ~/.raise/license.key
-
-rai backlog search "..."
-    → raise-pro entry point loads
-    → license_loader reads ~/.raise/license.key
-    → verifies signature with public key (offline)
-    → checks tier >= required
-    → proceeds or shows upgrade message
+S616.1 (models + auth + plan check) → S616.2 (13 endpoints + seed) → S616.3 (E2E tests)
 ```
 
-### Tier Model (MVP)
-
-| Tier | Entitlements |
-| ---- | ------------ |
-| community | raise-cli (no license needed) |
-| pro | + raise-pro adapters (Jira, Confluence, Odoo, GitLab) |
-| team | + raise-server (governance, metrics, cross-repo graphs) |
-| enterprise | + raise-agent, SSO, audit |
+**M1 (after S616.1):** Existing endpoints work with new auth + plan enforcement.
+**M2 (after S616.2):** Full admin API. First client seeded.
+**M3 (after S616.3):** Cross-story E2E validated. Epic complete.
 
 ## Progress Tracking
 
-| Story | Status | Notes |
-| ----- | ------ | ----- |
-| S616.1 License migration + endpoint | pending | |
-| S616.2 CLI command | pending | |
-| S616.3 Entry point check | pending | |
-| S616.4 Server deployment | pending | |
+| Story | Status | Est | Actual | Notes |
+| ----- | ------ | --- | ------ | ----- |
+| S616.1 Models + auth | **done** | M | M (90min) | 33 tests, 1.33x velocity. M1 reached. |
+| S616.2 Endpoints + seed | **done** | M | M (90min) | 68 tests, 14 E2E scenarios, 13 endpoints. M2 reached. |
+| S616.3 E2E integration tests | **done** | S | S (45min) | 22 E2E tests, NullPool fix. M3 reached. |

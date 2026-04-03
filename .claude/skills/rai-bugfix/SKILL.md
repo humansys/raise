@@ -1,34 +1,39 @@
 ---
 name: rai-bugfix
-description: >
-  Guide the developer through a formal 6-phase bug fix lifecycle
-  (start → analyse → plan → fix → review → close) with the same
-  rigor and traceability as a story. Use for tracked bugs that
-  need full accountability from reproduction to close.
+description: Guide a tracked bug through 6-phase fix lifecycle. Use for bugs needing traceability.
+disable-model-invocation: true
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - Bash
 
 license: MIT
-
 metadata:
-  raise.work_cycle: utility
+  raise.adaptable: 'true'
+  raise.fase: '0'
   raise.frequency: as-needed
-  raise.fase: "0"
-  raise.prerequisites: ""
-  raise.next: ""
-  raise.gate: ""
-  raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.gate: ''
+  raise.next: ''
+  raise.prerequisites: ''
+  raise.skillset: raise-maintainability
+  raise.version: 2.0.0
   raise.visibility: internal
+  raise.work_cycle: utility
 ---
 
 # Bugfix
 
 ## Purpose
 
-Guide the developer through a formal 6-phase bug fix lifecycle — branch, analyse, plan, fix, review, close — producing the same artifacts and traceability as a story.
+Guide the developer through a formal 7-phase bug fix lifecycle — branch, triage, analyse, plan, fix, review, close — producing classified bug data, process improvements, and the same artifacts and traceability as a story.
 
 ## Mastery Levels (ShuHaRi)
 
-- **Shu**: Follow all 6 phases strictly; produce every named artifact
+- **Shu**: Follow all 7 phases strictly; produce every named artifact
 - **Ha**: Collapse plan into analyse for XS bugs; skip retro for trivial fixes
 - **Ri**: Define domain-specific triage patterns; feed systemic findings to graph
 
@@ -52,7 +57,7 @@ Update the tracker immediately — assign to yourself and move to In Progress:
 
 ```bash
 rai backlog update RAISE-{N} --assignee "{developer-email}" -a jira
-rai backlog transition RAISE-{N} "In Progress" -a jira
+rai backlog transition RAISE-{N} in-progress -a jira
 ```
 
 Use the developer's Jira email from memory or session context. If not known, ask before proceeding.
@@ -71,7 +76,42 @@ Done when: [specific observable outcome]
 On `bug/raise-{N}/{slug}` branch. Jira issue assigned and In Progress. Bug reproduces. Scope artifact committed.
 </verification>
 
-### Step 2: Analyse *(mirrors `rai-story-design`)*
+### Step 2: Triage *(classify before investigating)*
+
+Classify the bug in 4 orthogonal dimensions before any analysis:
+
+| Dimension | Values |
+|-----------|--------|
+| **Bug Type** | Functional, Interface, Data, Logic, Configuration, Regression |
+| **Severity** | S0-Critical, S1-High, S2-Medium, S3-Low |
+| **Origin** | Requirements, Design, Code, Integration, Environment |
+| **Qualifier** | Missing, Incorrect, Extraneous |
+
+Append to `work/bugs/RAISE-{N}/scope.md`:
+
+```
+TRIAGE:
+  Bug Type:    [Functional|Interface|Data|Logic|Configuration|Regression]
+  Severity:    [S0-Critical|S1-High|S2-Medium|S3-Low]
+  Origin:      [Requirements|Design|Code|Integration|Environment]
+  Qualifier:   [Missing|Incorrect|Extraneous]
+```
+
+Update Jira — set the 4 custom fields in the Jira UI (Bug Type, Severity, Origin, Qualifier), then transition:
+
+```bash
+rai backlog transition RAISE-{N} triaged -a jira
+```
+
+> **Note:** `rai backlog update` does not support custom fields yet. Set Bug Type, Severity, Origin, and Qualifier directly in the Jira issue UI.
+
+**Triage gate:** All 4 dimensions must be classified before advancing to Analyse. If uncertain about Origin, use your best hypothesis — it can be revised during Analyse.
+
+<verification>
+4 dimensions classified. Jira fields set. Issue transitioned to Triaged. Scope artifact updated.
+</verification>
+
+### Step 3: Analyse *(mirrors `rai-story-design`)*
 
 | Tier | Criteria | Method |
 |------|----------|--------|
@@ -94,7 +134,7 @@ Write `work/bugs/RAISE-{N}/analysis.md`: confirmed root cause + fix approach.
 Root cause stated with evidence. Fix approach decided — not implemented yet.
 </verification>
 
-### Step 3: Plan *(mirrors `rai-story-plan`)*
+### Step 4: Plan *(mirrors `rai-story-plan`)*
 
 Write `work/bugs/RAISE-{N}/plan.md`: atomic tasks in TDD order (regression test task first), verification command and commit message per task.
 
@@ -102,7 +142,7 @@ Write `work/bugs/RAISE-{N}/plan.md`: atomic tasks in TDD order (regression test 
 Regression test task listed first. Each task independently committable.
 </verification>
 
-### Step 4: Fix *(mirrors `rai-story-implement`)*
+### Step 5: Fix *(mirrors `rai-story-implement`)*
 
 Execute plan tasks in order. Per task: RED (failing regression test) → GREEN (minimal fix) → REFACTOR. Verify and commit before moving on:
 
@@ -122,7 +162,7 @@ All tasks committed. All four gates pass (test, lint, format, types). Bug no lon
 3 attempts without fix → document partial state, create follow-up issue.
 </if-blocked>
 
-### Step 5: Review *(mirrors `rai-story-review`)*
+### Step 6: Review *(mirrors `rai-story-review`)*
 
 Verify: fix addresses root cause (not symptom), regression test green, no regressions introduced.
 
@@ -154,6 +194,11 @@ rai pattern reinforce {pattern_id} --vote {1|0|-1} --from RAISE-{N}
 
 Only evaluate patterns you consciously considered. `0` is correct for most patterns.
 
+**Process improvement extraction** — answer with specifics:
+
+1. What change in process or tooling would prevent this **class** of bug?
+2. What classification pattern does this bug represent? (e.g., Type=Functional + Origin=Code + Qualifier=Missing → missing boundary validation)
+
 **Write `work/bugs/RAISE-{N}/retro.md`:**
 
 ```markdown
@@ -162,6 +207,11 @@ Only evaluate patterns you consciously considered. `0` is correct for most patte
 ### Summary
 - Root cause: {one line}
 - Fix approach: {one line}
+- Classification: {Bug Type}/{Severity}/{Origin}/{Qualifier}
+
+### Process Improvement
+**Prevention:** {specific process/tool change that would prevent this class of bug}
+**Pattern:** {Bug Type}={X} + {Origin}={Y} → {systemic insight}
 
 ### Heutagogical Checkpoint
 1. Learned: ...
@@ -178,7 +228,7 @@ Only evaluate patterns you consciously considered. `0` is correct for most patte
 Retro written. Checkpoint answered. Patterns added/reinforced. All gates green.
 </verification>
 
-### Step 6: Close *(mirrors `rai-story-close`)*
+### Step 7: Close *(mirrors `rai-story-close`)*
 
 **Never merge locally to `{dev_branch}`.** Push the bug branch and create a merge request.
 
@@ -205,7 +255,7 @@ If `glab` is not available, provide the GitLab URL from `git push` output for ma
 Update tracker:
 
 ```bash
-rai backlog transition RAISE-{N} "Done" -a jira
+rai backlog transition RAISE-{N} done -a jira
 ```
 
 <verification>
@@ -216,26 +266,28 @@ MR created in GitLab targeting `{dev_branch}`. Local branch deleted. Jira transi
 
 | Artifact | Step | Purpose |
 |----------|------|---------|
-| `work/bugs/RAISE-{N}/scope.md` | 1 | Bug definition + done criteria |
-| `work/bugs/RAISE-{N}/analysis.md` | 2 | Root cause + fix approach |
-| `work/bugs/RAISE-{N}/plan.md` | 3 | Atomic tasks + test plan |
-| Code + commits | 4 | Fix + regression tests |
-| `work/bugs/RAISE-{N}/retro.md` | 5 | Learnings + optional pattern |
-| Merge request | 6 | GitLab MR: bug branch → `{dev_branch}` |
+| `work/bugs/RAISE-{N}/scope.md` | 1, 2 | Bug definition + done criteria + triage classification |
+| `work/bugs/RAISE-{N}/analysis.md` | 3 | Root cause + fix approach |
+| `work/bugs/RAISE-{N}/plan.md` | 4 | Atomic tasks + test plan |
+| Code + commits | 5 | Fix + regression tests |
+| `work/bugs/RAISE-{N}/retro.md` | 6 | Learnings + process improvement + optional pattern |
+| Merge request | 7 | GitLab MR: bug branch → `{dev_branch}` |
 
 ## Quality Checklist
 
 - [ ] Jira issue assigned and transitioned to In Progress (Step 1)
 - [ ] Bug reproduces before any fix (Step 1)
-- [ ] Root cause confirmed with evidence (Step 2)
-- [ ] Regression test written RED-first (Step 4)
-- [ ] All gates pass: test runner, linter, type checker (Step 4)
-- [ ] Fix verified against root cause — not symptom (Step 5)
-- [ ] Heutagogical checkpoint answered with specific examples (Step 5)
-- [ ] Patterns added with `--scope project` if applicable (Step 5)
-- [ ] MR created in GitLab targeting `{dev_branch}` (Step 6)
-- [ ] Local branch deleted after MR creation (Step 6)
-- [ ] Jira transitioned to Done (Step 6)
+- [ ] Bug classified in 4 dimensions, Jira fields set, transitioned to Triaged (Step 2)
+- [ ] Root cause confirmed with evidence (Step 3)
+- [ ] Regression test written RED-first (Step 5)
+- [ ] All gates pass: test runner, linter, type checker (Step 5)
+- [ ] Fix verified against root cause — not symptom (Step 6)
+- [ ] Process improvement extracted with prevention + pattern (Step 6)
+- [ ] Heutagogical checkpoint answered with specific examples (Step 6)
+- [ ] Patterns added with `--scope project` if applicable (Step 6)
+- [ ] MR created in GitLab targeting `{dev_branch}` (Step 7)
+- [ ] Local branch deleted after MR creation (Step 7)
+- [ ] Jira transitioned to Done (Step 7)
 - [ ] NEVER merge locally to `{dev_branch}` — always via MR
 - [ ] NEVER fix before analysing — symptoms recur without root cause
 - [ ] NEVER merge without retro — learnings compound
@@ -243,5 +295,5 @@ MR created in GitLab targeting `{dev_branch}`. Local branch deleted. Jira transi
 
 ## References
 
-- Lifecycle mirrors (Steps 1→6): `/rai-story-start` · `/rai-story-design` · `/rai-story-plan` · `/rai-story-implement` · `/rai-story-review` · `/rai-story-close`
+- Lifecycle mirrors (Steps 1→7): `/rai-story-start` · *triage* · `/rai-story-design` · `/rai-story-plan` · `/rai-story-implement` · `/rai-story-review` · `/rai-story-close`
 - Branch model: `CLAUDE.md` § Branch Model

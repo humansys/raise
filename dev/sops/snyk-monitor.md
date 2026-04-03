@@ -1,8 +1,8 @@
 # SOP: Snyk Dependency Monitoring
 
 > Standard Operating Procedure for scanning and uploading dependency snapshots to Snyk cloud
-> Version: 1.0
-> Date: 2026-03-18
+> Version: 2.0
+> Date: 2026-03-31
 > Status: Active
 
 ---
@@ -11,9 +11,11 @@
 
 Mantener visibilidad continua de vulnerabilidades en dependencias del proyecto mediante Snyk cloud. El monitoreo notifica automáticamente cuando aparecen nuevas CVEs en las dependencias instaladas.
 
-**Alcance:** Dos proyectos rastreados en Snyk org `aquileslazaroh`:
-- `raise-commons` — backend Python (root `/`)
-- `raise-docs` — frontend Node.js (`site/`)
+**Alcance:** Un proyecto rastreado en Snyk org `aquileslazaroh`:
+- `raise-commons` — Python (root `/`)
+
+> **Nota:** El proyecto `raise-docs` (frontend Node.js en `site/`) fue eliminado en RAISE-1129.
+> La documentación ahora usa MkDocs (Python) — sus dependencias están incluidas en el scan Python.
 
 ---
 
@@ -24,7 +26,7 @@ Mantener visibilidad continua de vulnerabilidades en dependencias del proyecto m
 
 ---
 
-## Python Backend (`raise-commons`)
+## Python (`raise-commons`)
 
 ### Problema
 `snyk monitor --all-projects` ignora `uv.lock`. Snyk requiere `pip` y un `requirements.txt` explícito.
@@ -63,58 +65,13 @@ snyk test \
 
 ---
 
-## Frontend (`raise-docs`)
-
-### Ubicación
-El frontend está en `site/` (no `docs/`).
-
-### Prerequisito
-`node_modules` debe existir. Si no:
-
-```bash
-cd site && npm install
-```
-
-### Pasos
-
-```bash
-cd site
-
-snyk monitor \
-  --file=package.json \
-  --org=aquileslazaroh \
-  --project-name=raise-docs
-```
-
-### Verificación local (sin subir)
-
-```bash
-cd site && snyk test --file=package.json --org=aquileslazaroh
-```
-
----
-
-## Dependencias transitivas vulnerables
-
-Cuando Snyk reporta vulnerabilidades en dependencias transitivas de Node.js, la solución es agregar `overrides` en `site/package.json`:
-
-```json
-"overrides": {
-  "nombre-paquete": ">=version-parcheada"
-}
-```
-
-Luego `npm install` para aplicar. Verificar con `npm list nombre-paquete`.
-
----
-
 ## Cuándo ejecutar
 
 | Evento | Acción |
 |--------|--------|
-| Merge a `dev` | `snyk monitor` Python + Node |
+| Merge a release branch | `snyk monitor` Python |
 | Dependabot alert recibido | `snyk test` local → fix → `snyk monitor` |
-| Release a `main` | `snyk monitor` Python + Node |
+| Release a `main` | `snyk monitor` Python |
 
 ---
 
