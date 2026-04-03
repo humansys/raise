@@ -1,6 +1,7 @@
 ---
 name: rai-mcp-remove
 description: Remove an MCP server with dependency checking. Use to unregister a server.
+disable-model-invocation: true
 
 allowed-tools:
   - Read

@@ -1,6 +1,7 @@
 ---
 name: rai-story-start
 description: Create story branch and scope commit. Use to begin story work.
+disable-model-invocation: true
 
 allowed-tools:
   - Read

@@ -1,6 +1,7 @@
 ---
 name: rai-epic-run
 description: Run the full epic lifecycle with delegation gates. Use to orchestrate an epic.
+disable-model-invocation: true
 
 allowed-tools:
   - Read

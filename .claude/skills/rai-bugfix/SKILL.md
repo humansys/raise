@@ -1,6 +1,7 @@
 ---
 name: rai-bugfix
 description: Guide a tracked bug through 6-phase fix lifecycle. Use for bugs needing traceability.
+disable-model-invocation: true
 
 allowed-tools:
   - Read

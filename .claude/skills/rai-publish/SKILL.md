@@ -1,6 +1,7 @@
 ---
 name: rai-publish
 description: Run release workflow with quality gates and PyPI publishing. Use for releases.
+disable-model-invocation: true
 
 allowed-tools:
   - Read

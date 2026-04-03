@@ -279,12 +279,9 @@ complete enough that skills can trust them fully.
 | Adapter doctor (`rai adapter doctor`) | New | Config must be validated against live backend |
 | Confluence config expansion | New | `.raise/confluence.yaml` needs routing rules |
 
-### Moved INTO 2.4.0 (revised 2026-04-02)
-
-- **Local persistence adapter** (RAISE-1040) — unified protocol for work artifacts + session state. Originally deferred, promoted to p1-required: skills must enforce governance through adapters, not bypass them with direct writes. Scope consolidated from 6 stories to 3 (1 protocol, 1 backend, 1 migration).
-
 ### Not in 2.4.0
 
+- Session adapter (filesystem is fine for now)
 - Release adapter (inline logic works)
 - Metrics adapter (local JSONL is sufficient)
 - Multi-backend fallback chains
