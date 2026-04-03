@@ -216,7 +216,9 @@ After the last step of the skill completes. Triggered by the `> **LEARN**` marke
    - Path: `.raise/rai/learnings/{skill}/{work_id}/record.yaml`
    - Schema: see § Learning Record Schema
 
-5. **Enrich previous skill's learning record** (if applicable)
+5. **Stage for commit** — `git add .raise/rai/learnings/` so the record travels with the branch. Records left unstaged are lost on worktree cleanup.
+
+6. **Enrich previous skill's learning record** (if applicable)
    - Read the upstream skill's learning record
    - Fill empty fields in `downstream` with factual observations
    - See § Downstream Enrichment

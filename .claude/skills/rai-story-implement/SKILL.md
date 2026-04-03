@@ -120,10 +120,11 @@ If verification fails: fix and re-verify (max 3 attempts before escalating).
 
 ### Step 4: Commit & Checkpoint
 
-1. Commit the completed task
-2. Update progress log (`work/epics/.../stories/{story_id}/progress.md`)
-3. Present to the human: what was completed, files changed, verification results
-4. Wait for acknowledgment before continuing
+1. Stage task files **and** any learning records: `git add .raise/rai/learnings/` (learning records must travel with the branch — they are lost if not committed)
+2. Commit the completed task
+3. Update progress log (`work/epics/.../stories/{story_id}/progress.md`)
+4. Present to the human: what was completed, files changed, verification results
+5. Wait for acknowledgment before continuing
 
 ### Step 5: Iterate or Finalize
 
