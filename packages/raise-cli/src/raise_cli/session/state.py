@@ -228,7 +228,8 @@ def save_session_state(
             existing
             and existing.last_modified
             and state.last_modified
-            and state.last_modified < existing.last_modified
+            and datetime.fromisoformat(state.last_modified)
+            < datetime.fromisoformat(existing.last_modified)
         ):
             raise StaleWriteError(
                 state_path, existing.last_modified, state.last_modified
