@@ -51,7 +51,7 @@ See `design-decisions.md` for full context. Summary:
 | 1 | RAISE-1041 | S1040.1: FilesystemAdapter — atomic I/O primitives | S | — | done |
 | 2 | RAISE-1042 | S1040.2: Migrate CLI writes to FilesystemAdapter + protections | M | S1040.1 | done |
 | 3 | RAISE-1043 | ~~S1040.3: Migrate CLI to stewards~~ | — | — | closed (unnecessary) |
-| 4 | RAISE-1044 | S1040.4: Harden FilesystemDocsTarget — frontmatter validation | S | — | backlog |
+| 4 | RAISE-1044 | S1040.4: Harden FilesystemDocsTarget — frontmatter validation | S | — | done |
 
 ```
 S1040.1 (Adapter, done) ──→ S1040.2 (CLI migration + protections)
@@ -65,7 +65,7 @@ S1040.4 (Docs hardening) ─── independent ───────────
 - [x] Timestamp comparison before session state overwrite (closes RAISE-697)
 - [x] Pattern, journal, session index writes use FilesystemAdapter (atomic append)
 - [x] Developer profile writes use FilesystemAdapter
-- [ ] FilesystemDocsTarget validates frontmatter before writing work artifacts
+- [x] FilesystemDocsTarget validates frontmatter before writing work artifacts
 - [ ] All existing tests pass
 - [ ] File layout identical to current behavior (non-breaking)
 
@@ -87,7 +87,7 @@ S1040.4 (Docs hardening) ─── independent ───────────
 | # | Story | Status | Milestone |
 |---|-------|--------|-----------|
 | 1 | S1040.1: FilesystemAdapter | done | M1 |
-| 4 | S1040.4: Docs hardening | backlog | M1 |
+| 4 | S1040.4: Docs hardening | done | M1 |
 | 2 | S1040.2: CLI migration + protections | done | M2 |
 
 ## References
