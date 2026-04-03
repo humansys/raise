@@ -16,11 +16,13 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from raise_cli.compat import file_lock, file_unlock
 from raise_cli.config.paths import (
     ACTIVE_SESSION_FILE,
     get_developer_sessions_dir,
     get_personal_dir,
 )
+from raise_cli.core.files import atomic_write
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +76,11 @@ def write_session_entry(
 
     line = entry.model_dump_json() + "\n"
     with index_path.open("a", encoding="utf-8") as f:
-        f.write(line)
+        file_lock(f)
+        try:
+            f.write(line)
+        finally:
+            file_unlock(f)
 
     logger.debug("Session %s appended to %s", entry.id, index_path)
     return index_path
@@ -129,10 +135,8 @@ def write_active_session(
         pointer_data: Active session metadata.
         project_root: Project root path. Defaults to current directory.
     """
-    personal_dir = get_personal_dir(project_root)
-    personal_dir.mkdir(parents=True, exist_ok=True)
-    pointer = personal_dir / ACTIVE_SESSION_FILE
-    pointer.write_text(pointer_data.model_dump_json() + "\n", encoding="utf-8")
+    pointer = get_personal_dir(project_root) / ACTIVE_SESSION_FILE
+    atomic_write(pointer, pointer_data.model_dump_json() + "\n")
     logger.debug("Active session pointer: %s", pointer_data.id)
 
 

@@ -82,7 +82,7 @@ def _parse_epic_id_and_name(
     if not epic_id_match:
         return None
 
-    epic_id = f"E{int(epic_id_match.group(1))}"  # E8 (normalize: e08 -> E8)
+    epic_id = f"E{epic_id_match.group(1)}"  # Preserve original: e08 -> E08
 
     # Extract epic name from H1: # Epic E8: Work Tracking Graph - Scope
     epic_name = None
@@ -298,7 +298,7 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
 
     parent_dir = file_path.parent.name
     epic_id_match = re.search(r"^e(\d+)", parent_dir, re.IGNORECASE)
-    epic_id = f"E{int(epic_id_match.group(1))}" if epic_id_match else "E0"
+    epic_id = f"E{epic_id_match.group(1)}" if epic_id_match else "E0"
 
     try:
         relative_path = portable_path(file_path, project_root)
