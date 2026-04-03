@@ -18,7 +18,7 @@ metadata:
   raise.next: story-start
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.3.0"
+  raise.version: "2.4.0"
   raise.visibility: public
   raise.inputs: |
     - scope: file_path, required, previous_skill
@@ -59,9 +59,13 @@ Transform the story list from `/rai-epic-design` into a sequenced implementation
 
 ## Steps
 
-> **PRIME**: Before Step 1, follow PRIME protocol in `aspects/introspection.md`.
-> Chain read: read epic-design's learning record at `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`.
-> Enrich epic-design's record with `downstream: {scope_clear: bool, stories_sequenceable: bool}`.
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: Read epic-design's learning record at `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`. Enrich epic-design's record with `downstream: {scope_clear: bool, stories_sequenceable: bool}`.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Review Epic Scope
 
@@ -156,8 +160,30 @@ Scope document updated. Plan reviewable in <5 minutes. Human acknowledges.
 | Plan template | `templates/plan-section.md` |
 | Next | `/rai-story-design` for first story in sequence |
 
-> **LEARN**: After completing Step 5, follow LEARN protocol in `aspects/introspection.md`.
-> Record path: `.raise/rai/learnings/rai-epic-plan/{work_id}/record.yaml`
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-epic-plan/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-epic-plan
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
 
 ## Quality Checklist
 
@@ -170,6 +196,7 @@ Scope document updated. Plan reviewable in <5 minutes. Human acknowledges.
 - [ ] NEVER over-plan — plans are hypotheses, not commitments
 - [ ] NEVER sequence by size alone — use risk-first as default
 - [ ] Multi-component epics include E2E integration checkpoint
+- [ ] LEARN record written to `.raise/rai/learnings/rai-epic-plan/{work_id}/record.yaml`
 
 ## References
 
