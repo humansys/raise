@@ -99,6 +99,9 @@ dmypy.json
 # Legacy telemetry (should be in personal/, will migrate)
 .raise/rai/telemetry/
 
+# Push tracking markers (per-environment, not shared)
+.raise/rai/learnings/**/.pushed
+
 # MCP server config (contains API tokens)
 .mcp.json
 

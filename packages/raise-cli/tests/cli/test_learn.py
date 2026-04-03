@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import uuid
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
@@ -120,3 +122,139 @@ class TestLearnWrite:
         assert result.exit_code == 1
         combined = _all_output(result)
         assert "yaml" in combined or "parse" in combined
+
+
+def _write_record_to_disk(base: Path, skill: str, work_id: str) -> Path:
+    """Helper: write a valid learning record to the conventional path."""
+    record_dir = base / ".raise" / "rai" / "learnings" / skill / work_id
+    record_dir.mkdir(parents=True, exist_ok=True)
+    data = {
+        "skill": skill,
+        "work_id": work_id,
+        "version": "2.4.0",
+        "timestamp": "2026-04-03T10:00:00",
+        "primed_patterns": [],
+        "tier1_queries": 0,
+        "tier1_results": 0,
+        "jit_queries": 0,
+        "pattern_votes": {},
+        "gaps": [],
+        "artifacts": [],
+    }
+    record_path = record_dir / "record.yaml"
+    record_path.write_text(
+        yaml.safe_dump(data, default_flow_style=False),
+        encoding="utf-8",
+    )
+    return record_path
+
+
+class TestLearnPush:
+    """Tests for rai learn push command."""
+
+    def test_missing_env_vars_exits_1(self, tmp_path: Path) -> None:
+        """Missing RAI_SERVER_URL exits with clear error."""
+        record_path = _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
+
+        with patch.dict("os.environ", {}, clear=True):
+            result = runner.invoke(
+                app,
+                ["learn", "push", str(record_path), "--project", str(tmp_path)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 1
+        combined = _all_output(result)
+        assert "rai_server_url" in combined or "not configured" in combined
+
+    def test_push_single_record_happy_path(self, tmp_path: Path) -> None:
+        """Single record push succeeds and creates .pushed marker."""
+        record_path = _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
+        server_id = uuid.uuid4()
+
+        mock_client = MagicMock()
+        mock_client.push.return_value = server_id
+
+        env = {"RAI_SERVER_URL": "http://localhost:8000", "RAI_API_KEY": "rsk_test"}
+        with (
+            patch.dict("os.environ", env),
+            patch("raise_cli.cli.commands.learn.LearningPushClient", return_value=mock_client),
+        ):
+            result = runner.invoke(
+                app,
+                ["learn", "push", str(record_path), "--project", str(tmp_path)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0, f"Output: {result.output}"
+        assert str(server_id) in result.output or "pushed" in result.output.lower()
+        # Marker should exist
+        assert (record_path.parent / ".pushed").exists()
+
+    def test_push_skips_already_pushed(self, tmp_path: Path) -> None:
+        """Already-pushed record is skipped."""
+        record_path = _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
+        # Write marker
+        (record_path.parent / ".pushed").write_text("fake-id\n2026-04-03\n")
+
+        env = {"RAI_SERVER_URL": "http://localhost:8000", "RAI_API_KEY": "rsk_test"}
+        with patch.dict("os.environ", env):
+            result = runner.invoke(
+                app,
+                ["learn", "push", str(record_path), "--project", str(tmp_path)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        combined = _all_output(result)
+        assert "skip" in combined or "already" in combined
+
+    def test_push_all_pushes_unpushed_only(self, tmp_path: Path) -> None:
+        """--all mode pushes unpushed and skips pushed."""
+        # Create two records, one already pushed
+        _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
+        path2 = _write_record_to_disk(tmp_path, "rai-story-plan", "S100.1")
+        (path2.parent / ".pushed").write_text("existing-id\n2026-04-03\n")
+
+        server_id = uuid.uuid4()
+        mock_client = MagicMock()
+        mock_client.push.return_value = server_id
+
+        env = {"RAI_SERVER_URL": "http://localhost:8000", "RAI_API_KEY": "rsk_test"}
+        with (
+            patch.dict("os.environ", env),
+            patch("raise_cli.cli.commands.learn.LearningPushClient", return_value=mock_client),
+        ):
+            result = runner.invoke(
+                app,
+                ["learn", "push", "--all", "--project", str(tmp_path)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        # Should have pushed exactly 1 record
+        assert mock_client.push.call_count == 1
+
+    def test_push_connection_error_exits_1(self, tmp_path: Path) -> None:
+        """Connection error produces clear message."""
+        import httpx
+
+        record_path = _write_record_to_disk(tmp_path, "rai-story-design", "S100.1")
+
+        mock_client = MagicMock()
+        mock_client.push.side_effect = httpx.ConnectError("Connection refused")
+
+        env = {"RAI_SERVER_URL": "http://localhost:8000", "RAI_API_KEY": "rsk_test"}
+        with (
+            patch.dict("os.environ", env),
+            patch("raise_cli.cli.commands.learn.LearningPushClient", return_value=mock_client),
+        ):
+            result = runner.invoke(
+                app,
+                ["learn", "push", str(record_path), "--project", str(tmp_path)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 1
+        combined = _all_output(result)
+        assert "reach" in combined or "connect" in combined or "server" in combined
