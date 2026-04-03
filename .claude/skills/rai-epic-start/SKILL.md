@@ -67,7 +67,26 @@ git branch --show-current
 On `{dev_branch}`, up to date with remote.
 </verification>
 
-### Step 2: Define Scope & Commit
+### Step 2: Verify No Directory Collision
+
+Before creating the epic directory, check that no existing directory would collide:
+
+```bash
+ls work/epics/ | grep -i "^e{N}-"
+```
+
+| Condition | Action |
+|-----------|--------|
+| No match | Continue — safe to create |
+| Match found | **STOP** — directory `e{N}-*` already exists. Ask the developer to choose a different epic number |
+
+This prevents ID collisions in the knowledge graph (RAISE-1199, RAISE-1204).
+
+<verification>
+No existing directory matches `e{N}-*` pattern.
+</verification>
+
+### Step 3: Define Scope & Commit
 
 Create TWO artifacts:
 
@@ -108,7 +127,7 @@ Scope commit on `{dev_branch}`. Epic visible in backlog.
 CLI adapter not configured → log warning and continue. Backlog sync is best-effort.
 </if-blocked>
 
-### Step 3: Present Next Steps
+### Step 4: Present Next Steps
 
 Show the developer:
 - Commit hash and epic directory path
