@@ -82,6 +82,33 @@ class TestList:
             assert not p.is_absolute()
 
 
+# ── Path containment ────────────────────────────────────────────────────
+
+
+class TestPathContainment:
+    """All operations must reject paths that escape root."""
+
+    def test_write_rejects_traversal(self, tmp_path: Path) -> None:
+        adapter = FilesystemAdapter(root=tmp_path)
+        with pytest.raises(ValueError, match="escapes root"):
+            adapter.write(Path("../../etc/passwd"), "evil")
+
+    def test_read_rejects_traversal(self, tmp_path: Path) -> None:
+        adapter = FilesystemAdapter(root=tmp_path)
+        with pytest.raises(ValueError, match="escapes root"):
+            adapter.read(Path("../../etc/passwd"))
+
+    def test_append_rejects_traversal(self, tmp_path: Path) -> None:
+        adapter = FilesystemAdapter(root=tmp_path)
+        with pytest.raises(ValueError, match="escapes root"):
+            adapter.append(Path("../../etc/passwd"), "evil")
+
+    def test_write_rejects_absolute_path(self, tmp_path: Path) -> None:
+        adapter = FilesystemAdapter(root=tmp_path)
+        with pytest.raises(ValueError, match="escapes root"):
+            adapter.write(Path("/etc/shadow"), "evil")
+
+
 # ── T2: append operation ─────────────────────────────────────────────────
 
 
