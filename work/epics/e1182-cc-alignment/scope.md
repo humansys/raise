@@ -1,4 +1,4 @@
-# Epic E1134: Skill CC-Alignment — Scope
+# Epic E1182: Skill CC-Alignment — Scope
 
 > **Status:** DONE
 > **Jira:** [RAISE-1182](https://humansys.atlassian.net/browse/RAISE-1182)
