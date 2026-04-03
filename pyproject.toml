@@ -110,6 +110,7 @@ ignore = [
 "packages/raise-cli/src/raise_cli/doctor/protocol.py" = ["D102"]
 "packages/raise-cli/src/raise_cli/gates/protocol.py" = ["D102"]
 "packages/raise-cli/src/raise_cli/hooks/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/session/protocols.py" = ["D102"]
 "**/tests/**/*.py" = [
     "S101", "S104", "S108", "S105", "S106", "S310",  # security rules relaxed in tests
     "ARG001", "ARG002", "ARG005",             # unused args (fixtures, mocks)
