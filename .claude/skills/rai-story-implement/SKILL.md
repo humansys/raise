@@ -24,7 +24,7 @@ metadata:
 
     '
   raise.prerequisites: story-plan
-  raise.version: 2.3.0
+  raise.version: 2.4.0
   raise.visibility: public
   raise.work_cycle: story
   raise.aspects: introspection
@@ -63,8 +63,13 @@ Execute the implementation plan task by task with TDD, producing verified code t
 
 ## Steps
 
-> **PRIME**: Before Step 1, follow PRIME protocol in `aspects/introspection.md`.
-> Chain read: read story-plan's learning record at `.raise/rai/learnings/rai-story-plan/{work_id}/record.yaml`.
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: Read story-plan's learning record at `.raise/rai/learnings/rai-story-plan/{work_id}/record.yaml`.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Load Plan & Context
 
@@ -136,9 +141,30 @@ If verification fails: fix and re-verify (max 3 attempts before escalating).
 | Progress log | `work/epics/.../stories/{story_id}/progress.md` |
 | Next | `/rai-story-review` |
 
-> **LEARN**: After completing Step 5, follow LEARN protocol in `aspects/introspection.md`.
-> Record path: `.raise/rai/learnings/rai-story-implement/{work_id}/record.yaml`
-> Enrich story-design's record with `downstream: {design_gaps_found: list[str]}`.
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-story-implement/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-story-implement
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain. Enrich story-design's record with `downstream: {design_gaps_found: list[str]}`.
 
 ## Quality Checklist
 
@@ -151,6 +177,7 @@ If verification fails: fix and re-verify (max 3 attempts before escalating).
 - [ ] Human acknowledged each task before proceeding
 - [ ] NEVER skip a failing test — fix it or escalate
 - [ ] NEVER accumulate errors — stop on defect (Jidoka)
+- [ ] LEARN record written to `.raise/rai/learnings/rai-story-implement/{work_id}/record.yaml`
 
 ## References
 

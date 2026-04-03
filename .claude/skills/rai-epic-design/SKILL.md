@@ -20,7 +20,7 @@ metadata:
   raise.next: epic-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.version: "2.3.0"
   raise.visibility: public
   raise.inputs: |
     - brief: file_path, optional, previous_skill
@@ -62,8 +62,13 @@ Design an epic that bridges strategic objectives to executable stories, making k
 
 ## Steps
 
-> **PRIME**: Before Step 1, follow PRIME protocol in `aspects/introspection.md`.
-> No chain read — epic-design is the first skill in the epic chain.
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: No chain read — epic-design is the first skill in the epic chain.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Load Brief & Frame Objective
 
@@ -154,8 +159,30 @@ Scope document reviewable in <10 minutes. Parking lot updated.
 | Parking lot | `dev/parking-lot.md` |
 | Next | `/rai-epic-plan` |
 
-> **LEARN**: After completing Step 5, follow LEARN protocol in `aspects/introspection.md`.
-> Record path: `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-epic-design
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
 
 ## Quality Checklist
 
@@ -167,6 +194,7 @@ Scope document reviewable in <10 minutes. Parking lot updated.
 - [ ] Done criteria are measurable
 - [ ] NEVER time-box epics — scope-based, not duration-based
 - [ ] NEVER over-specify stories — save details for `/rai-story-design`
+- [ ] LEARN record written to `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`
 
 ## References
 
