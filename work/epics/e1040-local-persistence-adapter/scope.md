@@ -66,8 +66,8 @@ S1040.4 (Docs hardening) ─── independent ───────────
 - [x] Pattern, journal, session index writes use FilesystemAdapter (atomic append)
 - [x] Developer profile writes use FilesystemAdapter
 - [x] FilesystemDocsTarget validates frontmatter before writing work artifacts
-- [ ] All existing tests pass
-- [ ] File layout identical to current behavior (non-breaking)
+- [x] All existing tests pass (3973 passed, 11 skipped, 0 failures)
+- [x] File layout identical to current behavior (non-breaking)
 
 ## Implementation Plan
 
