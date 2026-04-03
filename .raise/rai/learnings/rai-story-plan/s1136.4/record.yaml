@@ -1,0 +1,28 @@
+skill: rai-story-plan
+work_id: s1136.4
+version: "2.4.0"
+timestamp: "2026-04-03T12:00:00Z"
+primed_patterns:
+  - PAT-E-699
+  - PAT-E-667
+  - guardrail-should-cli-001
+tier1_queries: 3
+tier1_results: 3
+jit_queries: 0
+pattern_votes:
+  PAT-E-699:
+    vote: 1
+    why: "Risk-first ordering applied to task sequencing — client (riskiest) first"
+  PAT-E-667:
+    vote: 0
+    why: "Noted but no dead code found in design — design is lean already"
+  guardrail-should-cli-001:
+    vote: 1
+    why: "Explicit --project path parameter already in design, confirmed in plan"
+gaps:
+  - "No design learning record exists — design was done pre-LEARN protocol"
+artifacts:
+  - "work/epics/e1136-introspection-hardening/stories/s1136.4-plan.md"
+commit: f1e869ba
+branch: story/s1136.4/learn-push-server-persistence
+downstream: {}
