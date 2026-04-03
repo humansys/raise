@@ -25,6 +25,6 @@ gaps:
 artifacts:
   - "work/epics/e1136-introspection-hardening/stories/s1136.4-retrospective.md"
   - ".raise/rai/learnings/rai-story-review/s1136.4/record.yaml"
-commit: null
+commit: 89f4fd11
 branch: story/s1136.4/learn-push-server-persistence
 downstream: {}
