@@ -9,10 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.adapters.filesystem_docs import (
-    FilesystemDocsTarget,
-    FrontmatterValidationError,
-)
+from raise_cli.adapters.filesystem_docs import FilesystemDocsTarget
 from raise_cli.adapters.protocols import DocumentationTarget
 
 # ── T1: FilesystemDocsTarget ─────────────────────────────────────────────
@@ -93,28 +90,27 @@ class TestFrontmatterValidation:
         assert result.success is True
         assert (tmp_path / "doc.md").read_text() == content
 
-    def test_publish_unparseable_yaml_raises(self, tmp_path: Path) -> None:
+    def test_publish_unparseable_yaml_fails(self, tmp_path: Path) -> None:
         target = FilesystemDocsTarget(project_root=tmp_path)
         content = "---\n: bad: yaml: [unclosed\n---\n"
-        with pytest.raises(FrontmatterValidationError, match="Unparseable YAML"):
-            target.publish("generic", content, self._meta())
+        result = target.publish("generic", content, self._meta())
+        assert result.success is False
+        assert "Unparseable YAML" in (result.message or "")
         assert not (tmp_path / "doc.md").exists()
 
-    def test_publish_missing_required_fields_raises(self, tmp_path: Path) -> None:
+    def test_publish_missing_required_fields_fails(self, tmp_path: Path) -> None:
         target = FilesystemDocsTarget(project_root=tmp_path)
         content = "---\ntitle: Only Title\n---\n"
-        with pytest.raises(
-            FrontmatterValidationError, match="Missing required"
-        ) as exc_info:
-            target.publish("generic", content, self._meta())
-        assert "status" in exc_info.value.missing_fields
+        result = target.publish("generic", content, self._meta())
+        assert result.success is False
+        assert "status" in (result.message or "")
 
     def test_publish_epic_level_requires_epic_id(self, tmp_path: Path) -> None:
         target = FilesystemDocsTarget(project_root=tmp_path)
         content = "---\ntitle: Epic Doc\nstatus: active\n---\n"
-        with pytest.raises(FrontmatterValidationError) as exc_info:
-            target.publish("epic-design", content, self._meta())
-        assert "epic_id" in exc_info.value.missing_fields
+        result = target.publish("epic-design", content, self._meta())
+        assert result.success is False
+        assert "epic_id" in (result.message or "")
 
     def test_publish_epic_with_epic_id_passes(self, tmp_path: Path) -> None:
         target = FilesystemDocsTarget(project_root=tmp_path)
@@ -127,24 +123,25 @@ class TestFrontmatterValidation:
     ) -> None:
         target = FilesystemDocsTarget(project_root=tmp_path)
         content = "---\ntitle: Story Doc\nstatus: draft\n---\n"
-        with pytest.raises(FrontmatterValidationError) as exc_info:
-            target.publish("story-design", content, self._meta())
-        assert "story_id" in exc_info.value.missing_fields
-        assert "epic_id" in exc_info.value.missing_fields
+        result = target.publish("story-design", content, self._meta())
+        assert result.success is False
+        assert "story_id" in (result.message or "")
+        assert "epic_id" in (result.message or "")
 
     def test_publish_story_with_story_id_infers_level(self, tmp_path: Path) -> None:
         """story_id in frontmatter triggers story-level validation."""
         target = FilesystemDocsTarget(project_root=tmp_path)
         content = "---\ntitle: Doc\nstatus: draft\nstory_id: S1040.4\n---\n"
-        with pytest.raises(FrontmatterValidationError) as exc_info:
-            target.publish("generic", content, self._meta())
-        assert "epic_id" in exc_info.value.missing_fields
+        result = target.publish("generic", content, self._meta())
+        assert result.success is False
+        assert "epic_id" in (result.message or "")
 
-    def test_publish_non_mapping_frontmatter_raises(self, tmp_path: Path) -> None:
+    def test_publish_non_mapping_frontmatter_fails(self, tmp_path: Path) -> None:
         target = FilesystemDocsTarget(project_root=tmp_path)
         content = "---\n- item1\n- item2\n---\n"
-        with pytest.raises(FrontmatterValidationError, match="mapping"):
-            target.publish("generic", content, self._meta())
+        result = target.publish("generic", content, self._meta())
+        assert result.success is False
+        assert "mapping" in (result.message or "")
 
     def test_publish_empty_frontmatter_passes(self, tmp_path: Path) -> None:
         target = FilesystemDocsTarget(project_root=tmp_path)
