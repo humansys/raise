@@ -1,10 +1,6 @@
 ---
 name: rai-bugfix
-description: >
-  Guide the developer through a formal 6-phase bug fix lifecycle
-  (start → analyse → plan → fix → review → close) with the same
-  rigor and traceability as a story. Use for tracked bugs that
-  need full accountability from reproduction to close.
+description: Guide a tracked bug through 6-phase fix lifecycle. Use for bugs needing traceability.
 disable-model-invocation: true
 
 license: MIT

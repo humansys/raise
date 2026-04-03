@@ -1,9 +1,6 @@
 ---
 name: rai-code-audit
-description: >
-  Systematic module-by-module code audit against code-standards.md.
-  Evaluates the HUMAN and BOTH criteria that automated tools cannot catch:
-  naming, idiom quality, API surface design, architectural intent, test specification.
+description: Audit modules against code-standards.md for naming, idioms, and API design.
 
 license: MIT
 

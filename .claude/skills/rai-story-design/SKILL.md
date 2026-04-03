@@ -1,9 +1,6 @@
 ---
 name: rai-story-design
-description: >
-  Create lean story specifications optimized for both human understanding
-  and AI alignment. Design is not optional (PAT-186) — use before /rai-story-plan
-  for every story to ground integration decisions.
+description: Create lean story spec for human review and AI alignment. Use before story plan.
 
 license: MIT
 

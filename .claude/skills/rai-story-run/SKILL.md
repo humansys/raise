@@ -1,10 +1,6 @@
 ---
 name: rai-story-run
-description: >
-  Chain the full story lifecycle (start → design → plan → implement →
-  architecture review → quality review → review → close) in one
-  invocation. Resumes from last completed phase using git-derived
-  artifact detection. Delegation profile controls pause behavior.
+description: Run the full story lifecycle with delegation gates. Use to orchestrate a story.
 disable-model-invocation: true
 
 license: MIT

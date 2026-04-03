@@ -1,9 +1,6 @@
 ---
 name: rai-story-review
-description: >
-  Reflect on completed stories to extract learnings, identify process
-  improvements, and update the framework with insights gained. Use after
-  implementation is complete to close the development cycle.
+description: Extract learnings and persist patterns from completed story. Use after implementation.
 
 license: MIT
 

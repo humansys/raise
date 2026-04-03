@@ -1,9 +1,6 @@
 ---
 name: rai-skillset-manage
-description: >
-  Guided skill set management through conversation and CLI. Detects existing
-  sets, creates new ones from builtins, compares against upstream, and guides
-  customization. All mutations go through rai skill set CLI.
+description: Manage skill sets via CLI. Use to create, compare, or customize skill sets.
 
 license: MIT
 

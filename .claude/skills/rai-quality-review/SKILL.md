@@ -1,9 +1,6 @@
 ---
 name: rai-quality-review
-description: >
-  Critical code review with external auditor perspective. Catches what linters,
-  type checkers, and coverage gates miss: semantic bugs, type lies, test muda,
-  API design issues, and security concerns.
+description: Audit code for semantic bugs, type lies, and test muda. Use after implementation.
 
 license: MIT
 
