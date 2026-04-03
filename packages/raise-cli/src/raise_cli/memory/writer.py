@@ -16,7 +16,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from raise_cli.compat import file_lock, file_unlock
+from raise_cli.adapters.filesystem_adapter import FilesystemAdapter
 from raise_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
 from raise_cli.memory.models import MemoryScope, PatternSubType
 
@@ -376,20 +376,14 @@ def get_next_id(  # noqa: C901
 def _append_jsonl(file_path: Path, data: dict[str, Any]) -> None:
     """Append a JSON object as a line to a JSONL file.
 
-    Uses file locking to prevent data loss from concurrent appends
-    (e.g., parallel sessions writing to the same patterns.jsonl).
+    Uses FilesystemAdapter for atomic append semantics.
 
     Args:
         file_path: Path to JSONL file.
         data: Dictionary to serialize as JSON line.
     """
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-    with file_path.open("a", encoding="utf-8") as f:
-        file_lock(f)
-        try:
-            f.write(json.dumps(data) + "\n")
-        finally:
-            file_unlock(f)
+    adapter = FilesystemAdapter(root=file_path.parent)
+    adapter.append(Path(file_path.name), json.dumps(data))
 
 
 def append_pattern(
