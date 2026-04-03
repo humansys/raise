@@ -16,6 +16,6 @@ pattern_votes:
 gaps: []
 artifacts:
   - work/epics/e1136-introspection-hardening/stories/s1136.3-plan.md
-commit: null
+commit: 6f69f5cf
 branch: story/s1136.3/auto-commit-learnings
 downstream: {}
