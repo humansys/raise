@@ -23,7 +23,7 @@ Fix the 3 adoption failures discovered during E1133 dogfood: agents skip PRIME/L
 | S1136.1 | PRIME/LEARN mandatory in skills | S | — | Change markers to mandatory instructions, add schema inline, add to quality checklist ✓ |
 | S1136.2 | `rai learn write` CLI + schema validation | XS | S1136.1 | CLI command that validates against Pydantic model and writes record ✓ |
 | S1136.3 | Auto-commit learning records | XS | S1136.1 | Include learnings in git add during task commits ✓ |
-| S1136.4 | `rai learn push` — server persistence | M | S1136.2 | `rai learn write` CLI + schema validation | XS | S1136.1 | CLI command that validates against Pydantic model and writes record ✓ |
+| S1136.4 | `rai learn push` — server persistence | M | S1136.2 | Push learning records to raise-server via agent_events endpoint ✓ |
 | S1136.5 | Dogfood round 2 | S | S1136.1, S1136.2, S1136.3 | 3+ stories with fixes, measure vs baseline |
 
 ## Done Criteria
