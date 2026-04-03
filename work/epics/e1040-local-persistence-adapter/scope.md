@@ -1,46 +1,68 @@
 ---
 epic_id: "E1040"
 jira_key: "RAISE-1040"
-title: "Local Persistence Adapter — Unified Protocol, Filesystem Backend, Full Skill Migration"
+title: "Steward + Adapter — Reliability Governance for Process-Critical Data"
 status: "in-progress"
 created: "2026-04-02"
 ---
 
-# E1040: Local Persistence Adapter
+# E1040: Steward + Adapter
 
 ## Objective
 
-Ensure no lifecycle skill writes first-order artifacts directly to filesystem.
-All work artifacts (scope, design, plan, retro) and session state must pass
-through a single unified adapter with validation, correct location resolution,
-and atomic writes.
+All process-critical data in RaiSE is managed by a Steward — a domain-aware
+component that validates, protects integrity, and delegates I/O to a backend
+Adapter. No skill or CLI function writes process data directly to filesystem.
 
-## Design Decisions (2026-04-02)
+## Architecture
 
-1. **1 protocol, not 2** — LocalPersistenceAdapter covers both work artifacts and session state
-2. **Validation in the adapter** — frontmatter correctness, location resolution, atomic writes
-3. **Full migration, no exceptions** — all skills migrate, no partial adoption
-4. **No backend swappability yet** — Jira-native/Confluence backend is 3.0
+```
+Skill → CLI → Steward (domain rules, validation, protection)
+                 → Adapter (atomic I/O, backend-specific)
+```
+
+## Design Decisions
+
+See `design-decisions.md` for full context. Summary:
+
+| # | Decision |
+|---|----------|
+| DD-1 | Steward + Adapter two-layer architecture |
+| DD-2 | Scope: session + memory + developer (work artifacts already have adapter) |
+| DD-3 | Stewards own domain intelligence, adapters are dumb I/O |
+| DD-4 | Single concrete FilesystemAdapter, no protocol until second backend |
+| DD-5 | CLI orchestrates flow, stewards handle persistence |
+| DD-6 | Absorb existing Pydantic validation, add missing protections |
 
 ## Stories
 
 | # | Jira Key | Summary | Size | Depends On |
 |---|----------|---------|------|------------|
-| 1 | RAISE-1041 | S1040.1: LocalPersistenceAdapter Protocol — unified for work artifacts + session | S | — |
-| 2 | RAISE-1042 | S1040.2: FilesystemAdapter — single backend, validation, atomic writes | M | S1040.1 |
-| 3 | RAISE-1043 | S1040.3: Migrate all skills — lifecycle + session, zero direct writes | L | S1040.2 |
+| 1 | RAISE-1041 | S1040.1: FilesystemAdapter — atomic I/O primitives | S | — |
+| 2 | RAISE-1042 | S1040.2: SessionSteward + MemorySteward + DeveloperSteward | M | S1040.1 |
+| 3 | RAISE-1043 | S1040.3: Migrate CLI to stewards — replace direct writes, delete old functions | M | S1040.2 |
+| 4 | RAISE-1044 | S1040.4: Harden FilesystemDocsTarget — frontmatter validation | S | — |
+
+```
+S1040.1 (Adapter) ──→ S1040.2 (Stewards) ──→ S1040.3 (Migration)
+S1040.4 (Docs hardening) ─── independent ─────────────────────────
+```
 
 ## Done Criteria
 
-- [ ] No lifecycle skill has direct Write/Edit calls for work artifacts
-- [ ] No session skill has direct writes to session-state.yaml
-- [ ] FilesystemAdapter produces identical file layout to current behavior
-- [ ] Atomic writes prevent data corruption (RAISE-697 closed by design)
+- [ ] SessionSteward manages state, index, journal with timestamp protection (RAISE-697)
+- [ ] MemorySteward manages patterns with ID generation and validation
+- [ ] DeveloperSteward manages profile with defensive merge
+- [ ] FilesystemAdapter provides atomic write/append for all stewards
+- [ ] Zero direct filesystem writes for session/memory/developer data in CLI
+- [ ] FilesystemDocsTarget validates frontmatter before writing work artifacts
 - [ ] All existing tests pass
+- [ ] File layout identical to current behavior (non-breaking)
 
 ## References
 
+- Design decisions: `design-decisions.md`
 - Origin: `adapter-vision.md` §4 (Missing Protocols)
 - Jira: RAISE-1040
 - Closes: RAISE-697 (session state corruption)
-- Consolidated from 6 stories to 3 (2026-04-02 scope revision)
+- Evolution: 6 stories → 3 consolidated → 4 redesigned (Steward architecture)
