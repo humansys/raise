@@ -389,6 +389,53 @@ class TestSaveDeveloperProfile:
         assert content["name"] == "New"
 
 
+class TestSaveDeveloperProfileAdapter:
+    """Verify save_developer_profile uses FilesystemAdapter (S1040.2 T4)."""
+
+    def test_delegates_to_adapter_write(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """save_developer_profile should use FilesystemAdapter.write."""
+        from unittest.mock import patch
+
+        rai_home = tmp_path / ".rai"
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
+
+        profile = DeveloperProfile(name="Test")
+
+        with patch(
+            "raise_cli.onboarding.profile.FilesystemAdapter"
+        ) as mock_adapter_cls:
+            save_developer_profile(profile)
+
+            mock_adapter_cls.assert_called_once_with(root=rai_home)
+            mock_adapter_cls.return_value.write.assert_called_once()
+
+    def test_adapter_root_is_rai_home(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Adapter should be rooted at ~/.rai, not project root."""
+        from unittest.mock import patch
+
+        rai_home = tmp_path / ".rai"
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
+
+        profile = DeveloperProfile(name="Test")
+
+        with patch(
+            "raise_cli.onboarding.profile.FilesystemAdapter"
+        ) as mock_adapter_cls:
+            save_developer_profile(profile)
+
+            # Verify the adapter is rooted at rai_home
+            call_kwargs = mock_adapter_cls.call_args
+            assert call_kwargs == ((), {"root": rai_home})
+
+
 class TestIncrementSession:
     """Tests for increment_session function."""
 
