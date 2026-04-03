@@ -67,7 +67,7 @@ class TestExtractEpicDetails:
         epic = extract_epic_details(tmp_epic_file, project_root)
 
         assert epic is not None
-        assert epic.metadata["epic_id"] == "E8"
+        assert epic.metadata["epic_id"] == "E08"
 
     def test_extract_epic_name(self, tmp_epic_file: Path) -> None:
         """Should extract epic name from H1."""
@@ -81,7 +81,7 @@ class TestExtractEpicDetails:
         epic = extract_epic_details(tmp_epic_file)
 
         assert epic is not None
-        assert epic.id == "epic-e8"
+        assert epic.id == "epic-e08"
 
     def test_extract_concept_type(self, tmp_epic_file: Path) -> None:
         """Should have EPIC concept type."""
@@ -236,7 +236,7 @@ class TestExtractFeatures:
         features = extract_stories(tmp_epic_file)
 
         for feature in features:
-            assert feature.metadata["epic_id"] == "E8"
+            assert feature.metadata["epic_id"] == "E08"
 
     def test_feature_section(self, tmp_epic_file: Path) -> None:
         """Should have correct section format."""
@@ -289,6 +289,88 @@ class TestExtractFeatures:
             assert feature.file == "work/epics/e08-backlog/scope.md"
 
 
+class TestEpicIdPreservesOriginalNumber:
+    """Tests that epic IDs preserve directory number without int() normalization.
+
+    Regression: RAISE-1199, RAISE-1128, RAISE-648.
+    e03-identity and e3-something must produce DIFFERENT node IDs.
+    """
+
+    def test_leading_zeros_preserved(self, tmp_path: Path) -> None:
+        """e08-backlog should produce E08, not E8."""
+        epic_file = tmp_path / "work" / "epics" / "e08-backlog" / "scope.md"
+        epic_file.parent.mkdir(parents=True, exist_ok=True)
+        epic_file.write_text("# Epic E08: Backlog\n\n> **Status:** DRAFT\n")
+
+        epic = extract_epic_details(epic_file)
+
+        assert epic is not None
+        assert epic.metadata["epic_id"] == "E08"
+        assert epic.id == "epic-e08"
+
+    def test_no_leading_zeros_unchanged(self, tmp_path: Path) -> None:
+        """e8-backlog should produce E8."""
+        epic_file = tmp_path / "work" / "epics" / "e8-backlog" / "scope.md"
+        epic_file.parent.mkdir(parents=True, exist_ok=True)
+        epic_file.write_text("# Epic E8: Backlog\n\n> **Status:** DRAFT\n")
+
+        epic = extract_epic_details(epic_file)
+
+        assert epic is not None
+        assert epic.metadata["epic_id"] == "E8"
+        assert epic.id == "epic-e8"
+
+    def test_no_collision_between_e03_and_e3(self, tmp_path: Path) -> None:
+        """e03 and e3 directories must produce different IDs."""
+        e03_file = tmp_path / "work" / "epics" / "e03-identity" / "scope.md"
+        e03_file.parent.mkdir(parents=True, exist_ok=True)
+        e03_file.write_text("# Epic E03: Identity\n\n> **Status:** COMPLETE\n")
+
+        e3_file = tmp_path / "work" / "epics" / "e3-something" / "scope.md"
+        e3_file.parent.mkdir(parents=True, exist_ok=True)
+        e3_file.write_text("# Epic E3: Something\n\n> **Status:** DRAFT\n")
+
+        epic_03 = extract_epic_details(e03_file)
+        epic_3 = extract_epic_details(e3_file)
+
+        assert epic_03 is not None
+        assert epic_3 is not None
+        assert epic_03.id != epic_3.id, (
+            f"COLLISION: {epic_03.id} == {epic_3.id} — "
+            f"e03 and e3 must produce different node IDs"
+        )
+
+    def test_four_digit_ids_preserved(self, tmp_path: Path) -> None:
+        """e1134-cc-alignment should produce E1134."""
+        epic_file = tmp_path / "work" / "epics" / "e1134-cc-alignment" / "scope.md"
+        epic_file.parent.mkdir(parents=True, exist_ok=True)
+        epic_file.write_text("# Epic E1134: CC Alignment\n\n> **Status:** DRAFT\n")
+
+        epic = extract_epic_details(epic_file)
+
+        assert epic is not None
+        assert epic.metadata["epic_id"] == "E1134"
+        assert epic.id == "epic-e1134"
+
+    def test_stories_inherit_preserved_epic_id(self, tmp_path: Path) -> None:
+        """Stories should use the preserved (non-normalized) epic ID."""
+        epic_content = (
+            "# Epic E03: Identity\n\n"
+            "## Stories\n\n"
+            "| ID | Story | Size | Status |\n"
+            "|----|-------|:----:|:------:|\n"
+            "| F3.1 | Core | S | Pending |\n"
+        )
+        epic_file = tmp_path / "work" / "epics" / "e03-identity" / "scope.md"
+        epic_file.parent.mkdir(parents=True, exist_ok=True)
+        epic_file.write_text(epic_content)
+
+        stories = extract_stories(epic_file)
+
+        assert len(stories) >= 1
+        assert stories[0].metadata["epic_id"] == "E03"
+
+
 class TestIntegrationWithRealEpics:
     """Integration tests with real epic scope documents."""
 
@@ -302,9 +384,9 @@ class TestIntegrationWithRealEpics:
         epic = extract_epic_details(scope_path)
 
         assert epic is not None
-        assert epic.id == "epic-e3"
+        assert epic.id == "epic-e03"
         assert epic.type == ConceptType.EPIC
-        assert epic.metadata["epic_id"] == "E3"
+        assert epic.metadata["epic_id"] == "E03"
         assert "Identity" in epic.metadata["name"]
 
     def test_extract_stories_from_real_e3(self) -> None:
