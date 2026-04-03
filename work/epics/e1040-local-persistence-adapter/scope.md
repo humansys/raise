@@ -105,7 +105,7 @@ Architecture is new (Steward + Adapter). Prove the chain works E2E first.
 
 | # | Story | Status | Milestone |
 |---|-------|--------|-----------|
-| 1 | S1040.1: FilesystemAdapter | backlog | M1 |
+| 1 | S1040.1: FilesystemAdapter | done | M1 |
 | 4 | S1040.4: Docs hardening | backlog | M1 |
 | 2 | S1040.2: Stewards | backlog | M2 |
 | 3 | S1040.3: Migration | backlog | M3 |
