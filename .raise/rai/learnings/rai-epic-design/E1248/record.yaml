@@ -1,0 +1,38 @@
+skill: rai-epic-design
+work_id: E1248
+version: "2.4.0"
+timestamp: "2026-04-03T22:00:00Z"
+primed_patterns:
+  - PAT-E-686  # ActiveSessionPointer as typed JSON
+  - PAT-E-681  # DDD ACL maps to adapter pattern
+  - PAT-E-628  # Adapter-aware isinstance dispatch
+  - PAT-E-461  # Protocol+Registry+CLI triple cloning
+  - PAT-E-574  # CLI owns domain, adapter owns platform
+tier1_queries: 2
+tier1_results: 5
+jit_queries: 0
+pattern_votes:
+  PAT-E-686:
+    vote: 1
+    why: "Confirmed — typed pointer is the right approach, but needs gc"
+  PAT-E-681:
+    vote: 1
+    why: "Session protocols follow same ACL pattern as PM adapters"
+  PAT-E-628:
+    vote: 0
+    why: "Risk noted in ADR-038 — if only 2 backends, isinstance may suffice"
+  PAT-E-461:
+    vote: 1
+    why: "Protocol+Registry+entry_point triple applies perfectly to session protocols"
+gaps:
+  - "No patterns for worktree-aware state resolution"
+  - "No prior art for derived-not-stored state in this codebase"
+  - "WorkstreamMonitor is novel — no existing heuristics to build on"
+artifacts:
+  - work/epics/e1248-git-first-session-state/scope.md
+  - work/epics/e1248-git-first-session-state/design.md
+  - work/epics/e1248-git-first-session-state/gemba-findings.md
+  - dev/decisions/adr-038-session-protocols-derived-state.md
+commit: 160d3fcc73b62e88468bcbed0e6f2f47d11f928a
+branch: release/2.4.0
+downstream: {}
