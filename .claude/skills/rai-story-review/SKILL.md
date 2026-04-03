@@ -235,6 +235,8 @@ downstream: {}
 
 **Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
 
+**Commit:** Stage and commit the learning record with the retrospective: `git add .raise/rai/learnings/`. Records that stay on disk without a commit are lost when the worktree is cleaned up.
+
 ## Quality Checklist
 
 - [ ] Project language detected before running tests
