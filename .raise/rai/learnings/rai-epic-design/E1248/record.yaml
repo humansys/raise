@@ -35,4 +35,6 @@ artifacts:
   - dev/decisions/adr-038-session-protocols-derived-state.md
 commit: 160d3fcc73b62e88468bcbed0e6f2f47d11f928a
 branch: release/2.4.0
-downstream: {}
+downstream:
+  scope_clear: true
+  stories_sequenceable: true

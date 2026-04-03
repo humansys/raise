@@ -139,6 +139,91 @@ Use the new protocols in real sessions for 3-5 days:
 - RAISE-1232: S1229.1 SAR report (completed, informed this epic)
 - ADR-038: Session Protocols with Derived State
 
+---
+
+## Implementation Plan
+
+### Sequencing Strategy: Walking Skeleton + Risk-First
+
+S1248.1 proves the protocol architecture (highest risk, everything depends on it). Then S1248.2 and S1248.3 run in parallel — different codebase areas, no mutual dependency. S1248.4 and S1248.5 close out.
+
+### Story Sequence
+
+| # | Story | Size | Depends On | Rationale | Enables |
+|---|-------|------|-----------|-----------|---------|
+| 1 | S1248.1: Protocols + GitStateDeriver | M | — | Walking skeleton: proves protocol pattern, defines contracts, implements core derivation | S1248.2, S1248.3 |
+| 2a | S1248.2: SessionRegistry + gc | M | S1248.1 | Parallel track A: lifecycle management, zombie cleanup | S1248.4 |
+| 2b | S1248.3: Bundle integration + kill CLAUDE.local | M | S1248.1 | Parallel track B: wire protocols into actual bundle, user-visible change | S1248.5 |
+| 3 | S1248.4: WorkstreamMonitor basics | S | S1248.2 | Kaizen: session analysis heuristics, lowest risk | — |
+| 4 | S1248.5: Dogfood + stabilize | S | S1248.3 | Validation: real usage across worktrees, edge case fixing | Epic close |
+
+### Critical Path
+
+```
+S1248.1 ──► S1248.3 ──► S1248.5 ──► Epic Close
+              │
+S1248.1 ──► S1248.2 ──► S1248.4
+```
+
+Critical path: S1248.1 → S1248.3 → S1248.5 (protocol → bundle → validation).
+S1248.2 → S1248.4 is the parallel track (registry → monitor).
+
+### Milestones
+
+#### M1: Architecture Proven (after S1248.1)
+
+- [ ] Protocol contracts defined in `session/protocols.py`
+- [ ] GitStateDeriver returns correct CurrentWork for: release branch, story branch, worktree
+- [ ] Entry points registered and discoverable
+- [ ] Unit tests pass for all derivation cases (including edge: detached HEAD, no scope.md)
+
+**Demo:** `GitStateDeriver().current_work(Path("."))` returns accurate state in this worktree.
+
+#### M2: Core Reliable (after S1248.2 + S1248.3)
+
+- [ ] Bundle assembly uses StateDeriver (not YAML) for current_work
+- [ ] SessionRegistry gc() cleans zombies on session start
+- [ ] CLAUDE.local.md references removed
+- [ ] Session start works correctly in worktrees
+- [ ] All 7 failure modes addressed
+
+**Demo:** `/rai-session-start` in a worktree shows correct epic/story/branch context.
+
+#### M3: Epic Complete (after S1248.4 + S1248.5)
+
+- [ ] WorkstreamMonitor provides basic session insights
+- [ ] 3-5 days of real usage validates reliability
+- [ ] Done criteria met
+- [ ] Retrospective completed
+
+**Demo:** Session close optionally shows "this session: N commits, TDD compliance X%".
+
+### Parallel Opportunities
+
+S1248.2 and S1248.3 touch different areas:
+- S1248.2: `session/registry.py` (new), `session/index.py` (refactor), `cli/commands/session.py` (gc integration)
+- S1248.3: `session/bundle.py` (modify), `session/bundle_data.py` (modify), CLAUDE.local.md references (delete)
+
+No file overlap → safe to parallelize in separate sessions/worktrees.
+
+### Progress Tracking
+
+| Story | Status | Started | Completed | Notes |
+|-------|--------|---------|-----------|-------|
+| S1248.1 | pending | — | — | |
+| S1248.2 | pending | — | — | |
+| S1248.3 | pending | — | — | |
+| S1248.4 | pending | — | — | |
+| S1248.5 | pending | — | — | |
+
+### Sequencing Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| S1248.1 protocol pattern doesn't fit session domain | Blocks everything | ADR-038 mitigation: start with StateDeriver only, validate before extending |
+| Parallel S1248.2/S1248.3 causes merge conflicts | Low delay | Different files, rebase frequently |
+| Dogfood (S1248.5) reveals fundamental issues | Rework | PAT-E-592: budget 50% time buffer for dogfood stories |
+
 ## References
 
 - Design: `work/epics/e1248-git-first-session-state/design.md`
