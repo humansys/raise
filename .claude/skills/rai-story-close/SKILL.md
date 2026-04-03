@@ -175,6 +175,25 @@ Adapter not configured or transition fails → log and continue. Backlog sync is
 | Backlog update | via `rai backlog transition` (best-effort) |
 | Remote push + MR | Deferred to `/rai-epic-close` |
 
+## Scope Constraints (CRITICAL)
+
+Close is a **merge-only operation**. The following are explicitly forbidden:
+
+- **NEVER edit source code, skill files, config, or governance docs** — close does not "fix" things
+- **NEVER create "fix" or "refactor" commits** — if something looks wrong, report it; do not repair it
+- **NEVER delete directories, worktrees, or files outside the story branch** — close only deletes the merged story branch
+- **NEVER revert or modify commits already on `{dev_branch}`** — prior story work is settled
+- **NEVER rationalize unauthorized changes** — "this field looks wrong" is not a close concern
+
+**Conflict resolution:** When merge conflicts occur, resolve ONLY the conflicting hunks using the mechanical merge strategy (accept both sides where possible, prefer story branch for story-owned files). Do NOT use conflicts as an opportunity to audit or "correct" surrounding code.
+
+**Allowed writes during close (exhaustive list):**
+1. `work/epics/e{N}-{name}/scope.md` — update progress tracking only
+2. Merge commit message
+3. Signal/backlog CLI calls (side-effect only)
+
+Anything not on this list is out of scope. If you believe something needs fixing, return it as a finding — do not act on it.
+
 ## Quality Checklist
 
 - [ ] Retrospective complete before merge (gate)
@@ -183,8 +202,10 @@ Adapter not configured or transition fails → log and continue. Backlog sync is
 - [ ] Local story branch deleted after merge
 - [ ] Epic scope updated with completion status
 - [ ] Working tree clean before merge — no orphaned artifacts
+- [ ] No files modified outside scope constraints (scope.md only)
 - [ ] NEVER merge without retrospective — learnings compound
 - [ ] NEVER leave stale local branches — clean as you go
+- [ ] NEVER edit source/skill/config files during close — merge only
 - [ ] Remote push and MR happen at epic level (`/rai-epic-close`), not per story
 
 ## References

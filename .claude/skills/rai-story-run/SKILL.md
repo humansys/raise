@@ -201,6 +201,23 @@ ARGUMENTS: {story_id}
 - The orchestrator stays thin — it only reads summaries and checks for artifacts between forks
 - A skill invoked through fork must produce the same output as when invoked standalone
 
+**Close phase (phase 8) guardrails — MANDATORY in close agent prompt:**
+
+The close agent MUST receive these explicit constraints in its prompt, in addition to the SKILL.md:
+
+```
+## Scope Constraints (CRITICAL — close is merge-only)
+- ONLY: merge story branch, update epic scope.md, delete story branch, emit signals
+- NEVER edit source code, skill files, config files, or governance docs
+- NEVER create "fix" or "refactor" commits — report issues, do not repair them
+- NEVER delete directories, worktrees, or files outside the story branch
+- NEVER revert or modify commits already on the dev branch
+- Conflict resolution: resolve ONLY the conflicting hunks mechanically — do not audit or "correct" surrounding code
+- If something looks wrong, return it as a finding in your summary — do not act on it
+```
+
+This guardrail exists because close agents have historically rationalized unauthorized changes (removing fields, deleting directories) during conflict resolution. The close skill's "Scope Constraints" section is authoritative — these prompt guardrails reinforce it.
+
 <verification>
 Each skill's SKILL.md was loaded and all its steps executed before proceeding.
 </verification>
