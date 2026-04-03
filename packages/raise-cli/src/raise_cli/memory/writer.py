@@ -510,13 +510,10 @@ def reinforce_pattern(
             was_updated=False,
         )
 
-    # Atomic rewrite: write to temp, then rename
-    tmp_path = file_path.with_suffix(".jsonl.tmp")
-    tmp_path.write_text(
-        "\n".join(json.dumps(r) for r in records) + "\n",
-        encoding="utf-8",
-    )
-    tmp_path.replace(file_path)
+    # Atomic rewrite via FilesystemAdapter
+    content = "\n".join(json.dumps(r) for r in records) + "\n"
+    adapter = FilesystemAdapter(root=file_path.parent)
+    adapter.write(Path(file_path.name), content)
 
     return ReinforceResult(
         pattern_id=pattern_id,
