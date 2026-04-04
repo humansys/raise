@@ -1,0 +1,26 @@
+skill: rai-story-plan
+work_id: S1051.6
+version: 2.4.0
+timestamp: '2026-04-03T14:30:00Z'
+primed_patterns:
+- PAT-E-593
+- PAT-E-594
+- PAT-E-597
+tier1_queries: 1
+tier1_results: 0
+jit_queries: 0
+pattern_votes:
+  PAT-E-593:
+    vote: 0
+    why: "Not directly relevant \u2014 this story is config generation, not search"
+  PAT-E-597:
+    vote: 1
+    why: "Existing confluence_config_gen.py uses future annotations \u2014 must verify\
+      \ runtime imports match"
+gaps:
+- "No graph index available \u2014 could not query for decomposition or TDD patterns"
+artifacts:
+- work/epics/e1051-confluence-adapter-v2/stories/s1051.6-plan.md
+commit: null
+branch: story/s1051.6/config-generator-confluence
+downstream: {}

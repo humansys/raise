@@ -1,0 +1,35 @@
+skill: rai-story-review
+work_id: S1136.3
+version: 2.4.0
+timestamp: '2026-04-03T14:00:00Z'
+primed_patterns:
+- PAT-E-699
+- PAT-F-053
+- PAT-F-054
+tier1_queries: 2
+tier1_results: 3
+jit_queries: 1
+pattern_votes:
+  PAT-E-699:
+    vote: 0
+    why: "No code to review \u2014 docs-only XS story"
+  PAT-F-053:
+    vote: 1
+    why: "Stepping stone pattern directly applicable \u2014 commit instructions as\
+      \ stepping stones"
+  PAT-F-054:
+    vote: 1
+    why: Missing implement record confirmed silent nodes as signal
+gaps:
+- "Missing rai-story-implement learning record for s1136.3 \u2014 the exact problem\
+  \ this story fixes"
+artifacts:
+- work/epics/e1136-introspection-hardening/stories/s1136.3-retrospective.md
+- .raise/rai/learnings/rai-story-review/s1136.3/record.yaml
+commit: b2bd3618
+branch: story/s1136.3/auto-commit-learnings
+downstream:
+  rai-story-plan:
+    record: .raise/rai/learnings/rai-story-plan/s1136.3/record.yaml
+    observation: "Plan was accurate \u2014 2 tasks, linear, no deviations. Estimated\
+      \ 15 min, actual 15 min."
