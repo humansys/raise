@@ -5,8 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 from raise_cli.schemas.session_state import CurrentWork
 from raise_cli.session.derive import GitStateDeriver
 from raise_cli.session.protocols import StateDeriver
