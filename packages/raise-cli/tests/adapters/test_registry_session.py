@@ -8,6 +8,7 @@ from raise_cli.adapters.registry import (
     get_workstream_monitors,
 )
 from raise_cli.session.derive import GitStateDeriver
+from raise_cli.session.monitor import LocalWorkstreamMonitor
 from raise_cli.session.registry import LocalSessionRegistry
 
 
@@ -24,7 +25,7 @@ class TestSessionRegistryDiscovery:
         assert "local" in registries
         assert registries["local"] is LocalSessionRegistry
 
-    def test_workstream_monitors_empty_for_now(self) -> None:
+    def test_local_workstream_monitor_discovered(self) -> None:
         monitors = get_workstream_monitors()
-        # No implementations registered yet (S1248.4)
-        assert isinstance(monitors, dict)
+        assert "local" in monitors
+        assert monitors["local"] is LocalWorkstreamMonitor
