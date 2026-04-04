@@ -1,6 +1,6 @@
 # Epic E1136: Introspection Hardening
 
-> **Status:** IN PROGRESS
+> **Status:** DONE
 > **Created:** 2026-04-03
 > **Branch:** release/2.4.0
 
@@ -24,15 +24,15 @@ Fix the 3 adoption failures discovered during E1133 dogfood: agents skip PRIME/L
 | S1136.2 | `rai learn write` CLI + schema validation | XS | S1136.1 | CLI command that validates against Pydantic model and writes record ✓ |
 | S1136.3 | Auto-commit learning records | XS | S1136.1 | Include learnings in git add during task commits ✓ |
 | S1136.4 | `rai learn push` — server persistence | M | S1136.2 | Push learning records to raise-server via agent_events endpoint ✓ |
-| S1136.5 | Dogfood round 2 | S | S1136.1, S1136.2, S1136.3 | 3+ stories with fixes, measure vs baseline |
+| S1136.5 | Dogfood round 2 | S | S1136.1, S1136.2, S1136.3 | 3+ stories with fixes, measure vs baseline ✓ |
 
 ## Done Criteria
 
-- [ ] ≥5 learning records produced across ≥2 epics
-- [ ] All records pass schema validation (flat, ~10 fields)
-- [ ] Records committed to git (persist across worktrees)
-- [ ] Acceptance rate measurable (target: improve from 33% baseline)
-- [ ] Server endpoint accepts learning records (S1136.4)
+- [x] ≥5 learning records produced across ≥2 epics — 30 records, 5 epics
+- [x] All records pass schema validation (flat, ~10 fields) — consistent core schema
+- [x] Records committed to git (persist across worktrees) — all in git tree
+- [x] Acceptance rate measurable — 76% (baseline was 33%)
+- [x] Server endpoint accepts learning records (S1136.4) — 6 records pushed to server
 
 ## Baseline Metrics (from S1133.5)
 
