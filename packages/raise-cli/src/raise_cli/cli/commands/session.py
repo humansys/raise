@@ -42,7 +42,7 @@ from raise_cli.onboarding.profile import (
     save_developer_profile,
     start_session,
 )
-from raise_cli.schemas.session_state import SessionState
+from raise_cli.schemas.session_state import SessionInsights, SessionState
 from raise_cli.session.bundle import assemble_context_bundle, assemble_sections
 from raise_cli.session.close import CloseInput, load_state_file, process_session_close
 from raise_cli.session.identity import generate_session_id
@@ -67,6 +67,31 @@ logger = logging.getLogger(__name__)
 
 _ERR_NO_PROFILE = "No developer profile found"
 _DOT_RAISE = ".raise"
+
+
+def _get_session_insights(
+    project_path: Path, session_id: str
+) -> SessionInsights | None:
+    """Get session insights from WorkstreamMonitor, or None on failure."""
+    try:
+        from raise_cli.session.monitor import LocalWorkstreamMonitor
+
+        monitor = LocalWorkstreamMonitor(project_path)
+        return monitor.analyze_session(session_id)
+    except Exception:
+        logger.debug("Session insights failed — skipping", exc_info=True)
+        return None
+
+
+def _format_insights(insights: SessionInsights) -> str:
+    """Format session insights for CLI output."""
+    test_pct = f"{insights.test_commit_ratio:.0%}"
+    return (
+        f"  Session insights: {insights.commit_count} commits | "
+        f"Test ratio: {test_pct} | "
+        f"Reverts: {insights.revert_count} | "
+        f"Duration: {insights.duration_minutes}m"
+    )
 
 
 def _get_current_branch() -> str:
@@ -579,6 +604,15 @@ def close(  # noqa: C901
             )
         )
         typer.echo(f"Session {resolved_session_id} closed.")
+
+        # Show insights if project available
+        if project is not None:
+            insights = _get_session_insights(
+                Path(project), resolved_session_id
+            )
+            if insights and insights.commit_count > 0:
+                typer.echo(_format_insights(insights))
+
         return
 
     # Structured close: build CloseInput from flags or state file
@@ -718,6 +752,12 @@ def close(  # noqa: C901
         typer.echo(f"  Patterns added: {close_result.patterns_added}")
     if close_result.corrections_added > 0:
         typer.echo(f"  Corrections recorded: {close_result.corrections_added}")
+
+    # Show session insights
+    if final_session_id:
+        insights = _get_session_insights(project_path, final_session_id)
+        if insights and insights.commit_count > 0:
+            typer.echo(_format_insights(insights))
 
 
 @session_app.command("list")
