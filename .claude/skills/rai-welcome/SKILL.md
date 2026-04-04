@@ -40,7 +40,7 @@ Get a developer fully set up in a RaiSE project through a guided flow that detec
 
 **When to use:** First time a developer works in a RaiSE project. Subsequent runs verify setup.
 
-**When to skip:** Developer is already set up (profile exists, graph exists, CLAUDE.local.md exists).
+**When to skip:** Developer is already set up (profile exists, graph exists).
 
 **Inputs:** A project with `.raise/` directory (from `rai init`).
 
@@ -94,7 +94,7 @@ Preferences saved or defaults accepted.
 
 ### Step 4: Verify Setup
 
-Build graph if missing (`rai graph build`). Scaffold `CLAUDE.local.md` if missing. Run context bundle:
+Build graph if missing (`rai graph build`). Run context bundle:
 
 ```bash
 rai session start --project . --context
@@ -110,7 +110,7 @@ Profile, graph, and local config all present and functional.
 
 ```
 Welcome to RaiSE, {name}!
-Setup: Profile ({prefix}), Graph ({N} concepts), CLAUDE.local.md
+Setup: Profile ({prefix}), Graph ({N} concepts)
 Next: /rai-session-start
 ```
 
@@ -120,7 +120,7 @@ Next: /rai-session-start
 |------|-------------|
 | Developer profile | `~/.rai/developer.yaml` |
 | Knowledge graph | `.raise/rai/memory/index.json` |
-| Local config | `CLAUDE.local.md` |
+| Session context | Derived from git (ADR-038) |
 | Next | `/rai-session-start` |
 
 ## Quality Checklist
@@ -130,7 +130,7 @@ Next: /rai-session-start
 - [ ] Personalization clearly framed as optional
 - [ ] Graph built if missing (not assumed)
 - [ ] Context bundle runs successfully after setup
-- [ ] NEVER overwrite existing CLAUDE.local.md
+- [ ] Session context derived from git — no manual file needed
 - [ ] NEVER ask about experience level — learned implicitly through coaching
 
 ## References

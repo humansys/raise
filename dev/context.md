@@ -9,7 +9,7 @@
 | Content | New Location | Scope |
 |---------|--------------|-------|
 | Working style, communication prefs | `~/.claude/CLAUDE.md` | All projects (personal) |
-| Current focus, deadlines, sessions | `./CLAUDE.local.md` | This project (personal, git-ignored) |
+| Current focus, deadlines, sessions | Derived from git (ADR-038) | This project (automatic) |
 | Code standards, architecture | `./CLAUDE.md` | This project (shared via git) |
 
 ---
@@ -36,11 +36,11 @@
 
 ### End
 1. Commit changes
-2. Update `CLAUDE.local.md` (Recent Sessions)
+2. Run `rai session close` (captures state automatically)
 3. Update `dev/parking-lot.md` if new ideas captured
 4. Brief wrap-up summary
 
 ---
 
 *Deprecated: 2026-01-31*
-*See CLAUDE.local.md for active session context*
+*Session context is now derived from git automatically (ADR-038)*
