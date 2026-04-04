@@ -1,0 +1,36 @@
+skill: rai-story-review
+work_id: S1248.1
+version: "2.4.0"
+timestamp: "2026-04-03T19:30:00Z"
+primed_patterns:
+  - PAT-E-454
+  - PAT-E-683
+tier1_queries: 0
+tier1_results: 0
+jit_queries: 0
+pattern_votes:
+  PAT-E-454:
+    vote: 1
+    why: "Protocol pattern validated — standalone contracts with entry point discovery"
+  PAT-E-683:
+    vote: 1
+    why: "Integration tests caught entry point wiring that unit tests couldn't"
+  PAT-E-709:
+    vote: 1
+    why: "New pattern — instance methods as subprocess test seam, validated during implementation"
+  PAT-E-710:
+    vote: 1
+    why: "New pattern — entry point reinstall gotcha, caught during T3"
+gaps:
+  - "Graph unavailable during implementation — no tier1 queries possible"
+artifacts:
+  - work/epics/e1248-git-first-session-state/stories/s1248.1-retrospective.md
+commit: null
+branch: story/s1248.1/session-protocols-git-deriver
+downstream:
+  patterns_added:
+    - PAT-E-709
+    - PAT-E-710
+  patterns_reinforced:
+    - PAT-E-454
+    - PAT-E-683
