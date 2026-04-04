@@ -1,4 +1,10 @@
-"""Tests for Confluence config generator — S1130.4."""
+"""Tests for Confluence config generator — S1051.6 (v2).
+
+Tests generate_confluence_config() with v2 signature:
+- spaces: list[SpaceInfo] (replaces ConfluenceSpaceMap)
+- instance_name: str (new param)
+- Multi-instance output format
+"""
 
 from __future__ import annotations
 
@@ -6,113 +12,144 @@ import pytest
 
 from raise_cli.adapters.confluence_config import ArtifactRouting, ConfluenceConfig
 from raise_cli.adapters.confluence_config_gen import generate_confluence_config
-from raise_cli.adapters.confluence_discovery import ConfluenceSpaceMap
-from raise_cli.adapters.models.docs import PageSummary, SpaceInfo
+from raise_cli.adapters.models.docs import SpaceInfo
 
 
-def _sample_space_map() -> ConfluenceSpaceMap:
-    """Create a sample space map for testing."""
-    return ConfluenceSpaceMap(
-        spaces=[
-            SpaceInfo(
-                key="RaiSE1",
-                name="RaiSE Documentation",
-                url="/wiki/spaces/RaiSE1",
-                type="global",
-            ),
-            SpaceInfo(
-                key="OPS", name="Operations", url="/wiki/spaces/OPS", type="global"
-            ),
-        ],
-        top_level_pages={
-            "RaiSE1": [
-                PageSummary(id="123", title="Architecture", url="/wiki/pages/123"),
-                PageSummary(id="456", title="Developer Docs", url="/wiki/pages/456"),
-            ],
-            "OPS": [],
-        },
-    )
+def _sample_spaces() -> list[SpaceInfo]:
+    """Create sample spaces for testing."""
+    return [
+        SpaceInfo(
+            key="RaiSE1",
+            name="RaiSE Documentation",
+            url="/wiki/spaces/RaiSE1",
+            type="global",
+        ),
+        SpaceInfo(
+            key="OPS",
+            name="Operations",
+            url="/wiki/spaces/OPS",
+            type="global",
+        ),
+    ]
 
 
-class TestGenerateMinimalConfig:
+class TestGenerateMultiInstanceFormat:
+    """AC1: output passes ConfluenceConfig.from_dict()."""
+
     def test_returns_dict(self) -> None:
         result = generate_confluence_config(
-            space_map=_sample_space_map(),
+            spaces=_sample_spaces(),
             selected_space="RaiSE1",
             instance_url="https://humansys.atlassian.net/wiki",
+            instance_name="humansys",
         )
         assert isinstance(result, dict)
 
-    def test_includes_url(self) -> None:
+    def test_output_passes_from_dict_validation(self) -> None:
         result = generate_confluence_config(
-            space_map=_sample_space_map(),
+            spaces=_sample_spaces(),
             selected_space="RaiSE1",
             instance_url="https://humansys.atlassian.net/wiki",
+            instance_name="humansys",
         )
-        # Should be findable in the config structure
         config = ConfluenceConfig.from_dict(result)
-        inst = config.get_instance()
+        assert config.default_instance == "humansys"
+        assert "humansys" in config.instances
+
+    def test_instance_has_correct_url(self) -> None:
+        result = generate_confluence_config(
+            spaces=_sample_spaces(),
+            selected_space="RaiSE1",
+            instance_url="https://humansys.atlassian.net/wiki",
+            instance_name="humansys",
+        )
+        config = ConfluenceConfig.from_dict(result)
+        inst = config.get_instance("humansys")
         assert inst.url == "https://humansys.atlassian.net/wiki"
 
-    def test_includes_selected_space_key(self) -> None:
+    def test_instance_has_correct_space_key(self) -> None:
         result = generate_confluence_config(
-            space_map=_sample_space_map(),
+            spaces=_sample_spaces(),
             selected_space="RaiSE1",
             instance_url="https://humansys.atlassian.net/wiki",
+            instance_name="humansys",
         )
         config = ConfluenceConfig.from_dict(result)
-        inst = config.get_instance()
+        inst = config.get_instance("humansys")
         assert inst.space_key == "RaiSE1"
 
-
-class TestConfigValidation:
-    def test_generated_config_passes_confluence_config_validation(self) -> None:
+    def test_instance_has_correct_instance_name(self) -> None:
         result = generate_confluence_config(
-            space_map=_sample_space_map(),
+            spaces=_sample_spaces(),
+            selected_space="RaiSE1",
+            instance_url="https://humansys.atlassian.net/wiki",
+            instance_name="humansys",
+        )
+        config = ConfluenceConfig.from_dict(result)
+        inst = config.get_instance("humansys")
+        assert inst.instance_name == "humansys"
+
+    def test_default_instance_name_is_default(self) -> None:
+        result = generate_confluence_config(
+            spaces=_sample_spaces(),
             selected_space="RaiSE1",
             instance_url="https://humansys.atlassian.net/wiki",
         )
-        # This is the key test — output MUST be valid ConfluenceConfig
         config = ConfluenceConfig.from_dict(result)
         assert config.default_instance == "default"
-        assert "default" in config.instances
 
 
-class TestRouting:
-    def test_includes_routing_when_provided(self) -> None:
-        routing: dict[str, ArtifactRouting] = {
-            "adr": ArtifactRouting(parent_title="Architecture", labels=["adr"]),
-            "developer": ArtifactRouting(parent_title="Dev Docs", labels=["dev"]),
-        }
-        result = generate_confluence_config(
-            space_map=_sample_space_map(),
-            selected_space="RaiSE1",
-            instance_url="https://humansys.atlassian.net/wiki",
-            routing=routing,
-        )
-        config = ConfluenceConfig.from_dict(result)
-        inst = config.get_instance()
-        assert "adr" in inst.routing
-        assert inst.routing["adr"].parent_title == "Architecture"
+class TestInvalidSpace:
+    """AC2: ValueError when selected_space not in spaces list."""
 
-    def test_default_routing_when_none(self) -> None:
-        result = generate_confluence_config(
-            space_map=_sample_space_map(),
-            selected_space="RaiSE1",
-            instance_url="https://humansys.atlassian.net/wiki",
-        )
-        config = ConfluenceConfig.from_dict(result)
-        inst = config.get_instance()
-        # Should have sensible defaults
-        assert "adr" in inst.routing
-        assert "developer" in inst.routing
-
-
-class TestErrors:
-    def test_invalid_space_raises(self) -> None:
-        with pytest.raises(ValueError, match="MISSING"):
+    def test_raises_value_error(self) -> None:
+        with pytest.raises(ValueError, match="NONEXISTENT"):
             generate_confluence_config(
-                space_map=_sample_space_map(),
+                spaces=_sample_spaces(),
+                selected_space="NONEXISTENT",
+                instance_url="https://humansys.atlassian.net/wiki",
+                instance_name="humansys",
+            )
+
+    def test_error_lists_available_spaces(self) -> None:
+        with pytest.raises(ValueError, match="RaiSE1"):
+            generate_confluence_config(
+                spaces=_sample_spaces(),
                 selected_space="MISSING",
                 instance_url="https://humansys.atlassian.net/wiki",
             )
+
+
+class TestRouting:
+    """AC3: default routing applied when routing=None."""
+
+    def test_default_routing_when_none(self) -> None:
+        result = generate_confluence_config(
+            spaces=_sample_spaces(),
+            selected_space="RaiSE1",
+            instance_url="https://humansys.atlassian.net/wiki",
+            instance_name="humansys",
+        )
+        config = ConfluenceConfig.from_dict(result)
+        inst = config.get_instance("humansys")
+        assert "adr" in inst.routing
+        assert "developer" in inst.routing
+
+    def test_custom_routing_preserved(self) -> None:
+        routing = {
+            "adr": ArtifactRouting(
+                parent_title="Architecture Decision Records", labels=["adr"]
+            ),
+            "roadmap": ArtifactRouting(parent_title="Roadmaps", labels=["roadmap"]),
+        }
+        result = generate_confluence_config(
+            spaces=_sample_spaces(),
+            selected_space="RaiSE1",
+            instance_url="https://humansys.atlassian.net/wiki",
+            instance_name="humansys",
+            routing=routing,
+        )
+        config = ConfluenceConfig.from_dict(result)
+        inst = config.get_instance("humansys")
+        assert inst.routing["adr"].parent_title == "Architecture Decision Records"
+        assert inst.routing["roadmap"].labels == ["roadmap"]
