@@ -20,3 +20,9 @@
 4. Workflow point: `before:story:review` — so story-review skill can be told "records are missing, produce them before proceeding"
 
 **Design constraint:** The gate should WARN, not BLOCK. Missing records may be legitimate (story-design is optional for XS stories). The gate reports completeness; the skill decides what to do.
+
+## Implementation
+
+The fix is tracked as a proper story: **RAISE-1285** (S1001.5: Learning Chain Gate) under epic RAISE-1001 (Bug-Driven Process Improvement). This bug (RAISE-1277) is blocked by RAISE-1285.
+
+Rationale: the fix requires 3 deliverables (function + gate + CLI) with TDD — story lifecycle is more appropriate than inline bugfix.
