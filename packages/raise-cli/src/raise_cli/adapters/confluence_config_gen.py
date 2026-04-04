@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from raise_cli.adapters.confluence_config import ArtifactRouting
+from raise_cli.adapters.confluence_discovery import PageNode
 from raise_cli.adapters.models.docs import SpaceInfo
 
 # Default routing for common artifact types when none provided
@@ -71,3 +72,43 @@ def generate_confluence_config(
             },
         },
     }
+
+
+# ── Routing suggestion from page tree ────────────────────────────────
+
+# Artifact type → keywords that match top-level page titles (case-insensitive substring)
+_ROUTING_KEYWORDS: dict[str, list[str]] = {
+    "adr": ["architecture decision", "adr"],
+    "roadmap": ["roadmap"],
+    "developer": ["developer doc", "developer guide"],
+    "retrospective": ["retrospective", "retro"],
+}
+
+
+def suggest_routing(tree: PageNode) -> dict[str, ArtifactRouting]:
+    """Suggest artifact routing from top-level page titles.
+
+    Matches each top-level child title against known artifact type keywords
+    using case-insensitive substring matching. Returns a dict of artifact
+    type → ArtifactRouting for each match found.
+
+    Args:
+        tree: Root PageNode whose children are top-level pages.
+
+    Returns:
+        Dict of artifact_type → ArtifactRouting for matched pages.
+    """
+    suggestions: dict[str, ArtifactRouting] = {}
+    for child in tree.children:
+        title_lower = child.title.lower()
+        for artifact_type, keywords in _ROUTING_KEYWORDS.items():
+            if artifact_type in suggestions:
+                continue  # already matched this type
+            for keyword in keywords:
+                if keyword in title_lower:
+                    suggestions[artifact_type] = ArtifactRouting(
+                        parent_title=child.title,
+                        labels=[artifact_type],
+                    )
+                    break
+    return suggestions

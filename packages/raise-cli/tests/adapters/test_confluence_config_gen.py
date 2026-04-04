@@ -11,7 +11,11 @@ from __future__ import annotations
 import pytest
 
 from raise_cli.adapters.confluence_config import ArtifactRouting, ConfluenceConfig
-from raise_cli.adapters.confluence_config_gen import generate_confluence_config
+from raise_cli.adapters.confluence_config_gen import (
+    generate_confluence_config,
+    suggest_routing,
+)
+from raise_cli.adapters.confluence_discovery import PageNode
 from raise_cli.adapters.models.docs import SpaceInfo
 
 
@@ -153,3 +157,62 @@ class TestRouting:
         inst = config.get_instance("humansys")
         assert inst.routing["adr"].parent_title == "Architecture Decision Records"
         assert inst.routing["roadmap"].labels == ["roadmap"]
+
+
+# ── suggest_routing() tests ──────────────────────────────────────────
+
+
+def _make_tree(child_titles: list[str]) -> PageNode:
+    """Build a simple root + children tree for suggest_routing tests."""
+    children = [
+        PageNode(id=str(i), title=title, labels=[], children=[])
+        for i, title in enumerate(child_titles, start=100)
+    ]
+    return PageNode(id="1", title="Space Home", labels=[], children=children)
+
+
+class TestSuggestRouting:
+    """S1: suggest_routing() matches top-level page titles against keywords."""
+
+    def test_adr_match(self) -> None:
+        tree = _make_tree(["Architecture Decision Records", "Other Page"])
+        result = suggest_routing(tree)
+        assert "adr" in result
+        assert result["adr"].parent_title == "Architecture Decision Records"
+        assert "adr" in result["adr"].labels
+
+    def test_roadmap_match(self) -> None:
+        tree = _make_tree(["Roadmaps"])
+        result = suggest_routing(tree)
+        assert "roadmap" in result
+        assert result["roadmap"].parent_title == "Roadmaps"
+
+    def test_developer_match(self) -> None:
+        tree = _make_tree(["Developer Docs"])
+        result = suggest_routing(tree)
+        assert "developer" in result
+        assert result["developer"].parent_title == "Developer Docs"
+
+    def test_retrospective_match(self) -> None:
+        tree = _make_tree(["Sprint Retrospective Notes"])
+        result = suggest_routing(tree)
+        assert "retrospective" in result
+
+    def test_no_matches_returns_empty(self) -> None:
+        tree = _make_tree(["Random Page", "Meeting Notes"])
+        result = suggest_routing(tree)
+        assert result == {}
+
+    def test_multiple_matches(self) -> None:
+        tree = _make_tree(
+            ["Architecture Decision Records", "Roadmaps", "Developer Guide"]
+        )
+        result = suggest_routing(tree)
+        assert "adr" in result
+        assert "roadmap" in result
+        assert "developer" in result
+
+    def test_case_insensitive(self) -> None:
+        tree = _make_tree(["ARCHITECTURE DECISION RECORDS"])
+        result = suggest_routing(tree)
+        assert "adr" in result
