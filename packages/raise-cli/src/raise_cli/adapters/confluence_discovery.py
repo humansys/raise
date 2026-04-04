@@ -83,3 +83,90 @@ class ConfluenceDiscovery:
                 top_level_pages[space.key] = []
 
         return ConfluenceSpaceMap(spaces=spaces, top_level_pages=top_level_pages)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# V2 Discovery Service — S1051.4
+# ══════════════════════════════════════════════════════════════════════
+
+
+class PageNode(BaseModel):
+    """Recursive page tree node with labels."""
+
+    id: str
+    title: str
+    labels: list[str] = Field(default_factory=list)
+    children: list[PageNode] = Field(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
+
+
+PageNode.model_rebuild()  # resolve forward ref for recursive type
+
+
+class DiscoveryError(Exception):
+    """Discovery-layer error wrapping client errors."""
+
+    def __init__(self, message: str, cause: Exception | None = None) -> None:
+        self.message = message
+        self.cause = cause
+        super().__init__(message)
+
+
+class SpaceMap(BaseModel):
+    """Complete structural snapshot of a Confluence space."""
+
+    space: SpaceInfo
+    homepage_id: str
+    page_tree: PageNode
+    label_index: dict[str, list[str]]  # label -> [page_id, ...]
+
+
+class ConfluenceDiscoveryService:
+    """Queries live Confluence for structural metadata.
+
+    Consumed by doctor (validation) and setup (config generation).
+    All methods raise DiscoveryError on failure.
+
+    RAISE-1057 (S1051.4)
+    """
+
+    DEFAULT_MAX_DEPTH: int = 3
+
+    def __init__(self, client: ConfluenceClient) -> None:
+        self._client = client
+
+    def discover_spaces(self) -> list[SpaceInfo]:
+        """List all accessible spaces."""
+        raise NotImplementedError
+
+    def discover_page_tree(
+        self, space_key: str, max_depth: int = DEFAULT_MAX_DEPTH
+    ) -> PageNode:
+        """Build recursive page tree from space homepage."""
+        raise NotImplementedError
+
+    def discover_labels(self, page_ids: list[str]) -> dict[str, list[str]]:
+        """Get labels for a list of pages. Returns {page_id: [label, ...]}."""
+        raise NotImplementedError
+
+    def build_space_map(
+        self, space_key: str, max_depth: int = DEFAULT_MAX_DEPTH
+    ) -> SpaceMap:
+        """Composite: space info + page tree + label index."""
+        raise NotImplementedError
+
+    def _walk_children(
+        self, page_id: str, depth: int, max_depth: int
+    ) -> list[PageNode]:
+        """Recursive child page walk with depth limit."""
+        raise NotImplementedError
+
+    @staticmethod
+    def _build_label_index(tree: PageNode) -> dict[str, list[str]]:
+        """Build inverted index: label -> [page_id, ...] from tree."""
+        raise NotImplementedError
+
+    def _wrap_error(self, error: Exception, context: str) -> DiscoveryError:
+        """Wrap any exception in DiscoveryError with context."""
+        if isinstance(error, DiscoveryError):
+            return error
+        return DiscoveryError(f"{context}: {error}", cause=error)

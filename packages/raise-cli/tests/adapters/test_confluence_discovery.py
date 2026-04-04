@@ -11,7 +11,11 @@ import pytest
 
 from raise_cli.adapters.confluence_discovery import (
     ConfluenceDiscovery,
+    ConfluenceDiscoveryService,
     ConfluenceSpaceMap,
+    DiscoveryError,
+    PageNode,
+    SpaceMap,
 )
 from raise_cli.adapters.confluence_exceptions import (
     ConfluenceAuthError,
@@ -178,3 +182,81 @@ class TestConfluenceSpaceMap:
         space_map = ConfluenceSpaceMap(spaces=[SPACE_A], top_level_pages={})
         with pytest.raises(Exception):  # noqa: B017 — Pydantic ValidationError
             space_map.spaces = []  # type: ignore[misc]
+
+
+# ══════════════════════════════════════════════════════════════════════
+# S1051.4 — ConfluenceDiscoveryService (V2)
+# ══════════════════════════════════════════════════════════════════════
+
+# ── PageNode model tests ────────────────────────────────────────────
+
+
+class TestPageNode:
+    def test_construction_minimal(self) -> None:
+        node = PageNode(id="1", title="Root")
+        assert node.id == "1"
+        assert node.title == "Root"
+        assert node.labels == []
+        assert node.children == []
+
+    def test_construction_with_labels(self) -> None:
+        node = PageNode(id="1", title="Root", labels=["adr", "docs"])
+        assert node.labels == ["adr", "docs"]
+
+    def test_recursive_children(self) -> None:
+        child = PageNode(id="2", title="Child")
+        parent = PageNode(id="1", title="Parent", children=[child])
+        assert len(parent.children) == 1
+        assert parent.children[0].id == "2"
+
+    def test_deep_nesting(self) -> None:
+        leaf = PageNode(id="3", title="Leaf")
+        mid = PageNode(id="2", title="Mid", children=[leaf])
+        root = PageNode(id="1", title="Root", children=[mid])
+        assert root.children[0].children[0].id == "3"
+
+
+# ── SpaceMap model tests ────────────────────────────────────────────
+
+
+class TestSpaceMap:
+    def test_construction(self) -> None:
+        space = SpaceInfo(key="DEV", name="Dev", url="/wiki/spaces/DEV", type="global")
+        root = PageNode(id="1", title="Home")
+        smap = SpaceMap(
+            space=space,
+            homepage_id="1",
+            page_tree=root,
+            label_index={"adr": ["2", "3"]},
+        )
+        assert smap.space.key == "DEV"
+        assert smap.homepage_id == "1"
+        assert smap.page_tree.title == "Home"
+        assert smap.label_index == {"adr": ["2", "3"]}
+
+
+# ── DiscoveryError tests ────────────────────────────────────────────
+
+
+class TestDiscoveryError:
+    def test_message(self) -> None:
+        err = DiscoveryError("something failed")
+        assert err.message == "something failed"
+        assert str(err) == "something failed"
+        assert err.cause is None
+
+    def test_with_cause(self) -> None:
+        cause = ValueError("root cause")
+        err = DiscoveryError("wrapped", cause=cause)
+        assert err.cause is cause
+        assert isinstance(err, Exception)
+
+
+# ── ConfluenceDiscoveryService init tests ────────────────────────────
+
+
+class TestServiceInit:
+    def test_takes_client(self) -> None:
+        client = MagicMock()
+        service = ConfluenceDiscoveryService(client)
+        assert service._client is client
