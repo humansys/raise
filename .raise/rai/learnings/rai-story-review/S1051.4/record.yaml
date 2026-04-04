@@ -1,0 +1,37 @@
+skill: rai-story-review
+work_id: S1051.4
+version: "2.4.0"
+timestamp: "2026-04-03T14:00:00Z"
+primed_patterns:
+  - PAT-E-595
+  - PAT-E-597
+  - PAT-E-598
+tier1_queries: 2
+tier1_results: 0
+tier1_note: "Graph index unavailable in worktree — 0 results across both queries"
+jit_queries: 0
+pattern_votes:
+  PAT-E-595:
+    vote: 1
+    why: "4 granular discovery methods confirmed — each distinct return type and error semantics"
+  PAT-E-597:
+    vote: 1
+    why: "TYPE_CHECKING guard preserved in V2 service — no runtime import issues"
+  PAT-E-598:
+    vote: 1
+    why: "_wrap_error logs cause via DiscoveryError.cause chain — no bare except"
+gaps:
+  - "Graph index missing in worktree — all tier1 queries return 0 (systemic across E1051)"
+artifacts:
+  - work/epics/e1051-confluence-adapter-v2/stories/s1051.4-retrospective.md
+  - .raise/rai/learnings/rai-story-review/S1051.4/record.yaml
+commit: null
+branch: story/s1051.4/confluence-discovery
+downstream:
+  new_patterns:
+    - PAT-E-711
+    - PAT-E-712
+  aggregate_metrics:
+    acceptance_rate: 0.75
+    gap_rate: 1.0
+    pattern_utility: 1.0
