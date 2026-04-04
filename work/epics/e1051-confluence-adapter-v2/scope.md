@@ -140,7 +140,7 @@ S1051.8 and S1051.9 can run in parallel after S1051.7.
 | 1 | S1051.1: Confluence client wrapper | M | pending | Risk-first — validates library | S1051.2, S1051.4 |
 | 2 | S1051.2: PythonApiConfluenceAdapter | M | pending | Walking skeleton — first E2E | S1051.4, S1051.5 |
 | 3 | S1051.4: Confluence discovery service | S | done | Unblocks doctor + generator | S1051.5, S1051.6 |
-| 4 | S1051.5: Adapter doctor (Confluence) | S | pending | High user-facing value | S1051.6 |
+| 4 | S1051.5: Adapter doctor (Confluence) | S | done | High user-facing value | S1051.6 |
 | 5 | S1051.6: Config generator skill | M | pending | Last — highest integration | Epic done |
 
 **Parallel:** S1051.1 and S1051.3 run concurrently (position 1).
