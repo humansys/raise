@@ -1,0 +1,34 @@
+skill: rai-story-implement
+work_id: S1051.4
+version: "2.4.0"
+timestamp: "2026-04-03T12:00:00"
+tasks_completed: 3
+tasks_planned: 3
+test_count: 36
+commits:
+  - hash: 00e7928b
+    task: T1
+    description: "Models + DiscoveryError + service skeleton"
+  - hash: d6b0fb4b
+    task: T2
+    description: "All service methods with full TDD"
+files_changed:
+  - packages/raise-cli/src/raise_cli/adapters/confluence_discovery.py
+  - packages/raise-cli/tests/adapters/test_confluence_discovery.py
+pattern_votes:
+  PAT-E-595:
+    vote: 1
+    why: "4 granular discovery methods confirmed — each has distinct return type and error semantics"
+  PAT-E-597:
+    vote: 1
+    why: "TYPE_CHECKING guard for ConfluenceClient preserved in V2 service. No runtime import issues."
+  PAT-E-598:
+    vote: 1
+    why: "_wrap_error logs cause via DiscoveryError.cause chain — no bare except swallowing"
+observations:
+  - "Pyright struggles with self-referential Pydantic BaseModel fields — needed pyright: ignore[reportUnknownVariableType] on PageNode.children despite model_rebuild()"
+  - "V1 ConfluenceDiscovery coexists cleanly — all 9 original tests pass unmodified"
+  - "Ruff SIM300 (Yoda condition) caught in test assertions — easy fix"
+  - "build_space_map uses get_page_by_id for homepage title — design didn't specify but client method exists"
+gaps: []
+branch: story/s1051.4/confluence-discovery
