@@ -6,9 +6,14 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+
 from raise_cli.schemas.session_state import SessionInfo
 from raise_cli.session.protocols import SessionRegistry
 from raise_cli.session.registry import LocalSessionRegistry
+
+# gc() emits DeprecationWarning since S1248.5 — suppress in these tests
+pytestmark = pytest.mark.filterwarnings("ignore::DeprecationWarning")
 
 
 class TestProtocolCompliance:

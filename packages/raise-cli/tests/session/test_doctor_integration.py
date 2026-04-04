@@ -135,10 +135,41 @@ class TestDoctorLifecycle:
 
         plan = doctor.classify(findings)
         assert len(plan.auto_clean) >= 1  # stale output
-        # retention is info severity → goes to info_only (not needs_consent)
-        assert len(plan.info_only) >= 1  # retention
+        assert len(plan.needs_consent) >= 1  # retention needs consent
 
         # Execute only auto — stale cleaned, dirs preserved
         doctor.execute(plan, consent={"auto"})
         assert not output.exists()
         assert len(list(sessions.iterdir())) == 23  # dirs untouched
+
+    def test_retention_execution_with_consent(self, tmp_path: Path) -> None:
+        """Retention cleanup removes oldest dirs when consent given."""
+        project = _setup_project(tmp_path)
+        personal = project / ".raise" / "rai" / "personal"
+        sessions = personal / "sessions"
+
+        # Create 23 dirs (limit is 20) — stagger mtime so oldest are deterministic
+        for i in range(23):
+            d = sessions / f"S-E-2603{i:02d}-1000"
+            d.mkdir()
+            # Older dirs get older mtime
+            mtime = time.time() - ((23 - i) * 3600)
+            os.utime(d, (mtime, mtime))
+
+        doctor = SessionDoctor(project)
+        findings = doctor.diagnose()
+        plan = doctor.classify(findings)
+
+        # Execute with retention consent
+        cleaned = doctor.execute(plan, consent={"retention"})
+        assert len(cleaned) == 1  # one "Removed N old session dirs" message
+
+        # 3 oldest should be gone, 20 remain
+        remaining = list(sessions.iterdir())
+        assert len(remaining) == 20
+
+        # The 3 oldest (S-E-260300, S-E-260301, S-E-260302) should be gone
+        remaining_names = {d.name for d in remaining}
+        assert "S-E-260300-1000" not in remaining_names
+        assert "S-E-260301-1000" not in remaining_names
+        assert "S-E-260302-1000" not in remaining_names

@@ -16,6 +16,9 @@ import pytest
 from raise_cli.schemas.session_state import SessionInfo, SessionOutcome
 from raise_cli.session.registry import LocalSessionRegistry
 
+# gc() emits DeprecationWarning since S1248.5 — suppress in these tests
+pytestmark = pytest.mark.filterwarnings("ignore::DeprecationWarning")
+
 
 @pytest.mark.integration
 class TestGcIntegration:

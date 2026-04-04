@@ -29,7 +29,7 @@ class Finding(BaseModel, frozen=True):
     """A single diagnostic finding from the Session Doctor.
 
     Attributes:
-        category: Issue type — zombie, stale_output, retention, derivation.
+        category: Issue type — zombie, stale_output, retention.
         severity: info, warning, or error.
         description: Human-readable summary.
         detail: Context — age, size, content preview.
@@ -120,9 +120,8 @@ class SessionDoctor:
         for f in findings:
             if f.safe_to_auto_clean:
                 auto_clean.append(f)
-            elif f.severity == "info":
-                info_only.append(f)
             else:
+                # Not safe to auto-clean → needs explicit consent
                 needs_consent.append(f)
 
         return ActionPlan(
