@@ -12,11 +12,12 @@ They live in CLAUDE.md as always-on content (ADR-012).
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from pathlib import Path
 
 from raise_cli.onboarding.profile import DeveloperProfile
-from raise_cli.schemas.session_state import SessionState
+from raise_cli.schemas.session_state import CurrentWork, SessionState
 from raise_core.graph.models import GraphNode
 
 from .bundle_data import (
@@ -42,6 +43,8 @@ from .bundle_formatters import (
     format_work_section,
 )
 
+_logger = logging.getLogger(__name__)
+
 # ---------------------------------------------------------------------------
 # Section registry and manifest
 # ---------------------------------------------------------------------------
@@ -54,6 +57,21 @@ _TOKENS_PER_ITEM: dict[str, int] = {
     "deadlines": 30,
     "progress": 40,
 }
+
+
+def derive_current_work(project_path: Path) -> CurrentWork | None:
+    """Try to derive current work from git. Returns None on failure.
+
+    Uses GitStateDeriver (ADR-038) to read branch, epic, story, and phase
+    from git state. Falls back gracefully — never raises.
+    """
+    try:
+        from raise_cli.session.derive import GitStateDeriver
+
+        return GitStateDeriver().current_work(project_path)
+    except Exception:
+        _logger.debug("Git state derivation failed — using YAML fallback", exc_info=True)
+        return None
 
 
 def _count_governance(project_path: Path) -> int:
@@ -230,12 +248,22 @@ def assemble_orientation(
     Returns:
         Plain text orientation context.
     """
+    # Derive current work from git (ADR-038); fallback to YAML state
+    try:
+        derived_work = derive_current_work(project_path)
+    except Exception:
+        _logger.debug("derive_current_work raised — using YAML fallback", exc_info=True)
+        derived_work = None
+
     # Resolve release context for current epic
+    epic_id = (
+        (derived_work.epic if derived_work else None)
+        or (state.current_work.epic if state else None)
+        or ""
+    )
     release_node: GraphNode | None = None
-    if state and state.current_work.epic:
-        release_node = find_release_for_current_epic(
-            project_path, state.current_work.epic
-        )
+    if epic_id:
+        release_node = find_release_for_current_epic(project_path, epic_id)
 
     # Session Context header
     parts: list[str] = [
@@ -256,7 +284,11 @@ def assemble_orientation(
     # Fetch live backlog status (never blocks — degrades gracefully)
     live = fetch_live_status(state)
 
-    parts.append(format_work_section(state, release_node=release_node, live=live))
+    parts.append(
+        format_work_section(
+            state, release_node=release_node, live=live, current_work=derived_work
+        )
+    )
 
     # Last session + recent sessions
     parts.append(format_last_session(state))

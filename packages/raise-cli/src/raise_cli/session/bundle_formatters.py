@@ -12,7 +12,7 @@ from datetime import date
 from pathlib import Path
 
 from raise_cli.onboarding.profile import DeveloperProfile
-from raise_cli.schemas.session_state import SessionState
+from raise_cli.schemas.session_state import CurrentWork, SessionState
 from raise_core.graph.models import GraphNode
 
 from .bundle_data import SESSIONS_INDEX_REL_PATH, LiveBacklogStatus, SectionManifest
@@ -46,10 +46,23 @@ def format_work_section(
     state: SessionState | None,
     release_node: GraphNode | None = None,
     live: LiveBacklogStatus | None = None,
+    current_work: CurrentWork | None = None,
 ) -> str:
-    """Format current work state with optional live backlog annotations."""
-    if state is None:
+    """Format current work state with optional live backlog annotations.
+
+    Args:
+        state: Session state from YAML (may be None).
+        release_node: Optional graph node for release context.
+        live: Optional live backlog status annotations.
+        current_work: Optional override for current_work — when provided,
+            takes precedence over state.current_work. Used by git-derived
+            state (S1248.3 / ADR-038).
+    """
+    if state is None and current_work is None:
         return "Work: (no previous session state)"
+
+    # Resolve current_work: override > state > empty
+    work = current_work or (state.current_work if state else CurrentWork())
 
     lines: list[str] = []
 
@@ -65,18 +78,18 @@ def format_work_section(
         lines.append(" ".join(release_parts))
 
     # Story line with optional live annotation
-    story_line = f"Story: {state.current_work.story} [{state.current_work.phase}]"
+    story_line = f"Story: {work.story} [{work.phase}]"
     if live and live.story_status:
         story_line += f" — {live.story_status} (live)"
     lines.append(story_line)
 
     # Epic line with optional live annotation
-    epic_line = f"Epic: {state.current_work.epic}"
+    epic_line = f"Epic: {work.epic}"
     if live and live.epic_status:
         epic_line += f" — {live.epic_status} (live)"
     lines.append(epic_line)
 
-    lines.append(f"Branch: {state.current_work.branch}")
+    lines.append(f"Branch: {work.branch}")
 
     # Warning line for degraded live status
     if live and live.warning:
