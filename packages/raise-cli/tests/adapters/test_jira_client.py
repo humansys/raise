@@ -357,7 +357,7 @@ class TestUpdateIssue:
         result = client.update_issue("RAISE-1", fields)
 
         assert result["key"] == "RAISE-1"
-        backend.update_issue.assert_called_once_with("RAISE-1", fields)
+        backend.update_issue.assert_called_once_with("RAISE-1", {"fields": fields})
 
     def test_error_mapped(self) -> None:
         from atlassian.errors import ApiNotFoundError
@@ -507,7 +507,7 @@ class TestSetParent:
         client.set_parent("RAISE-2", "RAISE-1")
 
         backend.update_issue.assert_called_once_with(
-            "RAISE-2", {"parent": {"key": "RAISE-1"}}
+            "RAISE-2", {"fields": {"parent": {"key": "RAISE-1"}}}
         )
 
 

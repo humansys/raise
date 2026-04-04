@@ -111,7 +111,7 @@ class JiraClient:
     def update_issue(self, key: str, fields: dict[str, Any]) -> dict[str, Any]:
         """Update an issue by key. Returns raw response dict."""
         try:
-            result: dict[str, Any] = self._client.update_issue(key, fields)  # type: ignore[no-untyped-call]
+            result: dict[str, Any] = self._client.update_issue(key, {"fields": fields})  # type: ignore[no-untyped-call]
             return result
         except JiraAdapterError:
             raise
