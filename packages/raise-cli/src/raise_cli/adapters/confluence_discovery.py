@@ -136,34 +136,120 @@ class ConfluenceDiscoveryService:
 
     def discover_spaces(self) -> list[SpaceInfo]:
         """List all accessible spaces."""
-        raise NotImplementedError
+        try:
+            return self._client.get_spaces()
+        except DiscoveryError:
+            raise
+        except Exception as e:
+            raise self._wrap_error(e, "discover_spaces") from e
 
     def discover_page_tree(
         self, space_key: str, max_depth: int = DEFAULT_MAX_DEPTH
     ) -> PageNode:
-        """Build recursive page tree from space homepage."""
-        raise NotImplementedError
+        """Build recursive page tree from space homepage.
+
+        Resolves homepage via client.get_space_homepage_id(),
+        then walks children recursively up to max_depth.
+        Labels are fetched per page during the walk.
+        """
+        try:
+            homepage_id = self._client.get_space_homepage_id(space_key)
+            if not homepage_id:
+                raise DiscoveryError(
+                    f"discover_page_tree({space_key}): space has no homepage"
+                )
+            homepage_page = self._client.get_page_by_id(homepage_id)
+            homepage_labels = self._client.get_labels(homepage_id)
+            root = PageNode(
+                id=homepage_id,
+                title=homepage_page.title,
+                labels=homepage_labels,
+                children=self._walk_children(homepage_id, depth=1, max_depth=max_depth),
+            )
+            return root
+        except DiscoveryError:
+            raise
+        except Exception as e:
+            raise self._wrap_error(e, f"discover_page_tree({space_key})") from e
 
     def discover_labels(self, page_ids: list[str]) -> dict[str, list[str]]:
-        """Get labels for a list of pages. Returns {page_id: [label, ...]}."""
-        raise NotImplementedError
+        """Get labels for a list of pages. Returns {page_id: [label, ...]}.
+
+        Missing or deleted pages return an empty list (graceful degradation).
+        """
+        try:
+            result: dict[str, list[str]] = {}
+            for page_id in page_ids:
+                try:
+                    result[page_id] = self._client.get_labels(page_id)
+                except ConfluenceNotFoundError:
+                    result[page_id] = []
+            return result
+        except DiscoveryError:
+            raise
+        except Exception as e:
+            raise self._wrap_error(e, "discover_labels") from e
 
     def build_space_map(
         self, space_key: str, max_depth: int = DEFAULT_MAX_DEPTH
     ) -> SpaceMap:
-        """Composite: space info + page tree + label index."""
-        raise NotImplementedError
+        """Composite: space info + page tree + label index.
+
+        1. Find space in discover_spaces() by key
+        2. Build page tree with labels
+        3. Build inverted label index from tree
+        """
+        try:
+            spaces = self.discover_spaces()
+            matched = [s for s in spaces if s.key == space_key]
+            if not matched:
+                raise DiscoveryError(f"build_space_map: space '{space_key}' not found")
+            space_info = matched[0]
+            tree = self.discover_page_tree(space_key, max_depth)
+            label_index = self._build_label_index(tree)
+            return SpaceMap(
+                space=space_info,
+                homepage_id=tree.id,
+                page_tree=tree,
+                label_index=label_index,
+            )
+        except DiscoveryError:
+            raise
+        except Exception as e:
+            raise self._wrap_error(e, f"build_space_map({space_key})") from e
 
     def _walk_children(
         self, page_id: str, depth: int, max_depth: int
     ) -> list[PageNode]:
         """Recursive child page walk with depth limit."""
-        raise NotImplementedError
+        if depth > max_depth:
+            return []
+        children_summaries = self._client.get_page_children(page_id)
+        nodes: list[PageNode] = []
+        for child in children_summaries:
+            labels = self._client.get_labels(child.id)
+            grandchildren = self._walk_children(child.id, depth + 1, max_depth)
+            nodes.append(
+                PageNode(
+                    id=child.id,
+                    title=child.title,
+                    labels=labels,
+                    children=grandchildren,
+                )
+            )
+        return nodes
 
     @staticmethod
     def _build_label_index(tree: PageNode) -> dict[str, list[str]]:
         """Build inverted index: label -> [page_id, ...] from tree."""
-        raise NotImplementedError
+        index: dict[str, list[str]] = {}
+        stack: list[PageNode] = [tree]
+        while stack:
+            node = stack.pop()
+            for label in node.labels:
+                index.setdefault(label, []).append(node.id)
+            stack.extend(node.children)
+        return index
 
     def _wrap_error(self, error: Exception, context: str) -> DiscoveryError:
         """Wrap any exception in DiscoveryError with context."""

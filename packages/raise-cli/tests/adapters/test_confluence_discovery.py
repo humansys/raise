@@ -260,3 +260,307 @@ class TestServiceInit:
         client = MagicMock()
         service = ConfluenceDiscoveryService(client)
         assert service._client is client
+
+
+# ── Helper: build a V2-capable mock client ──────────────────────────
+
+
+def _make_v2_client(
+    *,
+    spaces: list[SpaceInfo] | None = None,
+    homepage_ids: dict[str, str | None] | None = None,
+    children: dict[str, list[PageSummary]] | None = None,
+    labels: dict[str, list[str]] | None = None,
+    page_titles: dict[str, str] | None = None,
+) -> MagicMock:
+    """Build a mocked ConfluenceClient for V2 discovery service tests."""
+    client = MagicMock()
+    client.get_spaces.return_value = spaces or []
+
+    _homepage_ids = homepage_ids or {}
+    client.get_space_homepage_id.side_effect = lambda sk: _homepage_ids.get(sk)
+
+    _children = children or {}
+    client.get_page_children.side_effect = lambda pid: _children.get(pid, [])
+
+    _labels = labels or {}
+    client.get_labels.side_effect = lambda pid: _labels.get(pid, [])
+
+    _titles = page_titles or {}
+    client.get_page_by_id.side_effect = lambda pid: MagicMock(
+        title=_titles.get(pid, "")
+    )
+
+    return client
+
+
+# ── TestServiceDiscoverSpaces ────────────────────────────────────────
+
+
+class TestServiceDiscoverSpaces:
+    def test_delegates_to_client(self) -> None:
+        client = _make_v2_client(spaces=[SPACE_A, SPACE_B])
+        service = ConfluenceDiscoveryService(client)
+
+        result = service.discover_spaces()
+
+        assert len(result) == 2
+        assert result[0].key == "SPACEA"
+        client.get_spaces.assert_called_once()
+
+    def test_empty_returns_empty(self) -> None:
+        client = _make_v2_client(spaces=[])
+        service = ConfluenceDiscoveryService(client)
+
+        result = service.discover_spaces()
+
+        assert result == []
+
+    def test_wraps_client_error(self) -> None:
+        from raise_cli.adapters.confluence_exceptions import ConfluenceApiError
+
+        client = _make_v2_client()
+        client.get_spaces.side_effect = ConfluenceApiError("503 Service Unavailable")
+        service = ConfluenceDiscoveryService(client)
+
+        with pytest.raises(DiscoveryError, match="discover_spaces") as exc_info:
+            service.discover_spaces()
+
+        assert exc_info.value.cause is not None
+
+
+# ── TestServiceDiscoverPageTree ──────────────────────────────────────
+
+
+class TestServiceDiscoverPageTree:
+    def test_builds_tree_from_homepage(self) -> None:
+        client = _make_v2_client(
+            homepage_ids={"RaiSE1": "100"},
+            page_titles={"100": "Home"},
+            children={
+                "100": [
+                    PageSummary(id="101", title="ADR", url="", space_key="RaiSE1"),
+                    PageSummary(id="102", title="Roadmap", url="", space_key="RaiSE1"),
+                ]
+            },
+            labels={"100": [], "101": ["adr"], "102": ["roadmap"]},
+        )
+        service = ConfluenceDiscoveryService(client)
+
+        tree = service.discover_page_tree("RaiSE1", max_depth=1)
+
+        assert tree.id == "100"
+        assert tree.title == "Home"
+        assert len(tree.children) == 2
+        assert tree.children[0].id == "101"
+        assert tree.children[0].labels == ["adr"]
+        assert tree.children[1].id == "102"
+
+    def test_respects_max_depth(self) -> None:
+        """max_depth=1 means homepage + direct children, no grandchildren."""
+        client = _make_v2_client(
+            homepage_ids={"S": "1"},
+            page_titles={"1": "Root"},
+            children={
+                "1": [PageSummary(id="2", title="Child", url="", space_key="S")],
+                "2": [PageSummary(id="3", title="Grandchild", url="", space_key="S")],
+            },
+            labels={},
+        )
+        service = ConfluenceDiscoveryService(client)
+
+        tree = service.discover_page_tree("S", max_depth=1)
+
+        assert len(tree.children) == 1
+        assert tree.children[0].id == "2"
+        # Grandchildren should NOT be fetched at max_depth=1
+        assert tree.children[0].children == []
+
+    def test_recursive_depth_2(self) -> None:
+        """max_depth=2 gets grandchildren but not great-grandchildren."""
+        client = _make_v2_client(
+            homepage_ids={"S": "1"},
+            page_titles={"1": "Root"},
+            children={
+                "1": [PageSummary(id="2", title="Child", url="", space_key="S")],
+                "2": [PageSummary(id="3", title="Grandchild", url="", space_key="S")],
+                "3": [PageSummary(id="4", title="Great", url="", space_key="S")],
+            },
+            labels={},
+        )
+        service = ConfluenceDiscoveryService(client)
+
+        tree = service.discover_page_tree("S", max_depth=2)
+
+        assert tree.children[0].children[0].id == "3"
+        assert tree.children[0].children[0].children == []
+
+    def test_no_homepage_raises_discovery_error(self) -> None:
+        client = _make_v2_client(homepage_ids={"S": None})
+        service = ConfluenceDiscoveryService(client)
+
+        with pytest.raises(DiscoveryError, match="no homepage"):
+            service.discover_page_tree("S")
+
+    def test_wraps_api_error(self) -> None:
+        from raise_cli.adapters.confluence_exceptions import ConfluenceApiError
+
+        client = _make_v2_client()
+        client.get_space_homepage_id.side_effect = ConfluenceApiError("503")
+        service = ConfluenceDiscoveryService(client)
+
+        with pytest.raises(DiscoveryError, match="discover_page_tree") as exc_info:
+            service.discover_page_tree("S")
+
+        assert isinstance(exc_info.value.cause, ConfluenceApiError)
+
+
+# ── TestServiceDiscoverLabels ────────────────────────────────────────
+
+
+class TestServiceDiscoverLabels:
+    def test_returns_labels_per_page(self) -> None:
+        client = _make_v2_client(labels={"101": ["adr", "arch"], "102": ["roadmap"]})
+        service = ConfluenceDiscoveryService(client)
+
+        result = service.discover_labels(["101", "102"])
+
+        assert result == {"101": ["adr", "arch"], "102": ["roadmap"]}
+
+    def test_missing_page_returns_empty_list(self) -> None:
+        """Graceful degradation: missing/deleted pages get empty labels (S1)."""
+        client = _make_v2_client(labels={})
+        # Make get_labels raise ConfluenceNotFoundError for unknown pages
+        client.get_labels.side_effect = lambda pid: []
+        service = ConfluenceDiscoveryService(client)
+
+        result = service.discover_labels(["99999"])
+
+        assert result == {"99999": []}
+
+    def test_wraps_api_error(self) -> None:
+        from raise_cli.adapters.confluence_exceptions import ConfluenceApiError
+
+        client = _make_v2_client()
+        client.get_labels.side_effect = ConfluenceApiError("500")
+        service = ConfluenceDiscoveryService(client)
+
+        with pytest.raises(DiscoveryError, match="discover_labels"):
+            service.discover_labels(["101"])
+
+
+# ── TestServiceBuildSpaceMap ─────────────────────────────────────────
+
+
+class TestServiceBuildSpaceMap:
+    def test_composite_result(self) -> None:
+        client = _make_v2_client(
+            spaces=[SPACE_A],
+            homepage_ids={"SPACEA": "1000"},
+            page_titles={"1000": "Space A Home"},
+            children={
+                "1000": [
+                    PageSummary(id="1001", title="ADR", url="", space_key="SPACEA"),
+                ]
+            },
+            labels={"1000": [], "1001": ["adr", "architecture"]},
+        )
+        service = ConfluenceDiscoveryService(client)
+
+        result = service.build_space_map("SPACEA", max_depth=1)
+
+        assert isinstance(result, SpaceMap)
+        assert result.space.key == "SPACEA"
+        assert result.homepage_id == "1000"
+        assert result.page_tree.id == "1000"
+        assert len(result.page_tree.children) == 1
+        # Label index is inverted
+        assert result.label_index == {
+            "adr": ["1001"],
+            "architecture": ["1001"],
+        }
+
+    def test_nonexistent_space_raises_discovery_error(self) -> None:
+        client = _make_v2_client(spaces=[SPACE_A])
+        service = ConfluenceDiscoveryService(client)
+
+        with pytest.raises(DiscoveryError, match="NONEXISTENT.*not found"):
+            service.build_space_map("NONEXISTENT")
+
+    def test_label_index_from_multiple_pages(self) -> None:
+        """Label index collects page IDs across the tree."""
+        client = _make_v2_client(
+            spaces=[SPACE_A],
+            homepage_ids={"SPACEA": "1"},
+            page_titles={"1": "Home"},
+            children={
+                "1": [
+                    PageSummary(id="2", title="P2", url="", space_key="SPACEA"),
+                    PageSummary(id="3", title="P3", url="", space_key="SPACEA"),
+                ]
+            },
+            labels={"1": ["root"], "2": ["shared", "adr"], "3": ["shared"]},
+        )
+        service = ConfluenceDiscoveryService(client)
+
+        result = service.build_space_map("SPACEA", max_depth=1)
+
+        assert "shared" in result.label_index
+        assert set(result.label_index["shared"]) == {"2", "3"}
+        assert result.label_index["root"] == ["1"]
+        assert result.label_index["adr"] == ["2"]
+
+
+# ── TestBuildLabelIndex (static method) ──────────────────────────────
+
+
+class TestBuildLabelIndex:
+    def test_empty_tree(self) -> None:
+        tree = PageNode(id="1", title="Root")
+        index = ConfluenceDiscoveryService._build_label_index(tree)
+        assert index == {}
+
+    def test_single_level(self) -> None:
+        tree = PageNode(id="1", title="Root", labels=["a", "b"])
+        index = ConfluenceDiscoveryService._build_label_index(tree)
+        assert index == {"a": ["1"], "b": ["1"]}
+
+    def test_multi_level(self) -> None:
+        tree = PageNode(
+            id="1",
+            title="Root",
+            labels=["shared"],
+            children=[
+                PageNode(id="2", title="C1", labels=["shared", "unique"]),
+                PageNode(id="3", title="C2", labels=["other"]),
+            ],
+        )
+        index = ConfluenceDiscoveryService._build_label_index(tree)
+        assert set(index["shared"]) == {"1", "2"}
+        assert index["unique"] == ["2"]
+        assert index["other"] == ["3"]
+
+
+# ── TestWrapError ────────────────────────────────────────────────────
+
+
+class TestWrapError:
+    def test_wraps_generic_exception(self) -> None:
+        client = MagicMock()
+        service = ConfluenceDiscoveryService(client)
+        cause = RuntimeError("boom")
+
+        result = service._wrap_error(cause, "test_context")
+
+        assert isinstance(result, DiscoveryError)
+        assert result.message == "test_context: boom"
+        assert result.cause is cause
+
+    def test_passes_through_discovery_error(self) -> None:
+        client = MagicMock()
+        service = ConfluenceDiscoveryService(client)
+        original = DiscoveryError("already wrapped")
+
+        result = service._wrap_error(original, "context")
+
+        assert result is original
