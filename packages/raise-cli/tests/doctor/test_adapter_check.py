@@ -193,3 +193,161 @@ class TestLiveHealthChecks:
         health_results = [r for r in results if "health" in r.check_id]
         for r in health_results:
             assert r.status == CheckStatus.ERROR
+
+
+# ── T4: Confluence space existence checks (S1051.5/T1) ────────────
+
+
+def _setup_confluence_config(
+    tmp_path: Path, *, routing: dict[str, dict[str, object]] | None = None
+) -> None:
+    """Create a valid multi-instance confluence.yaml for online tests."""
+    import yaml
+
+    routing_block = routing or {}
+    data = {
+        "default_instance": "default",
+        "instances": {
+            "default": {
+                "url": "https://test.atlassian.net/wiki",
+                "space_key": "TEST",
+                "instance_name": "default",
+                "routing": routing_block,
+            }
+        },
+    }
+    raise_dir = tmp_path / ".raise"
+    raise_dir.mkdir(exist_ok=True)
+    (raise_dir / "confluence.yaml").write_text(yaml.dump(data))
+    # Also create jira.yaml to avoid early exit
+    (raise_dir / "jira.yaml").write_text("default_instance: test\n")
+
+
+class TestConfluenceSpaceCheck:
+    """Online space existence checks — S1051.5/T1."""
+
+    def test_space_exists_passes(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Space found on instance produces PASS."""
+        from unittest.mock import MagicMock, patch
+
+        _setup_confluence_config(tmp_path)
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.return_value = MagicMock()
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=MagicMock(),
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        space_results = [
+            r for r in results if r.check_id == "adapter-confluence-space-exists"
+        ]
+        assert len(space_results) == 1
+        assert space_results[0].status == CheckStatus.PASS
+        assert "TEST" in space_results[0].message
+
+    def test_space_missing_errors_with_available(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Missing space produces ERROR with available spaces in message."""
+        from unittest.mock import MagicMock, patch
+
+        from raise_cli.adapters.confluence_exceptions import ConfluenceNotFoundError
+
+        _setup_confluence_config(tmp_path)
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.side_effect = ConfluenceNotFoundError(
+            "Space 'TEST' not found. Available: RaiSE1, DEMO"
+        )
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=MagicMock(),
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        space_results = [
+            r for r in results if r.check_id == "adapter-confluence-space-exists"
+        ]
+        assert len(space_results) == 1
+        assert space_results[0].status == CheckStatus.ERROR
+        assert "TEST" in space_results[0].message
+        assert space_results[0].fix_hint is not None
+        assert "Available" in space_results[0].fix_hint
+
+    def test_discovery_exception_errors_with_hint(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Generic discovery exception produces ERROR with connectivity hint."""
+        from unittest.mock import MagicMock, patch
+
+        _setup_confluence_config(tmp_path)
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.side_effect = ConnectionError("timeout")
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=MagicMock(),
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        space_results = [
+            r for r in results if r.check_id == "adapter-confluence-space-exists"
+        ]
+        assert len(space_results) == 1
+        assert space_results[0].status == CheckStatus.ERROR
+        assert "connectivity" in (space_results[0].fix_hint or "").lower()
+
+    def test_offline_skips_space_check(self, tmp_path: Path) -> None:
+        """Offline mode does not produce space check results."""
+        _setup_confluence_config(tmp_path)
+        ctx = _make_context(tmp_path, online=False)
+        check = AdapterDoctorCheck()
+        results = check.evaluate(ctx)
+        space_results = [r for r in results if "space" in r.check_id]
+        assert len(space_results) == 0

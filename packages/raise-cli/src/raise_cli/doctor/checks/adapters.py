@@ -56,6 +56,9 @@ class AdapterDoctorCheck:
                 self._check_jira_health(results, context.working_dir)
             if conf_exists:
                 self._check_confluence_health(results, context.working_dir)
+                _space_ok = self._check_confluence_space_exists(
+                    results, context.working_dir
+                )
 
         return results
 
@@ -214,6 +217,70 @@ class AdapterDoctorCheck:
                     fix_hint="Check JIRA_API_TOKEN and network connectivity",
                 )
             )
+
+    def _check_confluence_space_exists(
+        self, results: list[CheckResult], working_dir: Path
+    ) -> bool:
+        """Check configured space_key exists on instance. Returns True if found."""
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+        from raise_cli.adapters.confluence_config import load_confluence_config
+        from raise_cli.adapters.confluence_discovery import ConfluenceDiscovery
+        from raise_cli.adapters.confluence_exceptions import ConfluenceNotFoundError
+
+        try:
+            config = load_confluence_config(working_dir)
+            inst = config.instances[config.default_instance]
+        except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+            logger.debug("Confluence config load failed for space check", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence space validation failed: {exc}",
+                    fix_hint="Check Confluence connectivity and credentials",
+                )
+            )
+            return False
+
+        space_key = inst.space_key
+        try:
+            client = ConfluenceClient(inst)
+            discovery = ConfluenceDiscovery(client)
+            discovery.discover(space_key=space_key)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.PASS,
+                    message=f"Confluence space '{space_key}' exists",
+                )
+            )
+            return True
+        except ConfluenceNotFoundError as exc:
+            logger.debug("Confluence space check failed", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence space '{space_key}' not found on instance",
+                    fix_hint=f"Check space_key in .raise/confluence.yaml — {exc.message}",
+                )
+            )
+            return False
+        except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+            logger.debug("Confluence space validation failed", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence space validation failed: {exc}",
+                    fix_hint="Check Confluence connectivity and credentials",
+                )
+            )
+            return False
 
     def _check_confluence_health(
         self, results: list[CheckResult], working_dir: Path
