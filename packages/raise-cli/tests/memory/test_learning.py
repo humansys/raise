@@ -174,6 +174,31 @@ class TestWriteRecord:
         assert data["primed_patterns"] == ["PAT-001"]
         assert data["pattern_votes"]["PAT-001"]["vote"] == 1
 
+    def test_write_normalizes_work_id_to_uppercase(self, tmp_path: Path) -> None:
+        """write_record with lowercase work_id creates uppercase directory (RAISE-1278)."""
+        record = LearningRecord(
+            skill="rai-story-design",
+            work_id="s1051.6",
+            version="2.4.0",
+            timestamp=datetime(2026, 4, 1, 9, 15, 0, tzinfo=timezone.utc),
+        )
+        result_path = write_record(record, tmp_path)
+        expected = tmp_path / ".raise" / "rai" / "learnings" / "rai-story-design" / "S1051.6" / "record.yaml"
+        assert result_path == expected
+        # work_id in the model should also be normalized
+        data = yaml.safe_load(result_path.read_text(encoding="utf-8"))
+        assert data["work_id"] == "S1051.6"
+
+    def test_model_normalizes_work_id_on_construction(self) -> None:
+        """LearningRecord normalizes work_id to uppercase at construction (RAISE-1278)."""
+        record = LearningRecord(
+            skill="rai-story-design",
+            work_id="s1051.6",
+            version="2.4.0",
+            timestamp=datetime(2026, 4, 1, 9, 15, 0, tzinfo=timezone.utc),
+        )
+        assert record.work_id == "S1051.6"
+
     def test_overwrites_existing(self, tmp_path: Path) -> None:
         """Rework overwrites existing record."""
         record1 = LearningRecord(
@@ -229,6 +254,20 @@ class TestReadRecord:
 
         assert loaded is not None
         assert loaded == original
+
+    def test_read_normalizes_work_id_casing(self, tmp_path: Path) -> None:
+        """read_record with lowercase work_id finds uppercase record (RAISE-1278)."""
+        original = LearningRecord(
+            skill="rai-story-design",
+            work_id="S1051.6",
+            version="2.4.0",
+            timestamp=datetime(2026, 4, 1, 9, 15, 0, tzinfo=timezone.utc),
+        )
+        write_record(original, tmp_path)
+        # Read with lowercase — should find the uppercase record
+        loaded = read_record("rai-story-design", "s1051.6", tmp_path)
+        assert loaded is not None
+        assert loaded.work_id == "S1051.6"
 
     def test_returns_none_on_corrupted_file(self, tmp_path: Path) -> None:
         """read_record returns None for corrupted YAML."""

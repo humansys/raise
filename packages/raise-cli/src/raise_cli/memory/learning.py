@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +42,12 @@ class LearningRecord(BaseModel):
     skill: str
     work_id: str
     version: str
+
+    @field_validator("work_id")
+    @classmethod
+    def _normalize_work_id(cls, v: str) -> str:
+        """Normalize work_id to uppercase to prevent duplicate directories (RAISE-1278)."""
+        return v.upper()
     timestamp: datetime
     primed_patterns: list[str] = Field(default_factory=list)
     tier1_queries: int = Field(default=0, ge=0)
@@ -99,6 +105,7 @@ def read_record(skill: str, work_id: str, base_dir: Path) -> LearningRecord | No
     Returns:
         LearningRecord if found and valid, None otherwise.
     """
+    work_id = work_id.upper()  # Normalize casing (RAISE-1278)
     record_path = (
         base_dir / ".raise" / "rai" / "learnings" / skill / work_id / "record.yaml"
     )
