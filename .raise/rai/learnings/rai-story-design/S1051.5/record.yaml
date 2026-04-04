@@ -12,6 +12,8 @@ gaps:
 artifacts:
   - "work/epics/e1051-confluence-adapter-v2/stories/s1051.5-design.md"
   - ".raise/artifacts/s1051.5-design.yaml"
-commit: null
+commit: be92f09b
 branch: "story/s1051.5/adapter-doctor-confluence"
-downstream: {}
+downstream:
+  plan_derivable: true
+  tasks_clear: true
