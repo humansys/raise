@@ -1,0 +1,23 @@
+skill: rai-epic-close
+work_id: E1248
+version: "2.4.0"
+timestamp: "2026-04-03T23:45:00Z"
+primed_patterns: []
+tier1_queries: 1
+tier1_results: 1
+jit_queries: 0
+pattern_votes: {}
+gaps:
+  - "58% learning record loss across epic — autonomous mode and multi-session gaps"
+  - "Pattern ID conflicts on merge — patterns.jsonl needs auto-increment or UUID"
+artifacts:
+  - "work/epics/e1248-git-first-session-state/retrospective.md"
+commit: null
+branch: "release/2.4.0"
+downstream:
+  enables:
+    - "RAISE-1229: Server-Backed State Management (v3.0)"
+  learning_chain:
+    records_found: 7
+    records_missing: 10
+    record_rate: "41%"

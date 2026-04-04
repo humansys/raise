@@ -111,6 +111,12 @@ local = "raise_core.graph.backends.filesystem:FilesystemGraphBackend"
 [project.entry-points."rai.session.state_deriver"]
 git = "raise_cli.session.derive:GitStateDeriver"
 
+[project.entry-points."rai.session.registry"]
+local = "raise_cli.session.registry:LocalSessionRegistry"
+
+[project.entry-points."rai.session.monitor"]
+local = "raise_cli.session.monitor:LocalWorkstreamMonitor"
+
 [tool.uv.sources]
 raise-core = { workspace = true }
 

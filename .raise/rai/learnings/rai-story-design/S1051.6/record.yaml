@@ -1,0 +1,30 @@
+skill: rai-story-design
+work_id: S1051.6
+version: "2.4.0"
+timestamp: 2026-04-03T10:00:00Z
+primed_patterns:
+  - PAT-E-589
+  - PAT-E-593
+  - PAT-E-594
+tier1_queries: 3
+tier1_results: 0
+jit_queries: 0
+pattern_votes:
+  PAT-E-589:
+    vote: 0
+    why: "Not directly relevant — config gen doesn't use module-level Path constants as test seams"
+  PAT-E-593:
+    vote: 0
+    why: "CQL search gotchas not relevant to config gen (no search involved)"
+  PAT-E-594:
+    vote: 1
+    why: "Reinforces that generated config is env-specific; write_confluence_config writes to .raise/ which is committed — routing is project-level, not env-specific, so this is correct"
+gaps:
+  - "Graph index unavailable in worktree — tier1 queries returned 0 results due to missing .raise/rai/memory/index.json"
+  - "No existing test file for confluence_config_gen to compare patterns against (only Jira gen tests exist)"
+artifacts:
+  - work/epics/e1051-confluence-adapter-v2/stories/s1051.6-design.md
+  - .raise/artifacts/s1051.6-design.yaml
+commit: null
+branch: story/s1051.6/config-generator-confluence
+downstream: {}

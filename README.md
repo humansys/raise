@@ -54,7 +54,7 @@ This single command will:
 - **Detect your situation** (new developer, returning developer, etc.)
 - **Create your profile** (`~/.rai/developer.yaml`) with your name and pattern prefix
 - **Build the knowledge graph** so Rai has project context
-- **Scaffold `CLAUDE.local.md`** for your personal Claude Code instructions
+- **Set up session context** (derived from git automatically)
 - **Optionally customize** communication preferences (language, style)
 - **Verify everything works**
 

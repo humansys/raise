@@ -1,0 +1,24 @@
+skill: rai-story-review
+work_id: S1248.5
+version: "2.4.0"
+timestamp: "2026-04-03T23:15:00Z"
+primed_patterns:
+  - "PAT-E-709"
+  - "PAT-E-592"
+tier1_queries: 1
+tier1_results: 1
+jit_queries: 0
+pattern_votes:
+  PAT-E-709:
+    vote: 1
+    why: "Instance methods on SessionDoctor used as test seams — _check_zombie, _check_stale_output testable via diagnose()"
+  PAT-E-592:
+    vote: 1
+    why: "QR/AR phase caught classify() bug — validates buffer time for review"
+gaps:
+  - "No LEARN record from rai-story-implement — autonomous mode skipped it"
+artifacts:
+  - "work/epics/e1248-git-first-session-state/stories/s1248.5-retrospective.md"
+commit: null
+branch: "story/s1248.5/session-doctor"
+downstream: {}

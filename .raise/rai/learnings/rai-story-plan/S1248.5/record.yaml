@@ -1,0 +1,21 @@
+skill: rai-story-plan
+work_id: S1248.5
+version: "2.4.0"
+timestamp: "2026-04-03T22:30:00Z"
+primed_patterns:
+  - "/rai-doctor"
+  - "guardrail-must-arch-002"
+tier1_queries: 3
+tier1_results: 3
+jit_queries: 0
+pattern_votes:
+  PAT-E-709:
+    vote: 1
+    why: "Instance methods as test seams — will reuse for doctor testing with registry internals"
+gaps:
+  - "No existing pattern for consent-based CLI operations — Session Doctor introduces this"
+artifacts:
+  - "work/epics/e1248-git-first-session-state/stories/s1248.5-plan.md"
+commit: null
+branch: "story/s1248.5/session-doctor"
+downstream: {}

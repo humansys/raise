@@ -90,7 +90,7 @@ Report: "Found {N} projects: {list of project keys}"
 ```python
 from raise_cli.adapters.confluence_client import ConfluenceClient
 from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
-from raise_cli.adapters.confluence_discovery import ConfluenceDiscovery
+from raise_cli.adapters.confluence_discovery import ConfluenceDiscoveryService
 
 inst = ConfluenceInstanceConfig(
     instance_name="default",
@@ -98,13 +98,23 @@ inst = ConfluenceInstanceConfig(
     space_key="",  # discovery doesn't need this
 )
 client = ConfluenceClient(inst)
-discovery = ConfluenceDiscovery(client)
-space_map = discovery.discover()
+discovery = ConfluenceDiscoveryService(client)
+spaces = discovery.discover_spaces()
 ```
 
-Report: "Found {N} spaces: {list of space keys}"
+Report: "Found {N} spaces: {list of space keys with names}"
 
 **Question 3 (Confluence):** "Which space to use? [space key]"
+
+Optionally, discover the page tree for routing suggestions:
+
+```python
+page_tree = discovery.discover_page_tree(selected_space)
+from raise_cli.adapters.confluence_config_gen import suggest_routing
+routing_suggestions = suggest_routing(page_tree)
+```
+
+Show suggestions to the user and let them confirm or customize.
 
 ### Step 3: Generate Config
 
@@ -130,9 +140,11 @@ JiraConfig.model_validate(config_dict)
 from raise_cli.adapters.confluence_config_gen import generate_confluence_config
 
 config_dict = generate_confluence_config(
-    space_map=space_map,
+    spaces=spaces,
     selected_space=selected_space,
-    instance_url=instance_url,
+    instance_url=f"https://{site}/wiki",
+    instance_name=instance_name,  # e.g. site subdomain or "default"
+    routing=routing_suggestions,  # from suggest_routing(), or None for defaults
 )
 
 # Validate
@@ -151,11 +163,19 @@ print(yaml.dump(config_dict, default_flow_style=False, sort_keys=False))
 
 **Question 4:** "Write this config to .raise/{adapter}.yaml? [y/n]"
 
-If yes, write the file:
+If yes, write the file. For Confluence, use the dedicated writer:
 
 ```python
+from raise_cli.adapters.confluence_config_gen import write_confluence_config
 from pathlib import Path
-config_path = Path(".raise") / f"{adapter}.yaml"
+
+write_confluence_config(config_dict, project_root=Path("."), overwrite=confirmed_overwrite)
+```
+
+For Jira, write directly:
+
+```python
+config_path = Path(".raise") / "jira.yaml"
 config_path.parent.mkdir(parents=True, exist_ok=True)
 with open(config_path, "w") as f:
     yaml.dump(config_dict, f, default_flow_style=False, sort_keys=False)

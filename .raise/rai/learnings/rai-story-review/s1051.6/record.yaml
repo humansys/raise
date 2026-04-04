@@ -1,0 +1,24 @@
+skill: rai-story-review
+work_id: s1051.6
+version: "2.4.0"
+timestamp: "2026-04-03T18:00:00Z"
+primed_patterns:
+  - PAT-E-593
+  - PAT-E-594
+  - PAT-E-597
+  - PAT-E-712
+tier1_queries: 2
+tier1_results: 0
+jit_queries: 0
+pattern_votes:
+  PAT-E-594: {vote: 1, why: "write_confluence_config writes to .raise/ — env-specific files must be gitignored"}
+  PAT-E-597: {vote: 1, why: "module uses future annotations — verified runtime imports match"}
+  PAT-E-712: {vote: 1, why: "V1/V2 coexistence — replaced function in-place with new signature"}
+gaps:
+  - "Graph index unavailable in worktree — tier1 queries returned errors"
+artifacts:
+  - "work/epics/e1051-confluence-adapter-v2/stories/s1051.6-retrospective.md"
+  - ".raise/rai/learnings/rai-story-review/s1051.6/record.yaml"
+commit: 46b42aac
+branch: "story/s1051.6/config-generator-confluence"
+downstream: {}

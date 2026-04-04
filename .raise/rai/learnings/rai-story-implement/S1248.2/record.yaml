@@ -1,0 +1,25 @@
+skill: rai-story-implement
+work_id: S1248.2
+version: "2.4.0"
+timestamp: "2026-04-03T20:30:00Z"
+primed_patterns:
+  - PAT-E-709
+tier1_queries: 0
+tier1_results: 0
+jit_queries: 0
+pattern_votes:
+  PAT-E-709:
+    vote: 1
+    why: "Facade delegates to existing functions — same principle of clean test seams"
+gaps:
+  - "No graph available during implementation"
+  - "Timezone naive/aware mixing in ActiveSessionPointer (documented, not fixed)"
+artifacts:
+  - packages/raise-cli/src/raise_cli/session/registry.py
+  - packages/raise-cli/tests/session/test_registry.py
+  - packages/raise-cli/tests/session/test_registry_integration.py
+  - packages/raise-cli/tests/adapters/test_registry_session.py
+  - packages/raise-cli/pyproject.toml
+commit: ceaaf1b9
+branch: story/s1248.2/session-registry-lifecycle-gc
+downstream: {}

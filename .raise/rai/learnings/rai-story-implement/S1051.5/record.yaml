@@ -1,0 +1,17 @@
+skill: rai-story-implement
+work_id: S1051.5
+version: "2.4.0"
+timestamp: "2026-04-03T12:00:00Z"
+primed_patterns: []
+tier1_queries: 0
+tier1_results: 0
+jit_queries: 0
+pattern_votes: {}
+gaps:
+  - "Patching locally-imported names requires patching at source module, not at consumer module — pyright caught the unbound variable before runtime"
+artifacts:
+  - "packages/raise-cli/src/raise_cli/doctor/checks/adapters.py"
+  - "packages/raise-cli/tests/doctor/test_adapter_check.py"
+commit: c0ad066f
+branch: story/s1051.5/adapter-doctor-confluence
+downstream: {}

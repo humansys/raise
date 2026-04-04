@@ -56,6 +56,11 @@ class AdapterDoctorCheck:
                 self._check_jira_health(results, context.working_dir)
             if conf_exists:
                 self._check_confluence_health(results, context.working_dir)
+                space_ok = self._check_confluence_space_exists(
+                    results, context.working_dir
+                )
+                if space_ok:
+                    self._check_confluence_routing_parents(results, context.working_dir)
 
         return results
 
@@ -214,6 +219,146 @@ class AdapterDoctorCheck:
                     fix_hint="Check JIRA_API_TOKEN and network connectivity",
                 )
             )
+
+    def _check_confluence_space_exists(
+        self, results: list[CheckResult], working_dir: Path
+    ) -> bool:
+        """Check configured space_key exists on instance. Returns True if found."""
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+        from raise_cli.adapters.confluence_config import load_confluence_config
+        from raise_cli.adapters.confluence_discovery import ConfluenceDiscovery
+        from raise_cli.adapters.confluence_exceptions import ConfluenceNotFoundError
+
+        try:
+            config = load_confluence_config(working_dir)
+            inst = config.instances[config.default_instance]
+        except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+            logger.debug("Confluence config load failed for space check", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence space validation failed: {exc}",
+                    fix_hint="Check Confluence connectivity and credentials",
+                )
+            )
+            return False
+
+        space_key = inst.space_key
+        try:
+            client = ConfluenceClient(inst)
+            discovery = ConfluenceDiscovery(client)
+            discovery.discover(space_key=space_key)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.PASS,
+                    message=f"Confluence space '{space_key}' exists",
+                )
+            )
+            return True
+        except ConfluenceNotFoundError as exc:
+            logger.debug("Confluence space check failed", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence space '{space_key}' not found on instance",
+                    fix_hint=f"Check space_key in .raise/confluence.yaml — {exc.message}",
+                )
+            )
+            return False
+        except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+            logger.debug("Confluence space validation failed", exc_info=True)
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-space-exists",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence space validation failed: {exc}",
+                    fix_hint="Check Confluence connectivity and credentials",
+                )
+            )
+            return False
+
+    def _check_confluence_routing_parents(
+        self, results: list[CheckResult], working_dir: Path
+    ) -> None:
+        """Check each routing parent page exists in the configured space."""
+        from raise_cli.adapters.confluence_client import ConfluenceClient
+        from raise_cli.adapters.confluence_config import load_confluence_config
+
+        try:
+            config = load_confluence_config(working_dir)
+            inst = config.instances[config.default_instance]
+            client = ConfluenceClient(inst)
+        except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+            logger.debug(
+                "Confluence config load failed for routing check", exc_info=True
+            )
+            results.append(
+                CheckResult(
+                    check_id="adapter-confluence-routing-parent",
+                    category="adapters",
+                    status=CheckStatus.ERROR,
+                    message=f"Confluence routing validation failed: {exc}",
+                    fix_hint="Check Confluence connectivity and credentials",
+                )
+            )
+            return
+
+        for artifact_type, routing in inst.routing.items():
+            check_id = f"adapter-confluence-routing-parent-{artifact_type}"
+            try:
+                page = client.get_page_by_title(
+                    routing.parent_title, space=inst.space_key
+                )
+                if page:
+                    results.append(
+                        CheckResult(
+                            check_id=check_id,
+                            category="adapters",
+                            status=CheckStatus.PASS,
+                            message=(
+                                f"Routing parent page '{routing.parent_title}' "
+                                f"exists (artifact type: {artifact_type})"
+                            ),
+                        )
+                    )
+                else:
+                    results.append(
+                        CheckResult(
+                            check_id=check_id,
+                            category="adapters",
+                            status=CheckStatus.ERROR,
+                            message=(
+                                f"Routing parent page '{routing.parent_title}' "
+                                f"not found in space '{inst.space_key}'"
+                            ),
+                            fix_hint=(
+                                f"Create page '{routing.parent_title}' in space "
+                                f"{inst.space_key}, or update routing in confluence.yaml"
+                            ),
+                        )
+                    )
+            except Exception as exc:  # noqa: BLE001 — doctor checks must not crash
+                logger.debug(
+                    "Routing parent check failed for %s", artifact_type, exc_info=True
+                )
+                results.append(
+                    CheckResult(
+                        check_id=check_id,
+                        category="adapters",
+                        status=CheckStatus.ERROR,
+                        message=(
+                            f"Routing parent check failed for '{artifact_type}': {exc}"
+                        ),
+                        fix_hint="Check Confluence connectivity and credentials",
+                    )
+                )
 
     def _check_confluence_health(
         self, results: list[CheckResult], working_dir: Path
