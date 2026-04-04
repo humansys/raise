@@ -66,7 +66,7 @@ Each has a git-only community backend (2.4) and a server backend (3.0, RAISE-122
 | S1248.1 | Session protocols + GitStateDeriver | M | — | FM-7, FM-6, FM-1 | ✓ |
 | S1248.2 | SessionRegistry + lifecycle gc | M | S1248.1 | FM-2, FM-3, FM-4 | ✓ |
 | S1248.3 | Bundle integration + CLAUDE.local.md kill | M | S1248.1 | FM-5, FM-7 | ✓ |
-| S1248.4 | WorkstreamMonitor basics | S | S1248.2 | — (kaizen) |
+| S1248.4 | WorkstreamMonitor basics | S | S1248.2 | — (kaizen) | ✓ |
 | S1248.5 | Dogfood + stabilize | S | S1248.3 | All (validation) |
 
 ### S1248.1: Session Protocols + GitStateDeriver
