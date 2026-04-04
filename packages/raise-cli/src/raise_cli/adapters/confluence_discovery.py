@@ -141,7 +141,7 @@ class ConfluenceDiscoveryService:
         except DiscoveryError:
             raise
         except Exception as e:
-            raise self._wrap_error(e, "discover_spaces") from e
+            raise self.wrap_error(e, "discover_spaces") from e
 
     def discover_page_tree(
         self, space_key: str, max_depth: int = DEFAULT_MAX_DEPTH
@@ -170,7 +170,7 @@ class ConfluenceDiscoveryService:
         except DiscoveryError:
             raise
         except Exception as e:
-            raise self._wrap_error(e, f"discover_page_tree({space_key})") from e
+            raise self.wrap_error(e, f"discover_page_tree({space_key})") from e
 
     def discover_labels(self, page_ids: list[str]) -> dict[str, list[str]]:
         """Get labels for a list of pages. Returns {page_id: [label, ...]}.
@@ -188,7 +188,7 @@ class ConfluenceDiscoveryService:
         except DiscoveryError:
             raise
         except Exception as e:
-            raise self._wrap_error(e, "discover_labels") from e
+            raise self.wrap_error(e, "discover_labels") from e
 
     def build_space_map(
         self, space_key: str, max_depth: int = DEFAULT_MAX_DEPTH
@@ -206,7 +206,7 @@ class ConfluenceDiscoveryService:
                 raise DiscoveryError(f"build_space_map: space '{space_key}' not found")
             space_info = matched[0]
             tree = self.discover_page_tree(space_key, max_depth)
-            label_index = self._build_label_index(tree)
+            label_index = self.build_label_index(tree)
             return SpaceMap(
                 space=space_info,
                 homepage_id=tree.id,
@@ -216,7 +216,7 @@ class ConfluenceDiscoveryService:
         except DiscoveryError:
             raise
         except Exception as e:
-            raise self._wrap_error(e, f"build_space_map({space_key})") from e
+            raise self.wrap_error(e, f"build_space_map({space_key})") from e
 
     def _walk_children(
         self, page_id: str, depth: int, max_depth: int
@@ -240,7 +240,7 @@ class ConfluenceDiscoveryService:
         return nodes
 
     @staticmethod
-    def _build_label_index(tree: PageNode) -> dict[str, list[str]]:
+    def build_label_index(tree: PageNode) -> dict[str, list[str]]:
         """Build inverted index: label -> [page_id, ...] from tree."""
         index: dict[str, list[str]] = {}
         stack: list[PageNode] = [tree]
@@ -251,7 +251,7 @@ class ConfluenceDiscoveryService:
             stack.extend(node.children)
         return index
 
-    def _wrap_error(self, error: Exception, context: str) -> DiscoveryError:
+    def wrap_error(self, error: Exception, context: str) -> DiscoveryError:
         """Wrap any exception in DiscoveryError with context."""
         if isinstance(error, DiscoveryError):
             return error

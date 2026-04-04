@@ -259,7 +259,9 @@ class TestServiceInit:
     def test_takes_client(self) -> None:
         client = MagicMock()
         service = ConfluenceDiscoveryService(client)
-        assert service._client is client
+        # Verify service works with the client by calling a method
+        client.get_spaces.return_value = []
+        assert service.discover_spaces() == []
 
 
 # ── Helper: build a V2-capable mock client ──────────────────────────
@@ -277,19 +279,33 @@ def _make_v2_client(
     client = MagicMock()
     client.get_spaces.return_value = spaces or []
 
-    _homepage_ids = homepage_ids or {}
-    client.get_space_homepage_id.side_effect = lambda sk: _homepage_ids.get(sk)
+    _homepage_ids: dict[str, str | None] = homepage_ids or {}
 
-    _children = children or {}
-    client.get_page_children.side_effect = lambda pid: _children.get(pid, [])
+    def _get_homepage(sk: str) -> str | None:
+        return _homepage_ids.get(sk)
 
-    _labels = labels or {}
-    client.get_labels.side_effect = lambda pid: _labels.get(pid, [])
+    client.get_space_homepage_id.side_effect = _get_homepage
 
-    _titles = page_titles or {}
-    client.get_page_by_id.side_effect = lambda pid: MagicMock(
-        title=_titles.get(pid, "")
-    )
+    _children: dict[str, list[PageSummary]] = children or {}
+
+    def _get_children(pid: str) -> list[PageSummary]:
+        return _children.get(pid, [])
+
+    client.get_page_children.side_effect = _get_children
+
+    _labels: dict[str, list[str]] = labels or {}
+
+    def _get_labels(pid: str) -> list[str]:
+        return _labels.get(pid, [])
+
+    client.get_labels.side_effect = _get_labels
+
+    _titles: dict[str, str] = page_titles or {}
+
+    def _get_page(pid: str) -> MagicMock:
+        return MagicMock(title=_titles.get(pid, ""))
+
+    client.get_page_by_id.side_effect = _get_page
 
     return client
 
@@ -430,8 +446,12 @@ class TestServiceDiscoverLabels:
     def test_missing_page_returns_empty_list(self) -> None:
         """Graceful degradation: missing/deleted pages get empty labels (S1)."""
         client = _make_v2_client(labels={})
+
         # Make get_labels raise ConfluenceNotFoundError for unknown pages
-        client.get_labels.side_effect = lambda pid: []
+        def _empty_labels(_pid: str) -> list[str]:
+            return []
+
+        client.get_labels.side_effect = _empty_labels
         service = ConfluenceDiscoveryService(client)
 
         result = service.discover_labels(["99999"])
@@ -517,12 +537,12 @@ class TestServiceBuildSpaceMap:
 class TestBuildLabelIndex:
     def test_empty_tree(self) -> None:
         tree = PageNode(id="1", title="Root")
-        index = ConfluenceDiscoveryService._build_label_index(tree)
+        index = ConfluenceDiscoveryService.build_label_index(tree)
         assert index == {}
 
     def test_single_level(self) -> None:
         tree = PageNode(id="1", title="Root", labels=["a", "b"])
-        index = ConfluenceDiscoveryService._build_label_index(tree)
+        index = ConfluenceDiscoveryService.build_label_index(tree)
         assert index == {"a": ["1"], "b": ["1"]}
 
     def test_multi_level(self) -> None:
@@ -535,7 +555,7 @@ class TestBuildLabelIndex:
                 PageNode(id="3", title="C2", labels=["other"]),
             ],
         )
-        index = ConfluenceDiscoveryService._build_label_index(tree)
+        index = ConfluenceDiscoveryService.build_label_index(tree)
         assert set(index["shared"]) == {"1", "2"}
         assert index["unique"] == ["2"]
         assert index["other"] == ["3"]
@@ -550,7 +570,7 @@ class TestWrapError:
         service = ConfluenceDiscoveryService(client)
         cause = RuntimeError("boom")
 
-        result = service._wrap_error(cause, "test_context")
+        result = service.wrap_error(cause, "test_context")
 
         assert isinstance(result, DiscoveryError)
         assert result.message == "test_context: boom"
@@ -561,6 +581,6 @@ class TestWrapError:
         service = ConfluenceDiscoveryService(client)
         original = DiscoveryError("already wrapped")
 
-        result = service._wrap_error(original, "context")
+        result = service.wrap_error(original, "context")
 
         assert result is original
