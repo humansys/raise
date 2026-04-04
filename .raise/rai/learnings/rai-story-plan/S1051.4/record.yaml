@@ -1,0 +1,32 @@
+skill: rai-story-plan
+work_id: S1051.4
+version: "2.4.0"
+timestamp: "2026-04-03T11:00:00"
+primed_patterns:
+  - PAT-E-595
+  - PAT-E-597
+  - PAT-E-598
+tier1_queries: 2
+tier1_results: 0
+tier1_note: "Graph index unavailable in worktree — continued without graph context"
+jit_queries: 0
+pattern_votes:
+  PAT-E-595:
+    vote: 1
+    why: "Granular methods confirmed — 4 separate discovery methods map to granular read pattern"
+  PAT-E-597:
+    vote: 1
+    why: "Existing code uses TYPE_CHECKING guard for ConfluenceClient — new service must follow same pattern to avoid runtime import"
+  PAT-E-598:
+    vote: 1
+    why: "Design specifies _wrap_error logging cause — directly applies to error isolation in discovery methods"
+gaps:
+  - "No graph context available — relied on direct file reads for dependency mapping"
+observations:
+  - "Existing ConfluenceDiscovery (S1130.1) is V1 shallow discovery — new service coexists, no breaking changes needed"
+  - "Design decomposed cleanly into 3 tasks: models → methods → verification"
+  - "ConfluenceClient already has all needed low-level methods (get_spaces, get_page_children, get_labels, get_space_homepage_id)"
+artifacts:
+  - s1051.4-plan.md
+commit: null
+branch: story/s1051.4/confluence-discovery
