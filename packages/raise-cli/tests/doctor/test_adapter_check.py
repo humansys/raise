@@ -351,3 +351,226 @@ class TestConfluenceSpaceCheck:
         results = check.evaluate(ctx)
         space_results = [r for r in results if "space" in r.check_id]
         assert len(space_results) == 0
+
+
+# ── T5: Confluence routing parent checks (S1051.5/T2) ─────────────
+
+
+class TestConfluenceRoutingParentCheck:
+    """Routing parent page existence checks — S1051.5/T2."""
+
+    def test_routing_parent_exists_passes(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Existing routing parent produces PASS with artifact type suffix."""
+        from unittest.mock import MagicMock, patch
+
+        _setup_confluence_config(
+            tmp_path,
+            routing={
+                "adr": {
+                    "parent_title": "Architecture Decision Records",
+                    "labels": ["rai-adr"],
+                }
+            },
+        )
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_client = MagicMock()
+        mock_client.get_page_by_title.return_value = MagicMock()  # page found
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.return_value = MagicMock()
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=mock_client,
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        routing_results = [r for r in results if "routing-parent" in r.check_id]
+        assert len(routing_results) == 1
+        assert routing_results[0].check_id == "adapter-confluence-routing-parent-adr"
+        assert routing_results[0].status == CheckStatus.PASS
+        assert "adr" in routing_results[0].message
+
+    def test_routing_parent_missing_errors(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Missing routing parent produces ERROR with page title."""
+        from unittest.mock import MagicMock, patch
+
+        _setup_confluence_config(
+            tmp_path,
+            routing={"roadmap": {"parent_title": "Roadmaps", "labels": []}},
+        )
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_client = MagicMock()
+        mock_client.get_page_by_title.return_value = None  # page not found
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.return_value = MagicMock()
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=mock_client,
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        routing_results = [r for r in results if "routing-parent" in r.check_id]
+        assert len(routing_results) == 1
+        assert routing_results[0].status == CheckStatus.ERROR
+        assert "Roadmaps" in routing_results[0].message
+        assert routing_results[0].fix_hint is not None
+        assert "Roadmaps" in routing_results[0].fix_hint
+
+    def test_routing_skipped_when_space_fails(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Routing checks are skipped when space check fails (D3)."""
+        from unittest.mock import MagicMock, patch
+
+        from raise_cli.adapters.confluence_exceptions import ConfluenceNotFoundError
+
+        _setup_confluence_config(
+            tmp_path,
+            routing={"adr": {"parent_title": "ADRs", "labels": []}},
+        )
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.side_effect = ConfluenceNotFoundError(
+            "Space 'TEST' not found. Available: RaiSE1"
+        )
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=MagicMock(),
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        routing_results = [r for r in results if "routing-parent" in r.check_id]
+        assert len(routing_results) == 0
+
+    def test_routing_exception_per_page_errors(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Exception on individual page lookup produces ERROR, doesn't crash."""
+        from unittest.mock import MagicMock, patch
+
+        _setup_confluence_config(
+            tmp_path,
+            routing={"adr": {"parent_title": "ADRs", "labels": []}},
+        )
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_client = MagicMock()
+        mock_client.get_page_by_title.side_effect = RuntimeError("boom")
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.return_value = MagicMock()
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=mock_client,
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        routing_results = [r for r in results if "routing-parent" in r.check_id]
+        assert len(routing_results) == 1
+        assert routing_results[0].status == CheckStatus.ERROR
+
+    def test_multiple_routing_entries(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Multiple routing entries produce one result each."""
+        from unittest.mock import MagicMock, patch
+
+        _setup_confluence_config(
+            tmp_path,
+            routing={
+                "adr": {"parent_title": "ADRs", "labels": []},
+                "roadmap": {"parent_title": "Roadmaps", "labels": []},
+            },
+        )
+        monkeypatch.setenv("CONFLUENCE_API_TOKEN", "tok")
+        monkeypatch.setenv("CONFLUENCE_USERNAME", "user@test.com")
+        monkeypatch.setenv("JIRA_API_TOKEN", "tok")
+        ctx = _make_context(tmp_path, online=True)
+        check = AdapterDoctorCheck()
+
+        mock_client = MagicMock()
+        # First call (adr) found, second (roadmap) not found
+        mock_client.get_page_by_title.side_effect = [MagicMock(), None]
+
+        mock_discovery_inst = MagicMock()
+        mock_discovery_inst.discover.return_value = MagicMock()
+
+        with (
+            patch.object(check, "_check_jira_health", MagicMock()),
+            patch.object(check, "_check_confluence_health", MagicMock()),
+            patch(
+                "raise_cli.adapters.confluence_discovery.ConfluenceDiscovery",
+                return_value=mock_discovery_inst,
+            ),
+            patch(
+                "raise_cli.adapters.confluence_client.ConfluenceClient",
+                return_value=mock_client,
+            ),
+        ):
+            results = check.evaluate(ctx)
+
+        routing_results = [r for r in results if "routing-parent" in r.check_id]
+        assert len(routing_results) == 2
+        ids = {r.check_id for r in routing_results}
+        assert "adapter-confluence-routing-parent-adr" in ids
+        assert "adapter-confluence-routing-parent-roadmap" in ids
