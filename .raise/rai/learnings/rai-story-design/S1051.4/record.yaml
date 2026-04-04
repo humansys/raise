@@ -1,0 +1,32 @@
+skill: rai-story-design
+work_id: S1051.4
+version: "2.4.0"
+timestamp: "2026-04-03T10:00:00"
+primed_patterns:
+  - PAT-E-593
+  - PAT-E-595
+  - PAT-E-597
+tier1_queries: 1
+tier1_results: 0
+jit_queries: 0
+pattern_votes:
+  PAT-E-593:
+    vote: 0
+    why: "CQL search indexing gotcha -- not directly relevant to discovery service design but good background"
+  PAT-E-595:
+    vote: 1
+    why: "CLI read commands should be separate -- confirmed: discovery methods are granular (spaces, tree, labels, map)"
+  PAT-E-597:
+    vote: 0
+    why: "future annotations masking NameError -- not applicable here, no tricky import patterns"
+gaps:
+  - "Graph index unavailable in worktree -- no tier1 results to surface"
+  - "No existing patterns for recursive tree traversal with depth limits in this codebase"
+artifacts:
+  - s1051.4-design.md
+  - s1051.4-design.yaml
+commit: null
+branch: release/2.4.0
+downstream:
+  plan_derivable: true
+  tasks_clear: true
