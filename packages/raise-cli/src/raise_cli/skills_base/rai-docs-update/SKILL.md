@@ -1,10 +1,14 @@
 ---
 name: rai-docs-update
-description: >
-  Compare knowledge graph against module architecture docs and update
-  drifted fields. Deterministic frontmatter comparison using existing
-  rai graph commands, with inference for narrative sections. HITL
-  before any writes.
+description: Sync module docs with knowledge graph. Use when architecture docs drift.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

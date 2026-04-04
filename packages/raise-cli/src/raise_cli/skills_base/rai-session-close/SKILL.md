@@ -1,8 +1,12 @@
 ---
 name: rai-session-close
-description: >
-  Close a working session by reflecting on outcomes and feeding structured data to CLI.
-  CLI does all writes atomically; skill does inference reflection.
+description: Capture session outcomes and update memory. Use to close a working session.
+
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

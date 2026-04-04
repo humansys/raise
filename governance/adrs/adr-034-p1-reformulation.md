@@ -1,7 +1,7 @@
 ---
 id: ADR-034
 title: "Reformular P1: Humanos Definen Metas y Límites, Máquinas Negocian Ejecución"
-status: proposed
+status: accepted
 date: 2026-03-27
 decision_makers: [emilio]
 epic: RAISE-789
@@ -157,5 +157,5 @@ Estas actividades requieren propuesta del agente Y aprobación humana:
 
 ---
 
-*Status: Proposed — pendiente de ratificación después de completar E-ANTHROPIC research (S789.3, S789.4 pueden agregar evidencia).*
+*Status: Accepted — ratificado 2026-04-04. Evidencia completa: S789.1–S789.4 Done, 500+ sesiones operacionales.*
 *Autor: Emilio + Rai, derivado de S789.2 research.*

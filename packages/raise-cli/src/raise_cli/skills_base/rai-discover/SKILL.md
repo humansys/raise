@@ -1,8 +1,14 @@
 ---
 name: rai-discover
-description: >
-  Run the full codebase discovery pipeline: detect languages, extract symbols,
-  describe components, generate architecture docs, and build the knowledge graph.
+description: Scan codebase, extract symbols, and build knowledge graph. Use for codebase discovery.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 

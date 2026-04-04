@@ -1,9 +1,12 @@
 ---
 name: rai-story-plan
-description: >
-  Decompose user stories into atomic executable tasks, identify dependencies,
-  and create a deterministic implementation plan. Use after /rai-story-design
-  has grounded the story's integration decisions.
+description: Decompose story into atomic tasks with TDD verification. Use after story design.
+
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 
@@ -15,13 +18,24 @@ metadata:
   raise.next: story-implement
   raise.gate: gate-plan
   raise.adaptable: "true"
-  raise.version: "2.1.0"
+  raise.version: "2.3.0"
   raise.visibility: public
   raise.inputs: |
     - design_md: file_path, optional, previous_skill
     - story_md: file_path, required, story-start
   raise.outputs: |
     - plan_md: file_path, next_skill
+  raise.aspects: introspection
+  raise.introspection:
+    phase: story.plan
+    context_source: design doc
+    affected_modules: []
+    max_tier1_queries: 3
+    max_jit_queries: 2
+    tier1_queries:
+      - "decomposition patterns for {complexity} stories"
+      - "TDD patterns for {affected_modules}"
+      - "estimation calibration for {size} stories"
 ---
 
 # Story Plan
@@ -46,11 +60,22 @@ Decompose a story into atomic executable tasks with dependencies, verification c
 
 ## Steps
 
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: Read story-design's learning record at `.raise/rai/learnings/rai-story-design/{work_id}/record.yaml`. Enrich story-design's record with `downstream: {plan_derivable: bool, tasks_clear: bool}`.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
+
 ### Step 1: Verify Design
 
 ```bash
 ls work/epics/e*/stories/{story_id}-design.md 2>/dev/null || echo "INFO: No design"
 ```
+
+> **JIT**: Before verifying design completeness, query graph for complexity assessment patterns
+> → `aspects/introspection.md § JIT Protocol`
 
 | Condition | Action |
 |-----------|--------|
@@ -88,6 +113,9 @@ Each task is atomic and verifiable. Final integration test included.
 
 ### Step 3: Order & Dependencies
 
+> **JIT**: Before ordering dependencies, query graph for risk-first ordering patterns
+> → `aspects/introspection.md § JIT Protocol`
+
 - Map dependencies (sequential vs parallel)
 - Apply risk-first ordering (riskiest tasks early)
 - Maximize parallelism where no mutual dependencies exist
@@ -117,6 +145,31 @@ Plan document complete and reviewable in <5 minutes.
 | Implementation plan | `work/epics/e{N}-{name}/stories/s{N}.{M}-plan.md` |
 | Next | `/rai-story-implement` |
 
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-story-plan/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-story-plan
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
+
 ## Quality Checklist
 
 - [ ] Design verified or simple story confirmed
@@ -127,6 +180,7 @@ Plan document complete and reviewable in <5 minutes.
 - [ ] Execution order follows risk-first approach
 - [ ] NEVER over-decompose simple stories
 - [ ] NEVER skip TDD guidance — tests define behavior
+- [ ] LEARN record written to `.raise/rai/learnings/rai-story-plan/{work_id}/record.yaml`
 
 ## References
 

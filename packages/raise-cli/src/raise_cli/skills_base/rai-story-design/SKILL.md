@@ -1,9 +1,14 @@
 ---
 name: rai-story-design
-description: >
-  Create lean story specifications optimized for both human understanding
-  and AI alignment. Design is not optional (PAT-186) — use before /rai-story-plan
-  for every story to ground integration decisions.
+description: Create lean story spec for human review and AI alignment. Use before story plan.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 
@@ -15,7 +20,7 @@ metadata:
   raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.3.0"
+  raise.version: "2.5.0"
   raise.visibility: public
   raise.output_type: story-design
   raise.inputs: |
@@ -24,6 +29,17 @@ metadata:
   raise.outputs: |
     - design_yaml: file_path, .raise/artifacts/
     - design_md: file_path, next_skill
+  raise.aspects: introspection
+  raise.introspection:
+    phase: story.design
+    context_source: scope doc
+    affected_modules: []
+    max_tier1_queries: 3
+    max_jit_queries: 5
+    tier1_queries:
+      - "patterns for {affected_modules} design decisions"
+      - "prior designs for similar scope in {phase}"
+      - "risks and lessons from related epics"
 ---
 
 # Story Design
@@ -48,6 +64,14 @@ Create a lean story specification optimized for both human review (clear intent)
 
 ## Steps
 
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: No chain read — story-design is the first skill in the story chain.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
+
 ### Step 1: Assess Complexity
 
 | Criterion | Simple | Moderate | Complex |
@@ -63,6 +87,9 @@ Create a lean story specification optimized for both human review (clear intent)
 | Moderate | Core sections only |
 | Complex | Full spec with optional sections |
 
+> **JIT**: Before assessing complexity, query graph for patterns from similar stories
+> → `aspects/introspection.md § JIT Protocol`
+
 **Risk gate:** If story is marked HIGH RISK in epic scope, discuss risks before designing — name concerns, failure modes, and scope boundaries.
 
 **UX gate:** If story touches human interaction (workflows, prompts, DX), recommend `/rai-research` first (~10 min).
@@ -77,6 +104,9 @@ Complexity assessed. Risk/UX/Integration gates evaluated.
 
 Load `story.md` (from `/rai-story-start`) if it exists — use its User Story as starting frame.
 
+> **JIT**: Before framing problem and value, query graph for prior designs with similar scope
+> → `aspects/introspection.md § JIT Protocol`
+
 - **Problem**: What gap does this fill? (1-2 sentences)
 - **Value**: Why does this matter? (1-2 sentences, measurable or observable)
 
@@ -85,6 +115,9 @@ Can explain to non-technical stakeholder in 30 seconds.
 </verification>
 
 ### Step 3: Describe Approach
+
+> **JIT**: Before describing approach, query graph for implementation patterns in affected modules
+> → `aspects/introspection.md § JIT Protocol`
 
 Document WHAT you're building and WHY this approach (not detailed HOW):
 - Solution approach (1-2 sentences)
@@ -122,6 +155,9 @@ Can't envision examples → approach not concrete enough, return to Step 3.
 </if-blocked>
 
 ### Step 5: Define Acceptance Criteria
+
+> **JIT**: Before defining acceptance criteria, query graph for testing patterns and quality standards
+> → `aspects/introspection.md § JIT Protocol`
 
 If `story.md` has Gherkin AC, reference them here — refine, don't duplicate. If no `story.md`, define from scratch:
 
@@ -182,6 +218,31 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 | Design document | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
 | Next | `/rai-story-plan` |
 
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-story-design/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-story-design
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
+
 ## Quality Checklist
 
 - [ ] Complexity assessed — design depth matches complexity
@@ -194,6 +255,7 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 - [ ] Spec creation <30 minutes, review <5 minutes
 - [ ] NEVER over-specify HOW — trust AI for implementation details
 - [ ] NEVER skip examples — they are the most important section
+- [ ] LEARN record written to `.raise/rai/learnings/rai-story-design/{work_id}/record.yaml`
 
 ## References
 

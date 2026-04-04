@@ -1,9 +1,12 @@
 ---
 name: rai-epic-plan
-description: >
-  Sequence features from epic-design into an executable plan with milestones,
-  dependencies, and progress tracking. Use after /rai-epic-design to create a
-  realistic implementation roadmap before starting story work.
+description: Sequence epic stories into milestones and dependencies. Use after epic design.
+
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 
@@ -15,12 +18,23 @@ metadata:
   raise.next: story-start
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.version: "2.4.0"
   raise.visibility: public
   raise.inputs: |
     - scope: file_path, required, previous_skill
   raise.outputs: |
     - scope: file_path, next_skill
+  raise.aspects: introspection
+  raise.introspection:
+    phase: epic.plan
+    context_source: scope doc from epic-design
+    affected_modules: []
+    max_tier1_queries: 3
+    max_jit_queries: 3
+    tier1_queries:
+      - "sequencing patterns for {strategy} ordering"
+      - "estimation patterns for {size} epics"
+      - "milestone patterns for multi-story epics"
 ---
 
 # Epic Plan
@@ -44,6 +58,14 @@ Transform the story list from `/rai-epic-design` into a sequenced implementation
 **Inputs:** Epic scope document (`work/epics/e{N}-{name}/scope.md`), calibration data (if available).
 
 ## Steps
+
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: Read epic-design's learning record at `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`. Enrich epic-design's record with `downstream: {scope_clear: bool, stories_sequenceable: bool}`.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Review Epic Scope
 
@@ -73,6 +95,9 @@ Order stories using these strategies (in priority order):
 
 For each story, document: position, rationale, dependencies (hard/soft/external), what it enables.
 
+> **JIT**: Before choosing sequencing strategy, query graph for ordering patterns and calibration data
+> → `aspects/introspection.md § JIT Protocol`
+
 **Identify parallel opportunities:** Stories with no mutual dependencies, different codebase areas, or independent concerns can run concurrently.
 
 <verification>
@@ -91,6 +116,9 @@ Create 2-4 intermediate checkpoints:
 | **M4: Epic Complete** | Done criteria met | Ready for `/rai-epic-close` |
 
 Per milestone: stories included, success criteria (verifiable), demo capability.
+
+> **JIT**: Before defining milestones, query graph for calibration patterns and checkpoint strategies
+> → `aspects/introspection.md § JIT Protocol`
 
 **Integration checkpoint:** For epics with multiple components (client/server, CLI/API, frontend/backend), schedule an **E2E integration milestone** before the final story. This checkpoint runs real infrastructure (docker compose, actual DB) and verifies cross-story contracts (auth headers, payload schemas, parameter limits). Unit tests with mocks cannot catch these mismatches — only real E2E validates the seams between stories.
 
@@ -132,6 +160,31 @@ Scope document updated. Plan reviewable in <5 minutes. Human acknowledges.
 | Plan template | `templates/plan-section.md` |
 | Next | `/rai-story-design` for first story in sequence |
 
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-epic-plan/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-epic-plan
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
+
 ## Quality Checklist
 
 - [ ] All stories sequenced with rationale
@@ -143,6 +196,7 @@ Scope document updated. Plan reviewable in <5 minutes. Human acknowledges.
 - [ ] NEVER over-plan — plans are hypotheses, not commitments
 - [ ] NEVER sequence by size alone — use risk-first as default
 - [ ] Multi-component epics include E2E integration checkpoint
+- [ ] LEARN record written to `.raise/rai/learnings/rai-epic-plan/{work_id}/record.yaml`
 
 ## References
 

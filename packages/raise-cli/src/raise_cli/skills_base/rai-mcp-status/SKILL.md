@@ -1,10 +1,11 @@
 ---
 name: rai-mcp-status
-description: >
-  Health overview of all registered MCP servers plus stack-aware
-  recommendations for missing capabilities. Lists servers, runs
-  health checks, detects project stack, and suggests relevant
-  servers from the governance catalog.
+description: Check health of registered MCP servers. Use to diagnose MCP connectivity.
+
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
 
 license: MIT
 

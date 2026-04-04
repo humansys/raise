@@ -1,10 +1,14 @@
 ---
 name: rai-epic-design
-description: >
-  Design an epic from strategic objective to feature breakdown. Use when
-  starting a new body of work spanning multiple features (3-10), requiring
-  architectural decisions, or when establishing technical direction for
-  significant capability delivery.
+description: Design epic scope, stories, and architecture. Use for work spanning 3-10 features.
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Grep
+  - Glob
+  - "Bash(rai:*)"
 
 license: MIT
 
@@ -16,7 +20,7 @@ metadata:
   raise.next: epic-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.1.0"
+  raise.version: "2.3.0"
   raise.visibility: public
   raise.inputs: |
     - brief: file_path, optional, previous_skill
@@ -24,6 +28,17 @@ metadata:
   raise.outputs: |
     - scope: file_path, next_skill
     - design: file_path, optional, next_skill
+  raise.aspects: introspection
+  raise.introspection:
+    phase: epic.design
+    context_source: problem brief or strategic objective
+    affected_modules: []
+    max_tier1_queries: 3
+    max_jit_queries: 5
+    tier1_queries:
+      - "patterns for {affected_modules} architecture decisions"
+      - "risks and failure modes in {domain} epics"
+      - "prior epic designs with similar scope ({story_count} stories)"
 ---
 
 # Epic Design
@@ -47,6 +62,14 @@ Design an epic that bridges strategic objectives to executable stories, making k
 
 ## Steps
 
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: No chain read — epic-design is the first skill in the epic chain.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
+
 ### Step 1: Load Brief & Frame Objective
 
 Check for Epic Brief (`work/epics/e{N}-{name}/brief.md`) or Problem Brief (`work/problem-briefs/*.md`). If found, use hypothesis and boundaries as starting input.
@@ -59,6 +82,9 @@ Define what this epic accomplishes:
 
 Scoping heuristic: defer what doesn't block the objective; separate what needs its own ADRs.
 
+> **JIT**: Before defining scope boundaries, query graph for prior designs with similar scope
+> → `aspects/introspection.md § JIT Protocol`
+
 <verification>
 Objective explainable to non-technical stakeholder in 60 seconds. Scope boundaries explicit.
 </verification>
@@ -70,6 +96,9 @@ rai graph context mod-<name>
 ```
 
 Create ADRs when: multiple valid approaches with significant impact, new technology adoption, decisions other epics depend on. Skip when patterns are established or details are easily changed.
+
+> **JIT**: Before making architectural decisions, query graph for patterns and known risks
+> → `aspects/introspection.md § JIT Protocol`
 
 If significant uncertainty: `/rai-research` (timebox 2-4 hours), then create ADRs.
 ADR template: `.raise/templates/architecture/adr.md`. One decision per ADR.
@@ -84,6 +113,9 @@ Decompose epic into 3-10 independently deliverable stories.
 
 **Per story:** ID (S{N}.{seq}), name, 1-line description, T-shirt size (XS/S/M/L), dependencies.
 
+> **JIT**: Before finalizing decomposition, query graph for sizing patterns in similar epics
+> → `aspects/introspection.md § JIT Protocol`
+
 Target: each story delivers demonstrable value, 1-5 days duration. No dependency cycles. External blockers identified.
 
 <verification>
@@ -95,6 +127,9 @@ Each story passes "independently deliverable" test. Dependency graph is acyclic.
 **Done:** All stories complete + epic-specific measurable criteria + architecture docs updated + retrospective completed.
 
 **Risks:** Top 3 with likelihood/impact/mitigation.
+
+> **JIT**: Before assessing risks, query graph for known risks from related epics
+> → `aspects/introspection.md § JIT Protocol`
 
 <verification>
 Done criteria are measurable. Top risks have mitigations.
@@ -124,6 +159,31 @@ Scope document reviewable in <10 minutes. Parking lot updated.
 | Parking lot | `dev/parking-lot.md` |
 | Next | `/rai-epic-plan` |
 
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-epic-design
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
+
 ## Quality Checklist
 
 - [ ] Epic Brief consumed as input (if exists from `/rai-epic-start`)
@@ -134,6 +194,7 @@ Scope document reviewable in <10 minutes. Parking lot updated.
 - [ ] Done criteria are measurable
 - [ ] NEVER time-box epics — scope-based, not duration-based
 - [ ] NEVER over-specify stories — save details for `/rai-story-design`
+- [ ] LEARN record written to `.raise/rai/learnings/rai-epic-design/{work_id}/record.yaml`
 
 ## References
 

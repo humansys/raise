@@ -53,6 +53,16 @@ repos:
         language: system
         pass_filenames: false
 
+  # Skills distribution sync gate
+  - repo: local
+    hooks:
+      - id: check-skills-sync
+        name: check skills distribution sync
+        entry: bash scripts/check-skills-sync.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
   # Type checking (pre-push only — too slow for pre-commit)
   - repo: local
     hooks:
