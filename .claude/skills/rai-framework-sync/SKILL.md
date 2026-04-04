@@ -1,7 +1,6 @@
 ---
 name: rai-framework-sync
 description: Sync governance files across locations. Use after architectural decisions.
-disable-model-invocation: true
 
 allowed-tools:
   - Read

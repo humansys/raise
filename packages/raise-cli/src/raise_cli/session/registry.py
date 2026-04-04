@@ -3,8 +3,9 @@
 Implements the SessionRegistry protocol (ADR-038) as a facade over
 existing session index and active-session pointer infrastructure.
 
-Delegates to session/index.py for persistence. Adds gc() for zombie
-reaping, directory retention, and stale output cleanup.
+gc() is deprecated in favor of SessionDoctor (S1248.5) which provides
+consent-based cleanup instead of silent deletion. The method remains
+for protocol compatibility and programmatic use (server backend 3.0).
 
 Architecture: E1248 (Git-First Session State), S1248.2
 """
@@ -95,13 +96,27 @@ class LocalSessionRegistry:
     def gc(self, max_age_hours: int = 48) -> list[str]:
         """Garbage collect stale sessions and old directories.
 
+        .. deprecated:: 2.4.0
+            Use ``SessionDoctor.diagnose()`` + ``execute()`` instead.
+            gc() silently deletes without consent. SessionDoctor (S1248.5)
+            provides consent-based cleanup. This method remains for
+            protocol compatibility and programmatic use.
+
         Three cleanup operations:
         1. Zombie pointer: if active-session is older than max_age_hours, remove it
-        2. Session dir retention: keep max 20 dirs or 30 days (T2)
-        3. Stale output: remove session-output.yaml older than 24h (T2)
+        2. Session dir retention: keep max 20 dirs or 30 days
+        3. Stale output: remove session-output.yaml older than 24h
 
         Returns list of cleaned session IDs / paths.
         """
+        import warnings
+
+        warnings.warn(
+            "gc() is deprecated — use SessionDoctor.diagnose() + execute() "
+            "for consent-based cleanup",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         cleaned: list[str] = []
 
         # 1. Zombie active-session pointer

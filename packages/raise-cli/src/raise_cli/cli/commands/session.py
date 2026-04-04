@@ -15,6 +15,7 @@ Example:
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
@@ -41,7 +42,7 @@ from raise_cli.onboarding.profile import (
     save_developer_profile,
     start_session,
 )
-from raise_cli.schemas.session_state import SessionState
+from raise_cli.schemas.session_state import CurrentWork, SessionInsights, SessionState
 from raise_cli.session.bundle import assemble_context_bundle, assemble_sections
 from raise_cli.session.close import CloseInput, load_state_file, process_session_close
 from raise_cli.session.identity import generate_session_id
@@ -62,8 +63,35 @@ from raise_cli.session.state import (
     migrate_flat_to_session,
 )
 
+logger = logging.getLogger(__name__)
+
 _ERR_NO_PROFILE = "No developer profile found"
 _DOT_RAISE = ".raise"
+
+
+def _get_session_insights(
+    project_path: Path, session_id: str
+) -> SessionInsights | None:
+    """Get session insights from WorkstreamMonitor, or None on failure."""
+    try:
+        from raise_cli.session.monitor import LocalWorkstreamMonitor
+
+        monitor = LocalWorkstreamMonitor(project_path)
+        return monitor.analyze_session(session_id)
+    except Exception:
+        logger.debug("Session insights failed — skipping", exc_info=True)
+        return None
+
+
+def _format_insights(insights: SessionInsights) -> str:
+    """Format session insights for CLI output."""
+    test_pct = f"{insights.test_commit_ratio:.0%}"
+    return (
+        f"  Session insights: {insights.commit_count} commits | "
+        f"Test ratio: {test_pct} | "
+        f"Reverts: {insights.revert_count} | "
+        f"Duration: {insights.duration_minutes}m"
+    )
 
 
 def _get_current_branch() -> str:
@@ -203,6 +231,13 @@ def start(  # noqa: C901
             help="Output a context bundle for AI consumption",
         ),
     ] = False,
+    no_doctor: Annotated[
+        bool,
+        typer.Option(
+            "--no-doctor",
+            help="Skip session health check (for CI/automation)",
+        ),
+    ] = False,
 ) -> None:
     """Start a new working session.
 
@@ -258,6 +293,22 @@ def start(  # noqa: C901
             if not validation.is_valid:
                 typer.echo(f"Warning: {validation.summary()}")
                 typer.echo("Run `rai memory validate` to fix data quality issues.\n")
+
+    # Session Doctor: diagnose and auto-clean safe issues
+    if project is not None and not no_doctor:
+        try:
+            from raise_cli.session.doctor import SessionDoctor, format_findings
+
+            doctor = SessionDoctor(Path(project))
+            findings = doctor.diagnose()
+            if findings:
+                plan = doctor.classify(findings)
+                cleaned = doctor.execute(plan, consent={"auto"})
+                typer.echo(format_findings(findings, cleaned))
+            else:
+                typer.echo("Session health: clean (0 issues)")
+        except Exception:
+            logger.debug("Session doctor failed — continuing", exc_info=True)
 
     # Auto-sync skills if CLI was upgraded
     if project is not None:
@@ -553,6 +604,15 @@ def close(  # noqa: C901
             )
         )
         typer.echo(f"Session {resolved_session_id} closed.")
+
+        # Show insights if project available
+        if project is not None:
+            insights = _get_session_insights(
+                Path(project), resolved_session_id
+            )
+            if insights and insights.commit_count > 0:
+                typer.echo(_format_insights(insights))
+
         return
 
     # Structured close: build CloseInput from flags or state file
@@ -693,6 +753,12 @@ def close(  # noqa: C901
     if close_result.corrections_added > 0:
         typer.echo(f"  Corrections recorded: {close_result.corrections_added}")
 
+    # Show session insights
+    if final_session_id:
+        insights = _get_session_insights(project_path, final_session_id)
+        if insights and insights.commit_count > 0:
+            typer.echo(_format_insights(insights))
+
 
 @session_app.command("list")
 def list_sessions(
@@ -761,3 +827,73 @@ def list_sessions(
         typer.echo(f"  {entry.id}  {entry.name}  ({date_str}{closed_str}) {status}")
 
     typer.echo(f"\n{len(entries)} total sessions.")
+
+
+def _derive_current_work_for_doctor(project_path: Path) -> CurrentWork | None:
+    """Derive current work for doctor display — isolated for testability."""
+    try:
+        from raise_cli.session.derive import GitStateDeriver
+
+        return GitStateDeriver().current_work(project_path)
+    except Exception:
+        logger.debug("Git state derivation failed", exc_info=True)
+        return None
+
+
+@session_app.command("doctor")
+def doctor(
+    project: Annotated[
+        str | None,
+        typer.Option(
+            "--project",
+            "-p",
+            help="Project path",
+        ),
+    ] = None,
+) -> None:
+    """Run session health diagnostics.
+
+    Scans for zombie sessions, stale output files, retention issues,
+    and shows current git state derivation status. Does not modify
+    anything — diagnosis only.
+
+    Examples:
+        $ rai session doctor
+        $ rai session doctor --project /my/project
+    """
+    from raise_cli.session.doctor import SessionDoctor, format_findings
+
+    project_path = Path(project) if project else Path.cwd()
+
+    # Git state derivation status
+    work = _derive_current_work_for_doctor(project_path)
+    if work:
+        typer.echo("Git state derivation: working")
+        if work.branch:
+            typer.echo(f"  Branch: {work.branch}")
+        if work.epic:
+            typer.echo(f"  Epic: {work.epic}")
+        if work.story:
+            typer.echo(f"  Story: {work.story}")
+        if work.phase:
+            typer.echo(f"  Phase: {work.phase}")
+        typer.echo("")
+    else:
+        typer.echo("Git state derivation: unavailable")
+        typer.echo("")
+
+    # Session health scan
+    doc = SessionDoctor(project_path)
+    findings = doc.diagnose()
+
+    if findings:
+        plan = doc.classify(findings)
+        typer.echo(format_findings(findings, []))
+        consent_count = len(plan.needs_consent)
+        if consent_count > 0:
+            typer.echo(
+                f"  {consent_count} item(s) need review — "
+                "use `rai session start` for interactive cleanup."
+            )
+    else:
+        typer.echo("Session health: all clear")
