@@ -11,6 +11,6 @@ gaps:
   - "Graph index not available in worktree -- tier1 queries returned no results"
 artifacts:
   - "work/epics/e1051-confluence-adapter-v2/stories/s1051.5-plan.md"
-commit: null
+commit: 47bd17e8
 branch: "story/s1051.5/adapter-doctor-confluence"
 downstream: {}
