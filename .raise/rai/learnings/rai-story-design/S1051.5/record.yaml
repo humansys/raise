@@ -1,0 +1,17 @@
+skill: rai-story-design
+work_id: S1051.5
+version: "2.4.0"
+timestamp: "2026-04-03T14:00:00-06:00"
+primed_patterns: []
+tier1_queries: 3
+tier1_results: 0
+jit_queries: 0
+pattern_votes: {}
+gaps:
+  - "Graph index not available in worktree -- tier1 queries returned no results"
+artifacts:
+  - "work/epics/e1051-confluence-adapter-v2/stories/s1051.5-design.md"
+  - ".raise/artifacts/s1051.5-design.yaml"
+commit: null
+branch: "story/s1051.5/adapter-doctor-confluence"
+downstream: {}
