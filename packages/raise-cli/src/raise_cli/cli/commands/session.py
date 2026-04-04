@@ -42,7 +42,7 @@ from raise_cli.onboarding.profile import (
     save_developer_profile,
     start_session,
 )
-from raise_cli.schemas.session_state import SessionInsights, SessionState
+from raise_cli.schemas.session_state import CurrentWork, SessionInsights, SessionState
 from raise_cli.session.bundle import assemble_context_bundle, assemble_sections
 from raise_cli.session.close import CloseInput, load_state_file, process_session_close
 from raise_cli.session.identity import generate_session_id
@@ -827,3 +827,73 @@ def list_sessions(
         typer.echo(f"  {entry.id}  {entry.name}  ({date_str}{closed_str}) {status}")
 
     typer.echo(f"\n{len(entries)} total sessions.")
+
+
+def _derive_current_work_for_doctor(project_path: Path) -> CurrentWork | None:
+    """Derive current work for doctor display — isolated for testability."""
+    try:
+        from raise_cli.session.derive import GitStateDeriver
+
+        return GitStateDeriver().current_work(project_path)
+    except Exception:
+        logger.debug("Git state derivation failed", exc_info=True)
+        return None
+
+
+@session_app.command("doctor")
+def doctor(
+    project: Annotated[
+        str | None,
+        typer.Option(
+            "--project",
+            "-p",
+            help="Project path",
+        ),
+    ] = None,
+) -> None:
+    """Run session health diagnostics.
+
+    Scans for zombie sessions, stale output files, retention issues,
+    and shows current git state derivation status. Does not modify
+    anything — diagnosis only.
+
+    Examples:
+        $ rai session doctor
+        $ rai session doctor --project /my/project
+    """
+    from raise_cli.session.doctor import SessionDoctor, format_findings
+
+    project_path = Path(project) if project else Path.cwd()
+
+    # Git state derivation status
+    work = _derive_current_work_for_doctor(project_path)
+    if work:
+        typer.echo("Git state derivation: working")
+        if work.branch:
+            typer.echo(f"  Branch: {work.branch}")
+        if work.epic:
+            typer.echo(f"  Epic: {work.epic}")
+        if work.story:
+            typer.echo(f"  Story: {work.story}")
+        if work.phase:
+            typer.echo(f"  Phase: {work.phase}")
+        typer.echo("")
+    else:
+        typer.echo("Git state derivation: unavailable")
+        typer.echo("")
+
+    # Session health scan
+    doc = SessionDoctor(project_path)
+    findings = doc.diagnose()
+
+    if findings:
+        plan = doc.classify(findings)
+        typer.echo(format_findings(findings, []))
+        consent_count = len(plan.needs_consent)
+        if consent_count > 0:
+            typer.echo(
+                f"  {consent_count} item(s) need review — "
+                "use `rai session start` for interactive cleanup."
+            )
+    else:
+        typer.echo("Session health: all clear")
