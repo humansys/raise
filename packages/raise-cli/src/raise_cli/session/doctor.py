@@ -327,3 +327,39 @@ class SessionDoctor:
     def _personal_dir(self) -> Path:
         """Resolve the personal dir for this project."""
         return get_personal_dir(self._project)
+
+
+_SEVERITY_ICON = {"info": "i", "warning": "!", "error": "X"}
+
+
+def format_findings(findings: list[Finding], cleaned: list[str]) -> str:
+    """Format doctor findings for CLI output.
+
+    Args:
+        findings: All findings from diagnose().
+        cleaned: Descriptions of items that were auto-cleaned.
+
+    Returns:
+        Human-readable string for CLI display.
+    """
+    if not findings:
+        return "Session health: clean (0 issues)"
+
+    lines: list[str] = []
+    lines.append(f"Session Doctor — {len(findings)} finding(s):")
+    lines.append("")
+
+    for f in findings:
+        icon = _SEVERITY_ICON.get(f.severity, "?")
+        lines.append(f"  [{icon}] {f.description}")
+        lines.append(f"      {f.detail}")
+        lines.append(f"      Action: {f.action}")
+        lines.append("")
+
+    if cleaned:
+        lines.append("Auto-cleaned:")
+        for c in cleaned:
+            lines.append(f"  - {c}")
+        lines.append("")
+
+    return "\n".join(lines)

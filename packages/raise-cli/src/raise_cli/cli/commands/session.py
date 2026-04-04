@@ -15,6 +15,7 @@ Example:
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
@@ -61,6 +62,8 @@ from raise_cli.session.state import (
     load_session_state,
     migrate_flat_to_session,
 )
+
+logger = logging.getLogger(__name__)
 
 _ERR_NO_PROFILE = "No developer profile found"
 _DOT_RAISE = ".raise"
@@ -203,6 +206,13 @@ def start(  # noqa: C901
             help="Output a context bundle for AI consumption",
         ),
     ] = False,
+    no_doctor: Annotated[
+        bool,
+        typer.Option(
+            "--no-doctor",
+            help="Skip session health check (for CI/automation)",
+        ),
+    ] = False,
 ) -> None:
     """Start a new working session.
 
@@ -258,6 +268,22 @@ def start(  # noqa: C901
             if not validation.is_valid:
                 typer.echo(f"Warning: {validation.summary()}")
                 typer.echo("Run `rai memory validate` to fix data quality issues.\n")
+
+    # Session Doctor: diagnose and auto-clean safe issues
+    if project is not None and not no_doctor:
+        try:
+            from raise_cli.session.doctor import SessionDoctor, format_findings
+
+            doctor = SessionDoctor(Path(project))
+            findings = doctor.diagnose()
+            if findings:
+                plan = doctor.classify(findings)
+                cleaned = doctor.execute(plan, consent={"auto"})
+                typer.echo(format_findings(findings, cleaned))
+            else:
+                typer.echo("Session health: clean (0 issues)")
+        except Exception:
+            logger.debug("Session doctor failed — continuing", exc_info=True)
 
     # Auto-sync skills if CLI was upgraded
     if project is not None:
