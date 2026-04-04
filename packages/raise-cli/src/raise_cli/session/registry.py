@@ -107,6 +107,8 @@ class LocalSessionRegistry:
         # 1. Zombie active-session pointer
         pointer = read_active_session(project_root=self._project)
         if pointer is not None:
+            # Pointer stores naive local time; treat as UTC for age calc.
+            # Off by ±hours but gc threshold is 48h — negligible.
             age_hours = (
                 datetime.now(UTC) - pointer.started.replace(tzinfo=UTC)
             ).total_seconds() / 3600
