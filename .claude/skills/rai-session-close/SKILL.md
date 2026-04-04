@@ -1,7 +1,6 @@
 ---
 name: rai-session-close
 description: Capture session outcomes and update memory. Use to close a working session.
-disable-model-invocation: true
 
 allowed-tools:
   - Read
