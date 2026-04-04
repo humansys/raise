@@ -5,3 +5,9 @@ WHEN:      Different sessions/agents pass work_id with different casing (branch 
 WHERE:     packages/raise-cli/src/raise_cli/memory/learning.py:write_record(), read_record()
 EXPECTED:  Single canonical directory per work_id regardless of input casing
 Done when: work_id normalized to uppercase in write_record and read_record; existing lowercase dirs migrated; no duplicate dirs on disk
+
+TRIAGE:
+  Bug Type:    Data
+  Severity:    S2-Medium
+  Origin:      Code
+  Qualifier:   Missing
