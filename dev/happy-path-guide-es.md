@@ -34,7 +34,7 @@ rai init                              # Crea .raise/, manifest.yaml, estructura 
 
 ```
 # En Claude Code:
-/rai-welcome                          # Onboarding del desarrollador (perfil, grafo, CLAUDE.local.md)
+/rai-welcome                          # Onboarding del desarrollador (perfil, grafo, context bundle)
 /rai-project-create                   # Conversación guiada para llenar governance:
                                       #   -> vision.md, prd.md, guardrails.md, constitution
                                       #   -> ejecuta: rai memory build
@@ -259,7 +259,7 @@ governance/                           # Governance del proyecto (alimenta el gra
 framework/                            # Textbook público (constitución, glosario, conceptos)
 work/stories/                         # Artefactos de trabajo (scope, design, plan, retro)
 dev/                                  # Mantenimiento (parking-lot, decisiones)
-CLAUDE.local.md                       # Config personal de Claude Code (gitignored)
+# CLAUDE.local.md eliminado — contexto de sesión derivado de git (ADR-038)
 ```
 
 ---
