@@ -1,0 +1,22 @@
+skill: rai-story-implement
+work_id: S1051.6
+version: "2.4.0"
+timestamp: "2026-04-03T12:00:00Z"
+primed_patterns:
+  - PAT-E-593
+  - PAT-E-594
+tier1_queries: 0
+tier1_results: 0
+jit_queries: 0
+pattern_votes:
+  PAT-E-593: {vote: 0, why: "not directly relevant — config gen doesn't do CQL search"}
+  PAT-E-594: {vote: 1, why: "reinforced — write_confluence_config writes to .raise/ which should be gitignored for env-specific cache files"}
+gaps:
+  - "No pattern for pure-function config generator testing — emerged naturally from Jira config gen pattern"
+artifacts:
+  - packages/raise-cli/src/raise_cli/adapters/confluence_config_gen.py
+  - packages/raise-cli/tests/adapters/test_confluence_config_gen.py
+  - .claude/skills/rai-adapter-setup/SKILL.md
+commit: 30c1e59eba8d2da87b2ad932bcbaf3499b85b407
+branch: story/s1051.6/config-generator-confluence
+downstream: {}
