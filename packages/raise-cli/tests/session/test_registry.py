@@ -109,14 +109,116 @@ class TestClose:
         registry.close("S-X-999999-9999", outcome)  # should not raise
 
 
-class TestGcPlaceholder:
-    """GC is implemented in T2 — verify it exists and returns empty for now."""
+class TestGcZombieReaping:
+    """GC reaps zombie active-session pointers."""
 
-    def test_gc_returns_list(self, tmp_path: Path) -> None:
+    def test_reaps_stale_pointer(self, tmp_path: Path) -> None:
         _setup_personal_dir(tmp_path)
         registry = LocalSessionRegistry(project=tmp_path)
-        result = registry.gc()
-        assert isinstance(result, list)
+
+        # Register a session 72 hours ago
+        old_info = _make_session_info(
+            tmp_path,
+            started=datetime(2026, 4, 1, 0, 0),  # 72h before "now"
+        )
+        registry.register(old_info)
+
+        cleaned = registry.gc(max_age_hours=48)
+        assert old_info.session_id in cleaned
+
+        # Pointer should be gone
+        pointer_path = tmp_path / ".raise" / "rai" / "personal" / "active-session"
+        assert not pointer_path.exists()
+
+    def test_keeps_fresh_pointer(self, tmp_path: Path) -> None:
+        _setup_personal_dir(tmp_path)
+        registry = LocalSessionRegistry(project=tmp_path)
+        info = _make_session_info(tmp_path)
+        registry.register(info)
+
+        # gc with a very generous threshold — should not reap
+        cleaned = registry.gc(max_age_hours=999999)
+        assert cleaned == []
+
+        # Pointer should still exist
+        pointer_path = tmp_path / ".raise" / "rai" / "personal" / "active-session"
+        assert pointer_path.exists()
+
+    def test_no_pointer_is_noop(self, tmp_path: Path) -> None:
+        _setup_personal_dir(tmp_path)
+        registry = LocalSessionRegistry(project=tmp_path)
+        cleaned = registry.gc()
+        assert cleaned == []
+
+
+class TestGcDirRetention:
+    """GC enforces session directory retention."""
+
+    def test_removes_old_dirs_beyond_limit(self, tmp_path: Path) -> None:
+        personal = _setup_personal_dir(tmp_path)
+        sessions_dir = personal / "sessions"
+
+        # Create 25 session dirs (limit is 20)
+        for i in range(25):
+            d = sessions_dir / f"S-E-260{i:03d}-0000"
+            d.mkdir(parents=True)
+            (d / "state.yaml").write_text("test")
+
+        registry = LocalSessionRegistry(project=tmp_path)
+        cleaned = registry.gc()
+
+        # Should have removed 5 oldest
+        remaining = [d for d in sessions_dir.iterdir() if d.is_dir()]
+        assert len(remaining) == 20
+        assert len([c for c in cleaned if c.startswith("dir:")]) == 5
+
+    def test_keeps_all_when_under_limit(self, tmp_path: Path) -> None:
+        personal = _setup_personal_dir(tmp_path)
+        sessions_dir = personal / "sessions"
+
+        for i in range(5):
+            d = sessions_dir / f"S-E-260{i:03d}-0000"
+            d.mkdir(parents=True)
+
+        registry = LocalSessionRegistry(project=tmp_path)
+        registry.gc()
+
+        remaining = [d for d in sessions_dir.iterdir() if d.is_dir()]
+        assert len(remaining) == 5
+
+
+class TestGcStaleOutput:
+    """GC removes stale session-output.yaml."""
+
+    def test_removes_stale_output(self, tmp_path: Path) -> None:
+        import os
+        import time
+
+        personal = _setup_personal_dir(tmp_path)
+        output = personal / "session-output.yaml"
+        output.write_text("stale: true")
+
+        # Backdate the file by 25 hours
+        old_time = time.time() - (25 * 3600)
+        os.utime(output, (old_time, old_time))
+
+        registry = LocalSessionRegistry(project=tmp_path)
+        cleaned = registry.gc()
+
+        assert not output.exists()
+        assert "session-output.yaml" in cleaned
+
+    def test_keeps_fresh_output(self, tmp_path: Path) -> None:
+        personal = _setup_personal_dir(tmp_path)
+        output = personal / "session-output.yaml"
+        output.write_text("fresh: true")
+        # File is brand new — should be kept
+
+        registry = LocalSessionRegistry(project=tmp_path)
+        cleaned = registry.gc()
+
+        assert output.exists()
+        assert "session-output.yaml" not in cleaned
 
 
 # ---------------------------------------------------------------------------
@@ -136,11 +238,12 @@ def _make_session_info(
     session_id: str = "S-E-260403-1530",
     developer: str = "Emilio",
     branch: str = "release/2.4.0",
+    started: datetime | None = None,
 ) -> SessionInfo:
     return SessionInfo(
         session_id=session_id,
         developer=developer,
         project=project,
         branch=branch,
-        started=datetime(2026, 4, 3, 15, 30),
+        started=started or datetime(2026, 4, 3, 15, 30),
     )

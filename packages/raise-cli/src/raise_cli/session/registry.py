@@ -12,9 +12,12 @@ Architecture: E1248 (Git-First Session State), S1248.2
 from __future__ import annotations
 
 import logging
+import shutil
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+from raise_cli.config.paths import get_personal_dir
 from raise_cli.schemas.session_state import SessionInfo, SessionOutcome
 from raise_cli.session.index import (
     ActiveSessionPointer,
@@ -116,7 +119,62 @@ class LocalSessionRegistry:
                     age_hours,
                 )
 
-        # 2. Session dir retention — implemented in T2
-        # 3. Stale output cleanup — implemented in T2
+        # 2. Session dir retention (keep max 20)
+        cleaned.extend(self._gc_session_dirs())
+
+        # 3. Stale output cleanup (>24h)
+        cleaned.extend(self._gc_stale_output())
 
         return cleaned
+
+    def _gc_session_dirs(self, max_dirs: int = 20) -> list[str]:
+        """Remove oldest session dirs beyond retention limit."""
+        cleaned: list[str] = []
+        personal = self._personal_dir()
+        sessions_dir = personal / "sessions"
+        if not sessions_dir.is_dir():
+            return cleaned
+
+        # Collect all session dirs (direct children that are dirs)
+        dirs = sorted(
+            (d for d in sessions_dir.iterdir() if d.is_dir()),
+            key=lambda d: d.stat().st_mtime,
+        )
+
+        if len(dirs) <= max_dirs:
+            return cleaned
+
+        # Remove oldest dirs beyond limit
+        to_remove = dirs[: len(dirs) - max_dirs]
+        for d in to_remove:
+            try:
+                shutil.rmtree(d)
+                cleaned.append(f"dir:{d.name}")
+                logger.info("GC: removed session dir %s", d.name)
+            except OSError as exc:
+                logger.warning("GC: failed to remove %s: %s", d.name, exc)
+
+        return cleaned
+
+    def _gc_stale_output(self, max_age_hours: int = 24) -> list[str]:
+        """Remove session-output.yaml if older than max_age_hours."""
+        cleaned: list[str] = []
+        personal = self._personal_dir()
+        output = personal / "session-output.yaml"
+        if not output.exists():
+            return cleaned
+
+        age_hours = (time.time() - output.stat().st_mtime) / 3600
+        if age_hours > max_age_hours:
+            try:
+                output.unlink()
+                cleaned.append("session-output.yaml")
+                logger.info("GC: removed stale session-output.yaml (%.1fh old)", age_hours)
+            except OSError as exc:
+                logger.warning("GC: failed to remove session-output.yaml: %s", exc)
+
+        return cleaned
+
+    def _personal_dir(self) -> Path:
+        """Resolve the personal dir for this project."""
+        return get_personal_dir(self._project)
