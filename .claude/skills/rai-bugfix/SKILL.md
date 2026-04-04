@@ -79,12 +79,12 @@ On `bug/raise-{N}/{slug}` branch. Jira issue assigned and In Progress. Bug repro
 
 Classify the bug in 4 orthogonal dimensions before any analysis:
 
-| Dimension | Values |
-|-----------|--------|
-| **Bug Type** | Functional, Interface, Data, Logic, Configuration, Regression |
-| **Severity** | S0-Critical, S1-High, S2-Medium, S3-Low |
-| **Origin** | Requirements, Design, Code, Integration, Environment |
-| **Qualifier** | Missing, Incorrect, Extraneous |
+| Dimension | Scope artifact value | Jira dropdown value |
+|-----------|---------------------|---------------------|
+| **Bug Type** | Functional, Interface, Data, Logic, Configuration, Regression | *(same)* |
+| **Severity** | S0-Critical, S1-High, S2-Medium, S3-Low | Sev-0, Sev-1, Sev-2, Sev-3 |
+| **Origin** | Requirements, Design, Code, Integration, Environment | *(same, but Jira has typo: "Enviroment")* |
+| **Qualifier** | Missing, Incorrect, Extraneous | *(same)* |
 
 Append to `work/bugs/RAISE-{N}/scope.md`:
 
@@ -96,13 +96,22 @@ TRIAGE:
   Qualifier:   [Missing|Incorrect|Extraneous]
 ```
 
-Update Jira — set the 4 custom fields in the Jira UI (Bug Type, Severity, Origin, Qualifier), then transition:
+Update Jira — set the 4 classification custom fields via MCP. Map Severity to Jira format (`S{N}-Label` → `Sev-{N}`) and Origin Environment → `Enviroment`:
+
+```
+mcp__atlassian__jira_update_issue(
+  issue_key = "RAISE-{N}",
+  additional_fields = '{"customfield_13267": {"value": "{Bug Type}"}, "customfield_12090": {"value": "Sev-{N}"}, "customfield_13269": {"value": "{Origin}"}, "customfield_13270": {"value": "{Qualifier}"}}'
+)
+```
+
+Then transition:
 
 ```bash
 rai backlog transition RAISE-{N} triaged -a jira
 ```
 
-> **Note:** `rai backlog update` does not support custom fields yet. Set Bug Type, Severity, Origin, and Qualifier directly in the Jira issue UI.
+> **Field IDs:** Bug Type = `customfield_13267`, Severity = `customfield_12090`, Origin = `customfield_13269`, Qualifier = `customfield_13270`.
 
 **Triage gate:** All 4 dimensions must be classified before advancing to Analyse. If uncertain about Origin, use your best hypothesis — it can be revised during Analyse.
 
