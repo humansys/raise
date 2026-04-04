@@ -8,12 +8,17 @@ Tests generate_confluence_config() with v2 signature:
 
 from __future__ import annotations
 
+from pathlib import Path
+from typing import Any
+
 import pytest
+import yaml
 
 from raise_cli.adapters.confluence_config import ArtifactRouting, ConfluenceConfig
 from raise_cli.adapters.confluence_config_gen import (
     generate_confluence_config,
     suggest_routing,
+    write_confluence_config,
 )
 from raise_cli.adapters.confluence_discovery import PageNode
 from raise_cli.adapters.models.docs import SpaceInfo
@@ -216,3 +221,56 @@ class TestSuggestRouting:
         tree = _make_tree(["ARCHITECTURE DECISION RECORDS"])
         result = suggest_routing(tree)
         assert "adr" in result
+
+
+# ── write_confluence_config() tests ──────────────────────────────────
+
+
+def _sample_config_dict() -> dict[str, Any]:
+    """Produce a valid multi-instance config dict for write tests."""
+    return generate_confluence_config(
+        spaces=_sample_spaces(),
+        selected_space="RaiSE1",
+        instance_url="https://humansys.atlassian.net/wiki",
+        instance_name="humansys",
+    )
+
+
+class TestWriteConfluenceConfig:
+    """AC4, AC5: YAML writer with overwrite guard."""
+
+    def test_writes_yaml_file(self, tmp_path: Path) -> None:
+        config_dict = _sample_config_dict()
+        result_path = write_confluence_config(config_dict, project_root=tmp_path)
+        assert result_path.exists()
+        assert result_path.name == "confluence.yaml"
+
+    def test_written_yaml_roundtrips(self, tmp_path: Path) -> None:
+        config_dict = _sample_config_dict()
+        result_path = write_confluence_config(config_dict, project_root=tmp_path)
+        with open(result_path) as f:
+            loaded = yaml.safe_load(f)
+        config = ConfluenceConfig.from_dict(loaded)
+        assert config.default_instance == "humansys"
+        assert config.get_instance("humansys").space_key == "RaiSE1"
+
+    def test_raises_file_exists_error_when_not_overwrite(self, tmp_path: Path) -> None:
+        config_dict = _sample_config_dict()
+        write_confluence_config(config_dict, project_root=tmp_path)
+        with pytest.raises(FileExistsError, match="already exists"):
+            write_confluence_config(config_dict, project_root=tmp_path)
+
+    def test_overwrite_true_succeeds(self, tmp_path: Path) -> None:
+        config_dict = _sample_config_dict()
+        write_confluence_config(config_dict, project_root=tmp_path)
+        # Should not raise
+        result_path = write_confluence_config(
+            config_dict, project_root=tmp_path, overwrite=True
+        )
+        assert result_path.exists()
+
+    def test_creates_raise_directory_if_missing(self, tmp_path: Path) -> None:
+        config_dict = _sample_config_dict()
+        result_path = write_confluence_config(config_dict, project_root=tmp_path)
+        assert (tmp_path / ".raise").is_dir()
+        assert result_path == tmp_path / ".raise" / "confluence.yaml"
