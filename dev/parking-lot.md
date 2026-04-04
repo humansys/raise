@@ -952,4 +952,23 @@ Full e301 merge to dev done (commit `7d051f4`). You now have on dev:
 
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-25 (RAISE-275: architecture review findings)*
+*Last updated: 2026-04-03 (E1248: git-first session state)*
+
+---
+
+## Rai as Team Operating System ("Enterprise Computer") — 2026-04-03
+
+**Origen:** E1248 design session — Emilio's vision for 3.0+.
+
+**Vision:** Rai Server as the "computer" of the development team. Not just session tracking, but real-time awareness across all developers, repos, and workstreams:
+- Knows where every developer is, what they're working on, blast radius of each change
+- Learns from every session without being asked (kaizen as service, not ceremony)
+- PRO developers connect and the server governs: config download, stack setup, state provision
+- Developer doesn't track sessions — Rai observes, captures, prepares next session
+- Can answer "where are we ALL right now?" with a real-time map
+
+**Relationship:** RAISE-1229 (server state) is the infrastructure. This vision is the product direction that justifies it. E1248 (git-first protocols) provides the interface contracts.
+
+**Promotion condition:** After E1248 validates protocol pattern in 2.4 and RAISE-1229 server infra is scoped.
+
+**Prioridad:** Strategic — shapes 3.0 product direction.

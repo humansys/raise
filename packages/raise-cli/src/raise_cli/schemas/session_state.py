@@ -2,11 +2,15 @@
 
 Stored in .raise/rai/session-state.yaml — overwritten each session-close.
 Read by session-start to assemble context bundle.
+
+Session protocol models (ActivityEntry, SessionInfo, SessionOutcome,
+SessionInsights, Improvement) added for E1248 / ADR-038.
 """
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
+from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -119,3 +123,55 @@ class SessionState(BaseModel):
         default=None,
         description="ISO 8601 timestamp of last write. Used for stale-overwrite protection.",
     )
+
+
+# ---------------------------------------------------------------------------
+# Session protocol models (E1248 / ADR-038)
+# ---------------------------------------------------------------------------
+
+
+class ActivityEntry(BaseModel, frozen=True):
+    """A single entry from recent git activity."""
+
+    commit_hash: str
+    subject: str
+    author: str
+    timestamp: datetime
+    story_id: str = ""
+    epic_id: str = ""
+
+
+class SessionInfo(BaseModel, frozen=True):
+    """Metadata for an active session."""
+
+    session_id: str
+    developer: str
+    project: Path
+    branch: str
+    started: datetime
+
+
+class SessionOutcome(BaseModel, frozen=True):
+    """Result of a completed session."""
+
+    summary: str
+    patterns_captured: list[str] = Field(default_factory=list)
+    stories_completed: list[str] = Field(default_factory=list)
+
+
+class SessionInsights(BaseModel, frozen=True):
+    """Analysis results for a session."""
+
+    session_id: str
+    commit_count: int
+    test_commit_ratio: float
+    revert_count: int
+    duration_minutes: int
+
+
+class Improvement(BaseModel, frozen=True):
+    """A suggested improvement from workstream analysis."""
+
+    category: str
+    description: str
+    suggestion: str
