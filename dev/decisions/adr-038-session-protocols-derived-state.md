@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — 2026-04-03
+Accepted — 2026-04-03 (validated by S1248.1)
 
 ## Context
 
@@ -75,7 +75,31 @@ local = "raise_cli.session.registry:LocalSessionRegistry"
 local = "raise_cli.session.monitor:LocalWorkstreamMonitor"
 ```
 
-`raise-pro` and `raise-server` register their implementations under the same groups. Resolution: server > local, with fallback.
+`raise-pro` and `raise-server` register their implementations under the same groups.
+
+### Backend Selection Strategy
+
+When multiple backends are registered (e.g., `local` + `server` after installing `raise-pro`), the system selects the active backend using **capability detection with graceful fallback**:
+
+```
+1. Discover all registered backends via entry points
+2. If "server" backend exists:
+   a. Attempt health check (lightweight ping, <1s timeout)
+   b. If healthy → use server
+   c. If unhealthy → fallback to local, log warning
+3. If only "local" → use local
+4. If none → raise ConfigurationError
+```
+
+**Why not config flags?** The goal is zero-config upgrade. `pip install raise-pro` should be the only step. A manual config flag (`session.backend: server`) adds friction and a new failure mode (config says server but server is down).
+
+**Why not priority metadata?** Priority in entry points is fragile — it couples selection order to package install order and makes debugging harder. Explicit capability detection is observable.
+
+**Graceful degradation:** If the server becomes unreachable mid-session, operations that can degrade (reads) fall back to local. Operations that require server (cross-repo visibility) return empty results with a warning, never crash.
+
+**Data migration (community → pro):** On first `server` backend activation, the selector imports `index.jsonl` history into the server DB. This is a one-time, additive operation — local files are preserved as fallback. No data loss.
+
+**Override escape hatch:** `.raise/manifest.yaml` supports `session.backend: local|server|auto` (default: `auto`). This exists for debugging and CI environments, not for normal operation.
 
 ## Consequences
 
