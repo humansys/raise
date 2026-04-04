@@ -108,6 +108,9 @@ confluence = "raise_cli.adapters.confluence_adapter:PythonApiConfluenceAdapter"
 [project.entry-points."rai.graph.backends"]
 local = "raise_core.graph.backends.filesystem:FilesystemGraphBackend"
 
+[project.entry-points."rai.session.state_deriver"]
+git = "raise_cli.session.derive:GitStateDeriver"
+
 [tool.uv.sources]
 raise-core = { workspace = true }
 

@@ -1,0 +1,24 @@
+skill: rai-story-plan
+work_id: S1248.1
+version: "2.4.0"
+timestamp: "2026-04-03T22:45:00Z"
+primed_patterns:
+  - PAT-E-454  # Standalone protocol + bridge hook
+  - PAT-E-683  # E2E catches what unit tests miss
+tier1_queries: 1
+tier1_results: 5
+jit_queries: 0
+pattern_votes:
+  PAT-E-454:
+    vote: 1
+    why: "Session protocols follow standalone pattern — no bridge needed yet"
+  PAT-E-683:
+    vote: 1
+    why: "T4 integration test validates real git repo, not just mocks"
+gaps:
+  - "No prior pattern for subprocess-heavy TDD — git command mocking strategy is novel"
+artifacts:
+  - work/epics/e1248-git-first-session-state/stories/s1248.1-plan.md
+commit: null
+branch: story/s1248.1/session-protocols-git-deriver
+downstream: {}

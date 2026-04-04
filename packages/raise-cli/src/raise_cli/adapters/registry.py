@@ -28,6 +28,11 @@ EP_GOVERNANCE_PARSERS: str = "rai.governance.parsers"
 EP_DOC_TARGETS: str = "rai.docs.targets"
 EP_GRAPH_BACKENDS: str = "rai.graph.backends"
 
+# Session protocol entry point groups (ADR-038)
+EP_STATE_DERIVERS: str = "rai.session.state_deriver"
+EP_SESSION_REGISTRIES: str = "rai.session.registry"
+EP_WORKSTREAM_MONITORS: str = "rai.session.monitor"
+
 
 def _dist_name(ep: Any) -> str:
     """Best-effort extraction of the distribution name that provides an entry point."""
@@ -88,3 +93,21 @@ def get_doc_targets() -> dict[str, type]:
 def get_graph_backends() -> dict[str, type]:
     """Discover KnowledgeGraphBackend implementations."""
     return _discover(EP_GRAPH_BACKENDS)
+
+
+# Session protocol discovery (ADR-038)
+
+
+def get_state_derivers() -> dict[str, type]:
+    """Discover StateDeriver implementations."""
+    return _discover(EP_STATE_DERIVERS)
+
+
+def get_session_registries() -> dict[str, type]:
+    """Discover SessionRegistry implementations."""
+    return _discover(EP_SESSION_REGISTRIES)
+
+
+def get_workstream_monitors() -> dict[str, type]:
+    """Discover WorkstreamMonitor implementations."""
+    return _discover(EP_WORKSTREAM_MONITORS)

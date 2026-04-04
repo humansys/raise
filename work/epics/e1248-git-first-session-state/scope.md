@@ -63,7 +63,7 @@ Each has a git-only community backend (2.4) and a server backend (3.0, RAISE-122
 
 | ID | Name | Size | Dependencies | FMs Addressed |
 |----|------|------|-------------|---------------|
-| S1248.1 | Session protocols + GitStateDeriver | M | — | FM-7, FM-6, FM-1 |
+| S1248.1 | Session protocols + GitStateDeriver | M | — | FM-7, FM-6, FM-1 | ✓ |
 | S1248.2 | SessionRegistry + lifecycle gc | M | S1248.1 | FM-2, FM-3, FM-4 |
 | S1248.3 | Bundle integration + CLAUDE.local.md kill | M | S1248.1 | FM-5, FM-7 |
 | S1248.4 | WorkstreamMonitor basics | S | S1248.2 | — (kaizen) |
@@ -170,12 +170,12 @@ S1248.2 → S1248.4 is the parallel track (registry → monitor).
 
 ### Milestones
 
-#### M1: Architecture Proven (after S1248.1)
+#### M1: Architecture Proven (after S1248.1) ✓
 
-- [ ] Protocol contracts defined in `session/protocols.py`
-- [ ] GitStateDeriver returns correct CurrentWork for: release branch, story branch, worktree
-- [ ] Entry points registered and discoverable
-- [ ] Unit tests pass for all derivation cases (including edge: detached HEAD, no scope.md)
+- [x] Protocol contracts defined in `session/protocols.py`
+- [x] GitStateDeriver returns correct CurrentWork for: release branch, story branch, worktree
+- [x] Entry points registered and discoverable
+- [x] Unit tests pass for all derivation cases (including edge: detached HEAD, no scope.md)
 
 **Demo:** `GitStateDeriver().current_work(Path("."))` returns accurate state in this worktree.
 
