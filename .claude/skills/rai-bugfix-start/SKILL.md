@@ -29,6 +29,16 @@ metadata:
   raise.outputs: |
     - bug_branch: string, next_skill
     - scope_md: file_path, next_skill
+  raise.aspects: introspection
+  raise.introspection:
+    phase: bugfix.start
+    context_source: jira issue
+    affected_modules: []
+    max_tier1_queries: 2
+    max_jit_queries: 2
+    tier1_queries:
+      - "patterns for bug initialization and reproduction"
+      - "prior bugs in {affected_modules}"
 ---
 
 # Bugfix Start
@@ -57,7 +67,18 @@ Create a bug branch from the development branch, reproduce the bug, and write th
 
 ## Steps
 
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: No chain read — bugfix-start is the first skill in the bugfix chain.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
+
 ### Step 1: Create Bug Branch
+
+> **JIT**: Before creating branch, query graph for prior bugs in affected modules
+> → `aspects/introspection.md § JIT Protocol`
 
 ```bash
 git checkout {dev_branch} && git pull origin {dev_branch}
@@ -73,9 +94,19 @@ rai backlog transition RAISE-{N} in-progress -a jira
 
 Use the developer's Jira email from memory or session context. If not known, ask before proceeding.
 
+Emit telemetry:
+
+```bash
+rai signal emit-work bug RAISE-{N} --event start
+```
+
 <verification>
 On `bug/raise-{N}/{slug}` branch. Jira issue assigned and In Progress.
 </verification>
+
+<if-blocked>
+Jira transition fails → log warning and continue. Backlog sync is best-effort.
+</if-blocked>
 
 ### Step 2: Reproduce & Write Scope
 
@@ -114,13 +145,40 @@ Bug reproduces. Scope artifact committed on bug branch.
 | Backlog update | Jira assigned + In Progress |
 | Next | `/rai-bugfix-triage` |
 
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-bugfix-start/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-bugfix-start
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Missing records break the learning chain.
+
 ## Quality Checklist
 
 - [ ] Bug branch created from `{dev_branch}`
 - [ ] Jira issue assigned and transitioned to In Progress
 - [ ] Bug reproduces before any investigation
 - [ ] Scope artifact committed with WHAT/WHEN/WHERE/EXPECTED/Done-when
+- [ ] Telemetry emitted via `rai signal emit-work`
 - [ ] NEVER investigate before reproducing
+- [ ] LEARN record written to `.raise/rai/learnings/rai-bugfix-start/{work_id}/record.yaml`
 
 ## References
 

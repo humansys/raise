@@ -27,6 +27,17 @@ metadata:
     - scope_md: file_path, required, from_previous
   raise.outputs: |
     - analysis_md: file_path, next_skill
+  raise.aspects: introspection
+  raise.introspection:
+    phase: bugfix.analyse
+    context_source: scope doc with triage
+    affected_modules: []
+    max_tier1_queries: 3
+    max_jit_queries: 3
+    tier1_queries:
+      - "root cause patterns in {affected_modules}"
+      - "prior analyses for {bug_type} bugs"
+      - "failure modes for {origin} defects"
 ---
 
 # Bugfix Analyse
@@ -53,7 +64,18 @@ Determine the root cause of the bug using structured analysis methods. The outpu
 
 ## Steps
 
+### PRIME (mandatory — do not skip)
+
+Before starting Step 1, you MUST execute the PRIME protocol:
+
+1. **Chain read**: Read bugfix-triage's learning record at `.raise/rai/learnings/rai-bugfix-triage/{work_id}/record.yaml`.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
+
 ### Step 1: Select Analysis Method
+
+> **JIT**: Before selecting method, query graph for root cause patterns in affected modules
+> → `aspects/introspection.md § JIT Protocol`
 
 | Tier | Criteria | Method |
 |------|----------|--------|
@@ -76,7 +98,14 @@ Rule for both: "Human error" is never a root cause — ask why the error was pos
 Root cause stated with evidence. Fix approach decided — not implemented yet.
 </verification>
 
+<if-blocked>
+Root cause unclear after analysis → document top 2 hypotheses, escalate to human for judgment.
+</if-blocked>
+
 ### Step 3: Write Analysis Artifact
+
+> **JIT**: Before writing analysis, query graph for prior analyses of similar bug types
+> → `aspects/introspection.md § JIT Protocol`
 
 Write `work/bugs/RAISE-{N}/analysis.md`: confirmed root cause + fix approach.
 
@@ -101,6 +130,31 @@ Analysis artifact committed with root cause and fix approach.
 | Analysis | `work/bugs/RAISE-{N}/analysis.md` |
 | Next | `/rai-bugfix-plan` |
 
+### LEARN (mandatory — do not skip)
+
+After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-bugfix-analyse/{work_id}/record.yaml`:
+
+```yaml
+skill: rai-bugfix-analyse
+work_id: {work_id}
+version: "2.4.0"
+timestamp: {ISO 8601 UTC}
+primed_patterns: [{list of pattern IDs from PRIME}]
+tier1_queries: {count}
+tier1_results: {count}
+jit_queries: {count}
+pattern_votes:
+  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
+gaps:
+  - "description of missing knowledge"
+artifacts: [{list of files produced}]
+commit: {current commit hash or null}
+branch: {current branch}
+downstream: {}
+```
+
+**Rules:** Every cognitive skill execution MUST produce this record. Missing records break the learning chain. Enrich bugfix-triage's record with `downstream: {classification_accurate: bool}`.
+
 ## Quality Checklist
 
 - [ ] Root cause confirmed with evidence (not guessed)
@@ -108,6 +162,7 @@ Analysis artifact committed with root cause and fix approach.
 - [ ] Analysis artifact committed
 - [ ] "Human error" never accepted as root cause
 - [ ] NEVER fix before analysing — symptoms recur without root cause
+- [ ] LEARN record written to `.raise/rai/learnings/rai-bugfix-analyse/{work_id}/record.yaml`
 
 ## References
 
