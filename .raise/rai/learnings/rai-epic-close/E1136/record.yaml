@@ -1,0 +1,43 @@
+skill: rai-epic-close
+work_id: E1136
+version: "2.4.0"
+timestamp: "2026-04-04T04:30:00Z"
+primed_patterns:
+  - PAT-E-699
+  - PAT-F-053
+  - PAT-F-054
+tier1_queries: 1
+tier1_results: 5
+jit_queries: 0
+pattern_votes:
+  PAT-E-699:
+    vote: 0
+    why: "Risk-first ordering not directly applicable to epic close"
+  PAT-F-053:
+    vote: 1
+    why: "Stepping stone pattern confirmed — mandatory instructions were the stepping stone to adoption"
+  PAT-F-054:
+    vote: 1
+    why: "Silent nodes validated — missing implement records in autonomous mode are the signal"
+gaps:
+  - "No enforcement mechanism for LEARN in autonomous mode — instruction compliance drops to ~42%"
+  - "Graph index absent in worktrees makes tier1 queries dead — systemic across all worktree sessions"
+  - "Work ID normalization missing — filesystem casing creates duplicates"
+artifacts:
+  - "work/epics/e1136-introspection-hardening/retrospective.md"
+  - "work/epics/e1136-introspection-hardening/stories/s1136.5-scope.md"
+  - "work/epics/e1136-introspection-hardening/stories/s1136.5-retrospective.md"
+commit: null
+branch: "worktree/skills-improvement"
+downstream:
+  spawned_epic: "RAISE-1275 (E1137 — Introspection Improvements v3.0)"
+  bugs_filed:
+    - "RAISE-1276: Graph index in worktrees"
+    - "RAISE-1277: Autonomous mode LEARN enforcement"
+    - "RAISE-1278: Work ID casing normalization"
+  aggregate:
+    total_records: 30
+    epics_covered: 5
+    acceptance_rate: "76%"
+    baseline_acceptance: "33%"
+    improvement: "+43pp"
