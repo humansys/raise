@@ -83,6 +83,14 @@ rai backlog update RAISE-{N} --assignee "{developer-email}" -a jira
 rai backlog transition RAISE-{N} in-progress -a jira
 ```
 
+Query the graph for relevant context (single query, non-blocking):
+
+```bash
+rai graph query "bugs patterns {component or keywords from bug summary}" --types pattern --limit 5
+```
+
+If graph returns results, present them as context before starting phase 1. If graph is unavailable (e.g., worktree without index), note and continue — graph context is enrichment, not a gate.
+
 ### Step 2: Execute Skill Chain
 
 Execute each phase inline by reading the SKILL.md and following its steps directly. No subagents.
