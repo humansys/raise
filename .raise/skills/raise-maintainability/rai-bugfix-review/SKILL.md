@@ -25,16 +25,6 @@ metadata:
   raise.outputs: |
     - retro_md: file_path, next_skill
     - patterns: list, cli
-  raise.aspects: introspection
-  raise.introspection:
-    phase: bugfix.review
-    context_source: all bug artifacts
-    affected_modules: []
-    max_tier1_queries: 2
-    max_jit_queries: 3
-    tier1_queries:
-      - "evaluation patterns for {affected_modules}"
-      - "process patterns from recent bugs"
 ---
 
 # Bugfix Review
@@ -61,21 +51,7 @@ Verify the fix addresses root cause, extract process improvements and causal pat
 
 ## Steps
 
-### PRIME (mandatory — do not skip)
-
-Before starting Step 1, you MUST execute the PRIME protocol:
-
-1. **Chain read**: Read ALL previous bug learning records (bugfix-start, bugfix-triage, bugfix-analyse, bugfix-plan, bugfix-fix). This provides the aggregate view for the retrospective.
-2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
-3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
-
 ### Step 1: Verify Fix Quality
-
-Determine which test command to run using this priority chain:
-
-1. **Check `.raise/manifest.yaml`** for `project.test_command` — if set, use directly
-2. **Detect language** from `project.project_type` in manifest, or scan file extensions
-3. **Map language to default** (see `/rai-bugfix-fix` Step 1 for the full table)
 
 Verify:
 - Fix addresses root cause (not symptom) — compare with `analysis.md`
@@ -93,46 +69,13 @@ Fix verified against root cause. All gates green.
 
 ### Step 2: Heutagogical Checkpoint
 
-> **JIT**: Before reflecting, query graph for evaluation patterns in affected modules
-> → `aspects/introspection.md § JIT Protocol`
-
 Answer with specific examples:
 1. What did you learn about this system or codebase?
 2. What would you change about the fix process?
 3. Are there improvements for the framework (skill, guardrail, template)?
 4. What are you more capable of now?
 
-<verification>
-All four questions answered with specifics.
-</verification>
-
-### Step 3: Aggregate Learning Records
-
-Read learning records produced during this bug's lifecycle:
-- `.raise/rai/learnings/rai-bugfix-start/{work_id}/record.yaml`
-- `.raise/rai/learnings/rai-bugfix-triage/{work_id}/record.yaml`
-- `.raise/rai/learnings/rai-bugfix-analyse/{work_id}/record.yaml`
-- `.raise/rai/learnings/rai-bugfix-plan/{work_id}/record.yaml`
-- `.raise/rai/learnings/rai-bugfix-fix/{work_id}/record.yaml`
-
-If any record is missing (silent node or execution gap), note it and continue — missing records are valid signal.
-
-Produce aggregate summary with these metrics:
-
-| Metric | Calculation | What it tells us |
-|--------|-------------|-----------------|
-| **Acceptance rate** | Patterns voted +1 / total patterns primed | Are PRIME queries returning useful context? |
-| **Gap rate** | Total gaps / total JIT queries | Is the graph missing knowledge we need? |
-| **Pattern utility** | Patterns +1 / (patterns +1 + patterns -1) | Are stored patterns helping or misleading? |
-
-<verification>
-Learning records read (or missing noted). Metrics calculated.
-</verification>
-
-### Step 4: Persist Patterns & Reinforce
-
-> **JIT**: Before persisting patterns, query graph for existing patterns to avoid duplicates
-> → `aspects/introspection.md § JIT Protocol`
+### Step 3: Extract Patterns & Process Improvements
 
 **Add patterns** worth preserving (causal insights, recurring failure modes):
 
@@ -154,18 +97,12 @@ rai pattern reinforce {pattern_id} --vote {1|0|-1} --from RAISE-{N}
 | `0` | Pattern not relevant (does NOT count toward scoring) |
 | `-1` | Fix contradicted the pattern |
 
-Only evaluate patterns you consciously considered. `0` is correct for most patterns.
-
-**Process improvement extraction** — answer with specifics:
+**Process improvement** — answer with specifics:
 
 1. What change in process or tooling would prevent this **class** of bug?
-2. What classification pattern does this bug represent? (e.g., Type=Functional + Origin=Code + Qualifier=Missing → missing boundary validation)
+2. What classification pattern does this bug represent?
 
-<verification>
-Patterns persisted. Behavioral patterns evaluated.
-</verification>
-
-### Step 5: Write Retrospective
+### Step 4: Write Retrospective
 
 Write `work/bugs/RAISE-{N}/retro.md`:
 
@@ -178,7 +115,7 @@ Write `work/bugs/RAISE-{N}/retro.md`:
 - Classification: {Bug Type}/{Severity}/{Origin}/{Qualifier}
 
 ### Process Improvement
-**Prevention:** {specific process/tool change that would prevent this class of bug}
+**Prevention:** {specific change that would prevent this class of bug}
 **Pattern:** {Bug Type}={X} + {Origin}={Y} → {systemic insight}
 
 ### Heutagogical Checkpoint
@@ -186,13 +123,6 @@ Write `work/bugs/RAISE-{N}/retro.md`:
 2. Process change: ...
 3. Framework improvement: ...
 4. Capability gained: ...
-
-### Learning Chain Summary
-- Records found: {N}/5
-- Acceptance rate: {value}
-- Gap rate: {value}
-- Pattern utility: {value}
-- Notable gaps: {list or "none"}
 
 ### Patterns
 - Added: {pattern IDs or "none"}
@@ -202,26 +132,14 @@ Write `work/bugs/RAISE-{N}/retro.md`:
 Commit:
 
 ```bash
-git add work/bugs/RAISE-{N}/retro.md .raise/rai/learnings/
+git add work/bugs/RAISE-{N}/retro.md
 git commit -m "bug(RAISE-{N}): review — retro and patterns
 
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
 <verification>
-Retro written. Checkpoint answered. Patterns added/reinforced. Learning chain summarized.
-</verification>
-
-### Step 6: Emit Calibration Telemetry
-
-```bash
-rai signal emit-calibration RAISE-{N} --size {XS|S|M|L} --estimated {minutes} --actual {minutes}
-```
-
-This feeds the velocity tracking system for future estimation accuracy.
-
-<verification>
-Calibration event recorded (or skipped if CLI unavailable).
+Retro written. Patterns added/reinforced.
 </verification>
 
 ## Output
@@ -230,50 +148,17 @@ Calibration event recorded (or skipped if CLI unavailable).
 |------|-------------|
 | Retrospective | `work/bugs/RAISE-{N}/retro.md` |
 | Patterns | `.raise/rai/memory/patterns.jsonl` |
-| Calibration | Via `rai signal emit-calibration` |
 | Next | `/rai-bugfix-close` |
-
-### LEARN (mandatory — do not skip)
-
-After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-bugfix-review/{work_id}/record.yaml`:
-
-```yaml
-skill: rai-bugfix-review
-work_id: {work_id}
-version: "2.4.0"
-timestamp: {ISO 8601 UTC}
-primed_patterns: [{list of pattern IDs from PRIME}]
-tier1_queries: {count}
-tier1_results: {count}
-jit_queries: {count}
-pattern_votes:
-  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
-gaps:
-  - "description of missing knowledge"
-artifacts: [{list of files produced}]
-commit: {current commit hash or null}
-branch: {current branch}
-downstream: {}
-```
-
-**Rules:** Every cognitive skill execution MUST produce this record. Missing records break the learning chain.
-
-**Commit:** Stage and commit the learning record with the retrospective: `git add .raise/rai/learnings/`. Records that stay on disk without a commit are lost when the worktree is cleaned up.
 
 ## Quality Checklist
 
-- [ ] Project language detected before running tests
 - [ ] Fix verified against root cause (not symptom)
 - [ ] Heutagogical checkpoint answered with specifics
-- [ ] Learning records aggregated with metrics
 - [ ] Process improvement extracted with prevention + pattern
 - [ ] Patterns added with `--scope project` if applicable
-- [ ] Behavioral patterns reinforced via `rai pattern reinforce`
-- [ ] Calibration telemetry emitted
 - [ ] Retro artifact committed
 - [ ] NEVER merge without retro — learnings compound
 - [ ] NEVER skip pattern reinforce — scoring system depends on it
-- [ ] LEARN record written to `.raise/rai/learnings/rai-bugfix-review/{work_id}/record.yaml`
 
 ## References
 
