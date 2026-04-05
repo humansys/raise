@@ -1,13 +1,14 @@
 ---
 name: rai-bugfix-run
-description: Run the full 7-phase bugfix pipeline with delegation gates. Use to orchestrate a bug fix.
+description: Run the full 7-phase bugfix pipeline with 3 HITL gates. Use to orchestrate a bug fix.
 
 allowed-tools:
   - Read
+  - Edit
+  - Write
   - Grep
   - Glob
   - Bash
-  - Agent
   - Skill
 
 license: MIT
@@ -35,15 +36,17 @@ metadata:
 
 ## Purpose
 
-Execute the full 7-phase bugfix pipeline in one invocation, pausing at the mandatory triage gate and delegation-based gates, resuming automatically from the last completed phase.
+Execute the full 7-phase bugfix pipeline inline (no subagents), pausing at 3 fixed HITL gates where human judgment prevents cascading errors.
 
-**D5 principle:** Skills contain only judgment work. The orchestrator handles all deterministic actions (backlog transitions, Jira assignment, branch cleanup).
+**Design principles:**
+- **D5:** Skills contain only judgment work. Orchestrator handles deterministic actions.
+- **D6:** Inline execution, no subagents. Skills are short enough (<600w) for high compliance without context isolation. 3 fixed HITL gates replace delegation levels.
 
 ## Mastery Levels (ShuHaRi)
 
-- **Shu**: Show phase progress, explain each skill's output, pause at all gates
-- **Ha**: Brief progress between phases, pause only when delegation says REVIEW
-- **Ri**: Minimal output, AUTO delegation (triage gate still mandatory)
+- **Shu**: Explain each phase output, pause at all 3 gates with full context
+- **Ha**: Brief progress between phases, gates still mandatory
+- **Ri**: Minimal output, gates still mandatory (gates are never skippable)
 
 ## Context
 
@@ -62,105 +65,48 @@ Check artifacts in **reverse order** — take the most advanced phase:
 | Check | Artifact | If exists → resume at |
 |:-----:|----------|----------------------|
 | 6 | `work/bugs/RAISE-{N}/retro.md` | **close** |
-| 5 | Code commits on bug branch after `plan.md` timestamp | **review** |
+| 5 | Code commits on bug branch after `plan.md` | **review** |
 | 4 | `work/bugs/RAISE-{N}/plan.md` | **fix** |
 | 3 | `work/bugs/RAISE-{N}/analysis.md` | **plan** |
 | 2 | `work/bugs/RAISE-{N}/scope.md` with `^TRIAGE:` | **analyse** |
 | 1 | `work/bugs/RAISE-{N}/scope.md` without TRIAGE | **triage** |
 | 0 | (nothing) | **start** |
 
-Present: "Phase detection: resuming at **{phase}** (found: {artifact})" or "Starting fresh."
+Present: "Phase detection: resuming at **{phase}**" or "Starting fresh."
 
-### Step 1: Resolve Delegation
+### Step 1: Pre-chain Setup (orchestrator responsibility)
 
-Load `~/.rai/developer.yaml`. Resolve delegation level:
-
-| Source | Resolution |
-|--------|-----------|
-| `delegation.overrides.rai-bugfix-run` | Per-skill override (highest priority) |
-| `delegation.default_level` | Explicit default |
-| `experience_level` ShuHaRi | Shu→REVIEW, Ha→NOTIFY, Ri→AUTO |
-| No profile | Default to REVIEW |
-
-**Triage gate is ALWAYS mandatory regardless of delegation level.**
-
-### Step 2: Pre-chain Setup (orchestrator responsibility)
-
-Before forking phase 1 (start), the orchestrator handles:
+Before starting, handle Jira assignment (best-effort, non-blocking):
 
 ```bash
-# Assign bug and transition to In Progress
 rai backlog update RAISE-{N} --assignee "{developer-email}" -a jira
 rai backlog transition RAISE-{N} in-progress -a jira
 ```
 
-These are best-effort — failures do not block the pipeline.
+### Step 2: Execute Skill Chain
 
-### Step 3: Execute Skill Chain
+Execute each phase inline by reading the SKILL.md and following its steps directly. No subagents.
 
 **Chain order:**
 
-| Phase | Skill | Gate after? |
-|:-----:|-------|:-----------:|
-| 1 | `/rai-bugfix-start RAISE-{N}` | — |
-| 2 | `/rai-bugfix-triage RAISE-{N}` | **MANDATORY** (triage gate) |
-| 3 | `/rai-bugfix-analyse RAISE-{N}` | delegation gate |
-| 4 | `/rai-bugfix-plan RAISE-{N}` | — |
-| 5 | `/rai-bugfix-fix RAISE-{N}` | delegation gate |
-| 6 | `/rai-bugfix-review RAISE-{N}` | — |
-| 7 | `/rai-bugfix-close RAISE-{N}` | — |
+| Phase | Skill | Then |
+|:-----:|-------|:----:|
+| 1 | `/rai-bugfix-start` | → **GATE 1** |
+| 2 | `/rai-bugfix-triage` | ↓ |
+| 3 | `/rai-bugfix-analyse` | → **GATE 2** |
+| 4 | `/rai-bugfix-plan` | ↓ |
+| 5 | `/rai-bugfix-fix` | → **GATE 3** |
+| 6 | `/rai-bugfix-review` | ↓ |
+| 7 | `/rai-bugfix-close` | done |
 
-**All phases fork** via Agent tool with fresh context. The orchestrator never executes skill logic directly.
+**Per phase:**
 
-#### Fork Execution
+1. Read `.claude/skills/rai-bugfix-{phase}/SKILL.md`
+2. Execute every step — no compression, no skipping
+3. Show completion banner
+4. If gate follows → present gate, wait for human
 
-For each phase:
-
-1. **Read** the skill's SKILL.md from `.claude/skills/rai-bugfix-{phase}/SKILL.md`
-2. **Spawn** Agent tool subagent with prompt template (below)
-3. **Wait** for completion
-4. **Verify** output: confirm artifact exists on disk
-5. **Show** completion banner
-6. **Apply** gate if applicable
-
-**Agent prompt template:**
-
-```
-Execute the following skill for bug {bug_id}.
-
-## Skill Instructions
-
-{full SKILL.md content}
-
-## Bug Context
-
-- Bug ID: {bug_id}
-- Bug path: work/bugs/{bug_id}/
-- Prior artifacts on disk: {list existing files}
-- Bug branch: {branch name or "not yet created"}
-
-## Your Task
-
-1. Read CLAUDE.md for project-level context and rules
-2. Read the prior artifacts listed above from disk
-3. Execute every step in the Skill Instructions — no compression, no skipping
-4. Write all output artifacts to the correct paths
-5. When done, return a brief summary: what you did, artifacts created, and any decisions
-
-ARGUMENTS: {bug_id}
-```
-
-**Close phase guardrails — add to close agent prompt:**
-
-```
-## Scope Constraints (CRITICAL — close is MR-only)
-- ONLY: push branch, create MR, delete local branch
-- NEVER edit source code, skill files, config, or governance docs
-- NEVER create "fix" or "refactor" commits
-- If something looks wrong, return it as a finding — do not act on it
-```
-
-**Completion banner (after each phase):**
+**Completion banner:**
 
 ```markdown
 ### ✔ Phase {N}/7 — {skill_name}
@@ -170,76 +116,106 @@ ARGUMENTS: {bug_id}
 | + | `path/to/file.md` | created |
 | ~ | `path/to/file.py` | modified |
 
-**Commits:** {count} (`{hash}`) · **Tests:** {count} passed
+**Commits:** {count} (`{hash}`)
 ```
 
 <verification>
-Each skill's SKILL.md loaded and all steps executed.
+Each phase's steps fully executed before proceeding.
 </verification>
 
 <if-blocked>
-Skill fails → STOP immediately. Report which phase failed and why. Re-invoke `/rai-bugfix-run` after fixing — phase detection resumes from last artifact.
+Phase fails → STOP immediately. Report which phase and why. Re-invoke `/rai-bugfix-run` after fixing — phase detection resumes from last artifact.
 </if-blocked>
 
-### Step 4: Apply Gates
+### Step 3: HITL Gates
 
-#### Triage Gate (MANDATORY — always applies)
+#### GATE 1: Scope Confirmation (after start + triage)
 
-After phase 2 (triage), present classification using **anti-anchoring design** (D3): show reproduction context BEFORE AI classification.
+After phases 1-2, present for human verification:
 
 ```
-── Triage Gate (MANDATORY) ──
+── GATE 1: Scope & Classification ──
 
 Bug: RAISE-{N} — {summary}
 
 Reproduction:
   WHAT: {from scope.md}
   WHERE: {from scope.md}
+  Reproduces: {yes/no}
 
-AI Classification:
+Classification:
   Bug Type:  {value}
   Severity:  {value}
   Origin:    {value}
   Qualifier: {value}
 
-▸ Confirm classification? [y/edit/reject]
+▸ Is this the right problem with the right classification? [y/edit/reject]
 ```
 
 | Response | Action |
 |----------|--------|
 | **y** | Continue to analyse |
-| **edit** | Human corrects values → re-run MCP update → continue |
-| **reject** | STOP — re-evaluate |
+| **edit** | Human corrects scope or classification → update artifacts + MCP → continue |
+| **reject** | STOP — re-evaluate problem definition |
 
-Log overrides in session journal:
-```bash
-rai session journal add "TRIAGE OVERRIDE: RAISE-{N} — {original} → {corrected}" --type decision
+#### GATE 2: Analysis & Strategy (after analyse)
+
+After phase 3, present root cause and fix strategy:
+
+```
+── GATE 2: Root Cause & Strategy ──
+
+Root cause: {from analysis.md}
+Method: {5 Whys / Ishikawa / Direct}
+Evidence: {key evidence supporting root cause}
+
+Fix strategy: {proposed approach}
+
+▸ Does this root cause and strategy make sense? [y/adjust/reject]
 ```
 
-#### Delegation Gates (after analyse and fix)
+| Response | Action |
+|----------|--------|
+| **y** | Continue to plan + fix |
+| **adjust** | Human refines strategy → update analysis.md → continue |
+| **reject** | STOP — re-analyse with different hypotheses |
 
-| Level | Behavior |
-|-------|----------|
-| REVIEW | Present summary. Wait for approval. |
-| NOTIFY | Present summary. Continue after 3s. |
-| AUTO | Continue immediately. Stop on gate failure. |
+#### GATE 3: Fix Verification (after fix)
 
-### Step 5: Post-chain Cleanup (orchestrator responsibility)
+After phase 5, present fix results:
 
-After all phases complete, the orchestrator handles:
+```
+── GATE 3: Fix Verification ──
+
+Tasks completed: {N}/{total}
+Tests: {count} passed
+Bug reproduces: {no — verified}
+
+Files changed:
+  {list of modified files}
+
+▸ Does the fix look correct? [y/reject]
+```
+
+| Response | Action |
+|----------|--------|
+| **y** | Continue to review + close |
+| **reject** | STOP — human reviews code, identifies issues |
+
+### Step 4: Post-chain Cleanup (orchestrator responsibility)
+
+After all phases complete:
 
 ```bash
-# Transition Jira to Done
 rai backlog transition RAISE-{N} done -a jira
 ```
 
-### Step 6: Complete & Report
+### Step 5: Complete & Report
 
 ```markdown
 ## Bugfix Run Complete: RAISE-{N}
 
 **Phases:** {start_phase} → close ({N} phases executed)
-**Delegation:** {level}
 **Result:** MR created targeting `{dev_branch}` ({mr_url})
 
 ### Artifacts
@@ -262,7 +238,6 @@ rai backlog transition RAISE-{N} done -a jira
 | Commits | {total} across 7 phases |
 | Patterns | {PAT-IDs or "none"} |
 | Jira | RAISE-{N} → Done |
-| Triage override | {yes/no} |
 ```
 
 ## Output
@@ -277,21 +252,17 @@ rai backlog transition RAISE-{N} done -a jira
 ## Quality Checklist
 
 - [ ] Phase detection checked in reverse order
-- [ ] Delegation resolved before starting chain
 - [ ] Pre-chain: Jira assigned + In Progress (orchestrator, not skill)
-- [ ] Triage gate ALWAYS mandatory (even AUTO delegation)
-- [ ] Anti-anchoring: reproduction shown BEFORE classification
-- [ ] All 7 phases fork via Agent tool with fresh context
-- [ ] Each subagent gets only SKILL.md + disk artifacts (no conversation history)
-- [ ] Close agent prompt includes scope constraints
+- [ ] All 7 phases executed inline (no subagents)
+- [ ] GATE 1 (scope + classification) presented after start+triage
+- [ ] GATE 2 (root cause + strategy) presented after analyse
+- [ ] GATE 3 (fix verification) presented after fix
+- [ ] All 3 gates are mandatory — never skippable
 - [ ] Post-chain: Jira transitioned to Done (orchestrator, not skill)
 - [ ] Failure stops immediately — no cascading
-- [ ] NEVER skip the triage gate
-- [ ] NEVER pass conversation context to subagents
+- [ ] NEVER skip a gate — they prevent cascading errors
 
 ## References
 
 - Skills: `/rai-bugfix-start`, `-triage`, `-analyse`, `-plan`, `-fix`, `-review`, `-close`
-- Pattern: `/rai-story-run` (fork pattern, delegation gates)
-- Design: `work/epics/e1286-bugfix-pipeline-orchestration/design.md` (D1-D5)
-- Delegation: `~/.rai/developer.yaml`
+- Design: `work/epics/e1286-bugfix-pipeline-orchestration/design.md` (D1-D6)
