@@ -36,3 +36,8 @@ Python object + I/O. No diagnostic value for routine getUpdates.
    then pass `telegram_trigger.bot` to TelegramHandler. Remove standalone ptb_app.
 2. **Set poll_interval=2.0:** Add guard interval to start_polling() call.
 3. **Suppress httpx logs:** Set httpx logger to WARNING level in main().
+
+## Note
+
+Fix already implemented in release/3.0.0 (S1066.1, commits 82a5fb32..7c4f5d65). Cherry-pick
+conflicts due to 3.0 pipeline code not present in 2.4. Manual port of the 3 specific changes.
