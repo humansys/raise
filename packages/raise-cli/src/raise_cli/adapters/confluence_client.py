@@ -163,6 +163,30 @@ class ConfluenceClient:
 
     # ── Discovery ─────────────────────────────────────────────────────
 
+    def get_space_direct(self, space_key: str) -> SpaceInfo | None:
+        """Look up a single space by key (direct API call).
+
+        Bypasses get_all_spaces() enumeration, which may omit spaces with
+        mixed-case keys (RAISE-1187).
+
+        Returns:
+            SpaceInfo if space exists, None if not found.
+        """
+        try:
+            raw: dict[str, Any] = self._client.get_space(space_key)  # type: ignore[no-untyped-call]
+            if not raw or "key" not in raw:
+                return None
+            return SpaceInfo(
+                key=raw["key"],
+                name=raw.get("name", ""),
+                url=raw.get("_links", {}).get("webui", ""),
+                type=raw.get("type", "global"),
+            )
+        except ConfluenceError:
+            raise
+        except Exception:
+            return None
+
     def get_space_homepage_id(self, space_key: str) -> str | None:
         """Get the homepage page ID for a space. Returns None if not found."""
         try:
