@@ -312,6 +312,10 @@ def build(
         bool,
         typer.Option("--no-diff", help="Skip diff computation"),
     ] = False,
+    strict: Annotated[
+        bool,
+        typer.Option("--strict", help="Fail on duplicate node IDs (for CI)"),
+    ] = False,
 ) -> None:
     """Build graph index from all sources.
 
@@ -345,8 +349,13 @@ def build(
         old_graph = backend.load()
 
     # Build unified graph
-    builder = GraphBuilder()
+    builder = GraphBuilder(strict=strict)
     graph = builder.build()
+
+    # Report duplicate warnings (RAISE-648)
+    if builder.warnings:
+        for warning in builder.warnings:
+            console.print(f"[yellow]⚠ {warning}[/yellow]")
 
     # Count nodes by type
     node_counts: dict[str, int] = {}
