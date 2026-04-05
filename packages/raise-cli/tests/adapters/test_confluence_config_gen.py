@@ -225,11 +225,11 @@ class TestSuggestRouting:
     def test_skips_artifact_title_with_id_prefix(self) -> None:
         """RAISE-1272: 'ADR-041: Skill Runtime...' should NOT match 'adr'."""
         tree = _make_tree(
-            ["ADR-041: Skill Runtime Orchestration", "Architecture"]
+            ["ADR-041: Skill Runtime Orchestration", "Architecture Decision Records"]
         )
         result = suggest_routing(tree)
         assert "adr" in result
-        assert result["adr"].parent_title == "Architecture"
+        assert result["adr"].parent_title == "Architecture Decision Records"
 
     def test_skips_ticket_id_title(self) -> None:
         """RAISE-1272: 'RAISE-123: Some Bug' should be skipped."""
