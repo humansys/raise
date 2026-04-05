@@ -38,6 +38,8 @@ def _make_client(
         return client
 
     client.get_spaces.return_value = spaces or []
+    # Default: direct lookup returns None (space not found) — override in tests
+    client.get_space_direct.return_value = None
 
     _homepage_ids = homepage_ids or {}
 
@@ -278,6 +280,8 @@ def _make_v2_client(
     """Build a mocked ConfluenceClient for V2 discovery service tests."""
     client = MagicMock()
     client.get_spaces.return_value = spaces or []
+    # Default: direct lookup returns None (space not found) — override in tests
+    client.get_space_direct.return_value = None
 
     _homepage_ids: dict[str, str | None] = homepage_ids or {}
 
@@ -573,8 +577,7 @@ SPACE_MIXED = SpaceInfo(
 
 
 class TestDiscoverFallbackForMissingSpace:
-    """RAISE-1187: discover(space_key=...) should fall back to direct lookup
-    when get_spaces() omits the space (mixed-case key upstream quirk)."""
+    """RAISE-1187: fallback to direct lookup for mixed-case space keys."""
 
     def test_v1_discover_falls_back_to_direct_lookup(self) -> None:
         """V1: discover(space_key="RaiSE1") succeeds even if get_spaces() omits it."""
