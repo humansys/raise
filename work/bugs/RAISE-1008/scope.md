@@ -9,3 +9,9 @@ EXPECTED:  Daemon should idle at <5% CPU with minimal memory footprint. Single P
            guarded poll interval, suppressed verbose logs.
 Done when: (1) Only one PTB Application instance exists, (2) poll_interval >= 2.0,
            (3) httpx polling logs suppressed to WARNING level.
+
+TRIAGE:
+  Bug Type:    Logic
+  Severity:    S1-High
+  Origin:      Code
+  Qualifier:   Incorrect
