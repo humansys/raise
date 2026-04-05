@@ -300,6 +300,60 @@ class TestResolveDocsTarget:
         assert not isinstance(target, SyncDocsAdapter)
 
 
+# --- Config not found guidance (RAISE-593) ---
+
+
+class _StubPMConfigMissing:
+    """Stub that raises FileNotFoundError on init (simulates missing jira.yaml)."""
+
+    def __init__(self) -> None:
+        raise FileNotFoundError("Jira config not found: /project/.raise/jira.yaml")
+
+
+class _StubPMGenericError:
+    """Stub that raises generic error on init."""
+
+    def __init__(self) -> None:
+        msg = "Connection refused"
+        raise ConnectionError(msg)
+
+
+class TestResolveConfigNotFound:
+    """resolve_entrypoint should give actionable guidance on FileNotFoundError (RAISE-593)."""
+
+    def test_file_not_found_shows_guidance(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """FileNotFoundError should suggest rai adapter-setup, not show raw path."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters",
+            lambda: {"jira": _StubPMConfigMissing},
+        )
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
+        from raise_cli.cli.commands._resolve import resolve_adapter
+
+        with pytest.raises(SystemExit):
+            resolve_adapter(None)
+        captured = capsys.readouterr().out
+        assert "rai adapter-setup" in captured or "adapter-setup" in captured
+
+    def test_generic_error_shows_raw_message(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Non-FileNotFoundError should still show raw exception message."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters",
+            lambda: {"jira": _StubPMGenericError},
+        )
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
+        from raise_cli.cli.commands._resolve import resolve_adapter
+
+        with pytest.raises(SystemExit):
+            resolve_adapter(None)
+        captured = capsys.readouterr().out
+        assert "Connection refused" in captured
+
+
 # --- YAML + entry point mixed tests (S337.3) ---
 
 _DISCOVER_MOD = "raise_cli.adapters.declarative.discovery"
