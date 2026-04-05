@@ -362,3 +362,123 @@ class TestIssueTypeGeneration:
         config = JiraConfig.model_validate(result)
         assert config.default_instance == "humansys"
         assert "RAISE" in config.projects
+
+
+# ── T4: Per-project workflow/issue_types (RAISE-1300) ────────────────
+
+
+class TestPerProjectStructure:
+    """RAISE-1300: workflow states and issue types belong in per-project section."""
+
+    def test_single_project_has_per_project_workflow(self) -> None:
+        """Single project: workflow_states inside projects.{KEY}."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows=workflows,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        # Per-project, not global
+        assert "workflow" not in result, "Global workflow section should not exist"
+        project = result["projects"]["RAISE"]
+        assert "workflow_states" in project
+        names = {s["name"] for s in project["workflow_states"]}
+        assert names == {"Backlog", "Done"}
+
+    def test_multi_project_separate_workflows(self) -> None:
+        """Each project has its own workflow_states, not merged."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(name="Done", status_category="done", transitions=[]),
+            ],
+            "RTEST": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+                WorkflowState(
+                    name="In Review", status_category="indeterminate", transitions=[]
+                ),
+            ],
+        }
+        pm = _make_project_map(workflows=workflows)
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE", "RTEST"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        assert "workflow" not in result
+        raise_states = {
+            s["name"] for s in result["projects"]["RAISE"]["workflow_states"]
+        }
+        rtest_states = {
+            s["name"] for s in result["projects"]["RTEST"]["workflow_states"]
+        }
+        assert raise_states == {"Backlog", "Done"}
+        assert rtest_states == {"Backlog", "In Review"}
+
+    def test_per_project_issue_types(self) -> None:
+        """Issue types inside projects.{KEY}, not global."""
+        issue_types = {
+            "RAISE": [
+                IssueTypeInfo(id="10001", name="Story", subtask=False),
+                IssueTypeInfo(id="10002", name="Bug", subtask=False),
+            ],
+            "RTEST": [
+                IssueTypeInfo(id="10001", name="Story", subtask=False),
+                IssueTypeInfo(id="10004", name="Task", subtask=False),
+            ],
+        }
+        pm = _make_project_map(issue_types=issue_types)
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE", "RTEST"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        assert "issue_types" not in result, "Global issue_types should not exist"
+        raise_types = {it["name"] for it in result["projects"]["RAISE"]["issue_types"]}
+        rtest_types = {it["name"] for it in result["projects"]["RTEST"]["issue_types"]}
+        assert raise_types == {"Story", "Bug"}
+        assert rtest_types == {"Story", "Task"}
+
+    def test_no_global_workflow_or_issue_types(self) -> None:
+        """Even with data, no global workflow or issue_types keys."""
+        workflows = {
+            "RAISE": [
+                WorkflowState(name="Backlog", status_category="new", transitions=[]),
+            ],
+        }
+        issue_types = {
+            "RAISE": [
+                IssueTypeInfo(id="10001", name="Story", subtask=False),
+            ],
+        }
+        pm = _make_project_map(
+            projects=[
+                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
+            ],
+            workflows=workflows,
+            issue_types=issue_types,
+        )
+        result = generate_jira_config(
+            project_map=pm,
+            selected_projects=["RAISE"],
+            instance_name="humansys",
+            site="humansys.atlassian.net",
+        )
+        assert "workflow" not in result
+        assert "issue_types" not in result
+        assert "workflow_states" in result["projects"]["RAISE"]
+        assert "issue_types" in result["projects"]["RAISE"]
