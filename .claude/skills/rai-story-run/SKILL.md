@@ -293,7 +293,6 @@ All phases complete. Story merged and branch cleaned up.
 | All story artifacts | `work/epics/e{N}-{name}/stories/` |
 | Merge commit | Parent branch (epic or dev) |
 | Patterns | `.raise/rai/memory/patterns.jsonl` |
-| Calibration | Via `rai signal emit-calibration` |
 | Next | Next story or `/rai-epic-close` |
 
 ## Quality Checklist
@@ -316,5 +315,5 @@ All phases complete. Story merged and branch cleaned up.
 
 - Skills: `/rai-story-start`, `/rai-story-design`, `/rai-story-plan`, `/rai-story-implement`, `/rai-architecture-review`, `/rai-quality-review`, `/rai-story-review`, `/rai-story-close`
 - Delegation: `~/.rai/developer.yaml`, S325.2
-- BacklogHook: S325.4 (fires on `rai signal emit-work` in start/close)
+- BacklogHook: S325.4
 - Design: `s325.6-design.md` (decisions D1-D2-D3)

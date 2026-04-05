@@ -207,6 +207,6 @@ All phases complete. Epic merged.
 - Epic skills: `/rai-epic-start`, `/rai-epic-design`, `/rai-architecture-review`, `/rai-epic-plan`, `/rai-epic-close`
 - Story orchestrator: `/rai-story-run` (S325.6)
 - Delegation: `~/.rai/developer.yaml`, S325.2
-- BacklogHook: S325.4 (fires on `rai signal emit-work` in start/close)
+- BacklogHook: S325.4
 - Design: `s325.7-design.md` (decisions D1-D2-D3-D4)
 - F5 constraint & checkpoint protocol: E353 (ADR-043), S353.2, S353.3

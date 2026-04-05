@@ -127,7 +127,6 @@ If the story has a backlog ticket (Jira key or local key):
 
 ```bash
 rai backlog transition {story_key} in_progress
-rai signal emit-work story S{N}.{M} --event start
 ```
 
 | Condition | Action |

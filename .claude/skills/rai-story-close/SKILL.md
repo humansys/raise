@@ -145,10 +145,9 @@ git branch -d story/s{N}.{M}/{slug}
 Local story branch deleted.
 </verification>
 
-### Step 6: Update Context & Emit
+### Step 6: Update Backlog
 
-1. Emit telemetry: `rai signal emit-work story S{N}.{M} --event complete`
-2. If the story has a backlog ticket: `rai backlog transition {story_key} done`
+If the story has a backlog ticket: `rai backlog transition {story_key} done`
 
 | Condition | Action |
 |-----------|--------|
@@ -157,7 +156,7 @@ Local story branch deleted.
 | No ticket | Skip backlog transition |
 
 <verification>
-Local context updated. Telemetry emitted.
+Backlog updated.
 </verification>
 
 <if-blocked>

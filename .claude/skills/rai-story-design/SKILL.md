@@ -69,7 +69,7 @@ Create a lean story specification optimized for both human review (clear intent)
 Before starting Step 1, you MUST execute the PRIME protocol:
 
 1. **Chain read**: No chain read — story-design is the first skill in the story chain.
-2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note and continue.
 3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Assess Complexity
@@ -218,31 +218,6 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 | Design document | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
 | Next | `/rai-story-plan` |
 
-### LEARN (mandatory — do not skip)
-
-After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-story-design/{work_id}/record.yaml`:
-
-```yaml
-skill: rai-story-design
-work_id: {work_id}
-version: "2.4.0"
-timestamp: {ISO 8601 UTC}
-primed_patterns: [{list of pattern IDs from PRIME}]
-tier1_queries: {count}
-tier1_results: {count}
-jit_queries: {count}
-pattern_votes:
-  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
-gaps:
-  - "description of missing knowledge"
-artifacts: [{list of files produced}]
-commit: {current commit hash or null}
-branch: {current branch}
-downstream: {}
-```
-
-**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
-
 ## Quality Checklist
 
 - [ ] Complexity assessed — design depth matches complexity
@@ -255,7 +230,6 @@ downstream: {}
 - [ ] Spec creation <30 minutes, review <5 minutes
 - [ ] NEVER over-specify HOW — trust AI for implementation details
 - [ ] NEVER skip examples — they are the most important section
-- [ ] LEARN record written to `.raise/rai/learnings/rai-story-design/{work_id}/record.yaml`
 
 ## References
 
