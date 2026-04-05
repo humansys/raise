@@ -46,35 +46,29 @@ Push the bug branch, create a merge request targeting the development branch, an
 
 **Inputs:** Bug ID, `{dev_branch}` from `.raise/manifest.yaml`.
 
-**Expected state:** On bug branch. All artifacts exist (scope.md, analysis.md, plan.md, retro.md). All gates pass.
+**Expected state:** On bug branch. All artifacts exist (scope.md, analysis.md, plan.md, retro.md). Gates passed in fix phase.
 
 ## Steps
 
 ### Step 1: Verify Completeness & Clean Tree
 
-Check all required artifacts exist:
+Check all required artifacts exist and working tree is clean:
 
 ```bash
 for f in scope.md analysis.md plan.md retro.md; do
   [ -f "work/bugs/RAISE-{N}/$f" ] && echo "✓ $f" || echo "ERROR: Missing $f"
 done
-```
-
-Check working tree and gates:
-
-```bash
 git status --short
 ```
 
 | Condition | Action |
 |-----------|--------|
-| All 4 artifacts + clean tree + gates green | Continue |
+| All 4 artifacts + clean tree | Continue |
 | Any artifact missing | **STOP** — run the missing phase skill first |
 | Uncommitted changes | Commit them before push |
-| Any gate failing | Fix before push |
 
 <verification>
-All 4 artifacts verified. Working tree clean. Gates pass.
+All 4 artifacts verified. Working tree clean.
 </verification>
 
 ### Step 2: Push & Create MR
@@ -137,7 +131,6 @@ If something looks wrong, return it as a finding — do not act on it.
 
 - [ ] All 4 artifacts verified before closing
 - [ ] Working tree clean before push
-- [ ] All four gates pass
 - [ ] MR created in GitLab targeting `{dev_branch}`
 - [ ] Local branch deleted after MR creation
 - [ ] No files modified outside scope constraints

@@ -51,23 +51,7 @@ Verify the fix addresses root cause, extract process improvements and causal pat
 
 ## Steps
 
-### Step 1: Verify Fix Quality
-
-Verify:
-- Fix addresses root cause (not symptom) — compare with `analysis.md`
-- Regression test is green
-- No regressions introduced
-
-| Condition | Action |
-|-----------|--------|
-| Tests green | Continue |
-| Tests failing | Fix first — review requires green tests |
-
-<verification>
-Fix verified against root cause. All gates green.
-</verification>
-
-### Step 2: Heutagogical Checkpoint
+### Step 1: Heutagogical Checkpoint
 
 Answer with specific examples:
 1. What did you learn about this system or codebase?
@@ -75,7 +59,7 @@ Answer with specific examples:
 3. Are there improvements for the framework (skill, guardrail, template)?
 4. What are you more capable of now?
 
-### Step 3: Extract Patterns & Process Improvements
+### Step 2: Extract Patterns & Process Improvements
 
 **Add patterns** worth preserving (causal insights, recurring failure modes):
 
@@ -102,7 +86,7 @@ rai pattern reinforce {pattern_id} --vote {1|0|-1} --from RAISE-{N}
 1. What change in process or tooling would prevent this **class** of bug?
 2. What classification pattern does this bug represent?
 
-### Step 4: Write Retrospective
+### Step 3: Write Retrospective
 
 Write `work/bugs/RAISE-{N}/retro.md`:
 
@@ -152,7 +136,6 @@ Retro written. Patterns added/reinforced.
 
 ## Quality Checklist
 
-- [ ] Fix verified against root cause (not symptom)
 - [ ] Heutagogical checkpoint answered with specifics
 - [ ] Process improvement extracted with prevention + pattern
 - [ ] Patterns added with `--scope project` if applicable

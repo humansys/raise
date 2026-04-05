@@ -57,15 +57,8 @@ Write `work/bugs/RAISE-{N}/plan.md`: atomic tasks in TDD order.
 
 Each task must have:
 - **Description:** What to do
-- **Verification:** Command to run (test, lint, type check)
+- **Verification:** Command from `.raise/manifest.yaml` (test, lint, type check)
 - **Commit message:** Following `fix(RAISE-{N}): {description}` convention
-
-Resolve verification commands from `.raise/manifest.yaml` (`test_command`, `lint_command`, `type_check_command`). If absent, use language defaults:
-
-| Language | Test | Lint | Type Check |
-|----------|------|------|------------|
-| Python | `uv run pytest --tb=short` | `uv run ruff check` | `uv run pyright` |
-| TypeScript | `npx vitest run` | `npx eslint src/` | `npx tsc --noEmit` |
 
 The regression test task MUST be first:
 
