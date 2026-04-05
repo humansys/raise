@@ -1,6 +1,6 @@
 ---
 name: rai-bugfix-analyse
-description: Root cause analysis using 5 Whys or Ishikawa. Phase 3 of bugfix pipeline.
+description: Root cause analysis using the method best suited to the bug. Phase 3 of bugfix pipeline.
 
 allowed-tools:
   - Read
@@ -33,13 +33,13 @@ metadata:
 
 ## Purpose
 
-Determine the root cause of the bug using structured analysis methods. The output is a confirmed root cause and a decided fix approach — not the fix itself.
+Determine the root cause of the bug and decide a fix approach. Select the analysis method based on what information is available — not on an arbitrary complexity tier.
 
 ## Mastery Levels (ShuHaRi)
 
-- **Shu**: Follow analysis method strictly, document every hypothesis
-- **Ha**: Select method based on bug complexity; skip Ishikawa for single-chain causes
-- **Ri**: Domain-specific RCA methods (fault trees, failure mode analysis)
+- **Shu**: Follow the selected method strictly, document every hypothesis
+- **Ha**: Combine methods when signals overlap
+- **Ri**: Domain-specific RCA methods (fault trees, SBFL)
 
 ## Context
 
@@ -53,41 +53,57 @@ Determine the root cause of the bug using structured analysis methods. The outpu
 
 ## Steps
 
-### Step 1: Select Analysis Method
+### Step 1: Select Method Based on Available Signals
 
-| Tier | Criteria | Method |
-|------|----------|--------|
-| XS | Cause evident | Document directly |
-| S | Single causal chain | 5 Whys |
-| M/L | Multiple possible causes | Ishikawa |
+Read the scope artifact and determine which signals you have:
+
+| Signal available | Best method |
+|-----------------|-------------|
+| Stack trace or error message with location | **Stack trace analysis** — follow the error path to origin |
+| Bug appeared after a known change | **git bisect** — binary search commits to find the introducing change |
+| Single suspected cause | **5 Whys** — trace one causal chain, each answer evidenced |
+| Multiple possible causes, unclear which | **Hypothesis-driven** — list hypotheses, test each, eliminate |
+| Cause is evident from reproduction | **Document directly** — write the cause and move on |
+
+Choose the method that matches your signals. If uncertain, default to **hypothesis-driven** — it's the most general and what LLMs do naturally.
 
 ### Step 2: Analyse
 
-**5 Whys (S):** Trace one factual causal chain — ask "Why?" five times, each answer evidenced. Stop at actionable root cause. Record: `Problem → Why1 → Why2 → Why3 → Why4 → Root cause → Countermeasure`.
+Execute the selected method:
 
-**Ishikawa (M/L):** Explore 6 M's: Method, Machine, Material, Measurement, Manpower, Milieu. State each hypothesis, test it, confirm or eliminate:
+**Stack trace analysis:** Follow the error from the surface (exception/log) back through the call chain to the originating defect. Document the path.
+
+**git bisect:** `git bisect start`, `git bisect bad HEAD`, `git bisect good {known-good-commit}`. Test at each step until the introducing commit is found.
+
+**5 Whys:** Trace one factual causal chain — ask "Why?" up to five times, each answer evidenced by code. Stop at the actionable root cause.
+
+**Hypothesis-driven:** List 2-5 hypotheses for the root cause. For each one, define a test (grep, read code, run command), execute it, and record the result:
 
 | Hypothesis | Test | Result | Conclusion |
 |------------|------|--------|------------|
+| {what might cause it} | {how to verify} | {what you found} | confirmed / eliminated |
 
-Rule for both: "Human error" is never a root cause — ask why the error was possible.
+Narrow to one confirmed root cause. If two remain, escalate to human at GATE 2.
+
+**Rule for all methods:** "Human error" is never a root cause — ask why the error was possible.
 
 <verification>
 Root cause stated with evidence. Fix approach decided — not implemented yet.
 </verification>
 
 <if-blocked>
-Root cause unclear after analysis → document top 2 hypotheses, escalate to human for judgment.
+Root cause unclear after analysis → document top 2 hypotheses, escalate to human at GATE 2.
 </if-blocked>
 
 ### Step 3: Write Analysis Artifact
 
-Write `work/bugs/RAISE-{N}/analysis.md`: confirmed root cause + fix approach.
+Write `work/bugs/RAISE-{N}/analysis.md` with: method used, root cause, evidence, and fix approach.
 
 ```bash
 git add work/bugs/RAISE-{N}/analysis.md
 git commit -m "bug(RAISE-{N}): analyse — root cause identified
 
+Method: {method used}
 Root cause: {one line}
 Fix approach: {one line}
 
@@ -95,7 +111,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
 <verification>
-Analysis artifact committed with root cause and fix approach.
+Analysis artifact committed with method, root cause, and fix approach.
 </verification>
 
 ## Output
@@ -107,6 +123,7 @@ Analysis artifact committed with root cause and fix approach.
 
 ## Quality Checklist
 
+- [ ] Method selected based on available signals (not arbitrary tier)
 - [ ] Root cause confirmed with evidence (not guessed)
 - [ ] Fix approach decided but not implemented
 - [ ] Analysis artifact committed
