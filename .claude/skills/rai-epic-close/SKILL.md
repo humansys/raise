@@ -71,7 +71,7 @@ Complete an epic by conducting a retrospective, tagging the milestone, and updat
 Before starting Step 1, you MUST execute the PRIME protocol:
 
 1. **Chain read**: Read ALL learning records from this epic's skills (epic-design, epic-plan, and all story records). This provides the aggregate view for the retrospective.
-2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note and continue.
 3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Verify Stories Complete
@@ -202,14 +202,8 @@ Dev pushed to origin. MR created if targeting main. MR URL presented to develope
 1. Mark epic complete via CLI:
    - **If Jira issue exists:** `rai backlog transition {JIRA_KEY} "Done" -a jira`
    - **If no Jira key:** `rai backlog search "summary ~ '{epic name}'" -a jira` to find it, then transition
-2. Emit telemetry:
-
-```bash
-rai signal emit-work epic E{N} --event complete
-```
-
 <verification>
-Backlog reflects completion. Local context updated.
+Backlog reflects completion.
 </verification>
 
 ## Output
@@ -221,31 +215,6 @@ Backlog reflects completion. Local context updated.
 | Push | `{dev_branch}` pushed to origin |
 | Merge request | GitLab MR: `{dev_branch}` → `{main_branch}` (if release) |
 | Backlog update | Tracker via `rai backlog` CLI |
-
-### LEARN (mandatory — do not skip)
-
-After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-epic-close/{work_id}/record.yaml`:
-
-```yaml
-skill: rai-epic-close
-work_id: {work_id}
-version: "2.4.0"
-timestamp: {ISO 8601 UTC}
-primed_patterns: [{list of pattern IDs from PRIME}]
-tier1_queries: {count}
-tier1_results: {count}
-jit_queries: {count}
-pattern_votes:
-  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
-gaps:
-  - "description of missing knowledge"
-artifacts: [{list of files produced}]
-commit: {current commit hash or null}
-branch: {current branch}
-downstream: {}
-```
-
-**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain. This is the final record in the epic chain — include aggregate learning summary.
 
 ## Quality Checklist
 
@@ -259,7 +228,6 @@ downstream: {}
 - [ ] No epic branch to clean up — epics are logical containers
 - [ ] NEVER close without retrospective — learnings compound across epics
 - [ ] NEVER create per-story MRs — one MR per epic at close time
-- [ ] LEARN record written to `.raise/rai/learnings/rai-epic-close/{work_id}/record.yaml`
 
 ## References
 

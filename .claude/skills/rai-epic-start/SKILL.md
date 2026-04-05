@@ -119,12 +119,6 @@ Register epic in the backlog tracker via CLI:
 - **If Jira issue exists:** `rai backlog transition {JIRA_KEY} "In Progress" -a jira`
 - **If new epic (no Jira key):** `rai backlog create "{title}" -p RAISE -t Epic -l epic`
 
-Emit telemetry:
-
-```bash
-rai signal emit-work epic E{N} --event start
-```
-
 <verification>
 Scope commit on `{dev_branch}`. Epic visible in backlog.
 </verification>

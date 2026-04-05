@@ -62,7 +62,7 @@ Reflect on the completed story to extract learnings, persist patterns, reinforce
 Before starting Step 1, you MUST execute the PRIME protocol:
 
 1. **Chain read**: Read ALL previous story learning records (story-design, story-plan, story-implement). This provides the aggregate view for the retrospective.
-2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note in LEARN record and continue.
+2. **Graph query**: Execute tier1 queries from this skill's metadata using `rai graph query`. If graph is unavailable, note and continue.
 3. **Present**: Surface retrieved patterns as context. 0 results is valid — not a failure.
 
 ### Step 1: Verify Tests Pass
@@ -189,53 +189,13 @@ Create `work/epics/e{N}-{name}/stories/s{N}.{M}-retrospective.md` with:
 Retrospective document created with learning chain summary.
 </verification>
 
-### Step 6: Emit Calibration Telemetry
-
-```bash
-rai signal emit-calibration S{N}.{M} --size {XS|S|M|L} --estimated {minutes} --actual {minutes}
-```
-
-This feeds the velocity tracking system for future estimation accuracy.
-
-<verification>
-Calibration event recorded (or skipped if CLI unavailable).
-</verification>
-
 ## Output
 
 | Item | Destination |
 |------|-------------|
 | Retrospective | `work/epics/e{N}-{name}/stories/s{N}.{M}-retrospective.md` |
 | Patterns | `.raise/rai/memory/patterns.jsonl` |
-| Calibration | Via `rai signal emit-calibration` |
 | Next | `/rai-story-close` |
-
-### LEARN (mandatory — do not skip)
-
-After completing the final step, you MUST produce a learning record. Write to `.raise/rai/learnings/rai-story-review/{work_id}/record.yaml`:
-
-```yaml
-skill: rai-story-review
-work_id: {work_id}
-version: "2.4.0"
-timestamp: {ISO 8601 UTC}
-primed_patterns: [{list of pattern IDs from PRIME}]
-tier1_queries: {count}
-tier1_results: {count}
-jit_queries: {count}
-pattern_votes:
-  {PATTERN_ID}: {vote: 1|0|-1, why: "reason"}
-gaps:
-  - "description of missing knowledge"
-artifacts: [{list of files produced}]
-commit: {current commit hash or null}
-branch: {current branch}
-downstream: {}
-```
-
-**Rules:** Every cognitive skill execution MUST produce this record. Simple stories are not exempt — a record with 0 queries and 0 gaps is valid and expected. Missing records break the learning chain.
-
-**Commit:** Stage and commit the learning record with the retrospective: `git add .raise/rai/learnings/`. Records that stay on disk without a commit are lost when the worktree is cleaned up.
 
 ## Quality Checklist
 
@@ -244,11 +204,9 @@ downstream: {}
 - [ ] Heutagogical checkpoint answered with specific examples
 - [ ] New patterns persisted via `rai pattern add`
 - [ ] Behavioral patterns reinforced via `rai pattern reinforce`
-- [ ] Calibration telemetry emitted
 - [ ] Retrospective document created
 - [ ] NEVER skip pattern reinforce — scoring system depends on it (RAISE-170)
 - [ ] NEVER give vague checkpoint answers — be specific with concrete examples
-- [ ] LEARN record written to `.raise/rai/learnings/rai-story-review/{work_id}/record.yaml`
 
 ## References
 
