@@ -141,11 +141,19 @@ def _infer_depends_on(
     nodes: list[GraphNode],
     node_by_id: dict[str, GraphNode],
 ) -> list[GraphEdge]:
-    """Infer depends_on edges from module metadata."""
+    """Infer depends_on edges from module and component metadata (RAISE-573)."""
     edges: list[GraphEdge] = []
 
+    # Build name→id index for component nodes (class name → node ID)
+    comp_name_index: dict[str, str] = {}
     for node in nodes:
-        if node.type != "module":
+        if node.type == "component":
+            name = node.metadata.get("name", "")
+            if name:
+                comp_name_index[name] = node.id
+
+    for node in nodes:
+        if node.type not in ("module", "component"):
             continue
 
         raw_deps: Any = node.metadata.get("depends_on", [])
@@ -154,7 +162,8 @@ def _infer_depends_on(
         deps = cast("list[str]", raw_deps)
 
         for dep_name in deps:
-            target_id = f"mod-{dep_name}"
+            # Resolution order: component name → module name
+            target_id = comp_name_index.get(dep_name) or f"mod-{dep_name}"
             if target_id in node_by_id:
                 edges.append(
                     GraphEdge(
