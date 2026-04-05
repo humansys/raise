@@ -55,14 +55,23 @@ def _lazy_bridge_error() -> type:
 
 
 def _resolve_env(config: McpServerConfig) -> dict[str, str] | None:
-    """Build env dict from ServerConnection.env var names."""
-    env_names = config.server.env
-    if not env_names:
+    """Build env dict from ServerConnection.env entries.
+
+    Entries may be ``KEY`` (resolved from os.environ) or ``KEY=VALUE``
+    (used directly). Split on first ``=`` only so values containing
+    ``=`` are preserved.  Fixes RAISE-539.
+    """
+    env_entries = config.server.env
+    if not env_entries:
         return None
-    return {
-        **os.environ,
-        **{k: os.environ.get(k, "") for k in env_names},
-    }
+    resolved: dict[str, str] = {}
+    for entry in env_entries:
+        if "=" in entry:
+            key, value = entry.split("=", 1)
+            resolved[key] = value
+        else:
+            resolved[entry] = os.environ.get(entry, "")
+    return {**os.environ, **resolved}
 
 
 async def _call_tool(
