@@ -85,6 +85,15 @@ def resolve_entrypoint(
 
     try:
         instance = cls()
+    except FileNotFoundError as exc:
+        name = selected or next(iter(entries))
+        console.print(
+            f"[red]Error:[/red] {group_label} '{name}' config file not found.\n\n"
+            f"  {exc}\n\n"
+            f"To fix, run:  [bold]rai adapter-setup[/bold]\n"
+            f"Or create the config file manually."
+        )
+        sys.exit(1)
     except Exception as exc:
         name = selected or next(iter(entries))
         console.print(
