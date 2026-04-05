@@ -110,10 +110,10 @@ class TestCoreGenerator:
 
 
 class TestWorkflowGeneration:
-    """Workflow states and status mapping from discovery data."""
+    """Workflow states per project from discovery data."""
 
     def test_workflow_states_included(self) -> None:
-        """Discovered workflow states appear in output."""
+        """Discovered workflow states appear in per-project section."""
         workflows = {
             "RAISE": [
                 WorkflowState(name="Backlog", status_category="new", transitions=[]),
@@ -135,41 +135,12 @@ class TestWorkflowGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        assert "workflow" in result
-        states = result["workflow"]["states"]
+        states = result["projects"]["RAISE"]["workflow_states"]
         assert len(states) == 3
         names = [s["name"] for s in states]
         assert "Backlog" in names
         assert "In Progress" in names
         assert "Done" in names
-
-    def test_status_mapping_generated(self) -> None:
-        """Status mapping keys derived from state names (slugified)."""
-        workflows = {
-            "RAISE": [
-                WorkflowState(name="Backlog", status_category="new", transitions=[]),
-                WorkflowState(
-                    name="In Progress", status_category="indeterminate", transitions=[]
-                ),
-                WorkflowState(name="Done", status_category="done", transitions=[]),
-            ],
-        }
-        pm = _make_project_map(
-            projects=[
-                ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
-            ],
-            workflows=workflows,
-        )
-        result = generate_jira_config(
-            project_map=pm,
-            selected_projects=["RAISE"],
-            instance_name="humansys",
-            site="humansys.atlassian.net",
-        )
-        mapping = result["workflow"]["status_mapping"]
-        assert "backlog" in mapping
-        assert "in-progress" in mapping
-        assert "done" in mapping
 
     def test_status_category_in_states(self) -> None:
         """Each state includes its category."""
@@ -190,11 +161,11 @@ class TestWorkflowGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        state = result["workflow"]["states"][0]
+        state = result["projects"]["RAISE"]["workflow_states"][0]
         assert state["category"] == "new"
 
     def test_empty_workflows_omits_section(self) -> None:
-        """No workflow section when no states discovered."""
+        """No workflow_states key when no states discovered."""
         pm = _make_project_map(
             projects=[
                 ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
@@ -207,10 +178,10 @@ class TestWorkflowGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        assert "workflow" not in result
+        assert "workflow_states" not in result["projects"]["RAISE"]
 
-    def test_multi_project_merges_workflows(self) -> None:
-        """Workflows from multiple selected projects are merged (deduped)."""
+    def test_multi_project_keeps_separate_workflows(self) -> None:
+        """Each project keeps its own workflow_states (RAISE-1300)."""
         workflows = {
             "RAISE": [
                 WorkflowState(name="Backlog", status_category="new", transitions=[]),
@@ -231,13 +202,17 @@ class TestWorkflowGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        states = result["workflow"]["states"]
-        names = {s["name"] for s in states}
-        # Union of both projects, deduplicated
-        assert names == {"Backlog", "Done", "In Review"}
+        raise_names = {
+            s["name"] for s in result["projects"]["RAISE"]["workflow_states"]
+        }
+        rtest_names = {
+            s["name"] for s in result["projects"]["RTEST"]["workflow_states"]
+        }
+        assert raise_names == {"Backlog", "Done"}
+        assert rtest_names == {"Backlog", "In Review", "Done"}
 
     def test_schema_validates_with_workflow(self) -> None:
-        """Full config with workflow still passes JiraConfig.model_validate()."""
+        """Full config with per-project workflow still passes JiraConfig.model_validate()."""
         workflows = {
             "RAISE": [
                 WorkflowState(name="Backlog", status_category="new", transitions=[]),
@@ -256,7 +231,6 @@ class TestWorkflowGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        # JiraConfig has extra="allow", so workflow passes through
         config = JiraConfig.model_validate(result)
         assert config.default_instance == "humansys"
 
@@ -268,7 +242,7 @@ class TestIssueTypeGeneration:
     """Issue types section from discovery data."""
 
     def test_issue_types_included(self) -> None:
-        """Discovered issue types appear in output."""
+        """Discovered issue types appear in per-project section."""
         issue_types = {
             "RAISE": [
                 IssueTypeInfo(id="10001", name="Story", subtask=False),
@@ -288,14 +262,13 @@ class TestIssueTypeGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        assert "issue_types" in result
-        names = [it["name"] for it in result["issue_types"]]
+        names = [it["name"] for it in result["projects"]["RAISE"]["issue_types"]]
         assert "Story" in names
         assert "Bug" in names
         assert "Sub-task" in names
 
     def test_empty_issue_types_omits_section(self) -> None:
-        """No issue_types section when none discovered."""
+        """No issue_types key in project when none discovered."""
         pm = _make_project_map(
             projects=[
                 ProjectInfo(key="RAISE", name="RAISE", project_type_key="software")
@@ -308,10 +281,10 @@ class TestIssueTypeGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        assert "issue_types" not in result
+        assert "issue_types" not in result["projects"]["RAISE"]
 
-    def test_multi_project_merges_issue_types(self) -> None:
-        """Issue types from multiple projects are merged (deduped by name)."""
+    def test_multi_project_keeps_separate_issue_types(self) -> None:
+        """Each project keeps its own issue types (RAISE-1300)."""
         issue_types = {
             "RAISE": [
                 IssueTypeInfo(id="10001", name="Story", subtask=False),
@@ -329,11 +302,13 @@ class TestIssueTypeGeneration:
             instance_name="humansys",
             site="humansys.atlassian.net",
         )
-        names = {it["name"] for it in result["issue_types"]}
-        assert names == {"Story", "Bug", "Task"}
+        raise_types = {it["name"] for it in result["projects"]["RAISE"]["issue_types"]}
+        rtest_types = {it["name"] for it in result["projects"]["RTEST"]["issue_types"]}
+        assert raise_types == {"Story", "Bug"}
+        assert rtest_types == {"Story", "Task"}
 
     def test_schema_validates_with_all_extras(self) -> None:
-        """Full config with workflow + issue_types passes JiraConfig.model_validate()."""
+        """Full config with per-project workflow + issue_types passes JiraConfig.model_validate()."""
         workflows = {
             "RAISE": [
                 WorkflowState(name="Backlog", status_category="new", transitions=[]),
