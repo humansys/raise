@@ -3,6 +3,9 @@
 Takes JiraProjectMap from discovery + user selections, returns a dict
 that passes JiraConfig.model_validate() validation. No side effects.
 
+Workflow states and issue types are placed per-project (RAISE-1300),
+not merged globally.
+
 RAISE-1130 (S1130.5)
 """
 
@@ -11,39 +14,6 @@ from __future__ import annotations
 from typing import Any
 
 from raise_cli.adapters.jira_discovery import JiraProjectMap
-from raise_cli.adapters.models.pm import IssueTypeInfo, WorkflowState
-
-
-def _slugify(name: str) -> str:
-    """Convert status name to mapping key: lowercase, spaces → hyphens."""
-    return name.strip().lower().replace(" ", "-")
-
-
-def _merge_workflows(
-    project_map: JiraProjectMap,
-    selected_keys: set[str],
-) -> list[WorkflowState]:
-    """Merge and deduplicate workflow states across selected projects."""
-    seen: dict[tuple[str, str], WorkflowState] = {}
-    for key in sorted(selected_keys):
-        for ws in project_map.workflows.get(key, []):
-            dedup_key = (ws.name, ws.status_category)
-            if dedup_key not in seen:
-                seen[dedup_key] = ws
-    return list(seen.values())
-
-
-def _merge_issue_types(
-    project_map: JiraProjectMap,
-    selected_keys: set[str],
-) -> list[IssueTypeInfo]:
-    """Merge and deduplicate issue types across selected projects by name."""
-    seen: dict[str, IssueTypeInfo] = {}
-    for key in sorted(selected_keys):
-        for it in project_map.issue_types.get(key, []):
-            if it.name not in seen:
-                seen[it.name] = it
-    return list(seen.values())
 
 
 def generate_jira_config(
@@ -62,6 +32,7 @@ def generate_jira_config(
 
     Returns:
         Dict matching JiraConfig schema (default_instance, instances, projects).
+        Workflow states and issue types are per-project inside the projects dict.
 
     Raises:
         ValueError: If any selected_project is not in the discovery map.
@@ -87,37 +58,33 @@ def generate_jira_config(
         },
     }
 
-    # Build projects section
+    # Build projects section — with per-project workflow_states and issue_types
     projects: dict[str, dict[str, Any]] = {}
     for info in selected_infos:
-        projects[info.key] = {
+        project_entry: dict[str, Any] = {
             "instance": instance_name,
             "name": info.name,
         }
 
-    result: dict[str, Any] = {
+        # Per-project workflow states
+        workflow_states = project_map.workflows.get(info.key, [])
+        if workflow_states:
+            project_entry["workflow_states"] = [
+                {"name": ws.name, "category": ws.status_category}
+                for ws in workflow_states
+            ]
+
+        # Per-project issue types
+        issue_types = project_map.issue_types.get(info.key, [])
+        if issue_types:
+            project_entry["issue_types"] = [
+                {"name": it.name, "subtask": it.subtask} for it in issue_types
+            ]
+
+        projects[info.key] = project_entry
+
+    return {
         "default_instance": instance_name,
         "instances": instances,
         "projects": projects,
     }
-    merged_states = _merge_workflows(project_map, selected_keys)
-    if merged_states:
-        states_list: list[dict[str, Any]] = [
-            {"name": ws.name, "category": ws.status_category} for ws in merged_states
-        ]
-        status_mapping: dict[str, str] = {
-            _slugify(ws.name): ws.name for ws in merged_states
-        }
-        result["workflow"] = {
-            "states": states_list,
-            "status_mapping": status_mapping,
-        }
-
-    # Issue types section — merge across selected projects, dedup by name
-    merged_types = _merge_issue_types(project_map, selected_keys)
-    if merged_types:
-        result["issue_types"] = [
-            {"name": it.name, "subtask": it.subtask} for it in merged_types
-        ]
-
-    return result
