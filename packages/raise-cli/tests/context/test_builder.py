@@ -969,6 +969,88 @@ class TestLoadArchitecture:
         targets = {e.target for e in depends_on_edges if e.source == "mod-discovery"}
         assert targets == {"mod-core", "mod-schemas"}
 
+    def test_creates_depends_on_edges_for_components(self, tmp_path: Path) -> None:
+        """Should create depends_on edges for component nodes (RAISE-573)."""
+        from raise_core.graph.models import GraphNode as GN
+
+        comp_error = GN(
+            id="comp-exceptions-RaiseError",
+            type="component",
+            content="Base error class",
+            created="2026-04-04",
+            metadata={"name": "RaiseError", "kind": "class"},
+        )
+        comp_config = GN(
+            id="comp-exceptions-ConfigurationError",
+            type="component",
+            content="Config error",
+            created="2026-04-04",
+            metadata={
+                "name": "ConfigurationError",
+                "kind": "class",
+                "depends_on": ["RaiseError"],
+            },
+        )
+        comp_orphan = GN(
+            id="comp-utils-Helper",
+            type="component",
+            content="Helper",
+            created="2026-04-04",
+            metadata={
+                "name": "Helper",
+                "kind": "class",
+                "depends_on": ["NonExistentClass"],
+            },
+        )
+
+        builder = GraphBuilder(project_root=tmp_path)
+        nodes = [comp_error, comp_config, comp_orphan]
+        edges = builder.infer_relationships(nodes)
+
+        depends_on_edges = [e for e in edges if e.type == "depends_on"]
+        # ConfigurationError → RaiseError should produce an edge
+        assert any(
+            e.source == "comp-exceptions-ConfigurationError"
+            and e.target == "comp-exceptions-RaiseError"
+            for e in depends_on_edges
+        ), f"Expected comp→comp edge, got: {depends_on_edges}"
+        # NonExistentClass should NOT produce an edge (no crash)
+        assert not any(
+            e.source == "comp-utils-Helper" for e in depends_on_edges
+        )
+
+    def test_component_depends_on_module_cross_type(self, tmp_path: Path) -> None:
+        """Component depending on a module name should produce cross-type edge (RAISE-573)."""
+        from raise_core.graph.models import GraphNode as GN
+
+        mod_core = GN(
+            id="mod-core",
+            type="module",
+            content="Core module",
+            created="2026-04-04",
+            metadata={"name": "core"},
+        )
+        comp_service = GN(
+            id="comp-api-Service",
+            type="component",
+            content="Service class",
+            created="2026-04-04",
+            metadata={
+                "name": "Service",
+                "kind": "class",
+                "depends_on": ["core"],
+            },
+        )
+
+        builder = GraphBuilder(project_root=tmp_path)
+        edges = builder.infer_relationships([mod_core, comp_service])
+
+        depends_on_edges = [e for e in edges if e.type == "depends_on"]
+        assert any(
+            e.source == "comp-api-Service" and e.target == "mod-core"
+            for e in depends_on_edges
+        ), f"Expected comp→mod edge, got: {depends_on_edges}"
+
     def test_build_includes_architecture_modules(self, tmp_path: Path) -> None:
         """Build should include architecture module nodes in graph."""
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
