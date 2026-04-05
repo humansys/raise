@@ -1386,6 +1386,73 @@ class TestBuild:
             builder.build()
 
 
+    def test_build_skips_duplicates_when_not_strict(self, tmp_path: Path) -> None:
+        """Should warn and skip duplicate nodes when strict=False (RAISE-648)."""
+        builder = GraphBuilder(project_root=tmp_path, strict=False)
+
+        duplicate_nodes = [
+            GraphNode(
+                id="comp-test-Foo",
+                type="component",
+                content="First Foo",
+                created="2026-02-09",
+                source_file="first.py",
+            ),
+            GraphNode(
+                id="comp-test-Foo",
+                type="component",
+                content="Second Foo (collision)",
+                created="2026-02-09",
+                source_file="second.py",
+            ),
+        ]
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=duplicate_nodes),
+        ):
+            graph = builder.build()
+
+        # First node kept, second skipped
+        assert graph.node_count == 1
+        node = graph.get_concept("comp-test-Foo")
+        assert node is not None
+        assert node.content == "First Foo"
+        # Warning recorded
+        assert len(builder.warnings) == 1
+        assert "comp-test-Foo" in builder.warnings[0]
+
+    def test_build_raises_on_duplicate_when_strict(self, tmp_path: Path) -> None:
+        """Should raise ValueError on duplicate when strict=True (RAISE-648)."""
+        builder = GraphBuilder(project_root=tmp_path, strict=True)
+
+        duplicate_nodes = [
+            GraphNode(
+                id="comp-test-Foo",
+                type="component",
+                content="First Foo",
+                created="2026-02-09",
+            ),
+            GraphNode(
+                id="comp-test-Foo",
+                type="component",
+                content="Second Foo",
+                created="2026-02-09",
+            ),
+        ]
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=duplicate_nodes),
+            pytest.raises(ValueError, match="Duplicate node ID.*comp-test-Foo"),
+        ):
+            builder.build()
+
+
 class TestInferRelationships:
     """Tests for infer_relationships method."""
 
