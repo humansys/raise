@@ -1,23 +1,26 @@
 # RAISE-648: Analysis
 
-## Method: Document directly (cause evident from code)
+## Method: Stack trace analysis + hypothesis-driven
 
-The crash site is `builder.py:93-102`:
+### Causal chain (3 levels)
 
-```python
-if node.id in seen_ids:
-    raise ValueError(msg)  # ← crashes entire build
-```
+1. **ID generation** (`governance/parsers/epic.py:81-85`): `re.search(r"^e(\d+)", parent_dir)` extracts only the number — `e14-rai-distribution` and `e14-skill-product-evaluation` both → `E14` → `epic-e14`
+2. **No cross-source deduplication**: `extract_epics` from backlog.md and `extract_epic_details` from scope.md can both produce `epic-e14` — governance extractor merges same-source dupes but builder sees cross-loader dupes
+3. **Crash in builder** (`context/builder.py:102`): `raise ValueError` on duplicate — kills entire graph build, no index.json generated
 
-When any two loaders produce nodes with the same ID (e.g., two epic dirs that resolve to the same `epic-e14` ID), the entire graph build fails with an unhandled `ValueError`.
+### UX impact
+
+All graph-dependent commands fail: `rai graph query`, PRIME in skills, `rai session start --context`. The user sees an unhandled ValueError traceback with no recovery path.
 
 ## Root Cause
 
-`GraphBuilder.build()` raises `ValueError` on duplicate node IDs with no recovery path. The design comment says "silent overwrites lose data" — true, but crashing loses the entire graph.
+`GraphBuilder.build()` raises `ValueError` on duplicate node IDs with no graceful degradation. The design comment says "silent overwrites lose data" — true, but crashing loses the entire graph.
 
-## Fix Approach
+Note: The ID generation issue (extracting only the number) is tracked separately as RAISE-1204/RAISE-1199.
+
+## Fix Approach (Option B)
 
 1. Add `strict: bool` parameter to `GraphBuilder.__init__()` (default `False`)
-2. In `build()`: if duplicate detected and `strict=True`, raise as today. If `strict=False`, log warning with both source files and skip the duplicate (keep first seen).
+2. In `build()`: if duplicate and `strict=False` → log warning, skip duplicate (keep first). If `strict=True` → raise as today.
 3. Add `--strict` flag to `rai graph build` CLI command
-4. Return list of warnings from `build()` so CLI can report them
+4. `build()` collects warnings in a list accessible after build for CLI reporting
