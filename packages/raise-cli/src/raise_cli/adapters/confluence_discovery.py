@@ -58,10 +58,18 @@ class ConfluenceDiscovery:
         if space_key is not None:
             matched = [s for s in all_spaces if s.key == space_key]
             if not matched:
-                raise ConfluenceNotFoundError(
-                    f"Space '{space_key}' not found. "
-                    f"Available: {', '.join(s.key for s in all_spaces)}"
+                # Fallback: get_all_spaces() may omit mixed-case keys (RAISE-1187)
+                direct = self._client.get_space_direct(space_key)
+                if direct is None:
+                    raise ConfluenceNotFoundError(
+                        f"Space '{space_key}' not found. "
+                        f"Available: {', '.join(s.key for s in all_spaces)}"
+                    )
+                logger.info(
+                    "Space '%s' not in enumerated results, found via direct lookup",
+                    space_key,
                 )
+                matched = [direct]
             spaces = matched
         else:
             spaces = all_spaces
@@ -203,7 +211,17 @@ class ConfluenceDiscoveryService:
             spaces = self.discover_spaces()
             matched = [s for s in spaces if s.key == space_key]
             if not matched:
-                raise DiscoveryError(f"build_space_map: space '{space_key}' not found")
+                # Fallback: get_all_spaces() may omit mixed-case keys (RAISE-1187)
+                direct = self._client.get_space_direct(space_key)
+                if direct is None:
+                    raise DiscoveryError(
+                        f"build_space_map: space '{space_key}' not found"
+                    )
+                logger.info(
+                    "Space '%s' not in enumerated results, found via direct lookup",
+                    space_key,
+                )
+                matched = [direct]
             space_info = matched[0]
             tree = self.discover_page_tree(space_key, max_depth)
             label_index = self.build_label_index(tree)

@@ -38,6 +38,8 @@ def _make_client(
         return client
 
     client.get_spaces.return_value = spaces or []
+    # Default: direct lookup returns None (space not found) — override in tests
+    client.get_space_direct.return_value = None
 
     _homepage_ids = homepage_ids or {}
 
@@ -278,6 +280,8 @@ def _make_v2_client(
     """Build a mocked ConfluenceClient for V2 discovery service tests."""
     client = MagicMock()
     client.get_spaces.return_value = spaces or []
+    # Default: direct lookup returns None (space not found) — override in tests
+    client.get_space_direct.return_value = None
 
     _homepage_ids: dict[str, str | None] = homepage_ids or {}
 
@@ -562,6 +566,75 @@ class TestBuildLabelIndex:
 
 
 # ── TestWrapError ────────────────────────────────────────────────────
+
+
+# ── RAISE-1187: Mixed-case space key fallback ─────────────────────────
+
+
+SPACE_MIXED = SpaceInfo(
+    key="RaiSE1", name="RaiSE Documentation", url="/wiki/spaces/RaiSE1", type="global"
+)
+
+
+class TestDiscoverFallbackForMissingSpace:
+    """RAISE-1187: fallback to direct lookup for mixed-case space keys."""
+
+    def test_v1_discover_falls_back_to_direct_lookup(self) -> None:
+        """V1: discover(space_key="RaiSE1") succeeds even if get_spaces() omits it."""
+        client = _make_client(
+            spaces=[SPACE_A],  # RaiSE1 NOT in enumerated spaces
+            homepage_ids={"RaiSE1": "5000"},
+            children={"5000": [PAGE_1]},
+        )
+        # Direct lookup returns the space
+        client.get_space_direct.return_value = SPACE_MIXED
+        discovery = ConfluenceDiscovery(client)
+
+        result = discovery.discover(space_key="RaiSE1")
+
+        assert len(result.spaces) == 1
+        assert result.spaces[0].key == "RaiSE1"
+        client.get_space_direct.assert_called_once_with("RaiSE1")
+
+    def test_v1_discover_still_raises_when_truly_missing(self) -> None:
+        """V1: truly nonexistent space raises even after fallback attempt."""
+        client = _make_client(spaces=[SPACE_A])
+        client.get_space_direct.return_value = None
+        discovery = ConfluenceDiscovery(client)
+
+        with pytest.raises(ConfluenceNotFoundError, match="NONEXISTENT"):
+            discovery.discover(space_key="NONEXISTENT")
+
+    def test_v2_build_space_map_falls_back_to_direct_lookup(self) -> None:
+        """V2: build_space_map("RaiSE1") succeeds even if get_spaces() omits it."""
+        client = _make_v2_client(
+            spaces=[SPACE_A],  # RaiSE1 NOT in enumerated spaces
+            homepage_ids={"RaiSE1": "5000"},
+            page_titles={"5000": "RaiSE Home"},
+            children={
+                "5000": [
+                    PageSummary(id="5001", title="ADR", url="", space_key="RaiSE1"),
+                ]
+            },
+            labels={"5000": [], "5001": ["adr"]},
+        )
+        client.get_space_direct.return_value = SPACE_MIXED
+        service = ConfluenceDiscoveryService(client)
+
+        result = service.build_space_map("RaiSE1", max_depth=1)
+
+        assert result.space.key == "RaiSE1"
+        assert result.homepage_id == "5000"
+        client.get_space_direct.assert_called_once_with("RaiSE1")
+
+    def test_v2_build_space_map_still_raises_when_truly_missing(self) -> None:
+        """V2: truly nonexistent space raises DiscoveryError after fallback."""
+        client = _make_v2_client(spaces=[SPACE_A])
+        client.get_space_direct.return_value = None
+        service = ConfluenceDiscoveryService(client)
+
+        with pytest.raises(DiscoveryError, match="NONEXISTENT.*not found"):
+            service.build_space_map("NONEXISTENT")
 
 
 class TestWrapError:
