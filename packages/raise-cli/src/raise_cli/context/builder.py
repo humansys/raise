@@ -8,6 +8,7 @@ Architecture: ADR-019 Unified Context Graph Architecture
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -32,6 +33,8 @@ from raise_core.graph.models import GraphEdge, GraphNode
 if TYPE_CHECKING:
     from raise_cli.governance.extractor import GovernanceExtractor
 
+logger = logging.getLogger(__name__)
+
 
 class GraphBuilder:
     """Builds unified context graph from all sources.
@@ -54,15 +57,20 @@ class GraphBuilder:
         project_root: Path | None = None,
         *,
         agent_config: AgentConfig | None = None,
+        strict: bool = False,
     ) -> None:
         """Initialize builder with project root.
 
         Args:
             project_root: Root directory for the project. Defaults to cwd.
             agent_config: Agent configuration. Defaults to Claude.
+            strict: If True, raise ValueError on duplicate node IDs.
+                If False (default), warn and skip duplicates (RAISE-648).
         """
         self.project_root = project_root or Path.cwd()
         self.ide_config = agent_config or get_agent_config()
+        self.strict = strict
+        self.warnings: list[str] = []
 
     def build(self) -> Graph:
         """Build unified graph from all sources.
@@ -90,20 +98,26 @@ class GraphBuilder:
         # Must run before add_concept() so graph gets enriched copies
         self.load_code_structure(all_nodes)
 
-        # Fail on duplicate node IDs — silent overwrites lose data
+        # Detect duplicate node IDs (RAISE-648: warn+skip by default, raise with --strict)
         seen_ids: dict[str, str] = {}
+        unique_nodes: list[GraphNode] = []
         for node in all_nodes:
             if node.id in seen_ids:
                 msg = (
                     f"Duplicate node ID '{node.id}' — "
-                    f"'{node.source_file or 'unknown'}' would overwrite "
-                    f"'{seen_ids[node.id]}'"
+                    f"'{node.source_file or 'unknown'}' skipped, "
+                    f"keeping '{seen_ids[node.id]}'"
                 )
-                raise ValueError(msg)
+                if self.strict:
+                    raise ValueError(msg)
+                logger.warning(msg)
+                self.warnings.append(msg)
+                continue
             seen_ids[node.id] = node.source_file or "unknown"
+            unique_nodes.append(node)
 
         # Add nodes to graph
-        for node in all_nodes:
+        for node in unique_nodes:
             graph.add_concept(node)
 
         # Extract structural nodes and edges (E15 — bounded contexts, layers)
