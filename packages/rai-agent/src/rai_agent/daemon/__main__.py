@@ -97,28 +97,26 @@ def build_daemon(config: DaemonConfig) -> DaemonComponents:
         max_sessions=config.max_sessions_per_chat,
     )
 
-    # Get bot from PTB Application directly (avoid circular dep)
-    from telegram.ext import Application  # type: ignore[import-untyped]
+    # S1066.1: Deferred handler wiring breaks the init cycle.
+    # Order: dispatcher (no handler) → trigger (owns Application + bot)
+    # → handler (uses trigger.bot) → wire handler into dispatcher
+    dispatcher = SessionDispatcher()
 
-    ptb_app: Any = Application.builder().token(config.telegram_bot_token).build()
-    bot: Any = ptb_app.bot
-
-    # Handler + dispatcher
-    handler = TelegramHandler(
-        runtime=runtime,
-        bot=bot,
-        registry=registry,
-    )
-    dispatcher = SessionDispatcher(handler=handler.handle)
-
-    # TelegramTrigger (uses middleware pipeline)
+    # TelegramTrigger (builds its own PTB Application — the ONLY one)
     telegram_trigger = TelegramTrigger(
         bot_token=config.telegram_bot_token,
         allowed_users=set(config.allowed_user_ids),
         dispatcher=dispatcher,
         registry=registry,
-        handler=handler,
     )
+
+    # Handler uses trigger's bot — no duplicate Application
+    handler = TelegramHandler(
+        runtime=runtime,
+        bot=telegram_trigger.bot,
+        registry=registry,
+    )
+    dispatcher.set_handler(handler.handle)
 
     # Briefing pipeline (optional, still uses EventBus)
     briefing_pipeline: BriefingPipeline | None = None
@@ -229,6 +227,8 @@ def main(argv: list[str] | None = None) -> None:
         level=logging.INFO,
         format="%(levelname)s %(name)s: %(message)s",
     )
+    # Suppress verbose httpx polling logs (22K "getUpdates 200 OK" per 3.5 days)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
 
     args = parse_args(argv)
 

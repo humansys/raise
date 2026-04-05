@@ -64,7 +64,7 @@ class SessionDispatcher:
 
     def __init__(
         self,
-        handler: Callable[[SessionRequest], Awaitable[None]],
+        handler: Callable[[SessionRequest], Awaitable[None]] | None = None,
         *,
         maxsize: int = _DEFAULT_MAXSIZE,
         idle_timeout: float = _DEFAULT_IDLE_TIMEOUT,
@@ -74,6 +74,13 @@ class SessionDispatcher:
         self._idle_timeout = idle_timeout
         self._queues: dict[str, asyncio.Queue[SessionRequest]] = {}
         self._workers: dict[str, asyncio.Task[None]] = {}
+
+    def set_handler(
+        self,
+        handler: Callable[[SessionRequest], Awaitable[None]],
+    ) -> None:
+        """Set or replace the request handler (deferred wiring)."""
+        self._handler = handler
 
     @property
     def active_session_count(self) -> int:
@@ -91,6 +98,10 @@ class SessionDispatcher:
         Raises:
             SessionBusyError: If the session queue is full.
         """
+        if self._handler is None:
+            msg = "No handler set — call set_handler() before dispatching"
+            raise RuntimeError(msg)
+
         key = request.session_key
 
         # Get or create queue
@@ -117,6 +128,8 @@ class SessionDispatcher:
         queue: asyncio.Queue[SessionRequest],
     ) -> None:
         """Worker loop: process requests from queue in FIFO order."""
+        assert self._handler is not None  # guaranteed by dispatch() guard
+        handler = self._handler
         try:
             while True:
                 request = await asyncio.wait_for(
@@ -124,7 +137,7 @@ class SessionDispatcher:
                     timeout=self._idle_timeout,
                 )
                 try:
-                    await self._handler(request)
+                    await handler(request)
                     await request.on_complete()
                 except Exception as exc:  # noqa: BLE001
                     try:

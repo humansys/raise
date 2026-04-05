@@ -457,7 +457,7 @@ class TelegramTrigger:
         *,
         dispatcher: SessionDispatcher,
         registry: SessionRegistry,
-        handler: TelegramHandler,
+        handler: TelegramHandler | None = None,
         cwd: str = ".",
         max_tokens: int = 5,
         refill_rate: float = 0.2,
@@ -517,7 +517,7 @@ class TelegramTrigger:
         await self._app.initialize()
         await self._app.start()
         if self._app.updater:
-            await self._app.updater.start_polling()
+            await self._app.updater.start_polling(poll_interval=2.0)
 
     async def stop(self) -> None:
         """Gracefully shut down the bot."""
