@@ -90,9 +90,7 @@ class TestConfluenceInstanceConfig:
         from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
 
         with pytest.raises(ValidationError):
-            ConfluenceInstanceConfig(
-                username="u@x.com", space_key="DEV"
-            )  # type: ignore[call-arg]
+            ConfluenceInstanceConfig(username="u@x.com", space_key="DEV")  # type: ignore[call-arg]
 
     def test_username_optional_defaults_none(self) -> None:
         from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
@@ -170,9 +168,7 @@ class TestAuthResolution:
         with pytest.raises(ConfluenceAuthError, match="CONFLUENCE_API_TOKEN"):
             ConfluenceClient._resolve_token("humansys")
 
-    def test_instance_name_uppercased(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_instance_name_uppercased(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from raise_cli.adapters.confluence_client import ConfluenceClient
 
         monkeypatch.setenv("CONFLUENCE_API_TOKEN_MY_PROD", "secret")
@@ -235,9 +231,7 @@ class TestUsernameResolution:
 class TestClientConstructor:
     """Client wires atlassian.Confluence with correct params."""
 
-    def test_constructor_creates_client(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_constructor_creates_client(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from raise_cli.adapters.confluence_client import ConfluenceClient
         from raise_cli.adapters.confluence_config import ConfluenceInstanceConfig
 
@@ -326,7 +320,10 @@ class TestCreatePage:
             "id": "456",
             "title": "ADR-015",
             "body": {"storage": {"value": "<p>content</p>"}},
-            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "_links": {
+                "base": "https://test.atlassian.net/wiki",
+                "webui": "/spaces/TEST/pages/456",
+            },
             "version": {"number": 1},
             "space": {"key": "TEST"},
         }
@@ -349,8 +346,11 @@ class TestCreatePage:
     ) -> None:
         client, backend = _make_client(monkeypatch)
         backend.create_page.return_value = {
-            "id": "1", "title": "T", "body": {"storage": {"value": ""}},
-            "_links": {"base": "", "webui": ""}, "version": {"number": 1},
+            "id": "1",
+            "title": "T",
+            "body": {"storage": {"value": ""}},
+            "_links": {"base": "", "webui": ""},
+            "version": {"number": 1},
             "space": {"key": "OTHER"},
         }
 
@@ -374,7 +374,10 @@ class TestUpdatePage:
             "id": "456",
             "title": "ADR-015 v2",
             "body": {"storage": {"value": "<p>new</p>"}},
-            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "_links": {
+                "base": "https://test.atlassian.net/wiki",
+                "webui": "/spaces/TEST/pages/456",
+            },
             "version": {"number": 2},
             "space": {"key": "TEST"},
         }
@@ -397,7 +400,10 @@ class TestGetPageById:
             "id": "456",
             "title": "ADR-015",
             "body": {"storage": {"value": "<p>content</p>"}},
-            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "_links": {
+                "base": "https://test.atlassian.net/wiki",
+                "webui": "/spaces/TEST/pages/456",
+            },
             "version": {"number": 1},
             "space": {"key": "TEST"},
         }
@@ -411,9 +417,7 @@ class TestGetPageById:
 class TestGetPageByTitle:
     """get_page_by_title → PageContent | None."""
 
-    def test_returns_page_when_found(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_returns_page_when_found(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from raise_cli.adapters.models.docs import PageContent
 
         client, backend = _make_client(monkeypatch)
@@ -421,7 +425,10 @@ class TestGetPageByTitle:
             "id": "456",
             "title": "ADR-015",
             "body": {"storage": {"value": "<p>content</p>"}},
-            "_links": {"base": "https://test.atlassian.net/wiki", "webui": "/spaces/TEST/pages/456"},
+            "_links": {
+                "base": "https://test.atlassian.net/wiki",
+                "webui": "/spaces/TEST/pages/456",
+            },
             "version": {"number": 1},
             "space": {"key": "TEST"},
         }
@@ -431,9 +438,7 @@ class TestGetPageByTitle:
         assert isinstance(result, PageContent)
         assert result.title == "ADR-015"
 
-    def test_returns_none_when_not_found(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_returns_none_when_not_found(self, monkeypatch: pytest.MonkeyPatch) -> None:
         client, backend = _make_client(monkeypatch)
         backend.get_page_by_title.return_value = None
 
@@ -461,7 +466,9 @@ class TestGetPageByTitle:
         client.get_page_by_title("X")
 
         backend.get_page_by_title.assert_called_once_with(
-            space="TEST", title="X", expand="body.storage,version,space",
+            space="TEST",
+            title="X",
+            expand="body.storage,version,space",
         )
 
     def test_uses_space_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -471,7 +478,9 @@ class TestGetPageByTitle:
         client.get_page_by_title("X", space="OTHER")
 
         backend.get_page_by_title.assert_called_once_with(
-            space="OTHER", title="X", expand="body.storage,version,space",
+            space="OTHER",
+            title="X",
+            expand="body.storage,version,space",
         )
 
 
@@ -491,9 +500,7 @@ class TestErrorMapping:
         with pytest.raises(ConfluenceAuthError):
             client.get_page_by_id("123")
 
-    def test_not_found_error_maps(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_not_found_error_maps(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from atlassian.errors import ApiNotFoundError
 
         from raise_cli.adapters.confluence_exceptions import ConfluenceNotFoundError
@@ -504,9 +511,7 @@ class TestErrorMapping:
         with pytest.raises(ConfluenceNotFoundError):
             client.get_page_by_id("123")
 
-    def test_generic_api_error_maps(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_generic_api_error_maps(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from atlassian.errors import ApiError
 
         from raise_cli.adapters.confluence_exceptions import ConfluenceApiError
@@ -678,9 +683,7 @@ class TestGetSpaces:
 class TestGetPageChildren:
     """get_page_children returns list[PageSummary]."""
 
-    def test_returns_page_summary_list(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_returns_page_summary_list(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from raise_cli.adapters.models.docs import PageSummary
 
         client, backend = _make_client(monkeypatch)
@@ -719,9 +722,7 @@ class TestGetPageChildren:
 class TestSearch:
     """search with CQL returns list[PageSummary]."""
 
-    def test_returns_page_summaries(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_returns_page_summaries(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from raise_cli.adapters.models.docs import PageSummary
 
         client, backend = _make_client(monkeypatch)
@@ -743,15 +744,71 @@ class TestSearch:
         assert len(results) == 1
         assert isinstance(results[0], PageSummary)
         assert results[0].id == "456"
-        backend.cql.assert_called_once_with(
-            "type=page AND space=RaiSE1", limit=5
-        )
+        backend.cql.assert_called_once_with("type=page AND space=RaiSE1", limit=5)
 
     def test_returns_empty_list(self, monkeypatch: pytest.MonkeyPatch) -> None:
         client, backend = _make_client(monkeypatch)
         backend.cql.return_value = {"results": []}
 
         assert client.search("nonexistent") == []
+
+    def test_plain_text_wrapped_in_cql(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """RAISE-1174: plain text auto-wrapped in siteSearch CQL."""
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {"results": []}
+
+        client.search("getting started")
+
+        backend.cql.assert_called_once_with('siteSearch ~ "getting started"', limit=10)
+
+    def test_cql_passthrough_tilde(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """CQL with ~ operator is not wrapped."""
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {"results": []}
+
+        client.search('text ~ "hello"')
+
+        backend.cql.assert_called_once_with('text ~ "hello"', limit=10)
+
+    def test_cql_passthrough_and_operator(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """CQL with AND operator is not wrapped."""
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {"results": []}
+
+        client.search("type=page AND space=TEST")
+
+        backend.cql.assert_called_once_with("type=page AND space=TEST", limit=10)
+
+    def test_cql_passthrough_equals(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """CQL with = operator is not wrapped."""
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {"results": []}
+
+        client.search("space=TEST")
+
+        backend.cql.assert_called_once_with("space=TEST", limit=10)
+
+    def test_plain_text_escapes_quotes(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """RAISE-1174: double quotes in plain text are escaped."""
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {"results": []}
+
+        client.search('page with "quotes"')
+
+        backend.cql.assert_called_once_with(
+            'siteSearch ~ "page with \\"quotes\\""', limit=10
+        )
+
+    def test_single_word_wrapped(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Single word plain text is wrapped."""
+        client, backend = _make_client(monkeypatch)
+        backend.cql.return_value = {"results": []}
+
+        client.search("onboarding")
+
+        backend.cql.assert_called_once_with('siteSearch ~ "onboarding"', limit=10)
 
 
 class TestHealth:
