@@ -1,13 +1,14 @@
-WHAT:      rai docs publish creates pages in Confluence space root — no parent_id support
-WHEN:      rai docs publish any artifact type
-WHERE:     mcp_confluence.py ~148 — publish() never reads parent_id from metadata
-EXPECTED:  --parent flag passes parent_id to confluence_create_page
-Done when: rai docs publish --parent PAGE_ID creates page under specified parent
+# RAISE-605: Scope
+
+WHAT:      `rai docs publish` creates pages at space root — no way to specify parent page for ad-hoc publishing
+WHEN:      Publishing without routing config, or when needing to override routing's parent
+WHERE:     CLI: packages/raise-cli/src/raise_cli/cli/commands/docs.py (no --parent flag)
+           Adapter: packages/raise-cli/src/raise_cli/adapters/confluence_adapter.py (ignores metadata["parent_id"])
+EXPECTED:  CLI accepts `--parent PAGE_ID`, adapter uses it as parent override before routing fallback
+Done when: `rai docs publish <type> --parent <id>` places page under specified parent; routing still works as default
 
 TRIAGE:
   Bug Type:    Interface
   Severity:    S2-Medium
   Origin:      Code
   Qualifier:   Missing
-
-STATUS: Valid — publish() still ignores parent_id. 2-line fix proposed in ticket.
