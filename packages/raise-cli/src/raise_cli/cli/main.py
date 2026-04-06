@@ -20,8 +20,8 @@ from raise_cli.cli.commands.doctor import doctor_app
 from raise_cli.cli.commands.gate import gate_app
 from raise_cli.cli.commands.graph import graph_app
 from raise_cli.cli.commands.info import info_command
-from raise_cli.cli.commands.learn import learn_app
 from raise_cli.cli.commands.init import init_command
+from raise_cli.cli.commands.learn import learn_app
 from raise_cli.cli.commands.mcp import mcp_app
 from raise_cli.cli.commands.memory import memory_app
 from raise_cli.cli.commands.pattern import pattern_app
