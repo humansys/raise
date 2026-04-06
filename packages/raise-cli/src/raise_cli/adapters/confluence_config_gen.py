@@ -8,7 +8,6 @@ RAISE-1059 (S1051.6)
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import Any
 
@@ -89,16 +88,12 @@ _ROUTING_KEYWORDS: dict[str, list[str]] = {
 }
 
 
-# Pattern matching individual artifact titles: "ADR-041: ...", "RAISE-123: ..."
-_ARTIFACT_TITLE_RE = re.compile(r"^[A-Z]+-\d+\s*:")
-
-
 def suggest_routing(tree: PageNode) -> dict[str, ArtifactRouting]:
     """Suggest artifact routing from top-level page titles.
 
     Matches each top-level child title against known artifact type keywords
-    using case-insensitive substring matching. Skips titles that look like
-    individual artifacts (e.g., "ADR-041: Skill Runtime...").
+    using case-insensitive substring matching. Returns a dict of artifact
+    type → ArtifactRouting for each match found.
 
     Args:
         tree: Root PageNode whose children are top-level pages.
@@ -108,8 +103,6 @@ def suggest_routing(tree: PageNode) -> dict[str, ArtifactRouting]:
     """
     suggestions: dict[str, ArtifactRouting] = {}
     for child in tree.children:
-        if _ARTIFACT_TITLE_RE.match(child.title):
-            continue  # skip individual artifact pages (RAISE-1272)
         title_lower = child.title.lower()
         for artifact_type, keywords in _ROUTING_KEYWORDS.items():
             if artifact_type in suggestions:

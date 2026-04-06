@@ -222,29 +222,6 @@ class TestSuggestRouting:
         result = suggest_routing(tree)
         assert "adr" in result
 
-    def test_skips_artifact_title_with_id_prefix(self) -> None:
-        """RAISE-1272: 'ADR-041: Skill Runtime...' should NOT match 'adr'."""
-        tree = _make_tree(
-            ["ADR-041: Skill Runtime Orchestration", "Architecture Decision Records"]
-        )
-        result = suggest_routing(tree)
-        assert "adr" in result
-        assert result["adr"].parent_title == "Architecture Decision Records"
-
-    def test_skips_ticket_id_title(self) -> None:
-        """RAISE-1272: 'RAISE-123: Some Bug' should be skipped."""
-        tree = _make_tree(["RAISE-123: Some Bug Title", "Retrospective"])
-        result = suggest_routing(tree)
-        # "RAISE-123: ..." should not match anything
-        assert "retrospective" in result
-        assert result["retrospective"].parent_title == "Retrospective"
-
-    def test_artifact_title_only_no_container_returns_empty(self) -> None:
-        """If only artifact-like titles exist, no match is returned."""
-        tree = _make_tree(["ADR-041: Skill Runtime Orchestration"])
-        result = suggest_routing(tree)
-        assert "adr" not in result
-
 
 # ── write_confluence_config() tests ──────────────────────────────────
 
