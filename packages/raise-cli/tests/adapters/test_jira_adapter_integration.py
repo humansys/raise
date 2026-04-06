@@ -157,9 +157,10 @@ class TestJiraAdapterIntegration:
         assert isinstance(ref, CommentRef)
         assert ref.id  # non-empty
 
-        # Get comments — increase limit to catch our new comment
+        # Get comments — use a high limit so the newly-added comment
+        # (appended at the end by Jira) is included in the response.
         comments: list[Comment] = _run(
-            adapter.get_comments(_KNOWN_ISSUE, limit=50)
+            adapter.get_comments(_KNOWN_ISSUE, limit=200)
         )
         assert len(comments) > 0
         assert all(isinstance(c, Comment) for c in comments)
