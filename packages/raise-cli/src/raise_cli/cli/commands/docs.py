@@ -73,16 +73,26 @@ def publish(
     ] = None,
     file: Annotated[
         Path | None,
-        typer.Option("--file", "-f", help="Read content from file (skips governance/ convention)"),
+        typer.Option(
+            "--file", "-f", help="Read content from file (skips governance/ convention)"
+        ),
     ] = None,
     path: Annotated[
         str | None,
-        typer.Option("--path", "-p", help="Local file path for filesystem target (used with --stdin)"),
+        typer.Option(
+            "--path",
+            "-p",
+            help="Local file path for filesystem target (used with --stdin)",
+        ),
     ] = None,
     stdin: Annotated[
         bool,
         typer.Option("--stdin", help="Read content from stdin (requires --path)"),
     ] = False,
+    parent: Annotated[
+        str | None,
+        typer.Option("--parent", help="Parent page ID (overrides routing config)"),
+    ] = None,
     target: TargetOption = None,
 ) -> None:
     """Publish an artifact to a documentation target.
@@ -104,7 +114,9 @@ def publish(
             console.print("[red]Error:[/red] No content received from stdin")
             raise typer.Exit(1)
         if not path:
-            console.print("[red]Error:[/red] --path is required when reading from stdin")
+            console.print(
+                "[red]Error:[/red] --path is required when reading from stdin"
+            )
             raise typer.Exit(1)
         effective_path = path
     else:
@@ -115,7 +127,9 @@ def publish(
     doc_target = resolve_docs_target(target)
 
     page_title = title or artifact_type
-    metadata = {"title": page_title, "path": effective_path}
+    metadata: dict[str, str] = {"title": page_title, "path": effective_path}
+    if parent is not None:
+        metadata["parent_id"] = parent
 
     result = doc_target.publish(
         doc_type=artifact_type, content=content, metadata=metadata

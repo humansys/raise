@@ -166,7 +166,15 @@ class TestPublishWithFile:
         with _patch_target(mock_target):
             result = runner.invoke(
                 app,
-                ["docs", "publish", "story-design", "--file", str(artifact), "--title", "S1 Design"],
+                [
+                    "docs",
+                    "publish",
+                    "story-design",
+                    "--file",
+                    str(artifact),
+                    "--title",
+                    "S1 Design",
+                ],
             )
 
         assert result.exit_code == 0
@@ -221,16 +229,68 @@ class TestPublishWithFile:
         assert result.exit_code == 0
 
 
+class TestPublishWithParent:
+    """RAISE-605: --parent flag passes parent_id in metadata."""
+
+    def test_parent_flag_in_metadata(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """--parent PAGE_ID arrives as metadata["parent_id"]."""
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir()
+        (gov_dir / "roadmap.md").write_text("# Roadmap")
+        monkeypatch.chdir(tmp_path)
+
+        mock_target = _MockDocsTarget()
+        with _patch_target(mock_target):
+            result = runner.invoke(
+                app,
+                ["docs", "publish", "roadmap", "--parent", "12345"],
+            )
+
+        assert result.exit_code == 0
+        assert mock_target.last_publish_call is not None
+        assert mock_target.last_publish_call["metadata"]["parent_id"] == "12345"
+
+    def test_no_parent_flag_omits_parent_id(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Without --parent, metadata has no parent_id key."""
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir()
+        (gov_dir / "roadmap.md").write_text("# Roadmap")
+        monkeypatch.chdir(tmp_path)
+
+        mock_target = _MockDocsTarget()
+        with _patch_target(mock_target):
+            result = runner.invoke(app, ["docs", "publish", "roadmap"])
+
+        assert result.exit_code == 0
+        assert mock_target.last_publish_call is not None
+        assert "parent_id" not in mock_target.last_publish_call["metadata"]
+
+
 class TestPublishFromStdin:
     """--stdin flag + --path reads content from stdin."""
 
-    def test_publish_from_stdin(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_publish_from_stdin(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.chdir(tmp_path)
         mock_target = _MockDocsTarget()
         with _patch_target(mock_target):
             result = runner.invoke(
                 app,
-                ["docs", "publish", "story-design", "--stdin", "--path", "work/design.md", "--title", "Design"],
+                [
+                    "docs",
+                    "publish",
+                    "story-design",
+                    "--stdin",
+                    "--path",
+                    "work/design.md",
+                    "--title",
+                    "Design",
+                ],
                 input="# Design\nFrom stdin.",
             )
 
@@ -239,7 +299,9 @@ class TestPublishFromStdin:
         assert mock_target.last_publish_call["content"] == "# Design\nFrom stdin."
         assert mock_target.last_publish_call["metadata"]["path"] == "work/design.md"
 
-    def test_stdin_requires_path(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_stdin_requires_path(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.chdir(tmp_path)
         with _patch_target(_MockDocsTarget()):
             result = runner.invoke(
@@ -251,12 +313,21 @@ class TestPublishFromStdin:
         assert result.exit_code == 1
         assert "path" in result.output.lower()
 
-    def test_empty_stdin_raises(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_empty_stdin_raises(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.chdir(tmp_path)
         with _patch_target(_MockDocsTarget()):
             result = runner.invoke(
                 app,
-                ["docs", "publish", "story-design", "--stdin", "--path", "work/design.md"],
+                [
+                    "docs",
+                    "publish",
+                    "story-design",
+                    "--stdin",
+                    "--path",
+                    "work/design.md",
+                ],
                 input="",
             )
 
