@@ -35,7 +35,7 @@ metadata:
 
 ## Purpose
 
-Write a narrative session diary entry to Confluence that captures *how we got to the decisions* — not just what was decided. The diary is written for the team: so Fernando knows what happened while he was offline, so future-Emilio remembers the reasoning, so Rai can reference the thinking in future sessions.
+Write a narrative session diary entry to Confluence that captures *how we got to the decisions* — not just what was decided. The diary is written for the team: so colleagues know what happened while they were offline, so future-you remembers the reasoning, so Rai can reference the thinking in future sessions.
 
 ## What the Diary IS and IS NOT
 
@@ -43,7 +43,7 @@ Write a narrative session diary entry to Confluence that captures *how we got to
 - A narrative of the session — the arc, the tensions, the turning points
 - Written in first person by Rai
 - Honest about mistakes, pivots, and what cost time
-- Includes direct quotes from Emilio when they were decisive
+- Includes direct quotes from the developer when they were decisive
 - Accessible to someone technical who wasn't in the room
 
 **IS NOT:**
@@ -127,7 +127,7 @@ The title should capture the essence, not describe the work. Examples from past 
 
 ```markdown
 **Session:** {SES-ID} | **Duration:** ~{N} hours | **Type:** {type}
-**Participants:** Emilio Osorio + Rai
+**Participants:** {developer_name} + Rai
 **Branch:** {branch} → {target}
 **Epic:** {epic_id} ({jira_key}) — {epic_name}
 ```
@@ -150,8 +150,8 @@ The title should capture the essence, not describe the work. Examples from past 
 #### Voice and Style
 
 - **First person, Rai's voice** — "Audité el código...", "Propuse tres opciones..."
-- **Spanish or English** — match the session's language, or Emilio's preference
-- **Direct quotes from Emilio** when they were decisive — italics or quotes
+- **Spanish or English** — match the session's language, or the developer's preference
+- **Direct quotes from the developer** when they were decisive — italics or quotes
 - **Honest about mistakes** — "cometí un error", "había caído en la trampa"
 - **Technical but accessible** — a senior engineer not on the project should follow
 - **Code blocks** for architecture diagrams, commands, key code
@@ -166,7 +166,7 @@ Always end with:
 
 *— Rai*
 *{SES-ID}, {date}*
-*Con Emilio Osorio*
+*Con {developer_name}*
 ```
 
 <verification>
@@ -175,7 +175,7 @@ Entry drafted. Narrative arc present. Voice consistent with past entries.
 
 ### Step 4: Review with Developer
 
-Present the draft to Emilio for review before publishing. Key questions:
+Present the draft to the developer for review before publishing. Key questions:
 - Does the narrative capture what was important?
 - Are the quotes accurate?
 - Is anything missing or misrepresented?
@@ -215,7 +215,7 @@ Page created in Confluence under Diario de Sesiones. URL confirmed.
 - [ ] Narrative arc identified (opening → tension → turning point → resolution)
 - [ ] Title is evocative, not descriptive
 - [ ] Written in Rai's voice (first person, honest, technical)
-- [ ] Direct quotes from Emilio included where decisive
+- [ ] Direct quotes from the developer included where decisive
 - [ ] Mistakes and pivots documented honestly
 - [ ] Metrics included for implementation sessions
 - [ ] Developer reviewed before publish
