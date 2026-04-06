@@ -20,13 +20,21 @@ _ORG_NAME = "acme"
 
 @contextmanager
 def _override_auth(client: TestClient) -> Generator[None, None, None]:
-    """Override verify_api_key dependency to return a valid OrgContext."""
-    from raise_server.auth import OrgContext, verify_api_key
+    """Override verify_member dependency to return a valid MemberContext."""
+    from raise_server.auth import MemberContext, verify_member
 
-    async def _fake_auth() -> OrgContext:
-        return OrgContext(org_id=_ORG_ID, org_name=_ORG_NAME)
+    async def _fake_auth() -> MemberContext:
+        return MemberContext(
+            org_id=_ORG_ID,
+            org_name=_ORG_NAME,
+            member_id=_ORG_ID,
+            email="test@example.com",
+            role="admin",
+            plan="team",
+            features=[],
+        )
 
-    client.app.dependency_overrides[verify_api_key] = _fake_auth  # type: ignore[union-attr]
+    client.app.dependency_overrides[verify_member] = _fake_auth  # type: ignore[union-attr]
     try:
         yield
     finally:

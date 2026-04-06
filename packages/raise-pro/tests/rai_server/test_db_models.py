@@ -8,10 +8,12 @@ from __future__ import annotations
 
 from raise_server.db.models import (
     AgentEventRow,
-    ApiKey,
+    ApiKeyRow,
     Base,
     GraphEdgeRow,
     GraphNodeRow,
+    LicenseRow,
+    MemberRow,
     MemoryPatternRow,
     Organization,
 )
@@ -28,7 +30,9 @@ class TestTableRegistration:
         tables = set(Base.metadata.tables.keys())
         assert tables == {
             "organizations",
+            "members",
             "api_keys",
+            "licenses",
             "graph_nodes",
             "graph_edges",
             "agent_events",
@@ -64,23 +68,32 @@ class TestOrganizationModel:
 # --- ApiKey ---
 
 
-class TestApiKeyModel:
+class TestApiKeyRowModel:
     def test_tablename(self) -> None:
-        assert ApiKey.__tablename__ == "api_keys"
+        assert ApiKeyRow.__tablename__ == "api_keys"
 
     def test_columns_exist(self) -> None:
-        mapper = inspect(ApiKey)
+        mapper = inspect(ApiKeyRow)
         cols = {c.key for c in mapper.columns}
-        assert cols == {"id", "org_id", "key_hash", "prefix", "is_active", "created_at"}
+        assert cols == {
+            "id", "member_id", "org_id", "key_hash", "key_prefix",
+            "scopes", "last_used_at", "is_active", "created_at",
+        }
 
     def test_org_id_foreign_key(self) -> None:
-        mapper = inspect(ApiKey)
+        mapper = inspect(ApiKeyRow)
         col = mapper.columns["org_id"]
         fk_targets = {fk.target_fullname for fk in col.foreign_keys}
         assert "organizations.id" in fk_targets
 
+    def test_member_id_foreign_key(self) -> None:
+        mapper = inspect(ApiKeyRow)
+        col = mapper.columns["member_id"]
+        fk_targets = {fk.target_fullname for fk in col.foreign_keys}
+        assert "members.id" in fk_targets
+
     def test_id_is_uuid_primary_key(self) -> None:
-        mapper = inspect(ApiKey)
+        mapper = inspect(ApiKeyRow)
         col = mapper.columns["id"]
         assert isinstance(col.type, UUID)
         assert col.primary_key
