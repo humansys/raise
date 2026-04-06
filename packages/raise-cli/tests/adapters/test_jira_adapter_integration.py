@@ -147,27 +147,32 @@ class TestJiraAdapterIntegration:
     # ── Comments ───────────────────────────────────────────────────
 
     def test_add_comment_and_get_comments(self) -> None:
-        """Add a comment to a known issue, verify it appears."""
+        """Add a comment to a fresh issue, verify it appears."""
+        from raise_cli.adapters.models import IssueSpec
+
         adapter = self._make_adapter()
         tag = uuid.uuid4().hex[:8]
-        body = f"[rai-test] S1052.6 comment test {tag}"
 
-        # Add comment
-        ref: CommentRef = _run(adapter.add_comment(_KNOWN_ISSUE, body))
-        assert isinstance(ref, CommentRef)
-        assert ref.id  # non-empty
-
-        # Get comments — use a high limit so the newly-added comment
-        # (appended at the end by Jira) is included in the response.
-        comments: list[Comment] = _run(
-            adapter.get_comments(_KNOWN_ISSUE, limit=200)
+        # Create ephemeral issue so comments don't accumulate on a shared issue
+        spec = IssueSpec(
+            summary=f"[rai-test] comment test {tag}",
+            issue_type="Task",
+            labels=[_TEST_LABEL],
         )
-        assert len(comments) > 0
-        assert all(isinstance(c, Comment) for c in comments)
+        issue_ref: IssueRef = _run(adapter.create_issue(_PROJECT_KEY, spec))
+        issue_key = issue_ref.key
 
-        # Find our comment by ID (body may be ADF-transformed)
-        found = any(c.id == ref.id for c in comments)
-        assert found, f"Comment {ref.id} not found in comments (got {len(comments)})"
+        try:
+            body = f"[rai-test] comment body {tag}"
+            ref: CommentRef = _run(adapter.add_comment(issue_key, body))
+            assert isinstance(ref, CommentRef)
+            assert ref.id  # non-empty
+
+            comments: list[Comment] = _run(adapter.get_comments(issue_key))
+            assert len(comments) == 1
+            assert comments[0].id == ref.id
+        finally:
+            _run(adapter.transition_issue(issue_key, "done"))
 
     # ── Link issues ────────────────────────────────────────────────
 
