@@ -42,7 +42,13 @@ class PythonApiConfluenceAdapter:
     def publish(
         self, doc_type: str, content: str, metadata: dict[str, Any]
     ) -> PublishResult:
-        """Publish doc: resolve routing, find/create page, apply labels."""
+        """Publish doc: resolve parent and labels, find/create page.
+
+        Parent resolution priority (RAISE-605):
+        1. metadata["parent_id"] — explicit override
+        2. routing.parent_title — from config
+        3. Error — no parent available
+        """
         title = metadata.get("title")
         if not title:
             return PublishResult(
@@ -51,26 +57,29 @@ class PythonApiConfluenceAdapter:
             )
 
         routing = self._config.resolve_routing(doc_type)
-        if not routing:
-            return PublishResult(
-                success=False,
-                message=f"No routing configured for doc_type '{doc_type}'",
-            )
+        labels: list[str] = routing.labels if routing else []
+        parent_id: str | None = metadata.get("parent_id")
 
-        labels = routing.labels
-        parent_id: str | None = None
-
-        # Resolve parent page — fail if not found (reliability over convenience)
-        parent_page = self._client.get_page_by_title(routing.parent_title)
-        if not parent_page:
-            return PublishResult(
-                success=False,
-                message=(
-                    f"Parent page '{routing.parent_title}' not found in Confluence. "
-                    "Create it first or fix routing config."
-                ),
-            )
-        parent_id = parent_page.id
+        # Resolve parent: explicit > routing > error
+        if parent_id is None:
+            if not routing:
+                return PublishResult(
+                    success=False,
+                    message=(
+                        f"No routing configured for doc_type '{doc_type}' "
+                        "and no parent_id provided in metadata."
+                    ),
+                )
+            parent_page = self._client.get_page_by_title(routing.parent_title)
+            if not parent_page:
+                return PublishResult(
+                    success=False,
+                    message=(
+                        f"Parent page '{routing.parent_title}' not found in Confluence. "
+                        "Create it first or fix routing config."
+                    ),
+                )
+            parent_id = parent_page.id
 
         # Check if page already exists
         existing = self._client.get_page_by_title(title)
