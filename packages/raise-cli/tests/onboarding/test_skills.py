@@ -515,3 +515,32 @@ class TestSkillScaffoldResult:
         assert result.files_skipped == []
         assert result.skills_installed == []
         assert result.skills_skipped_names == []
+
+
+# ── Guardrail: DISTRIBUTABLE_SKILLS covers all skills_base dirs (RAISE-1299) ──
+
+
+class TestDistributableSkillsCompleteness:
+    """RAISE-1299: every skill in skills_base/ must be in DISTRIBUTABLE_SKILLS."""
+
+    def test_all_skills_base_dirs_in_distributable_list(self) -> None:
+        """Guardrail: no skill dir in skills_base/ left out of DISTRIBUTABLE_SKILLS."""
+        from importlib.resources import files
+
+        base = files("raise_cli.skills_base")
+        # Traverse finds all rai-* dirs that contain SKILL.md
+        on_disk: set[str] = set()
+        for item in base.iterdir():
+            if (
+                item.name.startswith("rai-")
+                and item.is_dir()
+                and (item / "SKILL.md").is_file()
+            ):
+                on_disk.add(item.name)
+
+        distributable = set(DISTRIBUTABLE_SKILLS)
+        missing = on_disk - distributable
+        assert not missing, (
+            f"Skills in skills_base/ but NOT in DISTRIBUTABLE_SKILLS: {sorted(missing)}. "
+            "Add them to DISTRIBUTABLE_SKILLS in skills_base/__init__.py."
+        )

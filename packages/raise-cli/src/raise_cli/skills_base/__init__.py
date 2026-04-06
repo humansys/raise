@@ -37,6 +37,7 @@ __version__ = "2.2.0"
 DISTRIBUTABLE_SKILLS: list[str] = [
     # Session lifecycle
     "rai-session-close",
+    "rai-session-diary",
     "rai-session-start",
     # Story lifecycle
     "rai-story-close",
@@ -53,12 +54,21 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-epic-plan",
     "rai-epic-run",
     "rai-epic-start",
+    # Bugfix lifecycle
+    "rai-bugfix",
     # Onboarding
+    "rai-adapter-setup",
     "rai-project-create",
     "rai-project-onboard",
     "rai-welcome",
     # Governance
     "rai-docs-update",
+    "rai-framework-sync",
+    "rai-publish",
+    # Quality
+    "rai-architecture-review",
+    "rai-code-audit",
+    "rai-quality-review",
     # Tools
     "rai-debug",
     "rai-discover",
@@ -68,4 +78,7 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-mcp-status",
     "rai-problem-shape",
     "rai-research",
+    "rai-skill-create",
+    "rai-skillset-manage",
+    "rai-sonarqube",
 ]
