@@ -5,6 +5,8 @@ A governance framework for AI-assisted software development.
 
 from __future__ import annotations
 
+from importlib.metadata import version as _pkg_version
+
 from raise_cli.exceptions import (
     ArtifactNotFoundError,
     ConfigurationError,
@@ -16,8 +18,6 @@ from raise_cli.exceptions import (
     StateError,
     ValidationError,
 )
-
-from importlib.metadata import version as _pkg_version
 
 __version__ = _pkg_version("raise-cli")
 __author__ = "Emilio Osorio"

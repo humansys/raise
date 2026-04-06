@@ -32,7 +32,7 @@ _COMMAND_GATES: list[Gate] = [
     Gate(name="Type checks clean", command="uv run pyright src/"),
     Gate(name="Lint clean", command="uv run ruff check src/"),
     Gate(name="Security scan", command="uv run bandit -r src/ -q -ll"),
-    Gate(name="Build succeeds", command="uv build"),
+    Gate(name="Build succeeds", command="uv build --out-dir dist"),
     Gate(name="Package validates", command="twine check dist/*"),
 ]
 
@@ -50,9 +50,12 @@ def _run_command(command: str, cwd: Path) -> tuple[bool, str]:
     try:
         import shlex
 
-        result = subprocess.run(
-            shlex.split(command),
+        # shell=True only for glob patterns (dist/*) — commands are internal constants
+        use_shell = "*" in command or "?" in command
+        result = subprocess.run(  # noqa: S602
+            command if use_shell else shlex.split(command),
             cwd=cwd,
+            shell=use_shell,  # nosec B602
             capture_output=True,
             text=True,
             timeout=300,
