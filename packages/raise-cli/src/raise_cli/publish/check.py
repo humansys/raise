@@ -158,7 +158,15 @@ def run_checks(
         )
 
     # 10: Version sync between pyproject.toml and __init__.py
+    # First try literal __version__ = "x.y.z", then importlib.metadata (PEP 396)
     init_version = _extract_version(init_path, r'__version__\s*=\s*"([^"]*)"')
+    if init_version is None:
+        try:
+            from importlib.metadata import version as _meta_version
+
+            init_version = _meta_version("raise-cli")
+        except Exception:  # noqa: BLE001, S110
+            init_version = None
     if pyproject_version and init_version and pyproject_version == init_version:
         results.append(
             CheckResult(
