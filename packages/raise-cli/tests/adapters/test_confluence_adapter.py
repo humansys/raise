@@ -133,8 +133,12 @@ class TestGetPage:
     def test_delegates_to_client(self) -> None:
         adapter, mock_client = _make_adapter()
         expected = PageContent(
-            id="123", title="Test", content="<p>hi</p>",
-            url="https://x/123", space_key="TEST", version=1,
+            id="123",
+            title="Test",
+            content="<p>hi</p>",
+            url="https://x/123",
+            space_key="TEST",
+            version=1,
         )
         mock_client.get_page_by_id.return_value = expected
         assert adapter.get_page("123") == expected
@@ -161,8 +165,12 @@ def _page(
     page_id: str = "100", title: str = "Test", url: str = "https://x/100"
 ) -> PageContent:
     return PageContent(
-        id=page_id, title=title, content="<p>body</p>",
-        url=url, space_key="TEST", version=1,
+        id=page_id,
+        title=title,
+        content="<p>body</p>",
+        url=url,
+        space_key="TEST",
+        version=1,
     )
 
 
@@ -183,7 +191,9 @@ class TestPublish:
         assert result.success is True
         assert result.url == "https://x/100"
         mock_client.create_page.assert_called_once_with(
-            "My Page", "<p>hi</p>", parent_id="5",
+            "My Page",
+            "<p>hi</p>",
+            parent_id="5",
         )
 
     def test_updates_existing_page(self) -> None:
@@ -199,7 +209,9 @@ class TestPublish:
         result = adapter.publish("doc", "<p>updated</p>", {"title": "My Page"})
 
         assert result.success is True
-        mock_client.update_page.assert_called_once_with("200", "My Page", "<p>updated</p>")
+        mock_client.update_page.assert_called_once_with(
+            "200", "My Page", "<p>updated</p>"
+        )
 
     def test_applies_labels_from_routing(self) -> None:
         routing = {"adr": ArtifactRouting(parent_title="ADRs", labels=["adr", "arch"])}
@@ -215,7 +227,9 @@ class TestPublish:
 
         assert result.success is True
         mock_client.create_page.assert_called_once_with(
-            "ADR-015", "<p>adr</p>", parent_id="10",
+            "ADR-015",
+            "<p>adr</p>",
+            parent_id="10",
         )
         mock_client.set_labels.assert_called_once_with("50", ["adr", "arch"])
 
@@ -246,6 +260,73 @@ class TestPublish:
 
         assert result.success is False
         assert "Parent page 'ADRs' not found" in result.message
+        mock_client.create_page.assert_not_called()
+
+
+# ── T3b: publish with explicit parent_id (RAISE-605) ──────────────────────
+
+
+class TestPublishWithParentId:
+    """RAISE-605: metadata["parent_id"] overrides routing parent."""
+
+    def test_explicit_parent_id_used_over_routing(self) -> None:
+        """metadata["parent_id"] takes priority over routing.parent_title."""
+        routing = {"doc": ArtifactRouting(parent_title="Docs", labels=["doc"])}
+        adapter, mock_client = _make_adapter(routing=routing)
+        mock_client.get_page_by_title.return_value = None  # new page
+        mock_client.create_page.return_value = _page()
+
+        result = adapter.publish(
+            "doc", "<p>hi</p>", {"title": "My Page", "parent_id": "999"}
+        )
+
+        assert result.success is True
+        mock_client.create_page.assert_called_once_with(
+            "My Page", "<p>hi</p>", parent_id="999"
+        )
+        # Should NOT have looked up parent by title
+        mock_client.get_page_by_title.assert_called_once()  # only title lookup, not parent
+
+    def test_explicit_parent_id_without_routing(self) -> None:
+        """parent_id works even when no routing is configured for doc_type."""
+        adapter, mock_client = _make_adapter()  # no routing
+        mock_client.get_page_by_title.return_value = None  # new page
+        mock_client.create_page.return_value = _page()
+
+        result = adapter.publish(
+            "custom", "<p>hi</p>", {"title": "Ad Hoc Page", "parent_id": "888"}
+        )
+
+        assert result.success is True
+        mock_client.create_page.assert_called_once_with(
+            "Ad Hoc Page", "<p>hi</p>", parent_id="888"
+        )
+
+    def test_explicit_parent_id_still_applies_routing_labels(self) -> None:
+        """When parent_id overrides parent, routing labels still apply if available."""
+        routing = {"adr": ArtifactRouting(parent_title="ADRs", labels=["adr", "arch"])}
+        adapter, mock_client = _make_adapter(routing=routing)
+        mock_client.get_page_by_title.return_value = None  # new page
+        mock_client.create_page.return_value = _page(page_id="50")
+
+        result = adapter.publish(
+            "adr", "<p>adr</p>", {"title": "ADR-042", "parent_id": "777"}
+        )
+
+        assert result.success is True
+        mock_client.create_page.assert_called_once_with(
+            "ADR-042", "<p>adr</p>", parent_id="777"
+        )
+        mock_client.set_labels.assert_called_once_with("50", ["adr", "arch"])
+
+    def test_no_parent_id_no_routing_fails(self) -> None:
+        """Without parent_id or routing, publish fails with clear message."""
+        adapter, mock_client = _make_adapter()  # no routing
+
+        result = adapter.publish("custom", "<p>hi</p>", {"title": "Orphan Page"})
+
+        assert result.success is False
+        assert "routing" in result.message.lower() or "parent" in result.message.lower()
         mock_client.create_page.assert_not_called()
 
 
