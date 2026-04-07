@@ -19,7 +19,7 @@ acli --version
 acli jira auth login --site your-org.atlassian.net
 ```
 
-For detailed setup, multi-instance configuration, and troubleshooting, see the **[Jira Adapter Guide](../guides/jira-adapter.md**.
+For detailed setup, multi-instance configuration, and troubleshooting, see **[Configuring Integrations](../guides/configuring-integrations.md)**.
 
 ### Project Configuration
 

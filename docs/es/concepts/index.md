@@ -104,7 +104,7 @@ Cada capa es trazable a la de arriba. Cuando alguien pregunta "¿por qué tenemo
 
 La gobernanza se carga al inicio de sesión y se aplica durante todo el trabajo. No es documentación que se queda en una carpeta — es contexto activo que moldea cada decisión.
 
-→ **[Leer más sobre Gobernanza](governance.md/**
+→ **[Leer más sobre Gobernanza](governance.md)**
 
 ### 2. Skills
 
@@ -125,7 +125,7 @@ Cada paso produce un artefacto. Cada artefacto alimenta el siguiente. Toda la ca
 
 Los skills también soportan niveles de maestría (Shu-Ha-Ri): principiantes reciben guía detallada, expertos reciben prompts mínimos. El mismo skill se adapta a tu experiencia.
 
-→ **[Leer más sobre Skills](skills.md/**
+→ **[Leer más sobre Skills](skills.md)**
 
 ### 3. Memoria
 
@@ -137,7 +137,7 @@ La memoria es lo que hace que la IA aprenda. Sin ella, cada sesión empieza de c
 
 La memoria vive en tres scopes: **global** (todos los proyectos), **project** (compartida vía git) y **personal** (tu historial privado de sesiones). Se acumula con el tiempo — la sesión 1 es descubrimiento, la sesión 50 es expertise.
 
-→ **[Leer más sobre Memoria](memory.md/**
+→ **[Leer más sobre Memoria](memory.md)**
 
 ### 4. Knowledge Graph
 
@@ -147,7 +147,7 @@ Los nodos son conceptos (patrones, principios, módulos, stories). Los edges son
 
 Así es como Rai sabe qué guardrails aplican a qué módulo, qué patrones se aprendieron en qué story, y cuáles son las restricciones arquitectónicas para el código que estás tocando.
 
-→ **[Leer más sobre el Knowledge Graph](knowledge-graph.md/**
+→ **[Leer más sobre el Knowledge Graph](knowledge-graph.md)**
 
 ## Cómo se conecta todo
 
@@ -198,6 +198,6 @@ El ciclo es: **gobernar → trabajar → aprender → acumular**. La gobernanza 
 
 ## Siguientes pasos
 
-- **[Comenzar](../getting-started.md/** — Instala y ejecuta tu primera sesión
-- **[Tu Primera Story](../guides/first-story.md/** — Experimenta el ciclo de vida completo
-- **[Referencia CLI](../cli/index.md/** — Todos los comandos, flags y opciones
+- **[Comenzar](../getting-started.md)** — Instala y ejecuta tu primera sesión
+- **[Tu Primera Story](../guides/first-story.md)** — Experimenta el ciclo de vida completo
+- **[Referencia CLI](../cli/index.md)** — Todos los comandos, flags y opciones

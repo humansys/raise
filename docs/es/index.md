@@ -9,10 +9,10 @@ RaiSE combina una **metodología lean** con un **toolkit CLI determinístico** p
 
 ## Qué encontrarás aquí
 
-- **[Comenzar](getting-started.md/** — Instala el CLI y ejecuta tu primera sesión
-- **[Conceptos](concepts/memory.md/** — Memoria, Skills, Gobernanza, Knowledge Graph
-- **[Guías](guides/first-story.md/** — Tu Primera Historia, Configurar un Proyecto
-- **[Referencia CLI](cli/index.md/** — Todos los comandos, flags y opciones
+- **[Comenzar](getting-started.md)** — Instala el CLI y ejecuta tu primera sesión
+- **[Conceptos](concepts/memory.md)** — Memoria, Skills, Gobernanza, Knowledge Graph
+- **[Guías](guides/first-story.md)** — Tu Primera Historia, Configurar un Proyecto
+- **[Referencia CLI](cli/index.md)** — Todos los comandos, flags y opciones
 
 ## Instalación rápida
 

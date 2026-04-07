@@ -310,7 +310,7 @@ From the [Constitution](framework/reference/constitution.md):
 
 ## Status
 
-Current stable release: `v2.1.0`. The framework is being used in production.
+Current stable release: `v2.3.0`. Next release: `v2.4.0` (in development). The framework is being used in production.
 
 We value your feedback:
 

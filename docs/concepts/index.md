@@ -104,7 +104,7 @@ Each layer is traceable to the one above. When someone asks "why do we have this
 
 Governance is loaded at session start and enforced throughout. It's not documentation that sits in a folder — it's active context that shapes every decision.
 
-→ **[Read more about Governance](governance.md/**
+→ **[Read more about Governance](governance.md)**
 
 ### 2. Skills
 
@@ -125,7 +125,7 @@ Each step produces an artifact. Each artifact feeds the next. The whole chain is
 
 Skills also support mastery levels (Shu-Ha-Ri): beginners get detailed guidance, experts get minimal prompts. The same skill adapts to your experience.
 
-→ **[Read more about Skills](skills.md/**
+→ **[Read more about Skills](skills.md)**
 
 ### 3. Memory
 
@@ -137,7 +137,7 @@ Memory is what makes the AI learn. Without it, every session starts from zero. W
 
 Memory lives in three scopes: **global** (all projects), **project** (shared via git), and **personal** (your private session history). It compounds over time — session 1 is discovery, session 50 is expertise.
 
-→ **[Read more about Memory](memory.md/**
+→ **[Read more about Memory](memory.md)**
 
 ### 4. Knowledge Graph
 
@@ -147,7 +147,7 @@ Nodes are concepts (patterns, principles, modules, stories). Edges are relations
 
 This is how Rai knows which guardrails apply to which module, which patterns were learned in which story, and what the architectural constraints are for the code you're touching.
 
-→ **[Read more about the Knowledge Graph](knowledge-graph.md/**
+→ **[Read more about the Knowledge Graph](knowledge-graph.md)**
 
 ## How it all connects
 
@@ -198,6 +198,6 @@ The cycle is: **govern → work → learn → compound**. Governance defines the
 
 ## Next steps
 
-- **[Getting Started](../getting-started.md/** — Install and run your first session
-- **[Your First Story](../guides/first-story.md/** — Experience the full story lifecycle
-- **[CLI Reference](../cli/index.md/** — Every command, flag, and option
+- **[Getting Started](../getting-started.md)** — Install and run your first session
+- **[Your First Story](../guides/first-story.md)** — Experience the full story lifecycle
+- **[CLI Reference](../cli/index.md)** — Every command, flag, and option

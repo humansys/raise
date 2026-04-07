@@ -124,7 +124,7 @@ Each step produces an artifact that feeds the next. The review feeds memory, whi
 
 Start with a small feature (XS or S sized). Get the rhythm first, then scale up.
 
-→ **[Walk through the full lifecycle](guides/first-story.md/** for a step-by-step guide.
+→ **[Walk through the full lifecycle](guides/first-story.md)** for a step-by-step guide.
 
 ## End a session
 
@@ -152,7 +152,7 @@ rai graph query "testing patterns"
 
 ## What's next
 
-- **[Your First Story](guides/first-story.md/** — Full story lifecycle walkthrough
-- **[Setting Up a Project](guides/setting-up.md/** — Greenfield and brownfield setup in depth
-- **[CLI Reference](cli/index.md/** — All commands, flags, and examples
-- **[Core Concepts](concepts/index.md/** — Memory, Skills, Governance, Knowledge Graph
+- **[Your First Story](guides/first-story.md)** — Full story lifecycle walkthrough
+- **[Setting Up a Project](guides/setting-up.md)** — Greenfield and brownfield setup in depth
+- **[CLI Reference](cli/index.md)** — All commands, flags, and examples
+- **[Core Concepts](concepts/index.md)** — Memory, Skills, Governance, Knowledge Graph

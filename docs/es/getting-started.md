@@ -83,7 +83,7 @@ Cada paso produce un artefacto que alimenta el siguiente. La review alimenta la 
 
 Empieza con una feature pequeña (tamaño XS o S). Primero domina el ritmo, luego escala.
 
-→ **[Recorre el ciclo completo](guides/first-story.md/** para una guía paso a paso.
+→ **[Recorre el ciclo completo](guides/first-story.md)** para una guía paso a paso.
 
 ## Terminar una sesión
 
@@ -109,7 +109,7 @@ rai graph query "testing patterns"
 
 ## Siguiente paso
 
-- **[Tu Primera Story](guides/first-story.md/** — Recorrido completo del ciclo de vida
-- **[Configurar un Proyecto](guides/setting-up.md/** — Setup greenfield y brownfield en detalle
-- **[Referencia CLI](cli/index.md/** — Todos los comandos, flags y ejemplos
-- **[Conceptos Core](concepts/index.md/** — Memoria, Skills, Gobernanza, Knowledge Graph
+- **[Tu Primera Story](guides/first-story.md)** — Recorrido completo del ciclo de vida
+- **[Configurar un Proyecto](guides/setting-up.md)** — Setup greenfield y brownfield en detalle
+- **[Referencia CLI](cli/index.md)** — Todos los comandos, flags y ejemplos
+- **[Conceptos Core](concepts/index.md)** — Memoria, Skills, Gobernanza, Knowledge Graph
