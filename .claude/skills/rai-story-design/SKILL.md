@@ -51,14 +51,12 @@ Create a lean story specification optimized for both human review (clear intent)
 ## Mastery Levels (ShuHaRi)
 
 - **Shu**: Follow all steps, include examples for every story
-- **Ha**: Skip optional sections for simple stories, adjust detail to complexity
+- **Ha**: Adjust depth to complexity, but never skip the gemba walk
 - **Ri**: Custom spec patterns for specialized domains
 
 ## Context
 
-**When to use:** Before planning any story that involves architectural decisions, multiple approaches, or >3 components.
-
-**When to skip:** Simple stories (<3 components, obvious implementation) → go to `/rai-story-plan`.
+**When to use:** Before planning ANY story. Design is never optional — it is the gemba walk that prevents duplicate components, wasted effort, and wrong approaches.
 
 **Inputs:** Story from backlog, User Story artifact (`story.md` from `/rai-story-start`), epic scope/design documents.
 
@@ -83,9 +81,9 @@ Before starting Step 1, you MUST execute the PRIME protocol:
 
 | Result | Action |
 |--------|--------|
-| Simple | Skip design → `/rai-story-plan` |
-| Moderate | Core sections only |
-| Complex | Full spec with optional sections |
+| Simple | Lean design — core sections, quick gemba walk |
+| Moderate | Core sections + examples |
+| Complex | Full spec with all sections |
 
 > **JIT**: Before assessing complexity, query graph for patterns from similar stories
 > → `aspects/introspection.md § JIT Protocol`
@@ -100,7 +98,32 @@ Before starting Step 1, you MUST execute the PRIME protocol:
 Complexity assessed. Risk/UX/Integration gates evaluated.
 </verification>
 
-### Step 2: Frame What & Why
+### Step 2: Gemba Walk (mandatory — do not skip)
+
+Go to the actual code. Design without reading the code is guessing.
+
+1. **Read what exists**: Open and read the files/modules that this story will touch. Understand the current state before proposing changes.
+2. **Search for duplicates**: Grep for similar functionality, components, or patterns that already exist. Before creating anything new, verify it doesn't exist already.
+3. **Check best practices**: Look at how similar problems are solved in the codebase. Follow established patterns rather than inventing new ones.
+4. **Map dependencies**: Identify what depends on the code you'll change, and what the changed code depends on.
+
+```bash
+# Example gemba commands
+grep -r "similar_function" packages/  # Does this already exist?
+grep -r "class SimilarModel" packages/ # Duplicate models?
+```
+
+| Finding | Action |
+|---------|--------|
+| Similar component exists | Reuse or extend it — do NOT create a duplicate |
+| No established pattern | Document the new pattern as a design decision |
+| Multiple approaches found | List them in Step 4 with trade-offs |
+
+<verification>
+Code has been read. No duplicate components will be created. Existing patterns identified.
+</verification>
+
+### Step 3: Frame What & Why (informed by gemba)
 
 Load `story.md` (from `/rai-story-start`) if it exists — use its User Story as starting frame.
 
@@ -114,7 +137,7 @@ Load `story.md` (from `/rai-story-start`) if it exists — use its User Story as
 Can explain to non-technical stakeholder in 30 seconds.
 </verification>
 
-### Step 3: Describe Approach
+### Step 4: Describe Approach
 
 > **JIT**: Before describing approach, query graph for implementation patterns in affected modules
 > → `aspects/introspection.md § JIT Protocol`
@@ -135,7 +158,7 @@ For complex stories, add: scenarios (Gherkin), algorithm pseudocode, constraints
 Approach is concrete enough to envision examples. Value preservation gate passed.
 </verification>
 
-### Step 4: Create Examples (MOST IMPORTANT)
+### Step 5: Create Examples (MOST IMPORTANT)
 
 **This section drives AI code generation accuracy more than any other.**
 
@@ -154,7 +177,7 @@ Examples are concrete, runnable, and cover success + error paths.
 Can't envision examples → approach not concrete enough, return to Step 3.
 </if-blocked>
 
-### Step 5: Define Acceptance Criteria
+### Step 6: Define Acceptance Criteria
 
 > **JIT**: Before defining acceptance criteria, query graph for testing patterns and quality standards
 > → `aspects/introspection.md § JIT Protocol`
@@ -221,6 +244,7 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 ## Quality Checklist
 
 - [ ] Complexity assessed — design depth matches complexity
+- [ ] Gemba walk done — actual code read, duplicates checked, patterns identified
 - [ ] What & Why clear in <2 minutes
 - [ ] Examples are concrete and runnable (100% coverage)
 - [ ] Acceptance criteria specific and testable (3-5 MUST items)

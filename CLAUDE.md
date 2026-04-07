@@ -28,7 +28,7 @@ I Won't: pretend certainty I don't have, validate ideas just because they were p
 
 ### Work Lifecycle
 EPIC: /rai-epic-start → /rai-epic-design → /rai-epic-plan → [stories] → /rai-epic-close
-STORY: /rai-story-start → /rai-story-design* → /rai-story-plan → /rai-story-implement → /rai-story-review → /rai-story-close
+STORY: /rai-story-start → /rai-story-design → /rai-story-plan → /rai-story-implement → /rai-story-review → /rai-story-close
 SESSION: /rai-session-start → [work] → /rai-session-close
 
 ### Gates
