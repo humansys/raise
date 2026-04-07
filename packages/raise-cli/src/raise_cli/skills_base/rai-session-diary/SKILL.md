@@ -8,10 +8,7 @@ allowed-tools:
   - Glob
   - "Bash(rai:*)"
   - "Bash(git:*)"
-  - mcp__atlassian__confluence_create_page
-  - mcp__atlassian__confluence_get_page
-  - mcp__atlassian__confluence_get_page_children
-  - mcp__atlassian__confluence_search
+  - Write
 
 license: MIT
 
@@ -28,7 +25,7 @@ metadata:
   raise.inputs: |
     - session_context: conversation, required
   raise.outputs: |
-    - confluence_page: url, confluence
+    - published_page: url, docs-adapter
 ---
 
 # Session Diary
@@ -64,7 +61,7 @@ Write a narrative session diary entry to Confluence that captures *how we got to
 
 **When to skip:** Pure implementation sessions with no design decisions or process insights. Quick bug fixes. Sessions shorter than 2 hours.
 
-**Confluence location:** Space `RaiSE1`, parent page ID `3067674642` (Diario de Sesiones).
+**Publish target:** Resolved via `rai docs publish session-diary` — routes to configured parent (default: Diario de Sesiones).
 
 ## Steps
 
@@ -185,22 +182,24 @@ Present the draft to the developer for review before publishing. Key questions:
 Developer reviewed and approved the content.
 </verification>
 
-### Step 5: Publish to Confluence
+### Step 5: Publish via Adapter
 
-Create the page under the Diario de Sesiones parent:
+Save the draft to a temporary file and publish through the docs adapter. The adapter resolves the parent page from routing config (`session-diary` → `Diario de Sesiones`).
 
+```bash
+rai docs publish session-diary --title "Session Diary — {YYYY-MM-DD}: {Evocative Title}" --file /tmp/session-diary-draft.md
 ```
-Space: RaiSE1
-Parent ID: 3067674642
-Title: Session Diary — {YYYY-MM-DD}: {Evocative Title}
-Format: markdown
-Emoji: (choose one that fits the session's mood)
+
+If the default routing parent needs an override (e.g., a different Confluence parent):
+
+```bash
+rai docs publish session-diary --title "..." --file /tmp/session-diary-draft.md --parent {PAGE_ID}
 ```
 
 Present the URL to the developer.
 
 <verification>
-Page created in Confluence under Diario de Sesiones. URL confirmed.
+Page published via adapter. URL confirmed. Works with both Confluence and filesystem targets.
 </verification>
 
 ## Output
@@ -219,13 +218,12 @@ Page created in Confluence under Diario de Sesiones. URL confirmed.
 - [ ] Mistakes and pivots documented honestly
 - [ ] Metrics included for implementation sessions
 - [ ] Developer reviewed before publish
-- [ ] Published under correct Confluence parent (ID: 3067674642)
+- [ ] Published via `rai docs publish` (adapter resolves target and parent)
 - [ ] NEVER write a changelog — the diary captures *how* we got to decisions
 - [ ] NEVER skip the reflection — it's what distinguishes a diary from a report
 
 ## References
 
-- Confluence space: RaiSE1
-- Parent page: Diario de Sesiones (ID: 3067674642)
+- Routing config: `.raise/confluence.yaml` → `session-diary` routing entry
 - Prior entries: 8 entries from SES-224 through SES-E-260402
 - Complement: `/rai-session-close` (run after diary)

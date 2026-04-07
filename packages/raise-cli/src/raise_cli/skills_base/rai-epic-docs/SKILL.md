@@ -1,5 +1,5 @@
 ---
-description: Generate architecture docs and publish to Confluence. Use before epic close.
+description: Generate architecture docs and publish via docs adapter. Use before epic close.
 
 allowed-tools:
   - Read
@@ -19,11 +19,9 @@ metadata:
 
     - story_retrospectives: file_path[], required
 
-    - confluence_space: string, required
-
     '
   raise.next: rai-epic-close
-  raise.outputs: '- confluence_pages: url[], confluence
+  raise.outputs: '- published_pages: url[], docs-adapter
 
     '
   raise.prerequisites: all stories complete
@@ -269,24 +267,32 @@ Document every known failure mode:
 Each failure mode has a concrete diagnosis step — not just "check the logs."
 </verification>
 
-### Step 7: Publish to Confluence
+### Step 7: Publish via Adapter
 
 Determine the page structure based on epic size:
 
 **S/M epic (1 page):**
-Create a single page with all 5 sections under the epic's Confluence parent.
+Save all 5 sections to a single file and publish.
 
 **L epic (multi-page):**
-Create an index page linking to child pages per subsystem.
+Publish an index page, then child pages with `--parent` pointing to the index.
 
 **Page title convention:** `E{N}: {Epic Name} — Developer Documentation`
 
-**Parent page:** Find the epic's Confluence space/parent. If none exists, use the governance section.
+Save the documentation to a temporary file, then publish through the docs adapter. The adapter resolves the parent page from routing config (`epic-docs` → `Developer Docs`).
 
-Use `confluence_create_page` or `confluence_update_page` MCP tools.
+```bash
+rai docs publish epic-docs --title "E{N}: {Epic Name} — Developer Documentation" --file /tmp/epic-docs-draft.md
+```
+
+For L epics with child pages, use `--parent` to nest under the index page:
+
+```bash
+rai docs publish epic-docs --title "E{N}: {Subsystem} — Details" --file /tmp/subsystem.md --parent {INDEX_PAGE_ID}
+```
 
 <verification>
-Page(s) created in Confluence. URLs captured.
+Page(s) published via adapter. URLs captured. Works with both Confluence and filesystem targets.
 </verification>
 
 ### Step 8: HITL Review

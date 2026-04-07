@@ -30,3 +30,12 @@ instances:
         parent_title: Work
         labels:
         - retrospective
+      session-diary:
+        parent_title: Diario de Sesiones
+        labels:
+        - session-diary
+      epic-docs:
+        parent_title: Developer Docs
+        labels:
+        - epic-docs
+        - developer-docs
