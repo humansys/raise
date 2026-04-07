@@ -10,7 +10,7 @@ project:
   code_file_count: 671
   detected_at: '2026-04-01T20:29:52.412195Z'
 branches:
-  development: release/2.4.0
+  development: release/2.4.1
   main: main
 ide:
   type: claude
