@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-04-06
+
 ### Added
 
 - **7 atomic bugfix skills** — rai-bugfix-start, triage, analyse, plan, fix, review, close. Decomposed from monolithic /rai-bugfix with 100% artifact completeness vs 38% baseline (E1286)
@@ -27,9 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - 20+ bugs resolved including: epic ID collisions (RAISE-1199, RAISE-1128), graph index unavailable in worktrees (RAISE-1276), LEARN record casing (RAISE-1278), Jira update_issue REST envelope (RAISE-1274), Confluence mixed-case space keys (RAISE-1187), suggest_routing substring matching (RAISE-1272), daemon CPU leak (RAISE-1008), docs publish parent_id (RAISE-605), stale imports (RAISE-1063), MCP env KEY=VALUE parsing (RAISE-539), session state overwrites (RAISE-697)
-- Integration test: comment test now uses ephemeral issues instead of accumulating on shared fixtures
-
-## [2.3.0] - 2026-03-30
+- Integration test: comment test now uses ephemeral issues instead of accumulating on shared fixtures## [2.3.0] - 2026-03-30
 
 ### Added
 
@@ -96,6 +96,7 @@ toolkit for reliable AI-assisted software engineering.
 - **Clean entry points**: adapters register via `rai.adapters.pm` and `rai.docs.targets`
 - **Gitignored adapter configs** (.raise/jira.yaml, .raise/confluence.yaml) to prevent PII leaks
 
-[Unreleased]: https://github.com/humansys/raise/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/humansys/raise/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/humansys/raise/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/humansys/raise/compare/v2.2.3...v2.3.0
 [2.2.3]: https://github.com/humansys/raise/releases/tag/v2.2.3
