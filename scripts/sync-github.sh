@@ -100,29 +100,39 @@ done
 TMPTOML=$(mktemp)
 git show :pyproject.toml > "$TMPTOML"
 
-# Remove workspace source entries for proprietary packages
+# Remove workspace source entries for proprietary/internal packages
 sed -i.bak '/^raise-server = { workspace = true }/d' "$TMPTOML"
 sed -i.bak '/^raise-pro = { workspace = true }/d' "$TMPTOML"
+sed -i.bak '/^rai-agent = { workspace = true }/d' "$TMPTOML"
 
-# Remove dev dependency entries for proprietary packages
+# Remove dev dependency entries for proprietary/internal packages
 sed -i.bak '/^    "raise-pro",$/d' "$TMPTOML"
 sed -i.bak '/^    "raise-server",$/d' "$TMPTOML"
+sed -i.bak '/^    "rai-agent",$/d' "$TMPTOML"
 
-# Remove proprietary package paths from pyright include
+# Remove proprietary/internal package paths from pyright include
 sed -i.bak '/"packages\/raise-pro\/src"/d' "$TMPTOML"
 sed -i.bak '/"packages\/raise-server\/src"/d' "$TMPTOML"
+sed -i.bak '/"packages\/rai-agent\/src"/d' "$TMPTOML"
 
-# Remove proprietary package paths from pytest cov
+# Remove proprietary/internal package paths from pytest cov
 sed -i.bak '/--cov=packages\/raise-pro/d' "$TMPTOML"
 sed -i.bak '/--cov=packages\/raise-server/d' "$TMPTOML"
+sed -i.bak '/--cov=packages\/rai-agent/d' "$TMPTOML"
 
-# Remove proprietary package test paths from testpaths
+# Remove proprietary/internal package test paths from testpaths
 sed -i.bak '/"packages\/raise-pro\/tests"/d' "$TMPTOML"
 sed -i.bak '/"packages\/raise-server\/tests"/d' "$TMPTOML"
+sed -i.bak '/"packages\/rai-agent\/tests"/d' "$TMPTOML"
 
-# Remove proprietary package paths from coverage source
+# Remove proprietary/internal package paths from coverage source
 sed -i.bak '/"packages\/raise-pro\/src\/rai_pro"/d' "$TMPTOML"
 sed -i.bak '/"packages\/raise-server\/src\/raise_server"/d' "$TMPTOML"
+sed -i.bak '/"packages\/rai-agent\/src\/rai_agent"/d' "$TMPTOML"
+
+# Remove rai-agent pyright overrides, pythonpath, and comments
+sed -i.bak '/packages\/rai-agent/d' "$TMPTOML"
+sed -i.bak '/^# rai-agent:/d' "$TMPTOML"
 
 # Write patched pyproject.toml back into the git index
 BLOB=$(git hash-object -w "$TMPTOML")
