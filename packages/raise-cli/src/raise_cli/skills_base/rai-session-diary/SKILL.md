@@ -8,7 +8,10 @@ allowed-tools:
   - Glob
   - "Bash(rai:*)"
   - "Bash(git:*)"
-  - Write
+  - mcp__atlassian__confluence_create_page
+  - mcp__atlassian__confluence_get_page
+  - mcp__atlassian__confluence_get_page_children
+  - mcp__atlassian__confluence_search
 
 license: MIT
 
@@ -25,14 +28,14 @@ metadata:
   raise.inputs: |
     - session_context: conversation, required
   raise.outputs: |
-    - published_page: url, docs-adapter
+    - confluence_page: url, confluence
 ---
 
 # Session Diary
 
 ## Purpose
 
-Write a narrative session diary entry to Confluence that captures *how we got to the decisions* — not just what was decided. The diary is written for the team: so colleagues know what happened while they were offline, so future-you remembers the reasoning, so Rai can reference the thinking in future sessions.
+Write a narrative session diary entry to Confluence that captures *how we got to the decisions* — not just what was decided. The diary is written for the team: so Fernando knows what happened while he was offline, so future-Emilio remembers the reasoning, so Rai can reference the thinking in future sessions.
 
 ## What the Diary IS and IS NOT
 
@@ -40,7 +43,7 @@ Write a narrative session diary entry to Confluence that captures *how we got to
 - A narrative of the session — the arc, the tensions, the turning points
 - Written in first person by Rai
 - Honest about mistakes, pivots, and what cost time
-- Includes direct quotes from the developer when they were decisive
+- Includes direct quotes from Emilio when they were decisive
 - Accessible to someone technical who wasn't in the room
 
 **IS NOT:**
@@ -61,7 +64,7 @@ Write a narrative session diary entry to Confluence that captures *how we got to
 
 **When to skip:** Pure implementation sessions with no design decisions or process insights. Quick bug fixes. Sessions shorter than 2 hours.
 
-**Publish target:** Resolved via `rai docs publish session-diary` — routes to configured parent (default: Diario de Sesiones).
+**Confluence location:** Space `RaiSE1`, parent page ID `3067674642` (Diario de Sesiones).
 
 ## Steps
 
@@ -124,7 +127,7 @@ The title should capture the essence, not describe the work. Examples from past 
 
 ```markdown
 **Session:** {SES-ID} | **Duration:** ~{N} hours | **Type:** {type}
-**Participants:** {developer_name} + Rai
+**Participants:** Emilio Osorio + Rai
 **Branch:** {branch} → {target}
 **Epic:** {epic_id} ({jira_key}) — {epic_name}
 ```
@@ -147,8 +150,8 @@ The title should capture the essence, not describe the work. Examples from past 
 #### Voice and Style
 
 - **First person, Rai's voice** — "Audité el código...", "Propuse tres opciones..."
-- **Spanish or English** — match the session's language, or the developer's preference
-- **Direct quotes from the developer** when they were decisive — italics or quotes
+- **Spanish or English** — match the session's language, or Emilio's preference
+- **Direct quotes from Emilio** when they were decisive — italics or quotes
 - **Honest about mistakes** — "cometí un error", "había caído en la trampa"
 - **Technical but accessible** — a senior engineer not on the project should follow
 - **Code blocks** for architecture diagrams, commands, key code
@@ -163,7 +166,7 @@ Always end with:
 
 *— Rai*
 *{SES-ID}, {date}*
-*Con {developer_name}*
+*Con Emilio Osorio*
 ```
 
 <verification>
@@ -172,7 +175,7 @@ Entry drafted. Narrative arc present. Voice consistent with past entries.
 
 ### Step 4: Review with Developer
 
-Present the draft to the developer for review before publishing. Key questions:
+Present the draft to Emilio for review before publishing. Key questions:
 - Does the narrative capture what was important?
 - Are the quotes accurate?
 - Is anything missing or misrepresented?
@@ -182,24 +185,22 @@ Present the draft to the developer for review before publishing. Key questions:
 Developer reviewed and approved the content.
 </verification>
 
-### Step 5: Publish via Adapter
+### Step 5: Publish to Confluence
 
-Save the draft to a temporary file and publish through the docs adapter. The adapter resolves the parent page from routing config (`session-diary` → `Diario de Sesiones`).
+Create the page under the Diario de Sesiones parent:
 
-```bash
-rai docs publish session-diary --title "Session Diary — {YYYY-MM-DD}: {Evocative Title}" --file /tmp/session-diary-draft.md
 ```
-
-If the default routing parent needs an override (e.g., a different Confluence parent):
-
-```bash
-rai docs publish session-diary --title "..." --file /tmp/session-diary-draft.md --parent {PAGE_ID}
+Space: RaiSE1
+Parent ID: 3067674642
+Title: Session Diary — {YYYY-MM-DD}: {Evocative Title}
+Format: markdown
+Emoji: (choose one that fits the session's mood)
 ```
 
 Present the URL to the developer.
 
 <verification>
-Page published via adapter. URL confirmed. Works with both Confluence and filesystem targets.
+Page created in Confluence under Diario de Sesiones. URL confirmed.
 </verification>
 
 ## Output
@@ -214,16 +215,17 @@ Page published via adapter. URL confirmed. Works with both Confluence and filesy
 - [ ] Narrative arc identified (opening → tension → turning point → resolution)
 - [ ] Title is evocative, not descriptive
 - [ ] Written in Rai's voice (first person, honest, technical)
-- [ ] Direct quotes from the developer included where decisive
+- [ ] Direct quotes from Emilio included where decisive
 - [ ] Mistakes and pivots documented honestly
 - [ ] Metrics included for implementation sessions
 - [ ] Developer reviewed before publish
-- [ ] Published via `rai docs publish` (adapter resolves target and parent)
+- [ ] Published under correct Confluence parent (ID: 3067674642)
 - [ ] NEVER write a changelog — the diary captures *how* we got to decisions
 - [ ] NEVER skip the reflection — it's what distinguishes a diary from a report
 
 ## References
 
-- Routing config: `.raise/confluence.yaml` → `session-diary` routing entry
+- Confluence space: RaiSE1
+- Parent page: Diario de Sesiones (ID: 3067674642)
 - Prior entries: 8 entries from SES-224 through SES-E-260402
 - Complement: `/rai-session-close` (run after diary)

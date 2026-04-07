@@ -8,10 +8,15 @@ All skills use the `rai-` namespace prefix to prevent collision
 with user-created or third-party skills.
 
 Contents:
-    Session lifecycle:  rai-session-start, rai-session-close
+    Session lifecycle:  rai-session-start, rai-session-close, rai-session-diary
     Story lifecycle:    rai-story-start, rai-story-plan, rai-story-design,
-                        rai-story-implement, rai-story-review, rai-story-close
-    Epic lifecycle:     rai-epic-start, rai-epic-plan, rai-epic-design, rai-epic-close
+                        rai-story-implement, rai-story-review, rai-story-close,
+                        rai-story-run
+    Epic lifecycle:     rai-epic-start, rai-epic-plan, rai-epic-design,
+                        rai-epic-docs, rai-epic-run, rai-epic-close
+    Bugfix lifecycle:   rai-bugfix-start, rai-bugfix-triage, rai-bugfix-analyse,
+                        rai-bugfix-plan, rai-bugfix-fix, rai-bugfix-review,
+                        rai-bugfix-close, rai-bugfix-run
     Discovery:          rai-discover
     Onboarding:         rai-project-create, rai-project-onboard, rai-welcome
     Governance:         rai-docs-update
@@ -20,7 +25,8 @@ Contents:
                         rai-adapter-setup
 
 Note: Internal skills (rai-framework-sync, rai-publish, rai-skillset-manage,
-      rai-bugfix) are excluded from distribution.
+      rai-sonarqube, rai-code-audit, rai-quality-review, rai-architecture-review)
+      are excluded from distribution.
 
 Usage:
     from importlib.resources import files
@@ -55,21 +61,22 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-epic-run",
     "rai-epic-start",
     # Bugfix lifecycle
-    "rai-bugfix",
+    "rai-bugfix-analyse",
+    "rai-bugfix-close",
+    "rai-bugfix-fix",
+    "rai-bugfix-plan",
+    "rai-bugfix-review",
+    "rai-bugfix-run",
+    "rai-bugfix-start",
+    "rai-bugfix-triage",
     # Onboarding
-    "rai-adapter-setup",
     "rai-project-create",
     "rai-project-onboard",
     "rai-welcome",
     # Governance
     "rai-docs-update",
-    "rai-framework-sync",
-    "rai-publish",
-    # Quality
-    "rai-architecture-review",
-    "rai-code-audit",
-    "rai-quality-review",
     # Tools
+    "rai-adapter-setup",
     "rai-debug",
     "rai-discover",
     "rai-doctor",
@@ -78,7 +85,4 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-mcp-status",
     "rai-problem-shape",
     "rai-research",
-    "rai-skill-create",
-    "rai-skillset-manage",
-    "rai-sonarqube",
 ]

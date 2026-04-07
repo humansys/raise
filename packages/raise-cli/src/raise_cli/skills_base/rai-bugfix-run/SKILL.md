@@ -22,7 +22,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: 2.4.0
-  raise.visibility: internal
+  raise.visibility: public
   raise.skillset: raise-maintainability
   raise.inputs: |
     - bug_id: string, required, argument (e.g. "RAISE-251")

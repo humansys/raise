@@ -227,9 +227,9 @@ def main() -> int:
     # Resolve paths relative to repo root
     repo_root = Path(__file__).parent.parent
     source_dir = repo_root / ".claude" / "skills"
-    target_dir = repo_root / "src" / "raise_cli" / "skills_base"
+    target_dir = repo_root / "packages" / "raise-cli" / "src" / "raise_cli" / "skills_base"
 
-    print("🔄 Syncing skills from .claude/skills/ to src/raise_cli/skills_base/\n")
+    print("🔄 Syncing skills from .claude/skills/ to packages/raise-cli/src/raise_cli/skills_base/\n")
 
     try:
         # Get public skills

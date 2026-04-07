@@ -17,7 +17,7 @@ metadata:
   raise.prerequisites: bugfix-start
   raise.skillset: raise-maintainability
   raise.version: 2.4.0
-  raise.visibility: internal
+  raise.visibility: public
   raise.work_cycle: bugfix
   raise.inputs: |
     - bug_id: string, required, argument
