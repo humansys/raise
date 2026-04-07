@@ -137,7 +137,7 @@ Load `story.md` (from `/rai-story-start`) if it exists — use its User Story as
 Can explain to non-technical stakeholder in 30 seconds.
 </verification>
 
-### Step 4: Describe Approach
+### Step 4: Describe Approach (lean principles)
 
 > **JIT**: Before describing approach, query graph for implementation patterns in affected modules
 > → `aspects/introspection.md § JIT Protocol`
@@ -146,11 +146,18 @@ Document WHAT you're building and WHY this approach (not detailed HOW):
 - Solution approach (1-2 sentences)
 - Components affected (list with change type: create/modify/delete)
 
+**Lean design gates** — challenge every component before committing:
+
+- **KISS**: Is this the simplest approach that works? If not, simplify.
+- **DRY**: Does this duplicate logic that exists elsewhere (gemba walk should have found it)?
+- **YAGNI**: Are you building for a real requirement or a hypothetical one? Cut speculative features.
+- **MVP**: What is the smallest version that delivers the value from Step 3? Build that, not more.
+
 **For refactoring:** grep all call sites of the target. A half-migration is worse than none.
 
 **For data mutations:** What happens when inputs reference missing entities? Declare the strategy explicitly: reject with error, skip + report count, partial success with warnings. Silent drops are semantic bugs.
 
-**Value preservation gate:** Before finalizing components, ask: "What domain knowledge does this layer provide that a generic pass-through wouldn't?" If the answer is "none", the design may be over-abstracted. If the answer involves config/resolution/mapping that an existing pattern handles differently, check where that responsibility lives in the proven pattern. KISS means simplest that serves the purpose — removing domain intelligence to reduce LOC removes the value proposition.
+**Value preservation gate:** Before finalizing components, ask: "What domain knowledge does this layer provide that a generic pass-through wouldn't?" If the answer is "none", the design may be over-abstracted. If the answer involves config/resolution/mapping that an existing pattern handles differently, check where that responsibility lives in the proven pattern.
 
 For complex stories, add: scenarios (Gherkin), algorithm pseudocode, constraints, testing strategy.
 
@@ -245,6 +252,7 @@ Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colo
 
 - [ ] Complexity assessed — design depth matches complexity
 - [ ] Gemba walk done — actual code read, duplicates checked, patterns identified
+- [ ] Lean gates passed: KISS, DRY, YAGNI, MVP — simplest version that delivers value
 - [ ] What & Why clear in <2 minutes
 - [ ] Examples are concrete and runnable (100% coverage)
 - [ ] Acceptance criteria specific and testable (3-5 MUST items)
