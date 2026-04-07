@@ -77,6 +77,7 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-docs-update",
     # Tools
     "rai-adapter-setup",
+    "rai-architecture-review",
     "rai-debug",
     "rai-discover",
     "rai-doctor",
@@ -84,5 +85,6 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-mcp-remove",
     "rai-mcp-status",
     "rai-problem-shape",
+    "rai-quality-review",
     "rai-research",
 ]
