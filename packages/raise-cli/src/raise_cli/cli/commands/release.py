@@ -42,12 +42,11 @@ GRAPH_REL_PATH = Path(".raise") / "rai" / "memory" / "index.json"
 # =============================================================================
 
 
-def _find_project_paths(project: Path) -> tuple[Path, Path, Path]:
-    """Find pyproject.toml, __init__.py, and CHANGELOG.md paths."""
+def _find_project_paths(project: Path) -> tuple[Path, Path]:
+    """Find pyproject.toml and CHANGELOG.md paths."""
     pyproject_path = project / "pyproject.toml"
     changelog_path = project / "CHANGELOG.md"
-    init_path = project / "src" / "raise_cli" / "__init__.py"
-    return pyproject_path, init_path, changelog_path
+    return pyproject_path, changelog_path
 
 
 def _read_current_version(pyproject_path: Path) -> str:
@@ -180,12 +179,11 @@ def check_command(
         $ rai release check
         $ rai release check --project /path/to/project
     """
-    pyproject_path, init_path, changelog_path = _find_project_paths(project)
+    pyproject_path, changelog_path = _find_project_paths(project)
 
     results = run_checks(
         project_root=project,
         pyproject_path=pyproject_path,
-        init_path=init_path,
         changelog_path=changelog_path,
     )
 
@@ -319,13 +317,13 @@ def publish_command(
         console.print("[red]Either --bump or --version is required[/red]")
         raise typer.Exit(1)
 
-    pyproject_path, init_path, changelog_path = _find_project_paths(project)
+    pyproject_path, changelog_path = _find_project_paths(project)
+    init_path = project / "src" / "raise_cli" / "__init__.py"
 
     if not skip_check:
         results = run_checks(
             project_root=project,
             pyproject_path=pyproject_path,
-            init_path=init_path,
             changelog_path=changelog_path,
         )
         all_passed = _display_results(results)

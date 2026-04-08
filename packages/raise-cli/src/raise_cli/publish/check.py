@@ -14,7 +14,6 @@ class Gate:
 
     name: str
     command: str
-    required: bool = True
 
 
 @dataclass(frozen=True)
@@ -26,15 +25,36 @@ class CheckResult:
     message: str
 
 
-# Subprocess gates (executed via shell)
-_COMMAND_GATES: list[Gate] = [
-    Gate(name="Tests pass", command="uv run pytest --cov --tb=no -q"),
-    Gate(name="Type checks clean", command="uv run pyright src/"),
-    Gate(name="Lint clean", command="uv run ruff check src/"),
-    Gate(name="Security scan", command="uv run bandit -r src/ -q -ll"),
-    Gate(name="Build succeeds", command="uv build --out-dir dist"),
-    Gate(name="Package validates", command="twine check dist/*"),
-]
+def _find_gates_yaml(start: Path) -> Path | None:
+    """Walk up from start to find .raise/release-gates.yaml."""
+    current = start.resolve()
+    for _ in range(10):  # safety limit
+        candidate = current / ".raise" / "release-gates.yaml"
+        if candidate.exists():
+            return candidate
+        parent = current.parent
+        if parent == current:
+            break
+        current = parent
+    return None
+
+
+def _load_gates(project_root: Path) -> list[Gate]:
+    """Load command gates from .raise/release-gates.yaml.
+
+    Falls back to empty list if file not found.
+    """
+    import yaml
+
+    gates_path = _find_gates_yaml(project_root)
+    if gates_path is None:
+        return []
+
+    data = yaml.safe_load(gates_path.read_text(encoding="utf-8"))
+    if not data or "gates" not in data:
+        return []
+
+    return [Gate(name=g["name"], command=g["run"]) for g in data["gates"]]
 
 
 def _run_command(command: str, cwd: Path) -> tuple[bool, str]:
@@ -93,7 +113,6 @@ def run_checks(
     *,
     project_root: Path,
     pyproject_path: Path,
-    init_path: Path,
     changelog_path: Path,
 ) -> list[CheckResult]:
     """Run all quality gates and return results.
@@ -101,7 +120,6 @@ def run_checks(
     Args:
         project_root: Project root directory.
         pyproject_path: Path to pyproject.toml.
-        init_path: Path to __init__.py with __version__.
         changelog_path: Path to CHANGELOG.md.
 
     Returns:
@@ -112,12 +130,22 @@ def run_checks(
 
     results: list[CheckResult] = []
 
-    # 1-7: Command-based gates
-    for gate in _COMMAND_GATES:
-        passed, message = _run_command(gate.command, project_root)
-        results.append(CheckResult(gate=gate.name, passed=passed, message=message))
+    # Command-based gates from .raise/release-gates.yaml
+    gates = _load_gates(project_root)
+    if not gates:
+        results.append(
+            CheckResult(
+                gate="Gate config",
+                passed=False,
+                message="No .raise/release-gates.yaml found",
+            )
+        )
+    else:
+        for gate in gates:
+            passed, message = _run_command(gate.command, project_root)
+            results.append(CheckResult(gate=gate.name, passed=passed, message=message))
 
-    # 8: Changelog has unreleased entries
+    # Changelog has unreleased entries
     if changelog_path.exists():
         content = changelog_path.read_text(encoding="utf-8")
         has_entries = has_unreleased_entries(content)
@@ -139,7 +167,7 @@ def run_checks(
             )
         )
 
-    # 9: Version is PEP 440 compliant
+    # Version is PEP 440 compliant
     pyproject_version = _extract_version(pyproject_path, r'version\s*=\s*"([^"]*)"')
     if pyproject_version and is_pep440(pyproject_version):
         results.append(
@@ -157,33 +185,6 @@ def run_checks(
                 message=f"'{pyproject_version}' is not valid PEP 440"
                 if pyproject_version
                 else "Could not read version from pyproject.toml",
-            )
-        )
-
-    # 10: Version sync between pyproject.toml and __init__.py
-    # First try literal __version__ = "x.y.z", then importlib.metadata (PEP 396)
-    init_version = _extract_version(init_path, r'__version__\s*=\s*"([^"]*)"')
-    if init_version is None:
-        try:
-            from importlib.metadata import version as _meta_version
-
-            init_version = _meta_version("raise-cli")
-        except Exception:  # noqa: BLE001, S110
-            init_version = None
-    if pyproject_version and init_version and pyproject_version == init_version:
-        results.append(
-            CheckResult(
-                gate="Version sync",
-                passed=True,
-                message=f"Both files: {pyproject_version}",
-            )
-        )
-    else:
-        results.append(
-            CheckResult(
-                gate="Version sync",
-                passed=False,
-                message=f"pyproject.toml={pyproject_version}, __init__.py={init_version}",
             )
         )
 

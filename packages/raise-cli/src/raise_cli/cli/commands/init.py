@@ -525,9 +525,8 @@ def _create_and_save_manifest(
 
     # Preserve existing name if caller got it from directory (no --name flag)
     effective_name = project_name
-    if ep and ep.name:
-        if project_name == project_path.name:
-            effective_name = ep.name
+    if ep and ep.name and project_name == project_path.name:
+        effective_name = ep.name
 
     # Preserve user-configured language; fall back to detection (RAISE-1320)
     effective_language = ep.language if ep and ep.language else detection.language

@@ -1,0 +1,24 @@
+# Release quality gates — executed by `rai release check`
+#
+# Each gate is a shell command run from the package root.
+# Gates run sequentially; all must pass for a release to proceed.
+# Edit this file to add, remove, or reorder gates — no code changes needed.
+
+gates:
+  - name: Tests pass
+    run: uv run pytest --cov --tb=no -q
+
+  - name: Type checks clean
+    run: uv run pyright src/
+
+  - name: Lint clean
+    run: uv run ruff check src/
+
+  - name: Security scan
+    run: uv run bandit -r src/ -q -ll
+
+  - name: Build succeeds
+    run: uv build --out-dir dist
+
+  - name: Package validates
+    run: uvx twine check dist/*

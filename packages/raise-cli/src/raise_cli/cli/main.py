@@ -26,7 +26,6 @@ from raise_cli.cli.commands.mcp import mcp_app
 from raise_cli.cli.commands.memory import memory_app
 from raise_cli.cli.commands.pattern import pattern_app
 from raise_cli.cli.commands.profile import profile_app
-from raise_cli.cli.commands.publish import publish_app
 from raise_cli.cli.commands.release import release_app
 from raise_cli.cli.commands.session import session_app
 from raise_cli.cli.commands.signal import signal_app
@@ -69,7 +68,6 @@ app.add_typer(mcp_app, name="mcp")
 app.add_typer(memory_app, name="memory")
 app.add_typer(pattern_app, name="pattern")
 app.add_typer(profile_app, name="profile")
-app.add_typer(publish_app, name="publish")
 app.add_typer(release_app, name="release")
 app.add_typer(session_app, name="session")
 app.add_typer(signal_app, name="signal")

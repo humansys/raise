@@ -10,6 +10,22 @@ import pytest
 from raise_cli.publish.check import CheckResult, Gate, run_checks
 
 
+def _create_gates_yaml(project: Path, gates: list[dict[str, str]] | None = None) -> None:
+    """Create .raise/release-gates.yaml in tmp project."""
+    raise_dir = project / ".raise"
+    raise_dir.mkdir(parents=True, exist_ok=True)
+    if gates is None:
+        gates = [
+            {"name": "Tests pass", "run": "echo ok"},
+            {"name": "Lint clean", "run": "echo ok"},
+        ]
+    import yaml
+
+    (raise_dir / "release-gates.yaml").write_text(
+        yaml.dump({"gates": gates}), encoding="utf-8"
+    )
+
+
 class TestCheckResult:
     """Test CheckResult model."""
 
@@ -27,10 +43,9 @@ class TestGate:
     """Test individual gate definitions."""
 
     def test_gate_has_required_fields(self) -> None:
-        gate = Gate(name="Tests", command="uv run pytest", required=True)
+        gate = Gate(name="Tests", command="uv run pytest")
         assert gate.name == "Tests"
         assert gate.command == "uv run pytest"
-        assert gate.required is True
 
 
 class TestRunChecks:
@@ -39,24 +54,19 @@ class TestRunChecks:
     def test_all_pass(self, tmp_path: pytest.TempPathFactory) -> None:
         """When all subprocess commands succeed, all checks pass."""
         project = tmp_path  # type: ignore[assignment]
-        # Create required files
+        _create_gates_yaml(project)
         changelog = project / "CHANGELOG.md"
         changelog.write_text(
             "# Changelog\n\n## [Unreleased]\n\n### Added\n- Feature\n\n## [1.0.0]\n"
         )
         pyproject = project / "pyproject.toml"
         pyproject.write_text('version = "2.0.0a7"\n')
-        init_py = project / "src" / "pkg"
-        init_py.mkdir(parents=True)
-        init_file = init_py / "__init__.py"
-        init_file.write_text('__version__ = "2.0.0a7"\n')
 
         with patch("raise_cli.publish.check._run_command") as mock_run:
             mock_run.return_value = (True, "ok")
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
-                init_path=Path(init_file),  # type: ignore[arg-type]
                 changelog_path=Path(changelog),  # type: ignore[arg-type]
             )
 
@@ -67,16 +77,13 @@ class TestRunChecks:
     ) -> None:
         """When a command fails, the corresponding gate fails."""
         project = tmp_path  # type: ignore[assignment]
+        _create_gates_yaml(project, [{"name": "Tests pass", "run": "pytest"}])
         changelog = project / "CHANGELOG.md"
         changelog.write_text(
             "# Changelog\n\n## [Unreleased]\n\n### Added\n- Feature\n\n## [1.0.0]\n"
         )
         pyproject = project / "pyproject.toml"
         pyproject.write_text('version = "2.0.0a7"\n')
-        init_py = project / "src" / "pkg"
-        init_py.mkdir(parents=True)
-        init_file = init_py / "__init__.py"
-        init_file.write_text('__version__ = "2.0.0a7"\n')
 
         def side_effect(cmd: str, cwd: Path) -> tuple[bool, str]:
             if "pytest" in cmd:
@@ -87,7 +94,6 @@ class TestRunChecks:
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
-                init_path=Path(init_file),  # type: ignore[arg-type]
                 changelog_path=Path(changelog),  # type: ignore[arg-type]
             )
 
@@ -98,18 +104,14 @@ class TestRunChecks:
     def test_changelog_missing_fails(self, tmp_path: pytest.TempPathFactory) -> None:
         """Missing CHANGELOG.md fails the changelog gate."""
         project = tmp_path  # type: ignore[assignment]
+        _create_gates_yaml(project)
         pyproject = project / "pyproject.toml"
         pyproject.write_text('version = "2.0.0a7"\n')
-        init_py = project / "src" / "pkg"
-        init_py.mkdir(parents=True)
-        init_file = init_py / "__init__.py"
-        init_file.write_text('__version__ = "2.0.0a7"\n')
 
         with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
-                init_path=Path(init_file),  # type: ignore[arg-type]
                 changelog_path=Path(project / "CHANGELOG.md"),  # type: ignore[arg-type]
             )
 
@@ -119,32 +121,26 @@ class TestRunChecks:
     def test_version_not_pep440_fails(self, tmp_path: pytest.TempPathFactory) -> None:
         """Non-PEP-440 version fails the version gate."""
         project = tmp_path  # type: ignore[assignment]
+        _create_gates_yaml(project)
         changelog = project / "CHANGELOG.md"
         changelog.write_text(
             "# Changelog\n\n## [Unreleased]\n\n### Added\n- Feature\n\n## [1.0.0]\n"
         )
         pyproject = project / "pyproject.toml"
         pyproject.write_text('version = "2.0.0-alpha.7"\n')
-        init_py = project / "src" / "pkg"
-        init_py.mkdir(parents=True)
-        init_file = init_py / "__init__.py"
-        init_file.write_text('__version__ = "2.0.0-alpha.7"\n')
 
         with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
-                init_path=Path(init_file),  # type: ignore[arg-type]
                 changelog_path=Path(changelog),  # type: ignore[arg-type]
             )
 
         version_result = next(r for r in results if "pep 440" in r.gate.lower())
         assert version_result.passed is False
 
-    def test_version_sync_mismatch_fails(
-        self, tmp_path: pytest.TempPathFactory
-    ) -> None:
-        """Mismatched versions between pyproject.toml and __init__.py fail."""
+    def test_no_gates_yaml_reports_error(self, tmp_path: pytest.TempPathFactory) -> None:
+        """Missing release-gates.yaml reports a config error."""
         project = tmp_path  # type: ignore[assignment]
         changelog = project / "CHANGELOG.md"
         changelog.write_text(
@@ -152,43 +148,33 @@ class TestRunChecks:
         )
         pyproject = project / "pyproject.toml"
         pyproject.write_text('version = "2.0.0a7"\n')
-        init_py = project / "src" / "pkg"
-        init_py.mkdir(parents=True)
-        init_file = init_py / "__init__.py"
-        init_file.write_text('__version__ = "2.0.0a6"\n')
 
-        with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
-            results = run_checks(
-                project_root=Path(project),  # type: ignore[arg-type]
-                pyproject_path=Path(pyproject),  # type: ignore[arg-type]
-                init_path=Path(init_file),  # type: ignore[arg-type]
-                changelog_path=Path(changelog),  # type: ignore[arg-type]
-            )
+        results = run_checks(
+            project_root=Path(project),  # type: ignore[arg-type]
+            pyproject_path=Path(pyproject),  # type: ignore[arg-type]
+            changelog_path=Path(changelog),  # type: ignore[arg-type]
+        )
 
-        sync_result = next(r for r in results if "sync" in r.gate.lower())
-        assert sync_result.passed is False
+        config_result = next(r for r in results if "config" in r.gate.lower())
+        assert config_result.passed is False
 
     def test_returns_all_gate_results(self, tmp_path: pytest.TempPathFactory) -> None:
-        """run_checks always returns results for all gates."""
+        """run_checks returns results for all YAML gates + file checks."""
         project = tmp_path  # type: ignore[assignment]
+        _create_gates_yaml(project)  # 2 gates
         changelog = project / "CHANGELOG.md"
         changelog.write_text(
             "# Changelog\n\n## [Unreleased]\n\n### Added\n- Feature\n\n## [1.0.0]\n"
         )
         pyproject = project / "pyproject.toml"
         pyproject.write_text('version = "2.0.0a7"\n')
-        init_py = project / "src" / "pkg"
-        init_py.mkdir(parents=True)
-        init_file = init_py / "__init__.py"
-        init_file.write_text('__version__ = "2.0.0a7"\n')
 
         with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
-                init_path=Path(init_file),  # type: ignore[arg-type]
                 changelog_path=Path(changelog),  # type: ignore[arg-type]
             )
 
-        # 6 command gates + 3 file checks = 9
-        assert len(results) == 9
+        # 2 YAML command gates + 2 file checks (changelog, PEP 440) = 4
+        assert len(results) == 4
