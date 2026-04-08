@@ -190,10 +190,12 @@ def update_distributable_list(
     if start_idx == -1:
         raise ValueError("DISTRIBUTABLE_SKILLS not found in __init__.py")
 
-    # Find the matching closing bracket
+    # Find the matching closing bracket — start counting from the `= [` part
+    # to avoid counting brackets in the type hint `list[str]`
+    list_start = content.find("= [", start_idx) + 2  # position of the `[`
     bracket_depth = 0
-    end_idx = start_idx
-    for i, char in enumerate(content[start_idx:], start=start_idx):
+    end_idx = list_start
+    for i, char in enumerate(content[list_start:], start=list_start):
         if char == "[":
             bracket_depth += 1
         elif char == "]":
