@@ -5,3 +5,9 @@ WHEN:      Every time `--parent` is passed to `rai backlog create`.
 WHERE:     `packages/raise-cli/src/raise_cli/adapters/jira_adapter.py:203-218` — `create_issue()` builds fields dict from IssueSpec but ignores `metadata` entirely.
 EXPECTED:  The created Jira issue should have `{"parent": {"key": "RAISE-764"}}` in its fields, making it a child of the specified parent.
 Done when: `create_issue()` reads `metadata["parent"]` and includes it in the fields dict sent to Jira. Test covers the path.
+
+TRIAGE:
+  Bug Type:    Interface
+  Severity:    S2-Medium
+  Origin:      Code
+  Qualifier:   Missing
