@@ -714,6 +714,14 @@ def _detect_and_generate_guardrails(
     guardrails_dir = project_path / "governance"
     guardrails_dir.mkdir(parents=True, exist_ok=True)
     guardrails_path = guardrails_dir / "guardrails.md"
+
+    # Never overwrite user-customized guardrails on re-init (RAISE-1320/Gustavo).
+    # Allow overwrite of empty scaffold templates (contain "fill with" marker).
+    if guardrails_path.exists():
+        existing = guardrails_path.read_text(encoding="utf-8")
+        if "fill with /rai-project-create" not in existing:
+            return
+
     guardrails_path.write_text(guardrails_content, encoding="utf-8")
 
     instructions_path = project_path / instructions_file
