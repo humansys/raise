@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-04-08
+
 ### Fixed
 
 - CLAUDE.local.md deprecated — git is authoritative via `rai session context` (RAISE-1434)
@@ -18,8 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - `rai session journal add/show` — journal system deprecated, relies on broken CC hook injection (RAISE-1433)
-- Pre-compact journal hook removed — output was discarded by Claude Code (RAISE-1433)
-## [2.4.0] - 2026-04-06
+- Pre-compact journal hook removed — output was discarded by Claude Code (RAISE-1433)## [2.4.0] - 2026-04-06
 
 ### Added
 
@@ -108,7 +109,8 @@ toolkit for reliable AI-assisted software engineering.
 - **Clean entry points**: adapters register via `rai.adapters.pm` and `rai.docs.targets`
 - **Gitignored adapter configs** (.raise/jira.yaml, .raise/confluence.yaml) to prevent PII leaks
 
-[Unreleased]: https://github.com/humansys/raise/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/humansys/raise/compare/v2.4.1...HEAD
+[2.4.1]: https://github.com/humansys/raise/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/humansys/raise/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/humansys/raise/compare/v2.2.3...v2.3.0
 [2.2.3]: https://github.com/humansys/raise/releases/tag/v2.2.3
