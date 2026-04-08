@@ -20,7 +20,7 @@ from raise_cli.cli.commands.doctor import doctor_app
 from raise_cli.cli.commands.gate import gate_app
 from raise_cli.cli.commands.graph import graph_app
 from raise_cli.cli.commands.info import info_command
-from raise_cli.cli.commands.init import init_command
+from raise_cli.cli.commands.init import init_command, upgrade_command
 from raise_cli.cli.commands.learn import learn_app
 from raise_cli.cli.commands.mcp import mcp_app
 from raise_cli.cli.commands.memory import memory_app
@@ -78,6 +78,7 @@ app.add_typer(skill_app, name="skill")
 # Register standalone commands
 app.command("info")(info_command)
 app.command("init")(init_command)
+app.command("upgrade")(upgrade_command)
 
 # Register CLI extensions from external packages
 discover_cli_extensions(app)

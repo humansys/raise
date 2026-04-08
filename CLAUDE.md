@@ -63,7 +63,8 @@ Epics are logical containers (directory + tracker), not branches
 ## CLI Quick Reference
 
 ### Core
-- cmd: rai init | sig: [--name TEXT] [--path PATH] [--detect] | notes: --detect analyzes conventions
+- cmd: rai init | sig: [--name TEXT] [--path PATH] [--detect] [--force] | notes: first-time only; errors if .raise/ exists (use rai upgrade)
+- cmd: rai upgrade | sig: [--path PATH] [--detect] [--dry-run] [--force] [--skip-updates] [--skill-set TEXT] | notes: update existing project; preserves user config
 
 ### Session
 - cmd: rai session start | sig: [--name TEXT] [--project TEXT] [--agent TEXT] [--context] | notes: --name first-time only, --context for bundle

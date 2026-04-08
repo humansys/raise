@@ -843,18 +843,31 @@ def init_command(
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
-    Detects project type (greenfield/brownfield), creates .raise/manifest.yaml,
-    and scaffolds skills/workflows for each target agent.
+    First-time setup only. If the project is already initialized (.raise/ exists),
+    use ``rai upgrade`` instead to update skills, framework files, and configuration.
 
     Examples:
         $ rai init                                 # defaults to claude
         $ rai init --agent cursor                  # single agent
         $ rai init --agent claude --agent cursor   # multi-agent
         $ rai init --detect                        # auto-detect agents
-        $ rai init --ide antigravity               # (deprecated) alias
+        $ rai init --force                         # re-init (destructive)
     """
     project_path = (path if path is not None else Path.cwd()).resolve()
     project_name = name if name is not None else project_path.name
+
+    # Guard: already initialized? Suggest rai upgrade (RAISE-1462)
+    raise_dir = project_path / ".raise"
+    if raise_dir.is_dir() and not force:
+        console.print(
+            "[yellow]Project already initialized[/yellow] "
+            f"(.raise/ exists at {project_path}).\n\n"
+            "To update skills and framework files, run:\n"
+            "  [bold]rai upgrade[/bold]\n\n"
+            "To re-initialize from scratch, run:\n"
+            "  [bold]rai init --force[/bold]"
+        )
+        raise typer.Exit(code=1)
 
     # Load or create developer profile
     profile, created_profile = _load_or_create_profile(project_path)
@@ -944,3 +957,175 @@ def init_command(
         _detect_and_generate_guardrails(
             project_path, project_name, profile, first_config.instructions_file
         )
+
+
+# =============================================================================
+# rai upgrade — re-init with merge strategy (RAISE-1462)
+# =============================================================================
+
+
+def upgrade_command(
+    path: Annotated[
+        Path | None,
+        typer.Option(
+            "--path",
+            "-p",
+            help="Project root directory (defaults to current directory).",
+        ),
+    ] = None,
+    detect: Annotated[
+        bool,
+        typer.Option(
+            "--detect",
+            "-d",
+            help="Re-detect installed agents and update AGENTS.md.",
+        ),
+    ] = False,
+    dry_run: Annotated[
+        bool,
+        typer.Option(
+            "--dry-run",
+            help="Preview skill updates without writing files.",
+        ),
+    ] = False,
+    force: Annotated[
+        bool,
+        typer.Option(
+            "--force",
+            help="Overwrite all skill files without prompting.",
+        ),
+    ] = False,
+    skip_updates: Annotated[
+        bool,
+        typer.Option(
+            "--skip-updates",
+            help="Keep all existing skills, only install new ones.",
+        ),
+    ] = False,
+    skill_set: Annotated[
+        str | None,
+        typer.Option(
+            "--skill-set",
+            help="Overlay a skill set from .raise/skills/{name}/ on top of builtins.",
+        ),
+    ] = None,
+) -> None:
+    """Update an existing RaiSE project to the latest version.
+
+    Updates skills, framework files, and regenerates CLAUDE.md while preserving
+    user-configured values (manifest fields, governance docs, custom skills).
+
+    Use ``rai init`` for first-time project setup.
+
+    Examples:
+        $ rai upgrade                  # update skills + framework
+        $ rai upgrade --detect         # also re-detect agents
+        $ rai upgrade --dry-run        # preview changes
+        $ rai upgrade --skip-updates   # only install new skills
+    """
+    project_path = (path if path is not None else Path.cwd()).resolve()
+
+    # Guard: must be initialized
+    raise_dir = project_path / ".raise"
+    if not raise_dir.is_dir():
+        console.print(
+            "[red]Project not initialized[/red] "
+            f"(no .raise/ at {project_path}).\n\n"
+            "Run [bold]rai init[/bold] first to set up the project."
+        )
+        raise typer.Exit(code=1)
+
+    # Load existing manifest for project name
+    existing_manifest = load_manifest(project_path)
+    project_name = (
+        existing_manifest.project.name if existing_manifest else project_path.name
+    )
+
+    # Load developer profile (never create on upgrade)
+    _profile, _created = _load_or_create_profile(project_path)
+
+    # Detect project type
+    detection = detect_project_type(project_path)
+
+    # Load agent registry and resolve agent types
+    registry = load_registry(project_root=project_path)
+    if detect:
+        agent_types = _resolve_agent_types(None, None, True, project_path, registry)
+    elif existing_manifest:
+        agent_types = existing_manifest.agents.types if existing_manifest.agents else ["claude"]
+    else:
+        agent_types = ["claude"]
+
+    valid_agent_types = _validate_agent_types(agent_types, registry)
+
+    # Update manifest with merge strategy (preserves user config)
+    manifest = _create_and_save_manifest(
+        project_path, project_name, detection, valid_agent_types
+    )
+
+    # Bootstrap (idempotent — skips existing files)
+    _bootstrap_result, _governance_result, memory_content = _bootstrap_project_assets(
+        project_path, project_name, manifest
+    )
+
+    # Update skills (diff/merge UX)
+    first_config = registry.get_config(valid_agent_types[0])
+    first_skills_result = _scaffold_per_agent(
+        project_path,
+        valid_agent_types,
+        registry,
+        memory_content,
+        force=force,
+        skip_updates=skip_updates,
+        dry_run=dry_run,
+        skill_set=skill_set,
+    )
+
+    # Dry-run: show summary and exit
+    if dry_run and first_skills_result is not None:
+        _print_skill_sync_summary(first_skills_result)
+        has_updates = bool(
+            first_skills_result.skills_updated
+            or first_skills_result.skills_installed
+            or first_skills_result.skills_conflicted
+        )
+        raise typer.Exit(code=0 if not has_updates else 1)
+
+    # Regenerate CLAUDE.md (it's generated, safe to overwrite)
+    if raise_dir.is_dir():
+        instructions_content = generate_instructions(
+            project_name=project_name,
+            detection=detection,
+            project_path=project_path,
+        )
+        instructions_path = project_path / first_config.instructions_file
+        instructions_path.parent.mkdir(parents=True, exist_ok=True)
+        instructions_path.write_text(instructions_content, encoding="utf-8")
+
+    # Emit event
+    emitter = create_emitter()
+    emitter.emit(
+        InitCompleteEvent(
+            project_path=project_path,
+            project_name=project_name,
+        )
+    )
+
+    # AGENTS.md on --detect
+    if detect:
+        _generate_agents_md(project_path, valid_agent_types, project_name)
+
+    # Output
+    console.print(
+        f"\n[bold green]Upgrade complete[/bold green] — {project_name}\n"
+    )
+    if first_skills_result:
+        installed = len(first_skills_result.skills_installed)
+        updated = len(first_skills_result.skills_updated)
+        kept = len(first_skills_result.skills_kept)
+        if installed or updated:
+            console.print(
+                f"  Skills: {installed} new, {updated} updated, {kept} unchanged"
+            )
+        else:
+            console.print("  Skills: all up to date")

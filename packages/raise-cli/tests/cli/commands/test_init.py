@@ -193,12 +193,32 @@ class TestInitOutputAdaptation:
 
 
 class TestInitIdempotency:
-    """Tests for init being safe to run multiple times."""
+    """Tests for init guard and upgrade path."""
 
-    def test_init_updates_existing_manifest(
+    def test_init_rejects_existing_project(
         self, brownfield_project: Path, mock_home: Path
     ) -> None:
-        """Running init again updates the manifest."""
+        """Running init on existing project suggests rai upgrade (RAISE-1462)."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            # First init
+            result1 = runner.invoke(
+                app, ["init", "--path", str(brownfield_project)], catch_exceptions=False
+            )
+            assert result1.exit_code == 0
+
+            # Second init → should fail
+            result2 = runner.invoke(
+                app, ["init", "--path", str(brownfield_project)], catch_exceptions=False
+            )
+            assert result2.exit_code == 1
+            assert "rai upgrade" in result2.output
+
+    def test_upgrade_updates_existing_manifest(
+        self, brownfield_project: Path, mock_home: Path
+    ) -> None:
+        """Running upgrade updates the manifest."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
@@ -211,9 +231,9 @@ class TestInitIdempotency:
             # Add more files
             (brownfield_project / "new_module.py").write_text("# new")
 
-            # Second init
+            # Upgrade
             result2 = runner.invoke(
-                app, ["init", "--path", str(brownfield_project)], catch_exceptions=False
+                app, ["upgrade", "--path", str(brownfield_project)], catch_exceptions=False
             )
             assert result2.exit_code == 0
 
@@ -515,7 +535,7 @@ class TestInitBootstrap:
     def test_init_does_not_overwrite_existing_identity(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """Re-running init should not overwrite existing identity files."""
+        """Re-running upgrade should not overwrite existing identity files."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         # First init
@@ -528,10 +548,10 @@ class TestInitBootstrap:
         core_path = greenfield_project / ".raise" / "rai" / "identity" / "core.yaml"
         core_path.write_text("values: []")
 
-        # Second init
+        # Upgrade (not init — project already exists)
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
-                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+                app, ["upgrade", "--path", str(greenfield_project)], catch_exceptions=False
             )
 
         assert result.exit_code == 0
@@ -689,10 +709,10 @@ class TestInitSkillScaffolding:
         assert (skills_dir / "rai-session-start" / "SKILL.md").exists()
         assert (skills_dir / "rai-discover" / "SKILL.md").exists()
 
-    def test_init_does_not_overwrite_existing_skills(
+    def test_upgrade_does_not_overwrite_existing_skills(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """Re-running init should not overwrite existing skill files."""
+        """Running upgrade should not overwrite existing skill files."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         # First init
@@ -707,10 +727,10 @@ class TestInitSkillScaffolding:
         )
         skill_path.write_text("# Custom skill")
 
-        # Second init
+        # Upgrade (not init — project already exists)
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
-                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+                app, ["upgrade", "--path", str(greenfield_project)], catch_exceptions=False
             )
 
         assert result.exit_code == 0
@@ -773,10 +793,10 @@ class TestInitGovernanceScaffolding:
         assert "# PRD: my-api" in prd
         assert "{project_name}" not in prd
 
-    def test_init_does_not_overwrite_existing_governance(
+    def test_upgrade_does_not_overwrite_existing_governance(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """Re-running init should not overwrite existing governance files."""
+        """Running upgrade should not overwrite existing governance files."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         # First init
@@ -789,10 +809,10 @@ class TestInitGovernanceScaffolding:
         prd_path = greenfield_project / "governance" / "prd.md"
         prd_path.write_text("# My Custom PRD\n")
 
-        # Second init
+        # Upgrade (not init — project already exists)
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
-                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+                app, ["upgrade", "--path", str(greenfield_project)], catch_exceptions=False
             )
 
         assert result.exit_code == 0
@@ -1302,13 +1322,13 @@ class TestInitDetectAgents:
         assert "roo" in manifest.agents.types
 
 
-class TestInitPreservesExistingManifest:
-    """Regression tests for RAISE-376: rai init must preserve existing manifest config."""
+class TestUpgradePreservesExistingManifest:
+    """Regression tests: rai upgrade must preserve existing manifest config."""
 
     def test_preserves_branches_development(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """Rai init preserves existing branches.development value."""
+        """Rai upgrade preserves existing branches.development value."""
         from raise_cli.onboarding.manifest import (
             AgentsManifest,
             ProjectInfo,
@@ -1326,7 +1346,7 @@ class TestInitPreservesExistingManifest:
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["init", "--path", str(greenfield_project)],
+                ["upgrade", "--path", str(greenfield_project)],
                 catch_exceptions=False,
             )
 
@@ -1338,7 +1358,7 @@ class TestInitPreservesExistingManifest:
     def test_preserves_tier_config(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """Rai init preserves existing tier value."""
+        """Rai upgrade preserves existing tier value."""
         from raise_cli.onboarding.manifest import (
             AgentsManifest,
             ProjectInfo,
@@ -1357,7 +1377,7 @@ class TestInitPreservesExistingManifest:
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["init", "--path", str(greenfield_project)],
+                ["upgrade", "--path", str(greenfield_project)],
                 catch_exceptions=False,
             )
 
@@ -1367,10 +1387,10 @@ class TestInitPreservesExistingManifest:
         assert manifest.tier is not None
         assert manifest.tier.level == "enterprise"
 
-    def test_preserves_language_and_toolchain_on_reinit(
+    def test_preserves_language_and_toolchain_on_upgrade(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """RAISE-1320: rai init must not overwrite language, toolchain, or backlog."""
+        """RAISE-1320: rai upgrade must not overwrite language, toolchain, or backlog."""
         from raise_cli.onboarding.manifest import (
             AgentsManifest,
             BacklogConfig,
@@ -1397,7 +1417,7 @@ class TestInitPreservesExistingManifest:
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["init", "--path", str(greenfield_project)],
+                ["upgrade", "--path", str(greenfield_project)],
                 catch_exceptions=False,
             )
 
