@@ -82,7 +82,6 @@ glossary = "raise_cli.governance.parsers.glossary:GlossaryParser"
 [project.entry-points."rai.hooks"]
 telemetry = "raise_cli.hooks.builtin.telemetry:TelemetryHook"
 gate-bridge = "raise_cli.hooks.builtin.gate_bridge:GateBridgeHook"
-memory-sync = "raise_cli.hooks.builtin.memory:MemoryMdSyncHook"
 
 [project.entry-points."rai.gates"]
 tests = "raise_cli.gates.builtin.tests:TestGate"
