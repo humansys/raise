@@ -283,7 +283,7 @@ Create an index page linking to child pages per subsystem.
 
 **Parent page:** Find the epic's Confluence space/parent. If none exists, use the governance section.
 
-Use `confluence_create_page` or `confluence_update_page` MCP tools.
+Publish via `rai docs publish` CLI command (routes to configured documentation target).
 
 <verification>
 Page(s) created in Confluence. URLs captured.
