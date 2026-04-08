@@ -550,7 +550,7 @@ class TestInitCompleteEvent:
             (tmp_path / "framework" / "methodology.yaml").write_text("")
             (tmp_path / ".raise").mkdir(parents=True, exist_ok=True)
 
-            result = runner.invoke(app, ["--path", str(tmp_path)])
+            result = runner.invoke(app, ["--path", str(tmp_path), "--force"])
 
         assert result.exit_code == 0, result.output
         init_events = [e for e in captured_events if isinstance(e, InitCompleteEvent)]
