@@ -1,0 +1,68 @@
+{
+  "run_id": "92070ef9",
+  "pipeline_name": "hotfix",
+  "issue_id": "RAISE-1309",
+  "current_phase_index": 4,
+  "phases": [
+    {
+      "id": "start",
+      "skill": "rai-hotfix-start",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "done",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null,
+      "started_at": "2026-04-07T22:53:21.174062+00:00",
+      "completed_at": "2026-04-07T22:53:21.691298+00:00"
+    },
+    {
+      "id": "fix",
+      "skill": "rai-hotfix-fix",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "done",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null,
+      "started_at": "2026-04-07T22:53:21.691714+00:00",
+      "completed_at": "2026-04-07T22:53:22.218443+00:00"
+    },
+    {
+      "id": "verify",
+      "skill": "rai-hotfix-verify",
+      "type": "llm",
+      "gate_type": "hitl",
+      "validates": [],
+      "when": null,
+      "status": "done",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null,
+      "started_at": "2026-04-07T22:53:22.218841+00:00",
+      "completed_at": "2026-04-07T22:53:22.724604+00:00"
+    },
+    {
+      "id": "close",
+      "skill": "rai-hotfix-close",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "done",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null,
+      "started_at": "2026-04-07T22:53:22.725002+00:00",
+      "completed_at": "2026-04-07T22:53:23.246112+00:00"
+    }
+  ],
+  "started_at": "2026-04-07T22:53:21.174051+00:00",
+  "metadata": {},
+  "status": "complete",
+  "completed_at": "2026-04-07T22:53:23.246124+00:00"
+}

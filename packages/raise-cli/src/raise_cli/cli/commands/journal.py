@@ -1,12 +1,11 @@
-"""CLI commands for session journal — incremental memory persistence.
+"""CLI commands for session journal — DEPRECATED.
 
-Provides `rai session journal add` and `rai session journal show` for
-persisting and retrieving session context across compaction events.
+The journal system is deprecated as of v3.0.0a1 (RAISE-1433). The append-only
+journal relied on Claude Code hook injection for post-compaction recovery,
+which is broken (CC bugs #12671, #15174). Commands remain functional for
+backward compatibility but will be removed in v3.1.
 
-Example:
-    $ rai session journal add "Use JSONL for persistence" --type decision
-    $ rai session journal show --last 5
-    $ rai session journal show --compact
+Use ``/rai-session-close`` skill for full session continuity instead.
 """
 
 from __future__ import annotations
@@ -97,11 +96,26 @@ def add(
 ) -> None:
     """Add a journal entry to the current session.
 
+    .. deprecated:: 3.0.0a1
+        Journal is deprecated (RAISE-1433). Use /rai-session-close for continuity.
+
     Examples:
         $ rai session journal add "Use JSONL for journal" --type decision
         $ rai session journal add "T1 complete" --type task_done
-        $ rai session journal add "Compaction loses rationale" --type insight --tags "compaction,memory"
     """
+    import warnings
+
+    warnings.warn(
+        "rai session journal is deprecated (RAISE-1433). "
+        "Use /rai-session-close skill for session continuity.",
+        DeprecationWarning,
+        stacklevel=1,
+    )
+    typer.echo(
+        "Warning: journal is deprecated (RAISE-1433). "
+        "Use /rai-session-close for session continuity.",
+        err=True,
+    )
     session_dir = _resolve_session_dir(project)
     tag_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
 
@@ -143,14 +157,21 @@ def show(
 ) -> None:
     """Show journal entries for the current session.
 
-    With --compact, outputs a token-efficient format suitable for
-    post-compaction context injection via hooks.
+    .. deprecated:: 3.0.0a1
+        Journal is deprecated (RAISE-1433). Use /rai-session-close for continuity.
 
     Examples:
         $ rai session journal show
-        $ rai session journal show --last 5
         $ rai session journal show --compact
     """
+    import warnings
+
+    warnings.warn(
+        "rai session journal is deprecated (RAISE-1433). "
+        "Use /rai-session-close skill for session continuity.",
+        DeprecationWarning,
+        stacklevel=1,
+    )
     session_dir = _resolve_session_dir(project)
     entries = read_journal(session_dir, last_n=last)
 

@@ -78,14 +78,15 @@ Review the session's work by reading:
    git log --oneline worktree-{name}
    ```
 
-2. **Session journal** (if available):
-   ```bash
-   rai session journal show --compact
-   ```
+2. **The conversation itself** — review the current conversation for key decisions,
+   pivots, quotes, tensions, and turning points. This is the primary source material.
 
 3. **Epic/story artifacts** created or modified during the session — scope docs, design decisions, retrospectives
 
-4. **The conversation itself** — key decisions, pivots, quotes, tensions
+4. **Session state** (if available):
+   ```bash
+   rai session context --sections progress,deadlines --project .
+   ```
 
 <verification>
 Material gathered: commits, artifacts, key decisions identified.

@@ -1,0 +1,230 @@
+{
+  "run_id": "87c60f20",
+  "pipeline_name": "story",
+  "issue_id": "RAISE-1311",
+  "current_phase_index": 1,
+  "phases": [
+    {
+      "id": "start",
+      "skill": "rai-story-start",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "done",
+      "context_spec": [
+        {
+          "types": [
+            "principle"
+          ],
+          "limit": 5
+        }
+      ],
+      "review_mode": null,
+      "review_template": null,
+      "started_at": "2026-04-07T22:12:11.891158+00:00",
+      "completed_at": "2026-04-07T22:12:11.892635+00:00"
+    },
+    {
+      "id": "design",
+      "skill": "rai-story-design",
+      "type": "llm",
+      "gate_type": "hitl",
+      "validates": [
+        {
+          "pattern": "**/*-design.md",
+          "description": "Story design document"
+        }
+      ],
+      "when": null,
+      "status": "pending",
+      "context_spec": [
+        {
+          "types": [
+            "pattern"
+          ],
+          "limit": 3
+        },
+        {
+          "types": [
+            "module"
+          ],
+          "limit": 2
+        },
+        {
+          "types": [
+            "decision"
+          ],
+          "limit": 2
+        }
+      ],
+      "review_mode": null,
+      "review_template": null
+    },
+    {
+      "id": "plan",
+      "skill": "rai-story-plan",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [
+        {
+          "pattern": "**/*-plan.md",
+          "description": "Story plan document"
+        }
+      ],
+      "when": null,
+      "status": "pending",
+      "context_spec": [
+        {
+          "types": [
+            "guardrail"
+          ],
+          "limit": 2
+        },
+        {
+          "types": [
+            "pattern"
+          ],
+          "limit": 3
+        }
+      ],
+      "review_mode": null,
+      "review_template": null
+    },
+    {
+      "id": "implement",
+      "skill": "rai-story-implement",
+      "type": "llm",
+      "gate_type": "hitl",
+      "validates": [
+        {
+          "pattern": "**/*-plan.md",
+          "description": "Story plan (verifies plan exists)"
+        }
+      ],
+      "when": null,
+      "status": "pending",
+      "context_spec": [
+        {
+          "types": [
+            "pattern"
+          ],
+          "limit": 5
+        },
+        {
+          "types": [
+            "module"
+          ],
+          "limit": 2
+        }
+      ],
+      "review_mode": null,
+      "review_template": null
+    },
+    {
+      "id": "architecture-review",
+      "skill": "rai-architecture-review",
+      "type": "llm",
+      "gate_type": "hitl",
+      "validates": [
+        {
+          "pattern": "**/*-ar.md",
+          "description": "Architecture review document"
+        }
+      ],
+      "when": "story_type == 'code'",
+      "status": "pending",
+      "context_spec": [
+        {
+          "types": [
+            "pattern"
+          ],
+          "limit": 5
+        },
+        {
+          "types": [
+            "module"
+          ],
+          "limit": 2
+        },
+        {
+          "types": [
+            "decision"
+          ],
+          "limit": 2
+        }
+      ],
+      "review_mode": "adversarial",
+      "review_template": "adversarial-ar"
+    },
+    {
+      "id": "quality-review",
+      "skill": "rai-quality-review",
+      "type": "llm",
+      "gate_type": "hitl",
+      "validates": [
+        {
+          "pattern": "**/*-qr.md",
+          "description": "Quality review document"
+        }
+      ],
+      "when": "story_type == 'code'",
+      "status": "pending",
+      "context_spec": [
+        {
+          "types": [
+            "pattern"
+          ],
+          "limit": 5
+        },
+        {
+          "types": [
+            "guardrail"
+          ],
+          "limit": 3
+        }
+      ],
+      "review_mode": "adversarial",
+      "review_template": "adversarial-qr"
+    },
+    {
+      "id": "review",
+      "skill": "rai-story-review",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "pending",
+      "context_spec": [
+        {
+          "types": [
+            "pattern"
+          ],
+          "limit": 3
+        },
+        {
+          "types": [
+            "guardrail"
+          ],
+          "limit": 2
+        }
+      ],
+      "review_mode": null,
+      "review_template": null
+    },
+    {
+      "id": "close",
+      "skill": "rai-story-close",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "pending",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null
+    }
+  ],
+  "started_at": "2026-04-07T22:12:11.891146+00:00",
+  "metadata": {}
+}

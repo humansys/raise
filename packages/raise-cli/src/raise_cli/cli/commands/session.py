@@ -627,6 +627,12 @@ def close(  # noqa: C901
             summary=summary or "",
             session_type=session_type or "feature",
         )
+        typer.echo(
+            "Warning: --summary close captures only a summary. "
+            "For full session continuity (narrative, patterns, next-session prompt), "
+            "use the /rai-session-close skill instead.",
+            err=True,
+        )
 
     # Coherence validation: reject if state file session_id
     # doesn't match the target session. Prevents race condition where

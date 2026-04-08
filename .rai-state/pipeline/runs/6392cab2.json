@@ -1,0 +1,61 @@
+{
+  "run_id": "6392cab2",
+  "pipeline_name": "hotfix",
+  "issue_id": "RAISE-2",
+  "current_phase_index": 0,
+  "phases": [
+    {
+      "id": "start",
+      "skill": "rai-hotfix-start",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "pending",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null,
+      "started_at": "2026-04-07T22:05:39.160428+00:00"
+    },
+    {
+      "id": "fix",
+      "skill": "rai-hotfix-fix",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "pending",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null
+    },
+    {
+      "id": "verify",
+      "skill": "rai-hotfix-verify",
+      "type": "llm",
+      "gate_type": "hitl",
+      "validates": [],
+      "when": null,
+      "status": "pending",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null
+    },
+    {
+      "id": "close",
+      "skill": "rai-hotfix-close",
+      "type": "llm",
+      "gate_type": null,
+      "validates": [],
+      "when": null,
+      "status": "pending",
+      "context_spec": null,
+      "review_mode": null,
+      "review_template": null
+    }
+  ],
+  "started_at": "2026-04-07T22:05:39.160422+00:00",
+  "metadata": {},
+  "status": "cancelled",
+  "completed_at": "2026-04-07T22:05:39.162330+00:00"
+}

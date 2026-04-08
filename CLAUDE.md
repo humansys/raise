@@ -69,8 +69,8 @@ Epics are logical containers (directory + tracker), not branches
 - cmd: rai session start | sig: [--name TEXT] [--project TEXT] [--agent TEXT] [--context] | notes: --name first-time only, --context for bundle
 - cmd: rai session close | sig: [--summary TEXT] [--type TEXT] [--pattern TEXT] [--state-file TEXT] [--session TEXT] | notes: --state-file for structured close, --pattern repeatable
 - cmd: rai session context | sig: --sections/-s TEXT --project/-p TEXT | notes: sections: governance,behavioral,coaching,deadlines,progress
-- cmd: rai session journal add | sig: TEXT [--type TYPE] | notes: add decision/insight/task to session
-- cmd: rai session journal show | sig: [--compact] [--project TEXT] | notes: --compact for post-compaction restore
+- cmd: rai session journal add | sig: TEXT [--type TYPE] | notes: DEPRECATED (RAISE-1433) — use /rai-session-close
+- cmd: rai session journal show | sig: [--compact] [--project TEXT] | notes: DEPRECATED (RAISE-1433)
 
 ### Graph
 - cmd: rai graph build | sig: [--output PATH] [--no-diff] | notes: NO --project flag, runs from CWD
@@ -149,10 +149,7 @@ Epics are logical containers (directory + tracker), not branches
 
 ## Post-Compaction Context Restoration
 When you detect context was compacted (continuation summary present), restore working state:
-1. Read the session journal: `uv run rai session journal show --compact --project .`
-2. Read the current epic/story scope doc if referenced in journal
+1. Read the current epic/story scope doc referenced in the continuation summary
+2. Check git log for recent commits on the current branch
 3. Summarize: where we are, what was decided, what's next
 4. Continue work — do NOT re-run `/rai-session-start` (session is already active)
-
-The PreCompact hook logs journal state before compaction (side-effect only).
-Post-compaction injection via hooks is broken (Claude Code bugs #12671, #15174).

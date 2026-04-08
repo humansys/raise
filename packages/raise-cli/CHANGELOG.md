@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- CLAUDE.local.md deprecated — git is authoritative via `rai session context` (RAISE-1434)
+- MEMORY.md ownership — `memory-sync` hook disabled, Claude auto-memory respected (RAISE-1459)
+- rai-epic-docs uses `rai docs publish` instead of direct MCP calls (RAISE-1298)
+- Missing httpx dependency added (RAISE-1424)
+- Heutagogia → Heutagogy spelling fix
+
+### Deprecated
+
+- `rai session journal add/show` — journal system deprecated, relies on broken CC hook injection (RAISE-1433)
+- Pre-compact journal hook removed — output was discarded by Claude Code (RAISE-1433)
 ## [2.4.0] - 2026-04-06
 
 ### Added
