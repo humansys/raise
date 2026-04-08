@@ -1,0 +1,132 @@
+# IDE / editor directories
+.specstory/
+.cursor/
+.idea/
+.vscode/
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+.claude/worktrees/
+.claude/projects/
+
+# Claude Code legacy files (superseded, prevent re-addition)
+.claude/RAI.md
+.claude/RAI-naming.md
+.claude/rai.archive/
+
+# RaiSE generated/cache files
+.raise/cache/
+.raise/confluence-pages.yaml
+.raise/backlog/
+
+# RaiSE adapter configs (declarative, PII-free — identity in env vars)
+# .raise/jira.yaml and .raise/confluence.yaml are tracked (shared config)
+.raise/adapters/*.yaml
+!.raise/adapters/*.yaml.example
+
+# Dossier output (generated, not committed)
+dev/output/
+
+# RaiSE derived artifacts (rebuild with `rai memory build`)
+.raise/rai/memory/index.json
+
+# RaiSE personal directory (per-developer, not shared)
+.raise/rai/personal/
+
+# RaiSE sync state (per-instance JIRA mappings, not shared)
+.raise/rai/sync/
+
+# Temporary files
+req.txt
+*.tmp
+*.bak-*
+*.log
+.DS_Store
+Thumbs.db
+
+# Script generated folders (if testing locally)
+.specify-raise/commands/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+.rai/memory/graph.json
+.envrc
+
+# Legacy telemetry (should be in personal/, will migrate)
+.raise/rai/telemetry/
+
+# Push tracking markers (per-environment, not shared)
+.raise/rai/learnings/**/.pushed
+
+# MCP server config (contains API tokens)
+.mcp.json
+
+# Secrets & credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.pypirc
+credentials.json
+*.sqlite
+.netrc
+.raise/mcp/
+!.raise/mcp/catalog.yaml
+
+# MkDocs build output
+_site/
+
+# Issue analysis artifacts (PDFs, images — binary, no git value)
+dev/issues/**/*.pdf
+dev/issues/**/*.png
+dev/issues/**/*.jpg
+dev/issues/**/*.txt
+dev/transcripts/
+
+# Prevent symlink artifacts from being tracked at root
+/es/
+work/research/

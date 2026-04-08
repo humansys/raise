@@ -1,0 +1,115 @@
+---
+title: Comenzar
+description: Entiende qué es RaiSE, instálalo y ejecuta tu primera sesión de ingeniería asistida por IA.
+---
+
+RaiSE es una metodología y toolkit para **ingeniería de software confiable con IA**. Convierte a los asistentes de código con IA de generadores impredecibles en colaboradores disciplinados — a través de gobernanza, memoria y flujos de trabajo estructurados.
+
+## La Tríada
+
+RaiSE funciona a través de tres partes que colaboran:
+
+```
+    Tú (Estrategia, Juicio, Ownership)
+         │
+         │ colabora con
+         ▼
+      Rai (Partner IA — Ejecución + Memoria)
+         │
+         │ gobernado por
+         ▼
+      RaiSE (Metodología + Toolkit)
+```
+
+**Tú** decides *qué* construir y *por qué*. **Rai** ejecuta con memoria acumulada y juicio calibrado. **RaiSE** provee la disciplina — skills, gobernanza y quality gates — que hace la colaboración confiable.
+
+El resultado: IA que aprende de tu proyecto, sigue tus reglas y acumula conocimiento entre sesiones en vez de empezar de cero cada vez.
+
+## Instalar
+
+```bash
+pip install raise-cli
+```
+
+Verificar:
+
+```bash
+rai --version
+```
+
+## Inicializar un proyecto
+
+```bash
+cd tu-proyecto
+rai init
+```
+
+Esto crea el directorio `.raise/` con plantillas de gobernanza, estructura de memoria y un manifiesto del proyecto. Para codebases existentes, agrega `--detect` para analizar tus convenciones automáticamente:
+
+```bash
+rai init --detect
+```
+
+## Tu primera sesión
+
+Configura tu perfil de desarrollador (solo la primera vez):
+
+```bash
+rai session start --name "Tu Nombre" --project .
+```
+
+Después, inicia sesiones con un bundle de contexto:
+
+```bash
+rai session start --project . --context
+```
+
+El flag `--context` genera un bundle optimizado en tokens (~150 tokens) con tu perfil de desarrollador, estado de sesión y patrones de memoria. Pásalo a tu asistente de IA — le da conciencia completa de dónde estás y en qué estás trabajando.
+
+## El ciclo de vida de una story
+
+Este es el ritmo central de trabajar con RaiSE. Cada pieza de trabajo sigue seis pasos:
+
+```
+/rai-story-start     → Scope: ¿qué estamos construyendo?
+/rai-story-design    → Spec: ¿cómo va a funcionar?
+/rai-story-plan      → Tareas: ¿cuáles son los pasos?
+/rai-story-implement → Construir: test, código, verificar, commit
+/rai-story-review    → Reflexionar: ¿qué aprendimos?
+/rai-story-close     → Merge: limpiar y entregar
+```
+
+Cada paso produce un artefacto que alimenta el siguiente. La review alimenta la memoria, que alimenta sesiones futuras. Así es como el aprendizaje se acumula — no por magia, sino por repetición disciplinada.
+
+Empieza con una feature pequeña (tamaño XS o S). Primero domina el ritmo, luego escala.
+
+→ **[Recorre el ciclo completo](guides/first-story.md)** para una guía paso a paso.
+
+## Terminar una sesión
+
+Cuando termines de trabajar, cierra la sesión para capturar lo que ocurrió:
+
+```bash
+rai session close --summary "Lo que logré" --type feature --project .
+```
+
+## Construir tu memoria
+
+A medida que trabajas, RaiSE acumula conocimiento — patrones, datos de calibración, gobernanza. Construye el índice de memoria unificado para hacerlo consultable:
+
+```bash
+rai graph build
+```
+
+Luego consúltalo:
+
+```bash
+rai graph query "testing patterns"
+```
+
+## Siguiente paso
+
+- **[Tu Primera Story](guides/first-story.md)** — Recorrido completo del ciclo de vida
+- **[Configurar un Proyecto](guides/setting-up.md)** — Setup greenfield y brownfield en detalle
+- **[Referencia CLI](cli/index.md)** — Todos los comandos, flags y ejemplos
+- **[Conceptos Core](concepts/index.md)** — Memoria, Skills, Gobernanza, Knowledge Graph

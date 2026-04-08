@@ -1,0 +1,203 @@
+---
+title: La Metodología RaiSE
+description: Por qué la IA necesita metodología, cómo funciona RaiSE, y los principios detrás de la ingeniería de software confiable con IA.
+---
+
+Los asistentes de código con IA son poderosos. También son poco confiables.
+
+Alucinan APIs. Olvidan tus convenciones entre sesiones. Optimizan velocidad sobre correctitud. No saben cuándo parar. Sin gobernanza, producen código que *se ve* correcto pero sutilmente no lo es — y entre más trabajas con ellos, más deuda técnica se acumula invisiblemente.
+
+RaiSE existe porque creemos que la ingeniería asistida por IA puede ser **confiable** — pero solo con disciplina.
+
+## El problema central
+
+La mayoría de herramientas de código con IA tratan al desarrollador como un escritor de prompts y a la IA como un generador de código. El flujo se ve así:
+
+```
+Desarrollador escribe prompt → IA genera código → Desarrollador revisa → Repetir
+```
+
+Esto funciona para tareas pequeñas. Se desmorona para proyectos reales porque:
+
+- **Sin memoria.** Cada sesión empieza de cero. La IA no recuerda lo que aprendió ayer.
+- **Sin reglas.** La IA sigue buenas prácticas generales, no *tus* reglas. Tus convenciones de naming, decisiones de arquitectura y estándares de calidad existen solo en tu cabeza.
+- **Sin proceso.** No hay forma estructurada de descomponer trabajo, verificar resultados o aprender de errores. Es solo prompt → generar → esperar lo mejor.
+- **Sin trazabilidad.** Cuando algo sale mal, no hay rastro. ¿Por qué se tomó esta decisión? ¿Quién la aprobó? ¿Cuál era el requerimiento original?
+
+RaiSE aborda los cuatro.
+
+## La Tríada
+
+RaiSE está construido sobre un modelo de colaboración que llamamos la Tríada:
+
+```
+    Tú (Estrategia, Juicio, Ownership)
+         │
+         │ colabora con
+         ▼
+      Rai (Partner IA — Ejecución + Memoria)
+         │
+         │ gobernado por
+         ▼
+      RaiSE (Metodología + Toolkit)
+```
+
+**Tú** eres el ingeniero. Defines qué construir, por qué importa y cómo se ve la calidad. Tomas decisiones de juicio que la IA no puede — priorización, trade-offs, empatía con el usuario, contexto de negocio. Tú eres dueño del resultado.
+
+**Rai** es el partner IA. No un asistente genérico — un colaborador entrenado en la disciplina de RaiSE. Rai ejecuta con memoria acumulada, sigue tus reglas de gobernanza, y se detiene cuando algo no se ve bien (en vez de generar más código esperando que tú caches el error).
+
+**RaiSE** es la metodología y toolkit. Provee la estructura — skills que definen cómo trabajar, gobernanza que define las reglas, memoria que persiste entre sesiones, y quality gates que detectan defectos temprano.
+
+Ninguno de los tres es suficiente solo. Tú sin Rai es lento. Rai sin RaiSE es poco confiable. RaiSE sin ti no tiene juicio. Juntos, producen algo que ninguno logra independientemente: **velocidad de IA con confiabilidad humana**.
+
+## Principios
+
+RaiSE toma prestado del Lean Manufacturing — específicamente del Toyota Production System. No son metáforas; son aplicaciones directas.
+
+### Jidoka: Parar ante defectos
+
+En las fábricas Toyota, cualquier trabajador puede jalar la cuerda para detener la línea de producción cuando detecta un defecto. El principio: **es más barato parar y arreglar ahora que dejar que un defecto se propague.**
+
+En RaiSE, esto significa:
+- Gates de verificación en cada paso. Si los tests fallan, no se avanza.
+- Rai se detiene cuando detecta incoherencia, ambigüedad o drift — en vez de generar más output.
+- La calidad se construye, no se inspecciona después.
+
+### Kaizen: Mejora continua
+
+Cada story termina con una retrospectiva. Cada retrospectiva produce al menos una mejora concreta. Los patrones se capturan en memoria. La memoria alimenta sesiones futuras.
+
+Esto no es solo proceso — es un **efecto compuesto**. La sesión 1 es lenta porque estás descubriendo todo. La sesión 50 es rápida porque patrones, datos de calibración y gobernanza se han acumulado. El sistema mejora entre más lo usas.
+
+### Poka-yoke: A prueba de errores
+
+Poka-yoke significa diseñar sistemas para que los errores no puedan ocurrir. En RaiSE:
+- No se pueden crear branches de story sin un branch de epic (la herramienta lo previene).
+- No se puede empezar implementación sin un plan (el skill lo verifica).
+- No se puede mergear sin una retrospectiva (el gate lo requiere).
+
+No son checkboxes burocráticos. Son restricciones estructurales que hacen difícil hacer lo incorrecto.
+
+### Humanos definen, máquinas ejecutan
+
+Esta es la separación fundamental. Tú escribes gobernanza en lenguaje natural — archivos Markdown que expresan tus principios, requerimientos y guardrails. El CLI los lee determinísticamente. La IA los interpreta en contexto. La maquinaria es transparente e inspeccionable.
+
+Tú especificas el *qué*. RaiSE maneja el *cómo*.
+
+## Los cuatro pilares
+
+### 1. Gobernanza
+
+La gobernanza es un sistema de reglas por capas que fluye de lo abstracto a lo concreto:
+
+```
+Principios (§)        →  "Por qué hacemos las cosas así"
+     ↓
+Requerimientos (RF)   →  "Qué necesitamos construir"
+     ↓
+Guardrails (GR)       →  "Qué reglas seguir"
+     ↓
+Código                →  "Lo que realmente producimos"
+```
+
+Cada capa es trazable a la de arriba. Cuando alguien pregunta "¿por qué tenemos esta regla?" puedes seguir la cadena: guardrail → requerimiento → principio. Nada existe sin justificación.
+
+La gobernanza se carga al inicio de sesión y se aplica durante todo el trabajo. No es documentación que se queda en una carpeta — es contexto activo que moldea cada decisión.
+
+→ **[Leer más sobre Gobernanza](governance.md)**
+
+### 2. Skills
+
+Los skills son proceso-como-código. Cada skill es un flujo de trabajo estructurado — un archivo Markdown — que guía tanto a ti como a Rai a través de una actividad de ingeniería específica. Piensa en ellos como runbooks que tu IA sigue, no solo lee.
+
+La cadena de skills más importante es el **ciclo de vida de una story**:
+
+```
+/rai-story-start     → Scope y branch
+/rai-story-design    → Especificación lean
+/rai-story-plan      → Descomposición en tareas atómicas
+/rai-story-implement → Ejecución TDD con gates de verificación
+/rai-story-review    → Retrospectiva y captura de patrones
+/rai-story-close     → Merge y cleanup
+```
+
+Cada paso produce un artefacto. Cada artefacto alimenta el siguiente. Toda la cadena es repetible, verificable y trazable.
+
+Los skills también soportan niveles de maestría (Shu-Ha-Ri): principiantes reciben guía detallada, expertos reciben prompts mínimos. El mismo skill se adapta a tu experiencia.
+
+→ **[Leer más sobre Skills](skills.md)**
+
+### 3. Memoria
+
+La memoria es lo que hace que la IA aprenda. Sin ella, cada sesión empieza de cero. Con la memoria de RaiSE, tu IA lleva consigo:
+
+- **Patrones** — aprendizajes del desarrollo ("usar fixtures para tests de base de datos", "commit después de cada tarea")
+- **Calibración** — cuánto tardan las cosas realmente vs. las estimaciones (tracking de velocidad)
+- **Sesiones** — registro cronológico de qué pasó y qué se logró
+
+La memoria vive en tres scopes: **global** (todos los proyectos), **project** (compartida vía git) y **personal** (tu historial privado de sesiones). Se acumula con el tiempo — la sesión 1 es descubrimiento, la sesión 50 es expertise.
+
+→ **[Leer más sobre Memoria](memory.md)**
+
+### 4. Knowledge Graph
+
+El Knowledge Graph conecta todo — gobernanza, memoria, skills, tracking de trabajo y componentes de código descubiertos — en una sola estructura consultable.
+
+Los nodos son conceptos (patrones, principios, módulos, stories). Los edges son relaciones (gobernado por, depende de, aprendido de). Cuando el CLI ensambla tu contexto de sesión, recorre este grafo para entregar exactamente la información correcta para tu trabajo actual.
+
+Así es como Rai sabe qué guardrails aplican a qué módulo, qué patrones se aprendieron en qué story, y cuáles son las restricciones arquitectónicas para el código que estás tocando.
+
+→ **[Leer más sobre el Knowledge Graph](knowledge-graph.md)**
+
+## Cómo se conecta todo
+
+Aquí está la imagen completa:
+
+```
+Archivos de gobernanza (Markdown)
+     │
+     ├── Parseados por CLI al Knowledge Graph
+     │
+     ├── Cargados al inicio de sesión como primes de gobernanza
+     │
+     └── Aplicados por skills vía gates de verificación
+
+Memoria (JSONL + YAML)
+     │
+     ├── Patrones, calibración, sesiones
+     │
+     ├── Fusionados en el Knowledge Graph
+     │
+     └── Cargados al inicio de sesión como primes de comportamiento
+
+Skills (SKILL.md)
+     │
+     ├── Definen el flujo de trabajo (pasos + gates)
+     │
+     ├── Referencian gobernanza (restricciones)
+     │
+     └── Producen artefactos que alimentan la memoria
+
+Inicio de sesión
+     │
+     ├── CLI recorre el grafo
+     │
+     ├── Ensambla bundle de contexto de ~150 tokens
+     │
+     └── Partner IA tiene conciencia completa
+```
+
+El ciclo es: **gobernar → trabajar → aprender → acumular**. La gobernanza define las reglas. Los skills estructuran el trabajo. La memoria captura lo que pasó. La siguiente sesión empieza más inteligente que la anterior.
+
+## Qué NO es RaiSE
+
+- **No es un generador de código.** RaiSE no escribe código por ti. Estructura cómo tú y tu partner IA escriben código juntos.
+- **No es específico de plataforma.** Funciona donde funciona Git. Sin dependencia de GitHub, GitLab o Bitbucket.
+- **No es pesado.** Los archivos de gobernanza son Markdown. La memoria es JSONL. Los skills son Markdown. Todo es legible, diffeable y versionado.
+- **No es magia.** El efecto compuesto es real pero gradual. La sesión 1 es más lenta que vibe coding. La sesión 50 es más rápida y confiable. Estás invirtiendo en un sistema, no buscando un atajo.
+
+## Siguientes pasos
+
+- **[Comenzar](../getting-started.md)** — Instala y ejecuta tu primera sesión
+- **[Tu Primera Story](../guides/first-story.md)** — Experimenta el ciclo de vida completo
+- **[Referencia CLI](../cli/index.md)** — Todos los comandos, flags y opciones

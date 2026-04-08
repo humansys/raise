@@ -1,0 +1,241 @@
+# raise-commons — uv workspace root
+# This file defines the workspace and shared tool configuration.
+# It is NOT a package itself. Each package lives in packages/.
+
+[tool.uv]
+# Security constraints for transitive dependencies
+# CVE-2026-32597: pyjwt <2.12.0 improper crit header validation (CVSS 8.7)
+constraint-dependencies = ["pyjwt>=2.12.0"]
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+raise-core = { workspace = true }
+raise-cli = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "raise-cli",
+    "raise-core",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.4.0",
+    "pyright>=1.1.350",
+    "bandit>=1.7.8",
+    "httpx>=0.27.0",
+    "mcp>=1.26,<2",
+    "import-linter>=2.11",
+    "readme-renderer[md]>=44.0",
+    "mkdocs-material>=9.7.6",
+    "mkdocs-static-i18n>=1.3.1",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+exclude = ["dev/experiments"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "S",   # flake8-bandit (security)
+    "C90", # McCabe complexity
+    "PL",  # Pylint subset
+    "PERF",# Perflint
+    "FURB",# refurb
+    "RET", # flake8-return
+    "ARG", # flake8-unused-arguments
+    "ERA", # eradicate
+    "PT",  # flake8-pytest-style
+    "TC",  # flake8-type-checking
+    "A",   # flake8-builtins
+    "ANN", # flake8-annotations (D3.1)
+    "D",   # pydocstyle (D5.1)
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "S603",   # subprocess calls are expected in a CLI tool that runs gates/tools
+    "S607",   # partial executable paths are intentional (uv, git, etc.)
+    "PLC0415",# inline imports are a project pattern (lazy loading, conditional imports)
+    "PLR2004",# magic value comparisons are pervasive in tests and parsers
+    "PLR0913",# many-argument functions are common in CLI commands and Pydantic models
+    "PLR0912",# too-many-branches covered by C901 complexity check
+    "PLR0915",# too-many-statements covered by C901 complexity check
+    "PLR0911",# too-many-return-statements covered by C901 complexity check
+    "PLW2901",# loop variable reassignment is a common pattern (line stripping, normalization)
+    "PLW1510",# subprocess.run without check is intentional -- we inspect returncode
+    "PLC0414",# explicit re-exports (X as X) are intentional for backward compatibility
+    "PERF401",# manual list comprehension: many cases have complex loop bodies where comprehension reduces readability
+    "RET504", # unnecessary assignment before return: named returns improve readability
+    "ARG002", # unused method argument: many are protocol/interface conformance
+    "ERA001", # commented-out code: high false positive rate (API docs, section headers, code examples)
+    "PT012", # pytest.raises with multiple statements: often intentional for testing specific line
+    "PT018", # composite assertion: splitting weakens test readability
+    "PT011", # pytest.raises too broad: adding match= to existing tests changes semantics
+    "PT019", # fixture without value: false positives on @patch mock parameters
+    "TC001", # typing-only first-party import: risky with Pydantic/isinstance runtime usage
+    "TC002", # typing-only third-party import: risky with Pydantic/isinstance runtime usage
+    "TC003", # typing-only stdlib import: risky with Pydantic/isinstance runtime usage
+    "TC004", # runtime-import-in-type-checking: intentional lazy imports for optional deps
+    "A002",  # builtin argument shadowing: `format`, `id`, `type` are common domain names
+    "D100",  # module docstring: not required for every module, especially small utilities
+    "D104",  # package docstring: __init__.py files rarely need docstrings
+    "D107",  # __init__ docstring: class docstring suffices
+    "D203",  # one-blank-line-before-class: conflicts with D211 (no-blank-line-before-class)
+    "D213",  # multi-line-summary-second-line: conflicts with D212 (summary-first-line)
+    "ANN401",# Any type: pyright strict enforces real type safety; Any is legitimate for entry points, **kwargs, dynamic dispatch
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Protocol stubs, sync wrappers, and adapter implementations of protocol methods
+"packages/raise-cli/src/raise_cli/adapters/protocols.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/adapters/sync.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/adapters/declarative/adapter.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/doctor/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/gates/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/hooks/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/session/protocols.py" = ["D102"]
+"**/tests/**/*.py" = [
+    "S101", "S104", "S108", "S105", "S106", "S310",  # security rules relaxed in tests
+    "ARG001", "ARG002", "ARG005",             # unused args (fixtures, mocks)
+    "ANN001", "ANN002", "ANN003",             # parameter annotations optional in tests
+    "ANN201", "ANN202",                       # return annotations optional in tests
+    "D100", "D101", "D102", "D103", "D105",  # docstrings optional in tests
+]
+    "C901",    # complexity (11 functions > 10)
+    "D102",    # missing docstrings in protocol methods
+    "D105",    # missing docstrings in magic methods
+    "D301",    # raw docstrings
+    "D417",    # missing arg descriptions
+    "S101",    # assert in non-test code (registry guards)
+    "S110",    # bare except-pass
+    "S310",    # URL audit
+    "PLW0603", # global statement
+    "PLW1641", # missing __hash__
+    "PLR1714", # mergeable comparisons
+    "SIM105",  # contextlib.suppress
+    "UP047",   # generic type parameters
+    "PERF102", # dict values()
+    "ARG001",  # unused function arg
+    "ARG004",  # unused static method arg
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+include = [
+    "packages/raise-core/src",
+    "packages/raise-cli/src",
+]
+exclude = [
+    "**/__pycache__",
+    "**/node_modules",
+    ".venv",
+]
+venvPath = "."
+venv = ".venv"
+reportMissingTypeStubs = false
+reportUnknownMemberType = false
+
+[tool.pytest.ini_options]
+testpaths = [
+    "packages/raise-core/tests",
+    "packages/raise-cli/tests",
+]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--import-mode=importlib",
+    "-m", "not integration",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=packages/raise-cli/src/raise_cli",
+    "--cov=packages/raise-core/src/raise_core",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+asyncio_mode = "auto"
+markers = [
+    "integration: Manual integration tests requiring external services (run with -m integration)",
+]
+
+[tool.coverage.run]
+source = [
+    "packages/raise-cli/src/raise_cli",
+    "packages/raise-core/src/raise_core",
+]
+omit = [
+    "*/tests/*",
+    "*/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.importlinter]
+root_packages = ["raise_cli"]
+
+[[tool.importlinter.contracts]]
+name = "ADR-001 Foundation Independence"
+type = "independence"
+modules = [
+    "raise_cli.core",
+    "raise_cli.schemas",
+    "raise_cli.rai_base",
+    "raise_cli.skills_base",
+]
+
+[[tool.importlinter.contracts]]
+name = "ADR-001 No Upward CLI Dependency"
+type = "forbidden"
+source_modules = [
+    "raise_cli.discovery",
+    "raise_cli.graph",
+    "raise_cli.engines",
+    "raise_cli.core",
+    "raise_cli.schemas",
+    "raise_cli.rai_base",
+    "raise_cli.skills_base",
+]
+forbidden_modules = [
+    "raise_cli.cli",
+    "raise_cli.output",
+    "raise_cli.viz",
+]
+
+[tool.rai]
+# RaiSE CLI configuration for this project
+output_format = "human"
+color = true
+verbosity = 0
+
+[tool.logfire]
+ignore_no_config = true

@@ -1,0 +1,137 @@
+site_name: RaiSE Docs
+site_url: https://docs.raiseframework.ai
+site_dir: _site
+site_description: >-
+  Learn how to use RaiSE — a lean methodology and deterministic toolkit
+  for reliable AI-assisted software engineering.
+
+repo_url: https://github.com/humansys/raise
+repo_name: humansys/raise
+
+theme:
+  name: material
+  language: en
+  logo: assets/images/logo.svg
+  favicon: assets/images/logo.svg
+  palette:
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: folder
+      fallback_to_default: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: es
+          name: Español
+          build: true
+          nav_translations:
+            Start Here: Comenzar
+            Home: Inicio
+            Getting Started: Comenzar
+            Installation: Instalación
+            Concepts: Conceptos
+            Overview: Metodología RaiSE
+            Memory: Memoria
+            Governance: Gobernanza
+            Guides: Guías
+            Your First Story: Tu Primera Story
+            Setting Up a Project: Configurar un Proyecto
+            Extending RaiSE: Extensibilidad
+            Create a Custom Adapter: Crear un Adaptador
+            Create a Custom Skill: Crear un Skill
+            Register an MCP Server: Registrar un Servidor MCP
+            Wire a Lifecycle Hook: Conectar un Hook
+            Configuring Integrations: Configurar Integraciones
+            Local Persistence: Persistencia Local
+            Bugfix Lifecycle: Ciclo de Bugfix
+            Session Health: Salud de Sesión
+            Skill Sets: Skill Sets
+            Reference: Referencia
+            CLI Reference: Referencia CLI
+
+extra_css:
+  - assets/stylesheets/custom.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Start Here:
+    - Home: index.md
+    - Getting Started: getting-started.md
+    - Installation: installation.md
+  - Concepts:
+    - Overview: concepts/index.md
+    - Memory: concepts/memory.md
+    - Skills: concepts/skills.md
+    - Governance: concepts/governance.md
+    - Knowledge Graph: concepts/knowledge-graph.md
+  - Guides:
+    - Your First Story: guides/first-story.md
+    - Setting Up a Project: guides/setting-up.md
+    - Extending RaiSE: guides/extending.md
+    - Create a Custom Adapter: guides/create-adapter.md
+    - Create a Custom Skill: guides/create-skill.md
+    - Register an MCP Server: guides/register-mcp.md
+    - Wire a Lifecycle Hook: guides/create-hook.md
+    - Configuring Integrations: guides/configuring-integrations.md
+    - Local Persistence: guides/local-persistence.md
+    - Bugfix Lifecycle: guides/bugfix-lifecycle.md
+    - Session Health: guides/session-health.md
+    - Skill Sets: guides/skillsets.md
+  - Reference:
+    - CLI Reference: cli/index.md
+    - rai init: cli/init.md
+    - rai session: cli/session.md
+    - rai graph: cli/graph.md
+    - rai pattern: cli/pattern.md
+    - rai signal: cli/signal.md
+    - rai backlog: cli/backlog.md
+    - rai skill: cli/skill.md
+    - rai discover: cli/discover.md
+    - rai adapter: cli/adapter.md
+    - rai mcp: cli/mcp.md
+    - rai gate: cli/gate.md
+    - rai doctor: cli/doctor.md
+    - rai docs: cli/docs.md
+    - rai artifact: cli/artifact.md
+    - rai release: cli/release.md
+    - rai info: cli/info.md
+    - rai profile: cli/profile.md

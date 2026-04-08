@@ -1,0 +1,42 @@
+adapter:
+  name: github
+  protocol: pm
+  description: "GitHub Issues via mcp-github"
+
+server:
+  command: uvx
+  args: [mcp-github]
+  env: [GITHUB_TOKEN]
+
+methods:
+  create_issue:
+    tool: github_create_issue
+    args:
+      title: "{{ issue.summary }}"
+      body: "{{ issue.description }}"
+      repo: "{{ project_key }}"
+    response:
+      fields:
+        key: "{{ data.number | str }}"
+        url: "{{ data.html_url }}"
+
+  search:
+    tool: github_search_issues
+    args:
+      query: "{{ query }}"
+      per_page: "{{ limit }}"
+    response:
+      items_path: data.items
+      fields:
+        key: "{{ item.number | str }}"
+        summary: "{{ item.title }}"
+        status: "{{ item.state }}"
+
+  transition_issue:
+    tool: github_update_issue
+    args:
+      issue_number: "{{ key }}"
+      state: "{{ status }}"
+
+  link_to_parent: null
+  link_issues: null

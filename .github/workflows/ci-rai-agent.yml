@@ -1,0 +1,27 @@
+name: "CI: rai-agent"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/rai-agent/**"
+      - "packages/raise-core/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/rai-agent/**"
+      - "packages/raise-core/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci-package.yml
+    with:
+      package: rai-agent
+      test-path: packages/rai-agent/tests/
+      src-path: packages/rai-agent/src/
