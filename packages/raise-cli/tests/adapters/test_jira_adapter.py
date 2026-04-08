@@ -382,6 +382,25 @@ class TestCreateIssue:
         call_fields = mock_client.create_issue.call_args[0][0]
         assert "description" not in call_fields  # empty description omitted
 
+    @pytest.mark.asyncio
+    async def test_creates_issue_with_parent(self) -> None:
+        """RAISE-1574: --parent metadata must reach Jira fields dict."""
+        adapter, mock_client = _make_adapter_with_client()
+        mock_client.create_issue.return_value = {"key": "RAISE-102", "id": "10102"}
+
+        from raise_cli.adapters.models.pm import IssueSpec
+
+        spec = IssueSpec(
+            summary="Child issue",
+            issue_type="Task",
+            metadata={"parent": "RAISE-764"},
+        )
+        result = await adapter.create_issue("RAISE", spec)
+
+        assert result.key == "RAISE-102"
+        call_fields = mock_client.create_issue.call_args[0][0]
+        assert call_fields["parent"] == {"key": "RAISE-764"}
+
 
 class TestUpdateIssue:
     """update_issue delegates field update to client."""
