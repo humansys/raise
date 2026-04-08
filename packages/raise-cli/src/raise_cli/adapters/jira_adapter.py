@@ -212,6 +212,8 @@ class PythonApiJiraAdapter:
             fields["description"] = issue.description
         if issue.labels:
             fields["labels"] = issue.labels
+        if issue.metadata.get("parent"):
+            fields["parent"] = {"key": issue.metadata["parent"]}
 
         result = client.create_issue(fields)
         key = result.get("key", "")
