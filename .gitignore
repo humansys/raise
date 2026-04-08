@@ -6,7 +6,6 @@
 
 # Claude Code local settings (user-specific)
 .claude/settings.local.json
-CLAUDE.local.md
 .claude/worktrees/
 .claude/projects/
 

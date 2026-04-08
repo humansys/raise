@@ -134,8 +134,7 @@ Story branch deleted (local and remote).
 
 ### Step 6: Update Context & Emit
 
-1. Update `CLAUDE.local.md` to reflect completion and next story
-2. Emit telemetry: `rai signal emit-work story S{N}.{M} --event complete`
+1. Emit telemetry: `rai signal emit-work story S{N}.{M} --event complete`
 3. If the story has a backlog ticket: `rai backlog transition {story_key} done`
 
 | Condition | Action |
@@ -145,7 +144,7 @@ Story branch deleted (local and remote).
 | No ticket | Skip backlog transition |
 
 <verification>
-Local context updated. Telemetry emitted.
+Telemetry emitted.
 </verification>
 
 <if-blocked>
@@ -160,7 +159,6 @@ Adapter not configured or transition fails → log and continue. Backlog sync is
 | Epic update | `work/epics/e{N}-{name}/scope.md` |
 | Branch cleanup | Story branch deleted |
 | Backlog update | via `rai backlog transition` (best-effort) |
-| Context update | `CLAUDE.local.md` |
 
 ## Quality Checklist
 

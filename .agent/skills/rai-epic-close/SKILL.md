@@ -112,15 +112,14 @@ Tag created. Retrospective committed.
 ### Step 4: Update Backlog & Context
 
 1. Mark epic complete in `governance/backlog.md` (status → `✅ Complete`)
-2. Update `CLAUDE.local.md` to reflect completion and next epic
-3. Emit telemetry:
+2. Emit telemetry:
 
 ```bash
 rai signal emit-work epic E{N} --event complete
 ```
 
 <verification>
-Backlog reflects completion. Local context updated.
+Backlog reflects completion.
 </verification>
 
 ## Output
@@ -130,7 +129,6 @@ Backlog reflects completion. Local context updated.
 | Retrospective | `work/epics/e{N}-{name}/retrospective.md` |
 | Tag | `epic/e{N}-complete` on `{dev_branch}` |
 | Backlog update | `governance/backlog.md` |
-| Context update | `CLAUDE.local.md` |
 
 ## Quality Checklist
 
