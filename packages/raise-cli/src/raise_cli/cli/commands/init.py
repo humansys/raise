@@ -511,11 +511,24 @@ def _create_and_save_manifest(
     detection: DetectionResult,
     valid_agent_types: list[str],
 ) -> ProjectManifest:
-    """Create project manifest from detection results and save it."""
+    """Create project manifest from detection results and save it.
+
+    When an existing manifest is present, preserve user-configured values
+    (name, ide, agents) and only fill gaps with detected values (RAISE-1431).
+    Detection updates toolchain/language/code_file_count unconditionally
+    since those are always re-scanned.
+    """
     existing_manifest = load_manifest(project_path)
 
+    # Preserve existing name if caller got it from directory (no --name flag)
+    effective_name = project_name
+    if existing_manifest and existing_manifest.project.name:
+        # Only override if --name was explicitly passed (not directory default)
+        if project_name == project_path.name:
+            effective_name = existing_manifest.project.name
+
     project_info = ProjectInfo(
-        name=project_name,
+        name=effective_name,
         project_type=detection.project_type,
         code_file_count=detection.code_file_count,
         language=detection.language,
@@ -525,16 +538,27 @@ def _create_and_save_manifest(
             detection.toolchain.type_check_command if detection.toolchain else None
         ),
     )
-    # Sync ide.type with agents.types[0] (RAISE-218)
-    primary = valid_agent_types[0] if valid_agent_types else "claude"
-    try:
-        ide_manifest = IdeManifest(type=primary)  # type: ignore[arg-type]
-    except Exception:
-        ide_manifest = IdeManifest()  # custom agents outside BuiltinAgentType
+
+    # Preserve existing agents/ide if present, merge new detections (RAISE-1431)
+    if existing_manifest:
+        existing_agents = existing_manifest.agents.types if existing_manifest.agents else []
+        # Merge: keep existing + add newly detected (no duplicates)
+        merged_agents = list(dict.fromkeys(existing_agents + valid_agent_types))
+        effective_agents = merged_agents
+        effective_ide = existing_manifest.ide
+    else:
+        effective_agents = valid_agent_types
+        # Sync ide.type with agents.types[0] (RAISE-218)
+        primary = valid_agent_types[0] if valid_agent_types else "claude"
+        try:
+            effective_ide = IdeManifest(type=primary)  # type: ignore[arg-type]
+        except Exception:
+            effective_ide = IdeManifest()
+
     manifest = ProjectManifest(
         project=project_info,
-        agents=AgentsManifest(types=valid_agent_types),
-        ide=ide_manifest,
+        agents=AgentsManifest(types=effective_agents),
+        ide=effective_ide,
         branches=existing_manifest.branches if existing_manifest else BranchConfig(),
         tier=existing_manifest.tier if existing_manifest else None,
     )
