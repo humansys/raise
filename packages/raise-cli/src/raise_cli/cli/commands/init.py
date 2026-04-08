@@ -514,41 +514,51 @@ def _create_and_save_manifest(
     """Create project manifest from detection results and save it.
 
     When an existing manifest is present, preserve user-configured values
-    (name, ide, agents) and only fill gaps with detected values (RAISE-1431).
-    Detection updates toolchain/language/code_file_count unconditionally
-    since those are always re-scanned.
+    and only update detection-derived fields (RAISE-1431, RAISE-1320).
+
+    Preserved on re-init: name, ide, agents, language (if set), detected_at,
+    toolchain commands (if user-configured), branches, tier, backlog.
+    Updated on re-init: project_type, code_file_count (always re-scanned).
     """
     existing_manifest = load_manifest(project_path)
+    ep = existing_manifest.project if existing_manifest else None
 
     # Preserve existing name if caller got it from directory (no --name flag)
     effective_name = project_name
-    if existing_manifest and existing_manifest.project.name:
-        # Only override if --name was explicitly passed (not directory default)
+    if ep and ep.name:
         if project_name == project_path.name:
-            effective_name = existing_manifest.project.name
+            effective_name = ep.name
+
+    # Preserve user-configured language; fall back to detection (RAISE-1320)
+    effective_language = ep.language if ep and ep.language else detection.language
+
+    # Preserve user-configured toolchain commands; fall back to detection
+    detected_test = detection.toolchain.test_command if detection.toolchain else None
+    detected_lint = detection.toolchain.lint_command if detection.toolchain else None
+    detected_type = detection.toolchain.type_check_command if detection.toolchain else None
+    detected_format = detection.toolchain.format_command if detection.toolchain else None
 
     project_info = ProjectInfo(
         name=effective_name,
         project_type=detection.project_type,
         code_file_count=detection.code_file_count,
-        language=detection.language,
-        test_command=detection.toolchain.test_command if detection.toolchain else None,
-        lint_command=detection.toolchain.lint_command if detection.toolchain else None,
-        type_check_command=(
-            detection.toolchain.type_check_command if detection.toolchain else None
-        ),
+        language=effective_language,
+        test_command=ep.test_command if ep and ep.test_command else detected_test,
+        lint_command=ep.lint_command if ep and ep.lint_command else detected_lint,
+        type_check_command=ep.type_check_command if ep and ep.type_check_command else detected_type,
+        format_command=ep.format_command if ep and ep.format_command else detected_format,
+        # Preserve original detected_at timestamp on re-init (RAISE-1320)
+        **({"detected_at": ep.detected_at} if ep else {}),
     )
 
     # Preserve existing agents/ide if present, merge new detections (RAISE-1431)
     if existing_manifest:
         existing_agents = existing_manifest.agents.types if existing_manifest.agents else []
-        # Merge: keep existing + add newly detected (no duplicates)
         merged_agents = list(dict.fromkeys(existing_agents + valid_agent_types))
         effective_agents = merged_agents
         effective_ide = existing_manifest.ide
     else:
         effective_agents = valid_agent_types
-        # Sync ide.type with agents.types[0] (RAISE-218)
         primary = valid_agent_types[0] if valid_agent_types else "claude"
         try:
             effective_ide = IdeManifest(type=primary)  # type: ignore[arg-type]
@@ -561,6 +571,8 @@ def _create_and_save_manifest(
         ide=effective_ide,
         branches=existing_manifest.branches if existing_manifest else BranchConfig(),
         tier=existing_manifest.tier if existing_manifest else None,
+        # Preserve backlog config on re-init (RAISE-1320)
+        backlog=existing_manifest.backlog if existing_manifest else None,
     )
     save_manifest(manifest, project_path)
     return manifest

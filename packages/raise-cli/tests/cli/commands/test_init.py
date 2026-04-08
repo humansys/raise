@@ -1366,3 +1366,52 @@ class TestInitPreservesExistingManifest:
         assert manifest is not None
         assert manifest.tier is not None
         assert manifest.tier.level == "enterprise"
+
+    def test_preserves_language_and_toolchain_on_reinit(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """RAISE-1320: rai init must not overwrite language, toolchain, or backlog."""
+        from raise_cli.onboarding.manifest import (
+            AgentsManifest,
+            BacklogConfig,
+            ProjectInfo,
+            ProjectManifest,
+        )
+
+        existing = ProjectManifest(
+            project=ProjectInfo(
+                name="my-project",
+                project_type="brownfield",
+                language="es",
+                test_command="pytest --custom",
+                lint_command="ruff check --custom",
+                type_check_command="pyright --strict",
+            ),
+            agents=AgentsManifest(types=["claude"]),
+            backlog=BacklogConfig(adapter_default="jira"),
+        )
+        original_detected_at = existing.project.detected_at
+        save_manifest(existing, greenfield_project)
+
+        mock_home.mkdir(parents=True, exist_ok=True)
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        # Language preserved (user set "es", detection would return something else)
+        assert manifest.project.language == "es"
+        # Toolchain commands preserved
+        assert manifest.project.test_command == "pytest --custom"
+        assert manifest.project.lint_command == "ruff check --custom"
+        assert manifest.project.type_check_command == "pyright --strict"
+        # detected_at preserved (not regenerated)
+        assert manifest.project.detected_at == original_detected_at
+        # Backlog preserved
+        assert manifest.backlog is not None
+        assert manifest.backlog.adapter_default == "jira"
