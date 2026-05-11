@@ -400,6 +400,50 @@ class TestScanDirectory:
         assert any(s.name == "App" for s in result.symbols)
         assert any(s.name == "helper" for s in result.symbols)
 
+    def test_scan_does_not_resolve_excluded_paths(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Excluded paths must not be stat'd via Path.resolve().
+
+        Regression: on large trees with gitignored directories (e.g. a
+        20GB ProcessWire site with site/assets uploads), calling
+        Path.resolve() before checking excludes dominated wall time and
+        peak memory because every file was stat'd and added to `seen`
+        before being discarded. resolve() must happen AFTER _should_exclude.
+        """
+        # Source file under root — should be scanned and resolved.
+        (tmp_path / "main.py").write_text("class Main: pass")
+
+        # Excluded-by-default directories with files under them.
+        for excluded_dir in ("node_modules", "vendor", ".venv"):
+            sub = tmp_path / excluded_dir / "pkg"
+            sub.mkdir(parents=True)
+            (sub / "leaf.py").write_text("class Leaf: pass")
+
+        # Record every absolute path on which Path.resolve() is invoked.
+        resolved_paths: list[str] = []
+        original_resolve = Path.resolve
+
+        def tracking_resolve(self: Path, *args: object, **kwargs: object) -> Path:
+            resolved_paths.append(str(self))
+            return original_resolve(self, *args, **kwargs)  # type: ignore[arg-type]
+
+        monkeypatch.setattr(Path, "resolve", tracking_resolve)
+
+        result = scan_directory(tmp_path)
+
+        # Source file is scanned normally.
+        assert result.files_scanned == 1
+        assert any(s.name == "Main" for s in result.symbols)
+
+        # No file inside any excluded directory was resolved.
+        for excluded_dir in ("node_modules", "vendor", ".venv"):
+            offending = [p for p in resolved_paths if f"/{excluded_dir}/" in p]
+            assert not offending, (
+                f"resolve() was called on excluded paths under {excluded_dir!r}: "
+                f"{offending!r}"
+            )
+
 
 class TestExtractTypescriptSymbols:
     """Tests for extract_typescript_symbols function."""

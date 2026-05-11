@@ -1848,13 +1848,18 @@ def scan_directory(  # noqa: C901 -- complexity 11, refactor deferred
             if file_path.is_dir():
                 continue
 
+            # Check excludes BEFORE resolving so we skip the stat syscall
+            # and avoid growing `seen` for excluded paths. On large trees
+            # (e.g. a 20GB ProcessWire site with gigabytes of gitignored
+            # uploads under site/assets) resolving every file before
+            # excluding dominated wall time and peak memory.
+            if _should_exclude(file_path, exclude_patterns):
+                continue
+
             resolved = file_path.resolve()
             if resolved in seen:
                 continue
             seen.add(resolved)
-
-            if _should_exclude(file_path, exclude_patterns):
-                continue
 
             if file_path.is_relative_to(root):
                 rel_str = portable_path(file_path, root)

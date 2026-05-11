@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `discovery.scanner.scan_directory` checked excludes after calling `Path.resolve()` and adding to the `seen` set, so excluded paths were stat'd and kept in memory anyway; on large trees with gigabytes of gitignored files (e.g. ProcessWire `site/assets` uploads) this dominated wall time and peak memory of `rai graph build`. Reorder to skip excludes first.
+
 ## [2.3.0] - 2026-03-30
 
 ### Added
