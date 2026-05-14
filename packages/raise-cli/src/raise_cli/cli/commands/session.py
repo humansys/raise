@@ -111,10 +111,17 @@ def _get_current_branch() -> str:
 
 
 def _maybe_sync_skills(project_path: Path) -> SkillScaffoldResult | None:
-    """Auto-sync skills if CLI version is newer than last deployed version.
+    """Auto-sync skills if the bundled skill payload version has changed.
 
-    Compares raise_cli.__version__ against .raise/manifests/skills.json.
-    If CLI is newer, runs scaffold_skills for each detected agent.
+    Compares ``raise_cli.skills_base.__version__`` against
+    ``.raise/manifests/skills.json``. When they differ, runs
+    ``scaffold_skills`` for each detected agent.
+
+    ``skills_base.__version__`` is the same source that ``scaffold_skills``
+    stamps into the manifest, so the gate and the write-back stay in
+    agreement. Using ``raise_cli.__version__`` (package metadata) here
+    would diverge on every release where the bundled skill payload was
+    unchanged, causing the gate to fire on every session start.
 
     Returns:
         SkillScaffoldResult if sync happened, None if skipped.
@@ -125,7 +132,7 @@ def _maybe_sync_skills(project_path: Path) -> SkillScaffoldResult | None:
     if manifest is None:
         return None
 
-    from raise_cli import __version__ as cli_version
+    from raise_cli.skills_base import __version__ as cli_version
 
     if manifest.raise_cli_version == cli_version:
         return None

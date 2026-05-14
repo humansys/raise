@@ -676,6 +676,83 @@ class TestSessionStartAutoSyncSkills:
         mock_sync.assert_not_called()
 
 
+class TestMaybeSyncSkillsVersionGate:
+    """The version gate must compare against the bundled skill payload
+    version (``raise_cli.skills_base.__version__``), not the package
+    metadata version (``raise_cli.__version__``). The two diverge on any
+    release whose skill payload was unchanged, and the manifest
+    write-back uses ``skills_base.__version__`` — so comparing against
+    anything else makes the gate fire on every session start.
+    """
+
+    def test_skips_sync_when_manifest_matches_skills_base_version(
+        self, tmp_path: Path
+    ) -> None:
+        """Gate short-circuits when manifest matches skills_base version,
+        even when the package metadata version differs."""
+        from raise_cli.cli.commands.session import _maybe_sync_skills
+        from raise_cli.onboarding.skill_manifest import (
+            SkillManifest,
+            save_skill_manifest,
+        )
+
+        project_path = tmp_path / "project"
+        (project_path / ".raise" / "manifests").mkdir(parents=True)
+
+        manifest = SkillManifest(raise_cli_version="9.9.9-payload")
+        save_skill_manifest(manifest, project_path)
+
+        with (
+            patch(
+                "raise_cli.skills_base.__version__",
+                "9.9.9-payload",
+            ),
+            patch(
+                "raise_cli.__version__",
+                "9.9.9.dev99999999",
+            ),
+            patch(
+                "raise_cli.onboarding.skills.scaffold_skills"
+            ) as mock_scaffold,
+        ):
+            result = _maybe_sync_skills(project_path)
+
+        assert result is None
+        mock_scaffold.assert_not_called()
+
+    def test_syncs_when_manifest_lags_skills_base_version(
+        self, tmp_path: Path
+    ) -> None:
+        """Gate triggers when manifest version is older than the
+        bundled skill payload version."""
+        from raise_cli.cli.commands.session import _maybe_sync_skills
+        from raise_cli.onboarding.skill_manifest import (
+            SkillManifest,
+            save_skill_manifest,
+        )
+        from raise_cli.onboarding.skills import SkillScaffoldResult
+
+        project_path = tmp_path / "project"
+        (project_path / ".raise" / "manifests").mkdir(parents=True)
+
+        manifest = SkillManifest(raise_cli_version="1.0.0-payload")
+        save_skill_manifest(manifest, project_path)
+
+        with (
+            patch(
+                "raise_cli.skills_base.__version__",
+                "2.0.0-payload",
+            ),
+            patch(
+                "raise_cli.onboarding.skills.scaffold_skills",
+                return_value=SkillScaffoldResult(),
+            ) as mock_scaffold,
+        ):
+            _maybe_sync_skills(project_path)
+
+        assert mock_scaffold.called
+
+
 class TestSessionStartCreatesDir:
     """Tests for session start creating per-session directory (RAISE-138)."""
 
