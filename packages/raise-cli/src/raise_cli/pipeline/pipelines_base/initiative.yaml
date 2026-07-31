@@ -1,0 +1,39 @@
+name: initiative
+description: "Default initiative — 4 phases (shaped→validated→delivering→concluded). ADR-143 C2."
+issue_types: [initiative]
+execution:
+  worktree_isolation: false
+phases:
+  - id: shaped
+    type: llm
+    skill: rai-initiative-shaped
+    # Default skill: lean merge of enterprise shaped+validated phases with ADR-135 machine sections
+    validates:
+      - pattern: "work/initiatives/**/treatment*.md"
+        description: "Initiative treatment"
+      - pattern: "work/initiatives/**/mvp-spec*.md"
+        description: "MVP specification"
+
+  - id: validated
+    type: deterministic
+    workflow_point: "before:initiative:validated"
+    # No validates: gate-strategic-fit (via GateBridgeHook) does the checking.
+    # Fail-open when portfolio_gates.enabled is not true.
+
+  - id: delivering
+    type: deterministic
+    skill: rai-initiative-delivering
+    # Default skill: validate-only — verifies epic decomposition, no artifact creation
+    validates:
+      - pattern: "work/epics/**/scope.md"
+        description: "Epic decomposition of the Initiative"
+
+  - id: concluded
+    type: llm
+    workflow_point: "before:initiative:concluded"
+    prompt: >
+      Continue / Pivot / Retire: confirm all child Epics are terminal and
+      write the outcome report before concluding this Initiative.
+    validates:
+      - pattern: "work/initiatives/**/outcome-report*.md"
+        description: "Initiative outcome report"

@@ -1,0 +1,62 @@
+name: epic-enterprise
+description: "7-phase epic lifecycle pipeline"
+issue_types:
+  - epic
+
+execution:
+  worktree_isolation: false
+  branch_pattern: "epic/{issue_id}/pipeline"
+
+phases:
+  - id: start
+    type: llm
+    skill: rai-epic-start
+
+  - id: design
+    type: llm
+    skill: rai-epic-design
+    validates:
+      - pattern: "work/epics/**/design.md"
+        description: "Epic design document"
+      - pattern: "work/epics/**/scope.md"
+        description: "Epic scope document"
+    gate:
+      type: hitl
+      level: REVIEW
+
+  - id: plan
+    type: llm
+    skill: rai-epic-plan
+    validates:
+      - pattern: "work/epics/**/scope.md"
+        description: "Epic scope document (plan appended)"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: story-iteration
+    type: deterministic
+    gate:
+      type: hitl
+      level: REVIEW
+      mandatory: true
+
+  - id: docs
+    type: llm
+    skill: rai-epic-docs
+
+  - id: journal
+    type: llm
+    skill: rai-epic-journal
+
+  - id: close
+    type: llm
+    skill: rai-epic-close
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - store: sqlite
+        type: retro
+        description: "Epic retrospective artifact recorded (own output)"

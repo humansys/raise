@@ -1,0 +1,80 @@
+name: initiative-enterprise
+description: "6-phase Initiative Flow pipeline (portfolio-model.md §4/§8)"
+issue_types:
+  - initiative
+
+execution:
+  worktree_isolation: false
+  branch_pattern: "initiative/{issue_id}/pipeline"
+
+# S14559.1 (RAISE-14588), epic RAISE-14559 (Initiative Flow). Turns the
+# Captured -> Shaped -> Validated -> Committed -> Delivering -> Concluded
+# prose (portfolio-model.md) into a runnable, gate-enforced pipeline.
+#
+# Design D3: rai-initiative-start does not exist yet (deferred to a
+# follow-up story) — Captured/Shaped deliberately carry no dedicated skill
+# so this pipeline is E2E-testable today without a hard dependency on it.
+#
+# Design D1/D2: the mechanical strategic-fit / child-epics-complete
+# invariants are NOT expressed here as `type: deterministic` + `commands`
+# (a silent no-op in the MCP pipeline_advance path — see design gemba
+# finding). They are deterministic point-bound governance gates
+# (gate-strategic-fit, gate-child-epics-complete) that fire through
+# workflow_point -> GateBridgeHook -> run_gates_for_point when this phase's
+# workflow_point is declared below. The `gate:` block on the same phase is
+# the SEPARATE portfolio judgment (HITL go/no-go), not the invariant check.
+phases:
+  - id: captured
+    type: deterministic
+    # Funnel marker (portfolio-model.md §4: "a raw idea, issuetype Idea") —
+    # no RaiSE action at this phase.
+
+  - id: shaped
+    type: llm
+    prompt: >
+      Frame this Initiative against strategy: state the hypothesis, the
+      target outcome, and the owner. Draft a short treatment (problem,
+      value, approach) so the Initiative can be evaluated for Validated.
+    validates:
+      - pattern: "work/initiatives/**/treatment*.md"
+        description: "Initiative treatment draft"
+
+  - id: validated
+    type: llm
+    prompt: >
+      Portfolio go/no-go: confirm the Initiative has a registered Theme
+      parent and a measurable hypothesis (MVP spec) before committing to
+      build. This is the portfolio table's strategic-fit checkpoint
+      (portfolio-model.md §8).
+    workflow_point: "before:initiative:validated"
+    validates:
+      - pattern: "work/initiatives/**/mvp-spec*.md"
+        description: "MVP specification"
+    gate:
+      type: hitl
+      level: REVIEW
+
+  - id: committed
+    type: deterministic
+    # Marker phase — Committed carries no new AC beyond appearing in the
+    # Flow name list (portfolio-model.md §4).
+
+  - id: delivering
+    type: deterministic
+    validates:
+      - pattern: "work/epics/**/scope.md"
+        description: "Epic decomposition of the Initiative"
+
+  - id: concluded
+    type: llm
+    prompt: >
+      Continue / Pivot / Retire: confirm all child Epics are terminal and
+      write the outcome report before concluding this Initiative.
+    workflow_point: "before:initiative:concluded"
+    validates:
+      - pattern: "work/initiatives/**/outcome-report*.md"
+        description: "Initiative outcome report"
+    gate:
+      type: hitl
+      level: REVIEW
+      mandatory: true

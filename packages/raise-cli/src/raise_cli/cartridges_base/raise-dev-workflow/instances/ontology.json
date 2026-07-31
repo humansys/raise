@@ -1,0 +1,4552 @@
+[
+  {
+    "id": "kc-raise-dev-workflow-branch-model-and-merge-requests",
+    "type": "concept",
+    "content": "The branch model defines how work flows from a developer's hands into stable software.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-release-branch-model",
+    "type": "concept",
+    "content": "RaiSE uses an explicit release-branch model: `main` holds stable, released code; a release branch (e.g. `release/3.1.0`) is the active development integration target; story branches are cut from and merged back to the release branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "branch-model-and-merge-requests",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-main-branch",
+    "type": "concept",
+    "content": "`main` holds stable, released code.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-release-branch",
+    "type": "concept",
+    "content": "a release branch (e.g. `release/3.1.0`) is the active development integration target",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-branches",
+    "type": "concept",
+    "content": "story branches are cut from and merged back to the release branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-no-direct-main-branch-merges",
+    "type": "guardrail",
+    "content": "Main receives only tested, released code — stories never branch from or merge to main directly.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "story-branches",
+          "type": "constrains"
+        },
+        {
+          "target": "main-branch",
+          "type": "constrains"
+        },
+        {
+          "target": "release-branch",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-development-branch-as-integration-target--branch-and-mr",
+    "type": "concept",
+    "content": "The development branch (the current release branch) is the single integration target for all story work. Every story branches from it and merges back to it.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "avoid-divergence-via-one-integration-target",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Development Branch as Integration Target",
+      "hygiene_original_id": "kc-raise-dev-workflow-development-branch-as-integration-target"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-avoid-divergence-via-one-integration-target",
+    "type": "principle",
+    "content": "Keeping one integration target avoids the divergence that multiple long-lived branches create.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "development-branch-as-integration-target",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Development Branch as Integration Target"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-branch-naming-convention",
+    "type": "practice",
+    "content": "Story branches follow `story/s{N}.{M}/{slug}`: `s{N}.{M}` identifies the story within its epic, and the slug is a short human-readable description. Consistent naming makes the branch's purpose and parentage legible at a glance.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Branch Naming"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-branch-slug",
+    "type": "concept",
+    "content": "a short human-readable description",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "story-branch-naming-convention",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Branch Naming"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-branch-identifier",
+    "type": "concept",
+    "content": "`s{N}.{M}` identifies the story within its epic",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "story-branch-naming-convention",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Branch Naming"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-merge-requests-via-rai-mr-create--branch-and-mr",
+    "type": "workflow",
+    "content": "Stories merge back through a Merge Request. This is created exclusively via the `/rai-mr-create` skill, and never by manual git push plus a manual glab/gh command, not even for \"quick\" chore or docs branches.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Requests via /rai-mr-create",
+      "hygiene_original_id": "kc-raise-dev-workflow-merge-requests-via-rai-mr-create"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-rai-mr-create-skill",
+    "type": "tool",
+    "content": "The `/rai-mr-create` skill is used to create Merge Requests. It runs the full gate suite before pushing and catches drift guards and other non-obvious failures.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "full-gate-suite",
+          "type": "implements"
+        },
+        {
+          "target": "drift-guards",
+          "type": "implements"
+        },
+        {
+          "target": "merge-requests-via-rai-mr-create",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Requests via /rai-mr-create"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-full-gate-suite",
+    "type": "workflow",
+    "content": "The full gate suite is run by the `/rai-mr-create` skill before pushing.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Requests via /rai-mr-create"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-drift-guards",
+    "type": "guardrail",
+    "content": "Drift guards are caught by the `/rai-mr-create` skill.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Requests via /rai-mr-create"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-re-run-full-gate-after-merging",
+    "type": "practice",
+    "content": "Always re-run the full gate suite before creating or updating the MR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Re-run the Full Gate After Merging the Target"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-clean-merge-does-not-guarantee-test-compatibility",
+    "type": "concept",
+    "content": "A clean merge of the target branch into your branch does not guarantee test compatibility — the target may carry tests that reference APIs your branch changed.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "re-run-full-gate-after-merging",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Re-run the Full Gate After Merging the Target"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-delete-merged-branches",
+    "type": "practice",
+    "content": "Merged branches are deleted immediately. Accumulating stale branches creates confusion about what is active. Cleanup is part of the merge, not a later chore.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Delete Branches After Merge"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-merge-not-deploy",
+    "type": "concept",
+    "content": "Merging a story to the development branch is not the same as deploying it. Stories that touch deployable components require explicit post-merge verification that the deploy actually happened. Pushing a release branch is likewise not the same as opening a release MR to main — those are separate, explicit actions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "deploy-verification-after-merge",
+          "type": "refines"
+        },
+        {
+          "target": "release-branch-push-not-release-mr",
+          "type": "refines"
+        },
+        {
+          "target": "delete-merged-branches",
+          "type": "implements"
+        },
+        {
+          "target": "create-mr-via-rai",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-main-branch-workflow",
+    "type": "concept",
+    "content": "main (stable) ← release branch (dev integration) ← `story/s{N}.{M}/{slug}`",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "release-branch-push-not-release-mr",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-create-mr-via-rai",
+    "type": "guardrail",
+    "content": "MRs created only via `/rai-mr-create` (runs full gate first) — never manual",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "workflow",
+      "verification": "MRs are only created using the `/rai-mr-create` command.",
+      "relationships": [
+        {
+          "target": "merge-not-deploy",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-re-run-full-gate-after-merge",
+    "type": "practice",
+    "content": "Re-run full gate after merging the target branch in",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "workflow",
+      "verification": "Verify that the full gate is re-run after merging the target branch.",
+      "relationships": [
+        {
+          "target": "merge-not-deploy",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-delete-merged-branches--branch-and-mr",
+    "type": "practice",
+    "content": "Delete merged branches immediately",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "workflow",
+      "verification": "Confirm that branches are deleted immediately after merging.",
+      "relationships": [
+        {
+          "target": "merge-not-deploy",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy",
+      "hygiene_original_id": "kc-raise-dev-workflow-delete-merged-branches"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-merge-not-deploy-summary",
+    "type": "concept",
+    "content": "Merge ≠ deploy; release-branch push ≠ release MR to main",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "merge-not-deploy",
+          "type": "refines"
+        },
+        {
+          "target": "deploy-verification-after-merge",
+          "type": "implements"
+        },
+        {
+          "target": "release-branch-push-not-release-mr",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-deploy-verification-after-merge",
+    "type": "practice",
+    "content": "Stories that touch deployable components require explicit post-merge verification that the deploy actually happened.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "verification",
+      "verification": "Verify deployment after merge for stories touching deployable components.",
+      "relationships": [
+        {
+          "target": "merge-not-deploy",
+          "type": "implements"
+        },
+        {
+          "target": "merge-not-deploy-summary",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-release-branch-push-not-release-mr",
+    "type": "concept",
+    "content": "Pushing a release branch is likewise not the same as opening a release MR to main — those are separate, explicit actions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "workflow",
+      "verification": "Distinguish between pushing a release branch and opening a release MR to main.",
+      "relationships": [
+        {
+          "target": "merge-not-deploy",
+          "type": "implements"
+        },
+        {
+          "target": "merge-not-deploy-summary",
+          "type": "implements"
+        },
+        {
+          "target": "main-branch-workflow",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-fleet-dispatch",
+    "type": "concept",
+    "content": "Fleet dispatch is the mechanism for parallelizing RaiSE work across multiple concurrent agents. Where a single session executes one body of work at a time, the fleet dispatches several units of work to run simultaneously, each in its own isolated context, and coordinates their completion.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "aliases": [
+        "fleet",
+        "agent fleet",
+        "parallel dispatch",
+        "swarm orchestration"
+      ],
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-raise-work-parallelization",
+    "type": "concept",
+    "content": "parallelizing RaiSE work across multiple concurrent agents",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "fleet-dispatch",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-agent-fleet",
+    "type": "concept",
+    "content": "multiple concurrent agents",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "fleet-dispatch",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-isolated-context",
+    "type": "concept",
+    "content": "each in its own isolated context",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "fleet-dispatch",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-fleet-scaling",
+    "type": "concept",
+    "content": "Fleet is how RaiSE scales from one human orchestrating one agent toward a few humans orchestrating many agents.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "fleet-dispatch",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-dispatch-work",
+    "type": "workflow",
+    "content": "Dispatch launches a unit of work to an agent in the fleet.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Dispatch"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-independent-units-of-work",
+    "type": "concept",
+    "content": "Each dispatched unit runs independently — it does not share the orchestrator's context window — so units do not interfere with one another.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "dispatch-work",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Dispatch"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-orchestrator-decision-making",
+    "type": "workflow",
+    "content": "The orchestrator decides what to dispatch and to how many agents, then waits for results rather than executing the work itself.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "dispatch-work",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Dispatch"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-fleet-status",
+    "type": "concept",
+    "content": "what each agent is doing, what has completed",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Status and Signal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-signalling-channel",
+    "type": "concept",
+    "content": "to coordinate or steer running agents",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Status and Signal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-status-observability",
+    "type": "concept",
+    "content": "Status makes the parallel work observable — the orchestrator can see progress across the fleet without reading every agent's full output.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "fleet-status",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Status and Signal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-orchestrator-intervention",
+    "type": "concept",
+    "content": "Signals let the orchestrator intervene without restarting a unit.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "signalling-channel",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Status and Signal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-human-approval",
+    "type": "concept",
+    "content": "Units that reach a gate requiring human approval surface that approval to the orchestrator rather than self-approving.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Approval in the Fleet"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-governance",
+    "type": "concept",
+    "content": "Fleet work still respects governance.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Approval in the Fleet"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-parallelism-increases-throughput",
+    "type": "concept",
+    "content": "Parallelism increases throughput; it does not relax the HITL and governance discipline that applies to single-session work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "governance",
+          "type": "constrains"
+        },
+        {
+          "target": "hitl-discipline",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Approval in the Fleet"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-discipline",
+    "type": "concept",
+    "content": "HITL and governance discipline that applies to single-session work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "governance",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Approval in the Fleet"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-orchestrator",
+    "type": "tool",
+    "content": "Units that reach a gate requiring human approval surface that approval to the orchestrator rather than self-approving.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "human-approval",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Approval in the Fleet"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-isolation-prevents-interference--fleet",
+    "type": "concept",
+    "content": "Each fleet unit is isolated (its own context, often its own worktree) so that concurrent work does not collide — no shared mutable state, no context bleed between agents. Isolation is what makes parallelism safe: the cost of an isolated worktree is paid precisely when concurrent agents would otherwise conflict.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Isolation Prevents Interference",
+      "hygiene_original_id": "kc-raise-dev-workflow-isolation-prevents-interference"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-parallelizes-work-across-concurrent-isolated-agents",
+    "type": "principle",
+    "content": "Parallelizes work across concurrent, isolated agents",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "isolation-prevents-interference",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Isolation Prevents Interference"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-orchestrator-dispatches-and-waits-it-does-not-execute-the-dispatched-work",
+    "type": "principle",
+    "content": "Orchestrator dispatches and waits; it does not execute the dispatched work",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Isolation Prevents Interference"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-exposes-status-and-signal-channels",
+    "type": "principle",
+    "content": "Exposes status (observability) and signal (coordination) channels",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Isolation Prevents Interference"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-governance-and-hitl-still-apply",
+    "type": "principle",
+    "content": "Governance and HITL still apply — units surface approvals, never self-approve",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Isolation Prevents Interference"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-isolation-context-worktree-prevents-cross-agent-interference",
+    "type": "guardrail",
+    "content": "Isolation (context, worktree) prevents cross-agent interference",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "isolation-prevents-interference",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Isolation Prevents Interference"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gate--gates-and-testing",
+    "type": "concept",
+    "content": "An automated quality checkpoint that must pass before work proceeds.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "derived_from": "Gates and Testing Policy",
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "",
+      "hygiene_original_id": "kc-raise-dev-workflow-gate"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-quality-floor",
+    "type": "concept",
+    "content": "A quality floor is where a commit that breaks any gate is not complete, and work never advances below the floor.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "derived_from": "Gates and Testing Policy",
+      "relationships": [
+        {
+          "target": "gate",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gates-make-quality-a-property-of-the-process",
+    "type": "principle",
+    "content": "Gates make quality a property of the process rather than a matter of individual diligence.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "derived_from": "Gates and Testing Policy",
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-rai-gate-check",
+    "type": "command",
+    "content": "Gates are run exclusively through `rai gate check`.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "derived_from": "Gates and Testing Policy",
+      "relationships": [
+        {
+          "target": "gate",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-direct-test-invocation-prohibited",
+    "type": "guardrail",
+    "content": "Direct test invocation (`uv run pytest`, `npm test`) is prohibited: it floods the agent's context window with raw output and bypasses the gate-tracking that records results in the project database for analytics and for blocking on repeated failures.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "derived_from": "Gates and Testing Policy",
+      "relationships": [
+        {
+          "target": "gate",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-rai-gate-check--gates-and-testing",
+    "type": "tool",
+    "content": "`rai gate check` is the only sanctioned way to run tests in a RaiSE project. It reads gate configuration from the manifest, scopes output for context efficiency, and records results.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "rai gate check Is the Exclusive Test Runner",
+      "hygiene_original_id": "kc-raise-dev-workflow-rai-gate-check"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-running-raw-test-commands-is-a-process-violation",
+    "type": "guardrail",
+    "content": "Running raw test commands is a process violation even when it \"works,\" because it leaves no tracked result and floods context.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "testing",
+      "verification": "No tracked result, floods context reported",
+      "relationships": [
+        {
+          "target": "rai-gate-check",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "rai gate check Is the Exclusive Test Runner"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-run-rai-gate-check",
+    "type": "command",
+    "content": "Run `rai gate check gate-tests --scope <test_path>` scoped to the tests for the module being changed.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "scoped-tests",
+          "type": "implements"
+        },
+        {
+          "target": "explicit-scope",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Scoped Testing — Per Task"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-scoped-tests",
+    "type": "concept",
+    "content": "Scoped runs are fast and keep the context window clean.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Scoped Testing — Per Task"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-explicit-scope",
+    "type": "guardrail",
+    "content": "Every per-task gate run must carry an explicit `--scope`.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "testing",
+      "verification": "Check if `--scope` argument was provided.",
+      "relationships": [
+        {
+          "target": "run-rai-gate-check",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Scoped Testing — Per Task"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-run-scoped-gate",
+    "type": "workflow",
+    "content": "Run the gate scoped to the changed package (`--scope packages/<pkg>/`) at story completion, before review.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "catch-cross-module-regressions",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Scoped Testing — Per Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-catch-cross-module-regressions",
+    "type": "concept",
+    "content": "Catch cross-module regressions within the package without running the entire suite.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Scoped Testing — Per Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-full-suite-gate",
+    "type": "guardrail",
+    "content": "The full suite is the final quality gate before merging to the development branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "category": "merge-quality",
+      "relationships": [
+        {
+          "target": "mr-creation-gate",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Full Suite — Only at MR Creation"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mr-creation-gate",
+    "type": "workflow",
+    "content": "The only place an unscoped full-suite gate runs is at MR creation, via /rai-mr-create.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "tool": "/rai-mr-create",
+      "relationships": [
+        {
+          "target": "full-suite-gate",
+          "type": "implements"
+        },
+        {
+          "target": "re-run-full-suite-after-merge",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Full Suite — Only at MR Creation"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-re-run-full-suite-after-merge",
+    "type": "practice",
+    "content": "The full gate is always re-run after merging the target branch in. A clean merge does not by itself guarantee compatibility — the target branch may have changed APIs your branch references.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "category": "merge-quality",
+      "relationships": [
+        {
+          "target": "full-suite-gate",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Full Suite — Only at MR Creation"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gates-before-every-commit--gates-and-testing",
+    "type": "concept",
+    "content": "Tests, type checks, and linting must all pass before any commit. This is enforced as a non-negotiable rule: there is no \"commit now, fix the gate later.\"",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "red-gate-is-a-stop-signal",
+          "type": "implements"
+        },
+        {
+          "target": "all-gates-pass-before-every-commit",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Gates Before Every Commit",
+      "hygiene_original_id": "kc-raise-dev-workflow-gates-before-every-commit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-red-gate-is-a-stop-signal",
+    "type": "concept",
+    "content": "A red gate is a stop signal (Jidoka), not a warning to be deferred.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Gates Before Every Commit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gates-quality-floor",
+    "type": "concept",
+    "content": "Gates: tests, lint, format, types — the quality floor",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Gates Before Every Commit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-rai-gate-check-runner",
+    "type": "tool",
+    "content": "`rai gate check` is the exclusive runner; raw pytest/npm is prohibited",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "gates-before-every-commit",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Gates Before Every Commit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-scope-gates-per-task-or-story",
+    "type": "concept",
+    "content": "Scope per task (module), per story (package); full suite only at MR creation",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Gates Before Every Commit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-all-gates-pass-before-every-commit",
+    "type": "guardrail",
+    "content": "All gates pass before every commit — no deferral",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "commit-process",
+      "verification": "All gates must pass",
+      "relationships": [
+        {
+          "target": "gates-before-every-commit",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Gates Before Every Commit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gate",
+    "type": "concept",
+    "content": "A pipeline pause that requires human approval before the work advances.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gate-application",
+    "type": "practice",
+    "content": "HITL gates sit on the phases where a human decision has the most leverage — notably design and implement. The gate is how human judgment enters an otherwise automated flow at the moments that matter.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-approval-gate",
+    "type": "concept",
+    "content": "Also known as: HITL gate, approval gate, human checkpoint.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-human-checkpoint",
+    "type": "concept",
+    "content": "Also known as: HITL gate, approval gate, human checkpoint.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-human-judgment",
+    "type": "concept",
+    "content": "The gate is how human judgment enters an otherwise automated flow at the moments that matter.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-shuhaari-philosophy",
+    "type": "concept",
+    "content": "The underlying ShuHaRi philosophy lives in the methodology layer.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gating-follows-developers-level",
+    "type": "concept",
+    "content": "HITL gating is not flat across the team — it follows each developer's ShuHaRi level.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "shu-h-ri-levels",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Pause Cadence Follows the Developer's Level"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-shu-h-ri-levels",
+    "type": "concept",
+    "content": "ShuHaRi is a martial arts concept describing stages of learning. In this context, it's mapped to developer autonomy and review gating.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "shu-level-gating",
+          "type": "implements"
+        },
+        {
+          "target": "ha-level-gating",
+          "type": "implements"
+        },
+        {
+          "target": "ri-level-gating",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Pause Cadence Follows the Developer's Level"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-shu-level-gating",
+    "type": "guardrail",
+    "content": "Shu pauses at each gate for review.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "shu-h-ri-levels",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Pause Cadence Follows the Developer's Level"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-ha-level-gating",
+    "type": "guardrail",
+    "content": "Ha advances autonomously through routine gates and pauses only on new or non-obvious decisions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "shu-h-ri-levels",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Pause Cadence Follows the Developer's Level"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-ri-level-gating",
+    "type": "guardrail",
+    "content": "Ri runs fully autonomous and pauses only on high-impact design decisions or on errors that persist after several resolution attempts.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "shu-h-ri-levels",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Pause Cadence Follows the Developer's Level"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-per-developer-level-policy",
+    "type": "principle",
+    "content": "A team policy defers to the per-developer level so mastery is respected without forcing newcomers to move too fast.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gating-follows-developers-level",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Pause Cadence Follows the Developer's Level"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-human-pause-triggers",
+    "type": "concept",
+    "content": "Certain situations always warrant a human pause: high-impact or architectural decisions, ADR-level choices, scope changes, irreversible or outward-facing actions, and errors unresolved after repeated attempts.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "avoid-routine-pauses",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-avoid-routine-pauses",
+    "type": "concept",
+    "content": "Autonomy is about not pausing on *routine* gates — not about removing human judgment from genuinely consequential decisions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "human-pause-triggers",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-high-impact-or-architectural-decisions",
+    "type": "decision",
+    "content": "High-impact or architectural decisions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "human-pause-triggers",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-adr-level-choices",
+    "type": "decision",
+    "content": "ADR-level choices.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "human-pause-triggers",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-scope-changes",
+    "type": "decision",
+    "content": "Scope changes.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "human-pause-triggers",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-irreversible-or-outward-facing-actions",
+    "type": "concept",
+    "content": "Irreversible or outward-facing actions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "human-pause-triggers",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-errors-unresolved-after-repeated-attempts",
+    "type": "concept",
+    "content": "Errors unresolved after repeated attempts.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "human-pause-triggers",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-no-code-without-governance-trail",
+    "type": "principle",
+    "content": "The principle is explicit: no code without a governance trail.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-autonomous-execution-produces-artifacts",
+    "type": "practice",
+    "content": "Autonomous execution still produces the full pipeline and the complete artifact trail — story, scope, design, plan, and retrospective — at every level, even for extra-small work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "no-code-without-governance-trail",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gates-pause-for-human-approval",
+    "type": "guardrail",
+    "content": "HITL gates pause for human approval (design, implement phases)",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "human-in-the-loop",
+      "verification": "HITL gates pause for human approval (design, implement phases)",
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-agents-never-self-approve-foundational-level",
+    "type": "guardrail",
+    "content": "Agents never self-approve at the foundational level",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "agent-autonomy",
+      "verification": "Agents never self-approve at the foundational level",
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-pause-cadence-follows-developer-shuhari-level",
+    "type": "principle",
+    "content": "Pause cadence follows the developer's ShuHaRi level (Shu/Ha/Ri)",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-ri-still-pauses-on-high-impact-decisions-and-errors",
+    "type": "guardrail",
+    "content": "Ri still pauses on high-impact/irreversible decisions and persistent errors",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "human-in-the-loop",
+      "verification": "Ri still pauses on high-impact/irreversible decisions and persistent errors",
+      "relationships": [
+        {
+          "target": "pause-cadence-follows-developer-shuhari-level",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-autonomy-never-skips-governance-artifacts",
+    "type": "guardrail",
+    "content": "Autonomy never skips governance artifacts — no code without a trail",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "governance",
+      "verification": "Autonomy never skips governance artifacts — no code without a trail",
+      "relationships": [
+        {
+          "target": "no-code-without-governance-trail",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-traceability-at-regulatory-standards",
+    "type": "concept",
+    "content": "This is required for traceability at regulatory (EU AI Act) standards.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-eu-ai-act",
+    "type": "concept",
+    "content": "EU AI Act",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "traceability-at-regulatory-standards",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-execution-discipline",
+    "type": "concept",
+    "content": "How missions and worktrees are used in the development flow.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-missions-and-worktrees--missions-and-worktrees",
+    "type": "concept",
+    "content": "Concepts defining what missions and worktrees are.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "execution-discipline",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "",
+      "hygiene_original_id": "kc-raise-dev-workflow-missions-and-worktrees"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-bind-isolate-integrate-work",
+    "type": "practice",
+    "content": "How to bind, isolate, and integrate work through missions and worktrees.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "missions-and-worktrees",
+          "type": "refines"
+        },
+        {
+          "target": "execution-discipline",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-as-a-teleological-container",
+    "type": "concept",
+    "content": "A mission is the teleological container for a body of work — a sustained objective that may span multiple epics and stories.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Mission as Execution Anchor"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-binding-to-purpose",
+    "type": "practice",
+    "content": "In the development flow, the mission is what a session binds to so that every piece of work traces back to a purpose.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "mission-as-a-teleological-container",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Mission as Execution Anchor"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-resolution-consistency",
+    "type": "guardrail",
+    "content": "Mission resolution (which mission is active) is resolved at session start and must be consistent across every caller in the session flow; divergence between resolvers is a known defect class and must be fixed across all callers in the same change.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "session-management",
+      "verification": "Divergence between resolvers is a known defect class and must be fixed across all callers in the same change.",
+      "relationships": [
+        {
+          "target": "mission-binding-to-purpose",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Mission as Execution Anchor"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-worktree-to-mission-binding",
+    "type": "guardrail",
+    "content": "One worktree is bound to one mission, persistently, and reused across the epics and stories of that mission until its objectives are met.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "worktree-management",
+      "verification": "Verify that a worktree is persistently bound to a single mission, reused across its epics and stories until objectives are met.",
+      "relationships": [
+        {
+          "target": "mission-as-a-teleological-container",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Mission as Execution Anchor"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-binding",
+    "type": "concept",
+    "content": "Also known as: mission binding, the active mission, mission-scoped work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "mission-binding-to-purpose",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Mission as Execution Anchor"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-worktree-as-isolation-unit--missions-and-worktrees",
+    "type": "concept",
+    "content": "A worktree is an isolated git checkout (under `.worktree/`) that lets parallel bodies of work proceed without colliding. Each worktree has its own branch and its own merge target.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Worktree as Isolation Unit",
+      "hygiene_original_id": "kc-raise-dev-workflow-worktree-as-isolation-unit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-enter-worktree-before-branching",
+    "type": "practice",
+    "content": "enter the worktree before creating the story branch, not after — this avoids checkout juggling and prevents commits landing on the wrong branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "worktree-as-isolation-unit",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Worktree as Isolation Unit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-one-worktree-per-mission--missions-and-worktrees",
+    "type": "concept",
+    "content": "The operating pattern is one worktree per mission, reused across all the work of that mission. Worktrees are not created per-story and discarded; they persist.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "One Worktree per Mission",
+      "hygiene_original_id": "kc-raise-dev-workflow-one-worktree-per-mission"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-stable-mission-environment",
+    "type": "concept",
+    "content": "This keeps the environment (env files, venv, MCP config) propagated once and stable for the duration of the mission.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "one-worktree-per-mission",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "One Worktree per Mission"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-commit-to-subdirectory",
+    "type": "concept",
+    "content": "Commands run from the wrong directory commit to the wrong branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Branch Discipline in Worktrees"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-assert-expected-branch-in-commit",
+    "type": "practice",
+    "content": "Assert the expected branch in the same command as the commit.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "commit-to-subdirectory",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Branch Discipline in Worktrees"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-use-absolute-paths-with-cwd-hooks",
+    "type": "practice",
+    "content": "Use absolute paths rather than `cd` when a CWD-binding hook is active.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "commit-to-subdirectory",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Branch Discipline in Worktrees"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-stashes-unreliable-for-cross-worktree-transfer",
+    "type": "guardrail",
+    "content": "Stashes are unreliable for transferring work between worktrees — they can be silently dropped by hooks — so they are not used for cross-worktree transfer.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Branch Discipline in Worktrees"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-worktree-epic-branch",
+    "type": "concept",
+    "content": "An intermediate epic branch (`worktree-{epic-slug}`) is created from the development branch when an epic is developed in a dedicated worktree.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic-branch-merge-to-dev-branch",
+    "type": "practice",
+    "content": "Only epic close merges the epic branch to the development branch via an MR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission",
+    "type": "concept",
+    "content": "Purpose anchor; session binds to it; resolution must be consistent across callers.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-worktree--missions-and-worktrees",
+    "type": "concept",
+    "content": "An isolated checkout; one per mission, persistent and reused.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "mission",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree",
+      "hygiene_original_id": "kc-raise-dev-workflow-worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-enter-worktree-before-story-branch",
+    "type": "practice",
+    "content": "Enter the worktree before creating the story branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "worktree",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-assert-branch-in-secondary-worktrees",
+    "type": "practice",
+    "content": "Assert branch in the same command as commit in secondary worktrees.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-stories-merge-to-epic-branch",
+    "type": "guardrail",
+    "content": "Stories merge to the epic branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "branching-strategy",
+      "verification": "Observe merge targets in MRs.",
+      "relationships": [
+        {
+          "target": "worktree-epic-branch",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic-close-merges-to-dev-branch",
+    "type": "guardrail",
+    "content": "Only epic close merges to the development branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "branching-strategy",
+      "verification": "Observe merge targets in MRs.",
+      "relationships": [
+        {
+          "target": "epic-branch-merge-to-dev-branch",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-pipeline-engine",
+    "type": "tool",
+    "content": "The pipeline engine is the execution backbone of RaiSE. It orchestrates work through an ordered sequence of phases, each phase bound to a skill and optionally to a Human-In-The-Loop (HITL) gate.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "also_known_as": [
+        "the pipeline",
+        "the engine",
+        "lifecycle orchestration",
+        "the phase machine"
+      ],
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-pipeline-process",
+    "type": "concept",
+    "content": "The pipeline is the process; the process is the quality system. Phases are never skipped — even for small work — because the structure is what makes the outcome reliable and the governance trail complete.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "pipeline-engine",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-phases-are-never-skipped",
+    "type": "guardrail",
+    "content": "Phases are never skipped — even for small work — because the structure is what makes the outcome reliable and the governance trail complete.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "workflow-integrity",
+      "relationships": [
+        {
+          "target": "pipeline-process",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-process-quality-system",
+    "type": "concept",
+    "content": "The process is the quality system.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "pipeline-process",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-pipeline-engine-exclusive-start",
+    "type": "guardrail",
+    "content": "The pipeline engine is the exclusive way to start orchestrated work. Story, bugfix, epic, and hotfix lifecycles are launched through it, not by invoking skills directly.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "workflow-initiation",
+      "relationships": [
+        {
+          "target": "pipeline-engine",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tracked-runs",
+    "type": "principle",
+    "content": "Each run is tracked in the project database with phase status, gate approvals, and artifacts, so progress survives context compaction and is auditable after the fact.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "category": "audibility",
+      "relationships": [
+        {
+          "target": "pipeline-engine",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic-lifecycle--pipelines-and-lifecycles",
+    "type": "concept",
+    "content": "An epic is a logical container for a bounded initiative (3–10 stories). Its lifecycle: start → design → plan → story-iteration → docs → journal → close.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle",
+      "hygiene_original_id": "kc-raise-dev-workflow-epic-lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-start-epic",
+    "type": "workflow",
+    "content": "`start` initializes the epic directory and tracker entry.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "epic-lifecycle",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-design-epic",
+    "type": "workflow",
+    "content": "`design` produces scope, design, and ADRs.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "epic-lifecycle",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-plan-epic",
+    "type": "workflow",
+    "content": "`plan` decomposes into stories.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "epic-lifecycle",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-iteration-epic",
+    "type": "workflow",
+    "content": "`story-iteration` runs each child story through its own pipeline.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "epic-lifecycle",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-close-epic",
+    "type": "workflow",
+    "content": "`close` requires an epic retrospective before completion.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "epic-lifecycle",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic-retrospective",
+    "type": "practice",
+    "content": "An epic retrospective is required before completion of the `close` stage.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "close-epic",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic-as-directory-and-tracker",
+    "type": "concept",
+    "content": "Epics are directories and tracker entries, not branches.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "epic-lifecycle",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story--pipelines-and-lifecycles",
+    "type": "concept",
+    "content": "A story is the unit of delivery value.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Lifecycle",
+      "hygiene_original_id": "kc-raise-dev-workflow-story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-lifecycle--pipelines-and-lifecycles",
+    "type": "workflow",
+    "content": "Its lifecycle: start → design → plan → implement → architecture-review → quality-review → review → close.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "story": "story",
+      "relationships": [
+        {
+          "target": "design",
+          "type": "precedes"
+        },
+        {
+          "target": "plan",
+          "type": "precedes"
+        },
+        {
+          "target": "implement",
+          "type": "precedes"
+        },
+        {
+          "target": "architecture-review",
+          "type": "precedes"
+        },
+        {
+          "target": "quality-review",
+          "type": "precedes"
+        },
+        {
+          "target": "review",
+          "type": "precedes"
+        },
+        {
+          "target": "close",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Lifecycle",
+      "hygiene_original_id": "kc-raise-dev-workflow-story-lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-design",
+    "type": "practice",
+    "content": "Design is never optional — it is the gemba walk that prevents building the wrong thing.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "story-lifecycle",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-architecture-review--pipelines-and-lifecycles",
+    "type": "guardrail",
+    "content": "The two adversarial reviews (architecture and quality) precede the final review.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "review",
+          "type": "precedes"
+        },
+        {
+          "target": "quality-review",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Lifecycle",
+      "hygiene_original_id": "kc-raise-dev-workflow-architecture-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-quality-review--pipelines-and-lifecycles",
+    "type": "guardrail",
+    "content": "The two adversarial reviews (architecture and quality) precede the final review.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "review",
+          "type": "precedes"
+        },
+        {
+          "target": "architecture-review",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Lifecycle",
+      "hygiene_original_id": "kc-raise-dev-workflow-quality-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-close",
+    "type": "concept",
+    "content": "Close requires a retrospective.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "story-lifecycle",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-git-workflow",
+    "type": "workflow",
+    "content": "Stories branch from the development branch and merge back on close.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "story",
+          "type": "implements"
+        },
+        {
+          "target": "close",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Story Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-bugfix-lifecycle--pipelines-and-lifecycles",
+    "type": "workflow",
+    "content": "A bugfix corrects a defect with mandatory root cause analysis. Its lifecycle: start → triage → analyse → plan → fix → review → close → PIR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "root-cause-analysis",
+          "type": "constrains"
+        },
+        {
+          "target": "post-incident-review",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle",
+      "hygiene_original_id": "kc-raise-dev-workflow-bugfix-lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-root-cause-analysis",
+    "type": "practice",
+    "content": "Root cause analysis (5 Whys, Ishikawa, Gemba) is mandatory before planning a fix — a fix without RCA is a patch, not a fix.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "five-whys",
+          "type": "refines"
+        },
+        {
+          "target": "ishikawa",
+          "type": "refines"
+        },
+        {
+          "target": "gemba",
+          "type": "refines"
+        },
+        {
+          "target": "bugfix-plan",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-five-whys",
+    "type": "tool",
+    "content": "5 Whys is a root cause analysis technique.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-ishikawa",
+    "type": "tool",
+    "content": "Ishikawa (Fishbone) diagrams are a root cause analysis technique.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gemba",
+    "type": "tool",
+    "content": "Gemba walks are a root cause analysis technique.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-bugfix-plan",
+    "type": "concept",
+    "content": "Planning a fix for a bug.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "root-cause-analysis",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-patch",
+    "type": "concept",
+    "content": "A fix without RCA is a patch, not a fix.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-post-incident-review",
+    "type": "workflow",
+    "content": "The Post-Incident Review (PIR) after close feeds the pattern system so the same defect class is caught earlier next time.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "pattern-system",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-pattern-system",
+    "type": "tool",
+    "content": "A system that receives input from PIR to catch similar defects earlier.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hotfix",
+    "type": "concept",
+    "content": "A hotfix is an expedited production correction. It compresses the bugfix lifecycle for urgency but never drops the governance trail: the fix is still traced to an artifact and a retrospective still follows.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Hotfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-compressed-bugfix-lifecycle",
+    "type": "concept",
+    "content": "The bugfix lifecycle compressed for urgency due to a hotfix.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hotfix",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Hotfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-governance-trail",
+    "type": "concept",
+    "content": "The governance trail is never dropped for a hotfix, meaning the fix is still traced to an artifact and a retrospective still follows.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hotfix",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Hotfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-artifact-tracing",
+    "type": "practice",
+    "content": "The hotfix is still traced to an artifact.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hotfix",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Hotfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-retrospective",
+    "type": "practice",
+    "content": "A retrospective still follows a hotfix.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hotfix",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Hotfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-leaving-a-record",
+    "type": "principle",
+    "content": "Speed changes the cadence, not the requirement to leave a record.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Hotfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gate-on-design-phase",
+    "type": "concept",
+    "content": "HITL gate on the design phase.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gate-on-implement-phase",
+    "type": "concept",
+    "content": "HITL gate on the implement phase.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gate--pipelines-and-lifecycles",
+    "type": "concept",
+    "content": "A gate that pauses the pipeline for human review.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "ai-agent-self-approval-shu",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases",
+      "hygiene_original_id": "kc-raise-dev-workflow-hitl-gate"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-ai-agent-self-approval-shu",
+    "type": "guardrail",
+    "content": "An AI agent must not self-approve a HITL gate at the Shu level.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "human-in-the-loop",
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gate-pause-cadence-relaxation",
+    "type": "concept",
+    "content": "At higher mastery levels the pause cadence relaxes per the developer's level, but the gate's existence and the artifact it guards do not disappear.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "hitl-gate",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-orchestrated-work-entry-point",
+    "type": "concept",
+    "content": "Exclusive entry point for orchestrated work (story/bugfix/epic/hotfix).",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-ordered-phases",
+    "type": "concept",
+    "content": "Phases are ordered.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skipped-phases",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skill-bound-phases",
+    "type": "concept",
+    "content": "Phases are skill-bound.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skipped-phases",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skipped-phases",
+    "type": "guardrail",
+    "content": "Phases are never skipped.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "workflow-integrity",
+      "relationships": [
+        {
+          "target": "ordered-phases",
+          "type": "implements"
+        },
+        {
+          "target": "skill-bound-phases",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-project-db-tracking",
+    "type": "concept",
+    "content": "Each run is tracked in the project DB (survives compaction, auditable).",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mandatory-design-retrospective",
+    "type": "guardrail",
+    "content": "Design and retrospective are mandatory in every story lifecycle.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "lifecycle-completeness",
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-lifecycle--pipelines-and-lifecycles-2",
+    "type": "concept",
+    "content": "The lifecycle of a story.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "HITL Gates on Phases",
+      "hygiene_original_id": "kc-raise-dev-workflow-story-lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-adversarial-reviews",
+    "type": "practice",
+    "content": "All code is reviewed before merge. Review is not optional, even for small changes. Every story passes through at minimum an architecture review and a quality review. Both are deliberately adversarial: the reviewer's job is to challenge the implementation and try to find what is wrong, not to validate it or rubber-stamp it. The goal is to surface problems before they reach production, when they are cheap to fix.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-architecture-review--reviews",
+    "type": "practice",
+    "content": "Architecture review is a deliberate adversarial review where the reviewer's job is to challenge the implementation and try to find what is wrong.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "adversarial-reviews",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "",
+      "hygiene_original_id": "kc-raise-dev-workflow-architecture-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-quality-review--reviews",
+    "type": "practice",
+    "content": "Quality review is a deliberate adversarial review where the reviewer's job is to challenge the implementation and try to find what is wrong.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "adversarial-reviews",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "",
+      "hygiene_original_id": "kc-raise-dev-workflow-quality-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-code-review",
+    "type": "concept",
+    "content": "Also known as: code review, adversarial review, AR/QR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "adversarial-reviews",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-adversarial-review",
+    "type": "concept",
+    "content": "Also known as: code review, adversarial review, AR/QR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "adversarial-reviews",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-arqr",
+    "type": "concept",
+    "content": "Also known as: code review, adversarial review, AR/QR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "adversarial-reviews",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-architecture-review--reviews-2",
+    "type": "practice",
+    "content": "Examines structural decisions: module boundaries, dependency direction, abstraction levels, and whether the implementation actually matches the design that was approved. It asks \"is this built the right way?\" and challenges the approach itself. A correct implementation of a wrong structure fails architecture review.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review",
+      "hygiene_original_id": "kc-raise-dev-workflow-architecture-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-module-boundaries",
+    "type": "concept",
+    "content": "module boundaries",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "architecture-review",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-dependency-direction",
+    "type": "concept",
+    "content": "dependency direction",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "architecture-review",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-abstraction-levels",
+    "type": "concept",
+    "content": "abstraction levels",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "architecture-review",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-implementation-matches-design",
+    "type": "concept",
+    "content": "whether the implementation actually matches the design that was approved",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "architecture-review",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-built-the-right-way",
+    "type": "concept",
+    "content": "is this built the right way?",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "architecture-review",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-challenging-the-approach",
+    "type": "practice",
+    "content": "challenges the approach itself",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "architecture-review",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-correct-implementation-of-wrong-structure",
+    "type": "concept",
+    "content": "A correct implementation of a wrong structure",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-quality-review--reviews-2",
+    "type": "workflow",
+    "content": "Quality review validates the implementation's correctness and craft: test coverage, edge-case handling, type-annotation completeness, and code clarity. It asks \"is this correct, not just working for the happy path?\"",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review",
+      "hygiene_original_id": "kc-raise-dev-workflow-quality-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-test-coverage",
+    "type": "concept",
+    "content": "test coverage",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-edge-case-handling",
+    "type": "concept",
+    "content": "edge-case handling",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-type-annotation-completeness",
+    "type": "concept",
+    "content": "type-annotation completeness",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-code-clarity",
+    "type": "concept",
+    "content": "code clarity",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-implementation-correctness",
+    "type": "concept",
+    "content": "implementation's correctness and craft",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-sound-structure",
+    "type": "concept",
+    "content": "Quality review assumes the structure is sound (architecture review's domain) and probes whether the details hold up.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "quality-review",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-architecture-review--reviews-3",
+    "type": "workflow",
+    "content": "architecture review's domain",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Quality Review",
+      "hygiene_original_id": "kc-raise-dev-workflow-architecture-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-adversarial-reviews--reviews",
+    "type": "concept",
+    "content": "Reviews are adversarial by design because a review that seeks to confirm finds little.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skepticism-default",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Why Adversarial",
+      "hygiene_original_id": "kc-raise-dev-workflow-adversarial-reviews"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skepticism-default",
+    "type": "principle",
+    "content": "A reviewer prompted to refute, to look for the failure mode, to default to skepticism, catches problems that a confirming review misses.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "adversarial-reviews",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Why Adversarial"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-jidoka-instinct",
+    "type": "concept",
+    "content": "The adversarial stance is the same Jidoka instinct applied to code: actively hunt the defect rather than wait for it to announce itself.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "adversarial-reviews",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Why Adversarial"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-architecture-review-and-quality-review-are-separate-pipeline-phases",
+    "type": "principle",
+    "content": "Architecture review and quality review are separate pipeline phases with separate templates, not a single combined pass. Separating them keeps each lens focused: structure first, then correctness. Collapsing them lets a reviewer satisfied on one axis wave through problems on the other.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Reviews Are Distinct Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-architecture-review--reviews-4",
+    "type": "practice",
+    "content": "Architecture review: structure, boundaries, design-match (\"built right?\")",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "category": "architecture",
+      "relationships": [
+        {
+          "target": "architecture-review-and-quality-review-are-separate-pipeline-phases",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Reviews Are Distinct Phases",
+      "hygiene_original_id": "kc-raise-dev-workflow-architecture-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-quality-review--reviews-3",
+    "type": "practice",
+    "content": "Quality review: coverage, edge cases, types, clarity (\"correct?\")",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "category": "quality",
+      "relationships": [
+        {
+          "target": "architecture-review-and-quality-review-are-separate-pipeline-phases",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Reviews Are Distinct Phases",
+      "hygiene_original_id": "kc-raise-dev-workflow-quality-review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-adversarial-stance",
+    "type": "principle",
+    "content": "Adversarial stance — reviewers refute, they do not confirm",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Reviews Are Distinct Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-distinct-phases-with-distinct-templates",
+    "type": "principle",
+    "content": "Distinct phases with distinct templates",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "architecture-review-and-quality-review-are-separate-pipeline-phases",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Reviews Are Distinct Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session",
+    "type": "concept",
+    "content": "A session is a bounded working period with an explicit start and an explicit close. Sessions are the atomic unit of human–AI collaboration in RaiSE. Every session loads context (governance, coaching, mission, current story), proposes a focus, does the work, and closes with a structured summary that persists decisions and learnings.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-opening-and-closing",
+    "type": "practice",
+    "content": "The discipline of opening and closing sessions makes work resumable and feeds the continuity system across days and across context compactions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-rai-session-start",
+    "type": "command",
+    "content": "Command to start a session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-opening-and-closing",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-rai-session-close",
+    "type": "command",
+    "content": "Command to close a session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-opening-and-closing",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-skills",
+    "type": "tool",
+    "content": "Skills used to open and close sessions, ensuring consistent context bundle and structured close.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "rai-session-start",
+          "type": "implements"
+        },
+        {
+          "target": "rai-session-close",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-start--sessions",
+    "type": "workflow",
+    "content": "Runs a deterministic sequence in one composite call: working-tree hygiene, base-branch drift check, database health, mission resolution, context bundle assembly, and MCP health.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "working-tree-hygiene",
+          "type": "precedes"
+        },
+        {
+          "target": "base-branch-drift-check",
+          "type": "precedes"
+        },
+        {
+          "target": "database-health",
+          "type": "precedes"
+        },
+        {
+          "target": "mission-resolution",
+          "type": "precedes"
+        },
+        {
+          "target": "context-bundle-assembly",
+          "type": "precedes"
+        },
+        {
+          "target": "mcp-health",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start",
+      "hygiene_original_id": "kc-raise-dev-workflow-session-start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-working-tree-hygiene",
+    "type": "practice",
+    "content": "Part of the Session start sequence.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-start",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-base-branch-drift-check",
+    "type": "practice",
+    "content": "Part of the Session start sequence.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-start",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-database-health",
+    "type": "practice",
+    "content": "Part of the Session start sequence.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-start",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-resolution",
+    "type": "practice",
+    "content": "Part of the Session start sequence.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-start",
+          "type": "implements"
+        },
+        {
+          "target": "mission-selection-surfacing",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-context-bundle-assembly",
+    "type": "practice",
+    "content": "Part of the Session start sequence.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-start",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mcp-health",
+    "type": "practice",
+    "content": "Part of the Session start sequence.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-start",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-selection-surfacing",
+    "type": "guardrail",
+    "content": "Mission selection is always surfaced to the developer unless the worktree is already bound to a mission — never silently auto-selected.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "user-experience",
+      "verification": "Observe new sessions to confirm mission selection is always presented.",
+      "relationships": [
+        {
+          "target": "mission-resolution",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-close--sessions",
+    "type": "workflow",
+    "content": "Session close produces a structured summary: what was done, decisions made, patterns discovered, and a next-session prompt. This summary is the bridge between sessions — the next session start consumes it.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-start",
+          "type": "precedes"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Close",
+      "hygiene_original_id": "kc-raise-dev-workflow-session-close"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-structured-summary",
+    "type": "concept",
+    "content": "A structured summary includes what was done, decisions made, patterns discovered, and a next-session prompt.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-close",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Close"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-loss-of-learnings-unclosed-session",
+    "type": "guardrail",
+    "content": "An unclosed session loses its learnings.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "session-management",
+      "relationships": [
+        {
+          "target": "session-close",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Close"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-start--sessions-2",
+    "type": "workflow",
+    "content": "The next session start consumes the structured summary produced by session close. This summary is the bridge between sessions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "structured-summary",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Close",
+      "hygiene_original_id": "kc-raise-dev-workflow-session-start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-journal--sessions",
+    "type": "tool",
+    "content": "The session journal records decisions, insights, and tasks as they happen. This is why decisions are logged to the journal rather than held only in the conversation — the conversation is volatile, the journal is durable.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "decisions",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Journal",
+      "hygiene_original_id": "kc-raise-dev-workflow-session-journal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-decisions",
+    "type": "concept",
+    "content": "Decisions made during a session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-journal",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Journal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-deliberate-practice",
+    "type": "practice",
+    "content": "Deliberate practice, a type of session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-types",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Types"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-delivery-work",
+    "type": "practice",
+    "content": "Delivery work, a type of session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-types",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Types"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-investigation",
+    "type": "practice",
+    "content": "Investigation, a type of session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-types",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Types"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-exploration",
+    "type": "practice",
+    "content": "Exploration, a type of session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-types",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Types"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-operations",
+    "type": "practice",
+    "content": "Operations, a type of session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "session-types",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Session Types"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-binding-to-mission",
+    "type": "concept",
+    "content": "A session binds to a mission (the teleological container — required) and optionally to a story (the tactical unit). The mission binding anchors the session in a larger objective; the story binding ties it to a specific deliverable.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "mission-resolution-consistency",
+          "type": "constrains"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Binding to Mission and Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-resolution-consistency--sessions",
+    "type": "guardrail",
+    "content": "Mission resolution must be consistent across all callers in the session flow, or bindings diverge.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Binding to Mission and Story",
+      "hygiene_original_id": "kc-raise-dev-workflow-mission-resolution-consistency"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-explicit-start-and-close",
+    "type": "practice",
+    "content": "Explicit start and close, both via session skills",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Binding to Mission and Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-loads-context-bundle",
+    "type": "practice",
+    "content": "Loads context bundle at start; produces structured summary at close",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Binding to Mission and Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-journal-survives-compaction",
+    "type": "concept",
+    "content": "Journal survives compaction — durable decision record",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Binding to Mission and Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-types--sessions",
+    "type": "concept",
+    "content": "Types: kata, feature, research, ideation, maintenance",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Binding to Mission and Story",
+      "hygiene_original_id": "kc-raise-dev-workflow-session-types"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-full-skill-cycle",
+    "type": "workflow",
+    "content": "RaiSE mandates the full skill cycle even for small stories. Skipping skills to \"save time\" trades a small, predictable cost for an unpredictable risk: a missing design step, an absent retrospective, a gap in the governance trail. The cycle exists because consistency at small scale is what makes consistency at large scale possible.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "The Full Skill Cycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-chain-read-prior-phase-output",
+    "type": "practice",
+    "content": "chain-read the prior phase's output",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "prime-protocol",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "PRIME Protocol"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-query-knowledge-graph-for-patterns",
+    "type": "practice",
+    "content": "query the knowledge graph for relevant patterns",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "prime-protocol",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "PRIME Protocol"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-surface-patterns-as-context",
+    "type": "practice",
+    "content": "surface them as context",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "prime-protocol",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "PRIME Protocol"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-emit-lifecycle-signal-for-observability",
+    "type": "practice",
+    "content": "emit a lifecycle signal for observability",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "prime-protocol",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "PRIME Protocol"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-grounded-execution",
+    "type": "concept",
+    "content": "ensure each skill execution starts grounded in what already exists rather than reinventing it",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "prime-protocol",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "PRIME Protocol"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-zero-query-results-valid-outcome",
+    "type": "concept",
+    "content": "Zero query results is a valid outcome, not a failure.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "query-knowledge-graph-for-patterns",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "PRIME Protocol"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skills-are-distributed-and-synced--skills",
+    "type": "concept",
+    "content": "Skills are managed under `.claude/skills/` as the canonical source and are synced to other agent surfaces. Editing a skill requires syncing the copies, or the distribution drift guard fails. The canonical source is always `.claude/skills/` — editing a generated copy gets clobbered on the next sync.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills Are Distributed and Synced",
+      "hygiene_original_id": "kc-raise-dev-workflow-skills-are-distributed-and-synced"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-claude-skills-directory",
+    "type": "concept",
+    "content": "The canonical source for all skills is located under the `.claude/skills/` directory.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skills-are-distributed-and-synced",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills Are Distributed and Synced"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-distribution-drift-guard",
+    "type": "guardrail",
+    "content": "A guardrail that fails if copies of skills are not synced with the canonical source.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skills-are-distributed-and-synced",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills Are Distributed and Synced"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skill",
+    "type": "concept",
+    "content": "A skill is *how to do* a task (procedure). They are invoked by name; each has defined purpose, steps, outputs, checklist and are bound to pipeline phases — running a phase executes its skill. Full cycle is mandatory even for small work. Canonical source `.claude/skills/`; edits must be synced to other surfaces.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills vs Cartridges"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-cartridge--skills",
+    "type": "concept",
+    "content": "A cartridge is *what to know* about a domain (knowledge). They are complementary: a skill may query a cartridge during its PRIME step, but they are different kinds of artifact with different lifecycles.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skill",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills vs Cartridges",
+      "hygiene_original_id": "kc-raise-dev-workflow-cartridge"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skill-cartridge-complementarity",
+    "type": "concept",
+    "content": "A skill may query a cartridge during its PRIME step, but they are different kinds of artifact with different lifecycles.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skill",
+          "type": "refines"
+        },
+        {
+          "target": "cartridge",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills vs Cartridges"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skill-lifecycle",
+    "type": "concept",
+    "content": "Full cycle is mandatory even for small work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "skill",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills vs Cartridges"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skill-source-control",
+    "type": "guardrail",
+    "content": "Canonical source `.claude/skills/`; edits must be synced to other surfaces",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "category": "source-control",
+      "relationships": [
+        {
+          "target": "skill",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Skills vs Cartridges"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-test-driven-development",
+    "type": "practice",
+    "content": "Test-Driven Development is mandatory in RaiSE, with no exceptions. The discipline is non-negotiable because tests are the specification of behavior, not a verification afterthought added once code exists. Writing the test first forces the interface and the expected outcome to be decided before implementation details cloud the picture. If behavior is not covered by a test, it is not specified.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "aliases": [
+        "TDD",
+        "red-green-refactor",
+        "test-first development"
+      ],
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": ""
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-write-a-failing-test",
+    "type": "practice",
+    "content": "Before any production code, write a failing test that defines the expected behavior.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "production-code-exists",
+          "type": "precedes"
+        },
+        {
+          "target": "test-must-fail-for-right-reason",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "RED — Write the Failing Test First"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-test-must-fail-for-right-reason",
+    "type": "principle",
+    "content": "The test must fail for the right reason — a missing implementation, not a syntax error or a typo.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "write-a-failing-test",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "RED — Write the Failing Test First"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-production-code-exists",
+    "type": "guardrail",
+    "content": "No production code exists without a failing test that demands it.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "write-a-failing-test",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "RED — Write the Failing Test First"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-write-minimal-code-to-pass",
+    "type": "practice",
+    "content": "Once a failing test exists, write the minimal code required to make it pass. No extra logic, no speculative future-proofing, no refactoring yet. The single goal of this phase is a passing test — nothing more.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "failing-test-exists",
+          "type": "depends_on"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "GREEN — Write Minimal Code to Pass"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-failing-test-exists",
+    "type": "state",
+    "content": "A failing test exists.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "GREEN — Write Minimal Code to Pass"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-refactor-to-improve-clarity",
+    "type": "practice",
+    "content": "Refactor to improve clarity, remove duplication, and apply clean-code principles.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "REFACTOR — Clean Up Without Breaking Tests"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tests-stay-green-throughout-refactoring",
+    "type": "principle",
+    "content": "Tests stay green throughout.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "refactor-to-improve-clarity",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "REFACTOR — Clean Up Without Breaking Tests"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-refactoring-changes-structure-never-observable-behavior",
+    "type": "principle",
+    "content": "Refactoring changes structure, never observable behavior.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "refactor-to-improve-clarity",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "REFACTOR — Clean Up Without Breaking Tests"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-if-refactor-breaks-a-test-the-refactor-was-wrong-not-the-test",
+    "type": "guardrail",
+    "content": "If a refactor breaks a test, the refactor was wrong, not the test.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "tests-stay-green-throughout-refactoring",
+          "type": "refines"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "REFACTOR — Clean Up Without Breaking Tests"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-test-suite-is-executable-specification",
+    "type": "concept",
+    "content": "The test suite is the executable specification of the system. This reframes testing from 'checking that code works' to 'defining what the code must do.'",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Tests Are Specification"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tests-are-written-first",
+    "type": "practice",
+    "content": "Tests are written first: the specification precedes the implementation, not the other way around.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "test-suite-is-executable-specification",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "Tests Are Specification"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tdd-governs-delivery-work",
+    "type": "principle",
+    "content": "TDD governs delivery work — code that produces observable value.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "tdd-cycle",
+          "type": "implements"
+        },
+        {
+          "target": "tests-are-specification",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "TDD Applies to Delivery Work"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tdd-cycle",
+    "type": "workflow",
+    "content": "RED (failing test) → GREEN (minimal pass) → REFACTOR (clean, stay green)",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "tdd-governs-delivery-work",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "TDD Applies to Delivery Work"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tests-are-specification--tdd",
+    "type": "concept",
+    "content": "Tests are the specification, written before implementation.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "relationships": [
+        {
+          "target": "tdd-governs-delivery-work",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "TDD Applies to Delivery Work",
+      "hygiene_original_id": "kc-raise-dev-workflow-tests-are-specification"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-apply-tdd-only-to-delivery-code",
+    "type": "guardrail",
+    "content": "Mandatory for all delivery code, no exceptions. Does not apply to non-delivery management tasks.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.255412+00:00",
+    "updated_at": null,
+    "metadata": {
+      "level": "MUST",
+      "relationships": [
+        {
+          "target": "tdd-governs-delivery-work",
+          "type": "implements"
+        }
+      ],
+      "cartridge": "raise-dev-workflow",
+      "source_heading": "TDD Applies to Delivery Work"
+    }
+  }
+]

@@ -1,0 +1,64 @@
+name: bugfix
+description: "Default bugfix — 5 fases via Agent() dispatch, contexto fresco por fase (ADR-134 v2)"
+issue_types:
+  - bug
+  - bugfix
+
+execution:
+  worktree_isolation: false  # Agent() provee aislamiento de contexto
+
+# Default edition: diagnose → fix → verify → review → pir → close (6 fases)
+# Enterprise eliminadas: triage, analyse, plan, architecture-review (4)
+# Skills: default residues de rai-bugfix-{start,fix,close} + enterprise rai-quality-review (Opción A)
+# Referencia: work/epics/e14770-lean-methodology/skill-audit.md + ADR-134 v2
+phases:
+  - id: diagnose
+    type: llm
+    skill: rai-bugfix-start
+    # Default residue de rai-bugfix-start: tree check + branch + reproduce + scope + commit (11 pasos vs 25)
+
+  - id: fix
+    type: llm
+    skill: rai-bugfix-fix
+    # Default residue de rai-bugfix-fix: TDD loop + gates + quality-review (11 pasos vs 19, sin HITL per-task)
+    validates:
+      - patterns:
+          - "tests/**/*.py"
+          - "packages/*/tests/**/*.py"
+        description: "Al menos un test file presente (regression test)"
+
+  - id: verify
+    type: llm
+    skill: rai-quality-review
+    # Opción A (32% ceremonia — texto pasivo): el orquestador inyecta prompt directivo
+    # "emite solo verdict + findings críticos, omite output format verbose"
+
+  - id: review
+    type: llm
+    skill: rai-bugfix-review
+    validates:
+      - pattern: "work/bugs/{issue_id}/retro.md"
+        description: "Bug retrospective (produced by review)"
+    # Owns the P1/P2/P3 AR checklist and writes gate-ar-bugfix's attestation.
+    # It follows quality-review; neither review nor close replaces that audit.
+
+  - id: pir
+    type: llm
+    skill: rai-bugfix-pir
+    when: "route != 'xs'"
+    validates:
+      - pattern: "work/bugs/{issue_id}/pir.md"
+        description: "PIR learning narrative"
+
+  - id: close
+    type: llm
+    skill: rai-bugfix-close
+    # Default residue de rai-bugfix-close: sin Pipeline Context Check HITL, acepta run_id (12 pasos vs 26)
+    workflow_point: "before:bug:close"
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/bugs/{issue_id}/scope.md"
+        description: "Scope artifact (producido por diagnose)"
+      - pattern: "work/bugs/{issue_id}/retro.md"
+        description: "Bug retrospective (produced by review)"
