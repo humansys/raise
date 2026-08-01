@@ -1,0 +1,35 @@
+name: epic-design-pdcv
+description: Pre-Design Capability Verification sub-pipeline — gemba walk + evidence + design + adversarial review
+
+phases:
+  - id: discovery
+    type: deterministic
+    commands:
+      - "rai graph build"
+
+  - id: evidence
+    type: llm
+    skill: rai-epic-predesign-evidence
+    model: sonnet
+    max_budget_usd: 2.0
+
+  - id: architecture
+    type: llm
+    skill: rai-epic-design
+    model: opus
+    max_budget_usd: 5.0
+
+  - id: adversarial
+    type: llm
+    skill: rai-adversarial-review
+    model: fable
+    max_budget_usd: 3.0
+
+  - id: write-design
+    type: llm
+    skill: rai-epic-design
+    model: opus
+    max_budget_usd: 5.0
+    validates:
+      - pattern: "work/epics/**/design.md"
+      - pattern: "work/epics/**/evidence/predesign.json"

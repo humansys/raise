@@ -1,0 +1,27 @@
+name: epic
+description: "Default epic — PDCV design sub-pipeline + story fan-out (ADR-134 v2)"
+issue_types:
+  - epic
+
+phases:
+  - id: start
+    type: llm
+    skill: rai-epic-start
+
+  - id: design
+    type: llm
+    pipeline: epic-design-pdcv
+
+  - id: stories
+    type: llm
+    pipeline: story
+    foreach: stories
+
+  - id: close
+    type: llm
+    skill: rai-epic-close
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/epics/**/scope.md"

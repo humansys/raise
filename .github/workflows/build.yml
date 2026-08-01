@@ -1,0 +1,119 @@
+name: Build binaries
+
+# Builds the standalone rai + rai-mcp-pipeline binaries (RAISE-15629 specs)
+# for linux-x86_64, darwin-arm64 and windows-x86_64, and publishes them as
+# assets on the GitHub Release for the pushed tag (RAISE-15664 — replaces
+# the GitLab-only build:binary:*/publish:binary:*/release:binaries jobs and
+# the Cloudflare R2 facade from S9).
+#
+# Apple Silicon only: GitHub Actions' macos-latest already resolves to
+# arm64 (macos-14) — Intel/darwin-x86_64 is explicitly out of scope
+# (decision 2026-07-30), so there is no separate macos-13 job here.
+#
+# Reuses the platform scripts as-is (scripts/build-binary-local.sh/.ps1,
+# scripts/package-binary-archive.sh, scripts/build-version-manifest.py) —
+# none of them are GitLab-specific.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Build binaries
+        run: bash scripts/build-binary-local.sh
+      - name: Package rai
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai packages/raise-cli/dist/rai-linux-x86_64 linux
+      - name: Package rai-mcp-pipeline
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai-mcp-pipeline packages/raise-cli/dist/rai-mcp-pipeline-linux-x86_64 linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-binaries
+          path: |
+            packages/raise-cli/dist/rai-linux-x86_64.tar.gz
+            packages/raise-cli/dist/rai-linux-x86_64.tar.gz.sha256
+            packages/raise-cli/dist/rai-mcp-pipeline-linux-x86_64.tar.gz
+            packages/raise-cli/dist/rai-mcp-pipeline-linux-x86_64.tar.gz.sha256
+
+  build-macos-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Build binaries
+        run: bash scripts/build-binary-local.sh
+      - name: Package rai
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai packages/raise-cli/dist/rai-darwin-arm64 darwin
+      - name: Package rai-mcp-pipeline
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai-mcp-pipeline packages/raise-cli/dist/rai-mcp-pipeline-darwin-arm64 darwin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64-binaries
+          path: |
+            packages/raise-cli/dist/rai-darwin-arm64.tar.gz
+            packages/raise-cli/dist/rai-darwin-arm64.tar.gz.sha256
+            packages/raise-cli/dist/rai-mcp-pipeline-darwin-arm64.tar.gz
+            packages/raise-cli/dist/rai-mcp-pipeline-darwin-arm64.tar.gz.sha256
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Build binaries
+        run: pwsh -File scripts/build-binary-local.ps1
+      # Windows packaging is inline pwsh (not package-binary-archive.sh, which
+      # only covers linux/darwin tar.gz) — mirrors .gitlab-ci.yml's
+      # build:binary:windows-x86_64 job (RAISE-15631).
+      - name: Package binaries
+        shell: pwsh
+        run: |
+          Compress-Archive -Path packages/raise-cli/dist/rai/* -DestinationPath packages/raise-cli/dist/rai-windows-x86_64.zip
+          Compress-Archive -Path packages/raise-cli/dist/rai-mcp-pipeline/* -DestinationPath packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip
+          "$((Get-FileHash packages/raise-cli/dist/rai-windows-x86_64.zip -Algorithm SHA256).Hash.ToLower())  rai-windows-x86_64.zip" | Out-File -Encoding ascii packages/raise-cli/dist/rai-windows-x86_64.zip.sha256
+          "$((Get-FileHash packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip -Algorithm SHA256).Hash.ToLower())  rai-mcp-pipeline-windows-x86_64.zip" | Out-File -Encoding ascii packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-binaries
+          path: |
+            packages/raise-cli/dist/rai-windows-x86_64.zip
+            packages/raise-cli/dist/rai-windows-x86_64.zip.sha256
+            packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip
+            packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip.sha256
+
+  release:
+    needs: [build-linux, build-macos-arm64, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "*-binaries"
+          path: dist
+          merge-multiple: true
+      - name: Generate version.json
+        run: >
+          python3 scripts/build-version-manifest.py
+          --version ${{ github.ref_name }}
+          --base-url https://github.com/humansys/raise/releases/download/${{ github.ref_name }}
+          --dist-dir dist
+          --output dist/version.json
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
+            dist/*.zip
+            dist/*.zip.sha256
+            dist/version.json
+            scripts/install.sh
+            scripts/install.ps1
