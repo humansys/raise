@@ -28,7 +28,7 @@ torch = { index = "pytorch-cpu" }
 [dependency-groups]
 dev = [
     "raise-cli[gdrive,observability,inference]",
-    "openai>=2.0",
+    "openai>=2.50.0",
     "raise-core",
     "pytest>=8.0.0",
     "pytest-asyncio>=0.25.2",
