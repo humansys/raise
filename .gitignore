@@ -1,0 +1,284 @@
+# Node.js
+node_modules/
+
+# IDE / editor directories
+.specstory/
+.cursor/
+.idea/
+.vscode/
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+.claude/worktrees/
+.claude/projects/
+
+# Hermes Agent worktrees (auto-created by hermes -w)
+.worktrees/
+
+# RaiSE worktrees (auto-created by rai-worktree-open — never commit as gitlink)
+.rai-worktrees/
+.worktree/
+
+# Codex/Agents experimental tooling (local only)
+.agents/
+# .codex/ and .codex-plugin/ are tracked — static hook scripts propagate via git
+# Only config.toml is machine-specific (absolute path to rai-mcp-pipeline resolved at init)
+.codex/config.toml
+
+# Hermes MCP config (auto-generated per worktree by rai worktree register
+# --provision — bakes in this worktree's absolute .venv-mcp path, so it can
+# never be shared across worktrees without producing a spurious diff)
+.hermes/config.yaml
+
+# Kimi Code MCP config (auto-generated per checkout by rai init --agent kimi
+# — bakes in this checkout's absolute project path, so it is per-checkout
+# like .mcp.json and .codex/config.toml; not committable) [S15457.3 D5/AC8]
+.kimi-code/mcp.json
+
+# Claude Code legacy files (superseded, prevent re-addition)
+.claude/RAI.md
+.claude/RAI-naming.md
+.claude/rai.archive/
+
+# Daemon config (contains secrets — template committed as .example)
+daemon-team.yaml
+daemon.yaml
+.env.fly
+
+# Conformance analysis data (SQLite, runtime-generated)
+dev/data/*.db
+
+# RaiSE generated/cache files
+.raise/cache/
+.raise/confluence-pages.yaml
+.raise/backlog/
+# .raise/artifacts/ — tracked (story-design YAMLs are versioned artifacts)
+
+# Reliability cadence data (runtime-generated, append-only — pushed to reliability-data branch)
+# These files are committed exclusively to the reliability-data branch via _push_to_data_branch.
+# Gitignore prevents accidental commits to story/main branches.
+.raise/reliability/
+
+# Drift detection pipeline outputs (computed, machine-specific paths, high churn)
+.raise/drift/
+packages/*/.raise/drift/
+packages/*/.raise/pending_sync.json
+packages/*/.raise/rai/personal/sessions/
+packages/*/.raise/rai/personal/telemetry/
+packages/*/.raise/rai/personal/calibration.jsonl
+packages/*/.raise/rai/personal/patterns.jsonl
+packages/*/.raise/rai/personal/active-session
+packages/*/.raise/rai/sessions/
+packages/*/.raise/rai/personal/last-build.json
+
+# Pipeline state (environment-specific, PAT-E-594)
+.rai-state/
+
+# RaiSE adapter configs (declarative, PII-free — identity in env vars)
+# .raise/jira.yaml and .raise/confluence.yaml are tracked (shared config)
+.raise/adapters/*.yaml
+!.raise/adapters/*.yaml.example
+
+# Dossier output (generated, not committed)
+dev/output/
+
+# RaiSE graph index — SQLite is canonical after S22.3; index.json excluded via .raise/.gitignore
+# Rebuild with: rai graph build
+
+# RaiSE personal directory (per-developer, not shared)
+# Note: .raise/rai/personal/memory/ is tracked (S9476.1 CC Memory git sync)
+.raise/rai/personal/sessions/
+.raise/rai/personal/telemetry/
+.raise/rai/personal/calibration.jsonl
+.raise/rai/personal/patterns.jsonl
+.raise/rai/personal/active-session
+
+# RaiSE sync state (per-instance JIRA mappings, not shared)
+.raise/rai/sync/
+
+# RaiSE global SQLite DB (per-machine, not shared)
+.raise/rai/raise.db
+.raise/raise.db
+
+# RaiSE mission migration artifacts
+.raise/rai/missions/*.migrated
+
+# RaiSE sync ephemeral artifacts (backups, dead-letter, migrations, pending ops)
+.raise/sync/backlog-ledger.yaml
+.raise/sync/backlog-ledger.yaml.backup.*
+.raise/sync/backlog-dead-letter.jsonl
+.raise/sync/docs-dead-letter.jsonl
+.raise/sync/backlog-ledger.yaml.migrated
+packages/*/.raise/sync/*-pending-ops.jsonl
+
+# Per-session env context written by Rai skills, read by CC hooks + MCP tool
+# Namespaced by CC session_id (RAISE-1982) — isolates concurrent CC sessions.
+.raise/rai/sessions/
+
+# Temporary files
+req.txt
+*.tmp
+*.bak-*
+*.log
+*.pid
+.DS_Store
+Thumbs.db
+
+# Script generated folders (if testing locally)
+.specify-raise/commands/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+/lib/
+/lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+.venv.dev/
+.venv-mcp/
+venv/
+ENV/
+env/
+
+# Testing
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+.rai/memory/graph.json
+.envrc
+
+# Legacy telemetry (should be in personal/, will migrate)
+.raise/rai/telemetry/
+
+# Push tracking markers (per-environment, not shared)
+.raise/rai/learnings/**/.pushed
+
+# MCP server config (contains API tokens)
+.mcp.json
+
+# Secrets & credentials
+.env
+.env.*
+!.env.example
+!.env.production
+*.pem
+*.key
+.pypirc
+credentials.json
+*.sqlite
+.netrc
+.raise/mcp/
+!.raise/mcp/catalog.yaml
+
+# MkDocs build output
+_site/
+.docs-build/
+
+# Security scan outputs (contain findings — not committed)
+work/reports/gl-secret-detection-report*
+
+# Customer and GTM transcripts are owned by raise-gtm/content/sources.
+work/transcripts/
+
+# Issue analysis artifacts (PDFs, images — binary, no git value)
+dev/issues/**/*.pdf
+dev/issues/**/*.png
+dev/issues/**/*.jpg
+dev/issues/**/*.txt
+dev/transcripts/
+
+# Prevent symlink artifacts from being tracked at root
+/es/
+
+# Ephemeral debug artifacts (Playwright MCP snapshots, root-level screenshots)
+.playwright-mcp/
+.claude/scheduled_tasks.lock
+/issue-*.png
+/panel-*.png
+/s7-*.png
+/app-actions-menu.yml
+/issue-layout.yml
+/layout-editor.yml
+/menu-open.yml
+/raise-*.yml
+
+# Per-developer docker compose override (e.g., expose postgres:5432 for e2e).
+# See dev/sops/raise-server-local.md § Running e2e tests locally.
+/docker-compose.override.yaml
+/docker-compose.override.yml
+.worktrees/
+.venv
+.venv
+work/debug/
+
+# Playwright E2E auth state (contains session cookies)
+# Wildcard: any package's .raise/dev/ is per-session Vite/dev-server runtime state (RAISE-11105)
+packages/*/.raise/dev/
+packages/raise-admin/e2e/.auth/
+# Playwright test results
+packages/raise-admin/test-results/
+packages/raise-admin/playwright-report/
+# Vite dev cache (generado por npm run dev, por máquina)
+packages/raise-admin/.vite/
+
+# Forge raise-jira app — generated files
+forge/raise-jira/static/raise-app/package-lock.json
+forge/raise-jira/static/raise-app/pnpm-workspace.yaml
+# Wildcard: any package's .raise/sync dead-letter / .raise/backlog cache (RAISE-11105)
+packages/*/.raise/sync/*-dead-letter.jsonl
+packages/*/.raise/backlog/
+packages/raise-cli/models/
+# ONNX model dir staging (server-int8 variant, ADR-139 C5, RAISE-15924) —
+# ~266 MB, never commit. README.md sentinel stays tracked so the Dockerfile
+# COPY of this directory can never fail on a fresh clone.
+infra/raise-server/onnx-model/*
+!infra/raise-server/onnx-model/README.md
+package-lock.json
+.raise/rai/*.db.backup-*
+*.npy
+
+# Generated per-worktree dev stack (rai dev up — compose.py); never commit
+docker-compose.dev.yml
+.hermes/config.yaml
+
+# Distillation verdicts — developer-specific GT data (RAISE-15398)
+.raise/distillation/verdicts/
+
+# Cloudflare Workers/Pages local secrets — never commit (RAISE-15651)
+# These patterns previously lived only in site/.gitignore; hoisted to the root
+# so removing a subdirectory can never silently unprotect a secrets file.
+.dev.vars
+.dev.vars.*
+.env.production
+.astro/
+.scannerwork/

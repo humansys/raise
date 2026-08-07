@@ -1,0 +1,12 @@
+name: management-ontology
+display_name: RaiSE Management Ontology
+version: 2.0.0
+description: 'Default work management ontology for RaiSE projects. Defines work types,
+  lifecycle phases, status semantics, transition rules, and query vocabulary. Extractable
+  corpus.
+
+  '
+source:
+  type: derived
+  authority: local
+  refresh: manual

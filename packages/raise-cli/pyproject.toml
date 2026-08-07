@@ -1,0 +1,202 @@
+[project]
+name = "raise-cli"
+version = "3.1.0rc3"
+description = "RaiSE CLI - Reliable AI Software Engineering governance framework"
+authors = [
+    {name = "Emilio Osorio", email = "emilio@humansys.ai"}
+]
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.12"
+keywords = ["ai", "governance", "cli", "software-engineering", "methodology"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+dependencies = [
+    "raise-core==3.1.0rc3",
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+    "packaging>=24.0",
+    "networkx>=3.6.1",
+    "tree-sitter>=0.25.2",
+    "tree-sitter-typescript>=0.23.2",
+    "tree-sitter-javascript>=0.25.0",
+    "tree-sitter-php>=0.24.1",
+    "tree-sitter-svelte>=1.0.2",
+    "tree-sitter-language-pack>=0.13.0",
+    "numpy>=1.26.0",
+    "logfire-api>=4.0",
+    "httpx>=0.27.0,<1.0",
+    "mcp>=1.26,<2",
+    "markdown>=3.6",
+    "atlassian-python-api>=3.41.0",
+    "qrcode>=8.2",
+    "onnxruntime>=1.18.0",
+    "tokenizers>=0.19",
+]
+
+[project.optional-dependencies]
+gdrive = [
+    "google-auth>=2.0",
+    "google-auth-oauthlib>=1.0",
+]
+observability = [
+    "logfire>=4.0",
+    "opentelemetry-api>=1.20",
+    "opentelemetry-sdk>=1.20",
+]
+csharp = [
+    "tree-sitter-c-sharp>=0.23.1",
+]
+java = [
+    "tree-sitter-java>=0.23.5",
+]
+go = [
+    "tree-sitter-go>=0.25.0",
+]
+eval = [
+    "ranx>=0.3.20,<0.4",
+    "scipy>=1.10",
+]
+inference = [
+    "anthropic>=0.89.0",
+]
+# Backwards-compat aliases — atlassian-python-api is now installed by default (RAISE-1912).
+atlassian = []
+confluence = []
+jira = []
+
+[project.urls]
+Homepage = "https://raiseframework.ai"
+Documentation = "https://docs.raiseframework.ai"
+Repository = "https://github.com/humansys/raise"
+Changelog = "https://github.com/humansys/raise/blob/main/CHANGELOG.md"
+
+[project.scripts]
+rai = "raise_cli.cli.main:app"
+rai-mcp-pipeline = "raise_cli.pipeline.mcp_server:main"
+
+[project.entry-points."rai.hooks"]
+telemetry = "raise_cli.hooks.builtin.telemetry:TelemetryHook"
+gate-bridge = "raise_cli.hooks.builtin.gate_bridge:GateBridgeHook"
+graph-auto-update = "raise_cli.hooks.builtin.graph_update:GraphAutoUpdateHook"
+pipeline-events = "raise_cli.hooks.builtin.pipeline_events:PipelineEventHook"
+# distillation hook disabled (E15376) — manual skill rai-session-distill replaces it
+# while classifier quality (F1 ~0.18) is below production threshold
+
+[project.entry-points."rai.gates"]
+tests = "raise_cli.gates.builtin.tests:TestGate"
+types = "raise_cli.gates.builtin.types:TypeGate"
+types-tests-advisory = "raise_cli.gates.builtin.types_tests_advisory:TypeGateTestsAdvisory"
+lint = "raise_cli.gates.builtin.lint:LintGate"
+coverage = "raise_cli.gates.builtin.coverage:CoverageGate"
+format = "raise_cli.gates.builtin.format:FormatGate"
+suppression-ratchet = "raise_cli.gates.builtin.suppression_ratchet:SuppressionRatchetGate"
+graph-applies-to-rc1 = "raise_cli.gates.builtin.graph_applies_to:GraphAppliesToGate"
+generated-artifact-hygiene = "raise_cli.gates.repository_hygiene:GeneratedArtifactHygieneGate"
+drift-post-refactor-orphan = "raise_cli.gates.drift.post_refactor_orphan:PostRefactorOrphanGate"
+drift-dead-public-api = "raise_cli.gates.drift.dead_public_api:DeadPublicApiGate"
+drift-linter-suppression = "raise_cli.gates.drift.linter_suppression:LinterSuppressionGate"
+capability-overlap = "raise_cli.gates.capability.capability_overlap:CapabilityOverlapGate"
+ar-story = "raise_cli.gates.ar.story_gate:ArchitectureReviewGate"
+ar-bugfix = "raise_cli.gates.ar.bugfix_gate:BugfixArchitectureReviewGate"
+alembic-single-head = "raise_cli.gates.alembic.single_head_gate:AlembicSingleHeadGate"
+epic-close-drift = "raise_cli.gates.drift.epic_close:EpicCloseGate"
+retrieval = "raise_cli.eval.gate:EvalGate"
+eval-federated = "raise_cli.eval.gate:FederatedEvalGate"
+memory-recall = "raise_cli.eval.memory_recall:MemoryRecallGate"
+gate-sync = "raise_cli.gates.sync:SyncGate"
+docs-sync = "raise_cli.gates.docs_sync:DocsSyncGate"
+docs-architecture-fresh = "raise_cli.gates.docs_architecture:ArchitectureDocsFreshGate"
+budget = "raise_cli.gates.budget.budget_gate:BudgetCapGate"
+backlog-sync = "raise_cli.gates.governance.backlog_sync_gate:BacklogSyncGate"
+epic-backlog-sync = "raise_cli.gates.governance.backlog_sync_gate:EpicBacklogSyncGate"
+governance-artifacts = "raise_cli.gates.governance.artifacts_gate:GovernanceArtifactsGate"
+close-jira-sync = "raise_cli.gates.governance.close_sync_gate:CloseSyncVerificationGate"
+strategic-fit = "raise_cli.gates.governance.strategic_fit_gate:StrategicFitGate"
+child-epics-complete = "raise_cli.gates.governance.child_epics_complete_gate:ChildEpicsCompleteGate"
+pm-jtbd = "raise_cli.gates.pm.jtbd_gate:JTBDGate"
+pm-icp = "raise_cli.gates.pm.icp_gate:ICPGate"
+pm-discovery = "raise_cli.gates.pm.discovery_gate:DiscoveryGroundingGate"
+pm-ownership = "raise_cli.gates.pm.ownership_gate:PMOwnershipGate"
+ff-s1-spi-conformance = "raise_cli.gates.slice1.spi_conformance:SPIConformanceGate"
+ff-s2-api-schema-lock = "raise_cli.gates.slice1.api_schema_lock:APISchemaLockGate"
+ff-s4-cage-profile-lint = "raise_cli.gates.slice1.cage_profile_lint:CageProfileLintGate"
+ff-s7-auth-invariant = "raise_cli.gates.slice1.auth_invariant:AuthInvariantGate"
+ff-3-protocol-parity = "raise_cli.gates.slice1.protocol_parity:ProtocolParityGate"
+ff-2-cwd-topology = "raise_cli.gates.slice1.cwd_topology:CWDTopologyGate"
+pipeline-coverage = "raise_cli.gates.governance.pipeline_coverage_gate:PipelineCoverageGate"
+gate-workflow-transition-ownership = "raise_cli.gates.governance.workflow_transition_ownership_gate:WorkflowTransitionOwnershipGate"
+before-ready = "raise_cli.gates.governance.before_ready_gate:BeforeReadyGate"
+skill-cli-refint = "raise_cli.gates.governance.skill_cli_refint_gate:SkillCliReferentialIntegrityGate"
+governance-trail-ci = "raise_cli.gates.governance.governance_trail_ci_gate:GovernanceTrailCiGate"
+
+[project.entry-points."rai.doctor.checks"]
+environment = "raise_cli.doctor.checks.environment:EnvironmentCheck"
+project = "raise_cli.doctor.checks.project:ProjectCheck"
+developer = "raise_cli.doctor.checks.developer:DeveloperCheck"
+adapters = "raise_cli.doctor.checks.adapters:AdapterDoctorCheck"
+runtimes = "raise_cli.doctor.checks.runtimes:RuntimesCheck"
+skills = "raise_cli.doctor.checks.skills:SkillCommandReferenceCheck"
+local-db = "raise_cli.doctor.checks.local_db:LocalDbCheck"
+acli = "raise_cli.doctor.checks.acli:AcliCheck"
+server-connectivity = "raise_cli.doctor.checks.onboarding:ServerConnectivityCheck"
+graph-state = "raise_cli.doctor.checks.onboarding:GraphStateCheck"
+cartridge-sync = "raise_cli.doctor.checks.onboarding:CartridgeSyncCheck"
+workspace = "raise_cli.doctor.checks.workspace_readiness:WorkspaceReadinessCheck"
+pipeline-coverage = "raise_cli.doctor.checks.pipeline_coverage:PipelineCoverageCheck"
+stash-hygiene = "raise_cli.doctor.checks.stash_hygiene:StashHygieneCheck"
+
+[project.entry-points."rai.adapters.pm"]
+filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"
+jira = "raise_cli.adapters.jira_adapter:PythonApiJiraAdapter"
+
+[project.entry-points."rai.docs.targets"]
+filesystem = "raise_cli.adapters.filesystem_docs:FilesystemDocsTarget"
+confluence = "raise_cli.adapters.confluence_adapter:PythonApiConfluenceAdapter"
+gdrive = "raise_cli.adapters.google_drive_adapter:GoogleDriveAdapter"
+
+[project.entry-points."rai.adapters.scm"]
+raise-server = "raise_cli.adapters.scm_adapter:RaiseServerScmAdapter"
+
+[project.entry-points."rai.graph.backends"]
+local = "raise_core.graph.backends.filesystem:FilesystemGraphBackend"
+
+[project.entry-points."rai.session.state_deriver"]
+git = "raise_cli.session.derive:GitStateDeriver"
+
+[project.entry-points."rai.session.registry"]
+local = "raise_cli.session.registry:LocalSessionRegistry"
+
+[project.entry-points."rai.session.monitor"]
+local = "raise_cli.session.monitor:LocalWorkstreamMonitor"
+
+[tool.uv.sources]
+raise-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raise_cli"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/raise_cli/",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
