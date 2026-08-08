@@ -50,7 +50,7 @@ dev = [
     "tree-sitter-java>=0.23.5",
     "paramiko>=5.0.0",
     "cairosvg>=2.9.0",
-    "pillow>=12.2.0",
+    "pillow>=12.3.0",
 ]
 
 [tool.ruff]
