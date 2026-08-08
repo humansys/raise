@@ -31,7 +31,7 @@ jobs:
         with:
           python-version: "3.13"
       - name: Cache HuggingFace model weights
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/huggingface
           key: hf-multilingual-e5-base-onnx-v1
@@ -66,7 +66,7 @@ jobs:
         with:
           python-version: "3.13"
       - name: Cache HuggingFace model weights
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/Library/Caches/huggingface
           key: hf-multilingual-e5-base-onnx-v1
@@ -101,7 +101,7 @@ jobs:
         with:
           python-version: "3.13"
       - name: Cache HuggingFace model weights
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~\AppData\Local\huggingface
           key: hf-multilingual-e5-base-onnx-v1
