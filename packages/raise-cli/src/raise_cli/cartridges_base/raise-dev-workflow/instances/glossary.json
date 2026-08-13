@@ -1,0 +1,168 @@
+[
+  {
+    "id": "kc-raise-dev-workflow-tdd--glossary",
+    "type": "term",
+    "content": "Test-Driven Development — write failing test first (RED), then minimal code (GREEN), then refactor. Mandatory in RaiSE with no exceptions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "tdd",
+      "name": "TDD",
+      "description": "Test-Driven Development — write failing test first (RED), then minimal code (GREEN), then refactor. Mandatory in RaiSE with no exceptions.",
+      "hygiene_original_id": "kc-raise-dev-workflow-tdd"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl",
+    "type": "term",
+    "content": "Human-In-The-Loop — mandatory pause for human review at design and implement pipeline gates. AI agents must not self-approve HITL gates.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "hitl",
+      "name": "HITL",
+      "description": "Human-In-The-Loop — mandatory pause for human review at design and implement pipeline gates. AI agents must not self-approve HITL gates."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gate",
+    "type": "term",
+    "content": "Automated quality checkpoint that must pass before proceeding. Includes tests (scoped), lint, format, and types. Run exclusively via `rai gate check`.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "gate",
+      "name": "Gate",
+      "description": "Automated quality checkpoint that must pass before proceeding. Includes tests (scoped), lint, format, and types. Run exclusively via `rai gate check`."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-cartridge",
+    "type": "term",
+    "content": "Distributable unit of domain knowledge containing schema, corpus, extractors, and instances. Installed per-project under .raise/cartridges/.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "cartridge",
+      "name": "Cartridge",
+      "description": "Distributable unit of domain knowledge containing schema, corpus, extractors, and instances. Installed per-project under .raise/cartridges/."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story",
+    "type": "term",
+    "content": "A unit of work in the RaiSE backlog representing one deployable increment. Stories follow the full pipeline (start → design → plan → implement → review → close) and branch from the development branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "story",
+      "name": "Story",
+      "description": "A unit of work in the RaiSE backlog representing one deployable increment. Stories follow the full pipeline (start → design → plan → implement → review → close) and branch from the development branch."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic",
+    "type": "term",
+    "content": "A logical container grouping related stories toward a shared objective. Epics are not branches — they are directories under work/epics/ and tracker entries. Stories within an epic branch from the development branch, not from an epic branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "epic",
+      "name": "Epic",
+      "description": "A logical container grouping related stories toward a shared objective. Epics are not branches — they are directories under work/epics/ and tracker entries. Stories within an epic branch from the development branch, not from an epic branch."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-worktree",
+    "type": "term",
+    "content": "An isolated git checkout under .worktree/ bound to a mission. One worktree per mission, reused across epics and stories until the mission objectives are met.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "worktree",
+      "name": "Worktree",
+      "description": "An isolated git checkout under .worktree/ bound to a mission. One worktree per mission, reused across epics and stories until the mission objectives are met."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mr",
+    "type": "term",
+    "content": "Merge Request — the mechanism for integrating a story branch into the development branch. Created exclusively via `/rai-mr-create` after the full gate suite passes.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "mr",
+      "name": "MR",
+      "description": "Merge Request — the mechanism for integrating a story branch into the development branch. Created exclusively via `/rai-mr-create` after the full gate suite passes."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-scope",
+    "type": "term",
+    "content": "The `--scope <path>` flag on `rai gate check gate-tests` that restricts test execution to a specific directory. Required for per-task and per-story gate runs to prevent context flooding.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "scope",
+      "name": "Scope (gate)",
+      "description": "The `--scope <path>` flag on `rai gate check gate-tests` that restricts test execution to a specific directory. Required for per-task and per-story gate runs to prevent context flooding."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-jidoka",
+    "type": "term",
+    "content": "Stop-the-line principle — stop and fix defects immediately when detected. Do not accumulate errors or defer fixes. A failing gate means stop, not continue.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "jidoka",
+      "name": "Jidoka",
+      "description": "Stop-the-line principle — stop and fix defects immediately when detected. Do not accumulate errors or defer fixes. A failing gate means stop, not continue."
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-development-branch",
+    "type": "term",
+    "content": "The integration target for all story merges. Currently release/3.1.0. Stories branch from and merge back to this branch. Main receives only tested, released code.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/glossary.yaml",
+    "created": "2026-06-18T18:44:38.252838+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "group": "terms",
+      "id": "development-branch",
+      "name": "Development Branch",
+      "description": "The integration target for all story merges. Currently release/3.1.0. Stories branch from and merge back to this branch. Main receives only tested, released code."
+    }
+  }
+]

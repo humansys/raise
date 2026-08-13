@@ -1,0 +1,128 @@
+name: bugfix-enterprise
+description: "Bugfix lifecycle pipeline — phases right-size to work size (ADR-116)"
+issue_types:
+  - bug
+  - bugfix
+
+execution:
+  worktree_isolation: true
+  branch_pattern: "bug/{issue_id}/pipeline"
+
+# Proportionality aspect (ADR-116): `when: size >= …` gates optional phases on the
+# XS < S < M < L scale. The mandatory trail (start, fix, review, close) has no
+# `when` and always runs, preserving the governance artifact trail (RAISE-9271);
+# only the depth of triage/analyse/plan/AR/QR/PIR scales. Set size at pipeline_start
+# (size=XS|S|M|L); unset → fail-safe full ceremony.
+#   XS → start, fix, review, close            (4)
+#   S  → + triage, analyse, quality-review    (7)
+#   M  → + plan, architecture-review          (9)
+#   L  → + pir                                (10)
+phases:
+  - id: start
+    type: llm
+    skill: rai-bugfix-start
+
+  - id: triage
+    type: llm
+    skill: rai-bugfix-triage
+    when: "size >= S"
+    validates:
+      - pattern: "work/bugs/{issue_id}/scope.md"
+        description: "Scope artifact with TRIAGE classification block"
+    gate:
+      type: hitl
+      level: REVIEW
+      mandatory: true
+
+  - id: analyse
+    type: llm
+    skill: rai-bugfix-analyse
+    when: "size >= S"
+    validates:
+      - pattern: "work/bugs/{issue_id}/analysis.md"
+        description: "Root cause analysis document"
+    gate:
+      type: hitl
+      level: REVIEW
+
+  - id: plan
+    type: llm
+    skill: rai-bugfix-plan
+    when: "size >= M"
+    validates:
+      - pattern: "work/bugs/{issue_id}/plan.md"
+        description: "Fix plan document"
+
+  - id: architecture-review
+    type: llm
+    skill: rai-architecture-review
+    when: "size >= M"
+    context:
+      graph:
+        - types: [pattern]
+          limit: 5
+        - types: [module]
+          limit: 2
+    validates:
+      - pattern: "work/bugs/{issue_id}/ar.md"
+        description: "Architecture review document"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: fix
+    type: llm
+    skill: rai-bugfix-fix
+    validates:
+      - pattern: "packages/**/tests/**/*.py"
+        description: "At least one test file must be present"
+    gate:
+      type: hitl
+      level: REVIEW
+
+  - id: quality-review
+    type: llm
+    skill: rai-quality-review
+    when: "size >= S"
+    context:
+      graph:
+        - types: [pattern]
+          limit: 5
+        - types: [guardrail]
+          limit: 3
+    validates:
+      - pattern: "work/bugs/{issue_id}/qr.md"
+        description: "Quality review document"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: review
+    type: llm
+    skill: rai-bugfix-review
+
+  - id: pir
+    type: llm
+    skill: rai-bugfix-pir
+    when: "size >= L"
+    validates:
+      - pattern: "work/bugs/{issue_id}/pir.md"
+        description: "PIR learning narrative"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+      mandatory: false
+
+  - id: close
+    type: llm
+    skill: rai-bugfix-close
+    workflow_point: "before:bug:close"
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/bugs/{issue_id}/retro.md"
+        description: "Bug retrospective (proves review produced its own artifact)"
