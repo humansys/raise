@@ -1,0 +1,87 @@
+# WARNING: This file is maintained by the RaiSE team. DO NOT EDIT MANUALLY.
+# To add or remove commands from the CLI Quick Reference, edit this file
+# and run `rai upgrade` to regenerate AGENTS.md / CLAUDE.md.
+
+sections:
+  - name: Core
+    commands:
+      - rai init
+
+  - name: Session
+    commands:
+      - rai session start
+      - rai session close
+      - rai session context
+      - rai session journal add
+      - rai session journal show
+
+  - name: Graph
+    commands:
+      - rai graph build
+      - rai graph query
+      - rai graph context
+
+  - name: Pattern
+    commands:
+      - rai pattern add
+
+  - name: Signal
+    commands:
+      - rai signal emit-work
+
+  - name: Discovery
+    commands:
+      - rai discover scan
+
+  - name: Skill
+    commands:
+      - rai skill list
+      - rai skill validate
+      - rai skill check-name
+      - rai skill scaffold
+      - rai skill set create
+      - rai skill set list
+      - rai skill set diff
+
+  - name: Backlog
+    commands:
+      - rai backlog create
+      - rai backlog search
+      - rai backlog get
+      - rai backlog get-comments
+      - rai backlog transition
+      - rai backlog batch-transition
+      - rai backlog comment
+      - rai backlog link
+      - rai backlog update
+
+  - name: Docs
+    commands:
+      - rai docs publish
+      - rai docs get
+      - rai docs search
+
+  - name: MCP
+    commands:
+      - rai mcp list
+      - rai mcp health
+      - rai mcp tools
+      - rai mcp call
+      - rai mcp install
+      - rai mcp scaffold
+
+  - name: Gate
+    commands:
+      - rai gate list
+      - rai gate check
+
+  - name: Adapter
+    commands:
+      - rai adapter list
+      - rai adapter check
+      - rai adapter validate
+
+  - name: Release
+    commands:
+      - rai release check
+      - rai release publish

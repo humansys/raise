@@ -1,0 +1,8 @@
+name: Claude Code
+agent_type: claude
+instructions_file: CLAUDE.md
+skills_dir: .claude/skills
+detection_markers:
+  - CLAUDE.md
+  - .claude
+  - ~/.claude

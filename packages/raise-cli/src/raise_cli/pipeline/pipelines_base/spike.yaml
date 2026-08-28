@@ -1,0 +1,37 @@
+name: spike
+description: "Default spike — 3 fases via Agent() dispatch, contexto fresco por fase (ADR-134 v2)"
+issue_types:
+  - spike
+  - research
+
+execution:
+  worktree_isolation: false  # Agent() provee aislamiento de contexto
+
+# Default edition: start → implement → close (3 fases)
+# Enterprise eliminadas: research (conditional), journal post-close (2+)
+# Skills: enterprise rai-spike-{start,journal,close} reutilizados sin variantes default
+# Referencia: work/epics/e14770-lean-methodology/skill-audit.md + ADR-134 v2
+phases:
+  - id: start
+    type: llm
+    skill: rai-spike-start
+    # Enterprise skill reutilizado: scope.md + branch + worktree setup
+
+  - id: implement
+    type: llm
+    skill: rai-spike-journal
+    # Enterprise skill reutilizado: narrativa de investigación / journal incremental
+    validates:
+      - pattern: "work/spikes/**/*-journal.md"
+        description: "Spike journal artifact (investigación documentada)"
+
+  - id: close
+    type: llm
+    skill: rai-spike-close
+    # Enterprise skill reutilizado: decisión + cierre de scope + commit
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/spikes/**/scope.md"
+        description: "Spike scope con decisión (producido por start, actualizado en close)"

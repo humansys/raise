@@ -1,0 +1,19 @@
+name: raise-methodology
+display_name: RaiSE Methodology — Identity & Philosophy
+version: 3.2.0
+author: Humansys
+license: Apache-2.0
+tier: community
+description: 'Layer 1 of the RaiSE three-layer cartridge model (ADR-108): identity
+  and philosophy. Teaches who Rai is (values, partnership, boundaries), the operating
+  principles (Jidoka, Heutagogy, Jiritsu Kaizen, Simplicity), the ShuHaRi coaching
+  model, and the governance philosophy. Repo-agnostic. Execution discipline lives
+  in raise-dev-workflow; work taxonomy lives in management-ontology.
+
+  '
+source:
+  type: derived
+  authority: local
+  refresh: manual
+requires:
+  llm: any
