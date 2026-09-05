@@ -1,0 +1,73 @@
+name: story
+description: "Canonical story default — 6 fases via Agent() dispatch, contexto fresco por fase (ADR-143 C1 canonical default, fix RAISE-16114)"
+issue_types:
+  - story
+  - task
+
+execution:
+  worktree_isolation: false  # Agent() provee aislamiento de contexto
+
+# Canonical edition (ADR-143 C1): start → design → implement → verify → review → close (6 fases)
+# Enterprise eliminadas: plan, architecture-review, pir (5+); review restaurado (RAISE-16114 fix)
+# Skills: lean residues de rai-story-{start,close} + rai-story-design (portfolio-aware, S1.15341) + enterprise rai-{story-implement,quality-review} (Opción A)
+# Referencia: work/epics/e14770-lean-methodology/skill-audit.md + ADR-134 v2 + RAISE-15345
+# RAISE-16114: review phase re-added; close.workflow_point + retro validates added to fix deadlock
+phases:
+  - id: start
+    type: llm
+    skill: rai-story-start
+    # Canónico post-ADR-143 B1: rai-story-start-lean colapsado en rai-story-start
+
+  - id: design
+    type: llm
+    skill: rai-story-design
+    when: "size != 'XS'"
+    # Portfolio-grounded design (RAISE-15341): rai portfolio suggest al inicio del gemba walk
+    # Sin gate HITL — lean. rai-story-design ya corre fail-open si no hay portfolio context.
+    validates:
+      - pattern: "work/epics/**/stories/*-design.md"
+        description: "Design artifact produced before implement runs"
+
+  - id: implement
+    type: llm
+    skill: rai-story-implement
+    # Opción A (30% ceremonia — texto pasivo): el orquestador inyecta prompt directivo
+    # "ejecuta TDD sin HITL per-task; calidad garantizada por gates y raise_task_complete"
+    validates:
+      - patterns:
+          - "tests/**/*.py"
+          - "packages/*/tests/**/*.py"
+        description: "Al menos un test file presente (TDD requirement)"
+
+  - id: verify
+    type: llm
+    skill: rai-quality-review
+    # Opción A (32% ceremonia — texto pasivo): el orquestador inyecta prompt directivo
+    # "emite solo verdict + findings críticos, omite output format verbose"
+
+  - id: review
+    type: llm
+    skill: rai-story-review
+    # RAISE-16114: restored review phase (removed in RAISE-15345, breaking rai-story-close)
+    # Mirrors bugfix-lean.yaml review phase; produces retrospective artifact for close.
+    validates:
+      - store: sqlite
+        type: retro
+        description: "Story retrospective artifact recorded (proves review ran)"
+
+  - id: close
+    type: llm
+    skill: rai-story-close
+    # Canónico post-ADR-143 B2: rai-story-close-lean colapsado en rai-story-close
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    # RAISE-16114: added workflow_point + retro validates (sqlite, issue-scoped) so engine
+    # blocks if review skipped. workflow_point is advisory (fires but does not block).
+    workflow_point: "before:story:close"
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/epics/**/stories/s*.md"
+        description: "Story scope artifact (producido por start)"
+      - store: sqlite
+        type: retro
+        description: "Story retrospective artifact recorded (proves review ran)"
