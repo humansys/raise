@@ -1,0 +1,40 @@
+{
+  "schema_version": "1",
+  "files": {"cs": 3, "sql": 8, "sqlproj": 1},
+  "sql_objects": [
+    {"schema": "dbo", "object": "MeterMeasurement", "type": "table", "kind": "class", "file": "Database/Tables/MeterMeasurement.sql"},
+    {"schema": "dbo", "object": "MeterMeasurementHistory", "type": "table", "kind": "class", "file": "Database/Tables/MeterMeasurementHistory.sql"},
+    {"schema": "dbo", "object": "udtMeterMeasurement", "type": "type", "kind": "class", "file": "Database/Types/udtMeterMeasurement.sql"},
+    {"schema": "dbo", "object": "InsertMeterMeasurement", "type": "procedure", "kind": "function", "file": "Database/Procedures/InsertMeterMeasurement.sql"},
+    {"schema": "dbo", "object": "InsertMeterMeasurementHistory", "type": "procedure", "kind": "function", "file": "Database/Procedures/InsertMeterMeasurementHistory.sql"},
+    {"schema": "dbo", "object": "vwMeterMeasurement", "type": "view", "kind": "class", "file": "Database/Views/vwMeterMeasurement.sql"},
+    {"schema": "dbo", "object": "fnLatestMeasurement", "type": "function", "kind": "function", "file": "Database/Functions/fnLatestMeasurement.sql"},
+    {"schema": "dbo", "object": "trMeterMeasurementArchive", "type": "trigger", "kind": "function", "file": "Database/Triggers/trMeterMeasurementArchive.sql"}
+  ],
+  "sql_dependencies": [
+    {"source": "InsertMeterMeasurement", "target": "MeterMeasurement", "edge": "references"},
+    {"source": "InsertMeterMeasurement", "target": "udtMeterMeasurement", "edge": "references"},
+    {"source": "InsertMeterMeasurementHistory", "target": "MeterMeasurementHistory", "edge": "references"},
+    {"source": "InsertMeterMeasurementHistory", "target": "udtMeterMeasurement", "edge": "references"},
+    {"source": "vwMeterMeasurement", "target": "MeterMeasurement", "edge": "references"},
+    {"source": "fnLatestMeasurement", "target": "MeterMeasurement", "edge": "references"},
+    {"source": "trMeterMeasurementArchive", "target": "InsertMeterMeasurementHistory", "edge": "calls"}
+  ],
+  "sql_unresolved_min": 1,
+  "sql_unresolved_names": ["dbo.MeterMeasurementAudit"],
+  "canonical_subset": {
+    "objects": ["MeterMeasurement", "MeterMeasurementHistory", "udtMeterMeasurement", "InsertMeterMeasurement", "InsertMeterMeasurementHistory", "vwMeterMeasurement"],
+    "dependency_count": 5
+  },
+  "csharp_symbols": [
+    {"file": "ConsoleClient/Program.cs", "name": "Program", "kind": "class"},
+    {"file": "WinFormsClient/Program.cs", "name": "Program", "kind": "class"},
+    {"file": "Shared/MeasurementRepository.cs", "name": "MeasurementRepository", "kind": "class"}
+  ],
+  "collision_pair": ["ConsoleClient/Program.cs", "WinFormsClient/Program.cs"],
+  "encodings": {
+    "Database/Tables/MeterMeasurementHistory.sql": "utf-8-sig",
+    "Database/Procedures/InsertMeterMeasurement.sql": "utf-16-le",
+    "Database/Triggers/trMeterMeasurementArchive.sql": "utf-8-crlf"
+  }
+}

@@ -1,0 +1,344 @@
+"""Terminal-transition merge gate — RAISE-15769.
+
+Stream FEI transitioned 7 bugs to Done while the fixing code sat on the
+local, unmerged branch `fix/rc1-stream-fei`, diverging the tracker from
+git reality. `raise_backlog_transition` (mcp_tools_backlog.py) had no gate
+distinguishing "commit exists" from "commit merged" for terminal
+transitions — the brief said "transition when fixed" without drawing that
+line, and nothing in code caught it.
+
+`check_merge_gate` closes that gap for terminal transitions: it classifies
+them from language-independent ``status_category`` metadata when available,
+falling back to whole English tokens only when category metadata is absent.
+It then resolves
+the issue's registered worktree (`SqliteWorktreeStore.find_by_story`, the
+live story->worktree binding established by RAISE-15764 D2.a) and checks
+commit-reachability (`check_branch_landed`, below) to confirm the branch's
+tip actually landed in its `merge_target` before a terminal transition is
+allowed through.
+
+This gate does NOT reuse `is_branch_merged` (RAISE-11104, `rai worktree
+prune`'s safety check) — that function runs `git branch --merged` and
+returns `False` on any failure or absence, which is the *safe* direction
+for prune's question ("is it safe to delete this branch?": False = don't
+delete) but the *unsafe* direction for this gate's question ("is it safe
+to mark Done?": False = block). Reusing it here produced false hard-blocks
+on legitimate merges (RAISE-15855 C1):
+  - squash-merged branches never appear in `git branch --merged` output
+    (prune.py's own docstring admits this) — a GitLab squash-merge
+    permanently blocked Done.
+  - a branch deleted after merge (this project's own convention: "Delete
+    Branches After Merge immediately") is absent from `--merged` output —
+    false block on a legitimately-shipped fix.
+  - a stale/absent local `merge_target` ref (merged via MR on origin,
+    local release branch never fetched) also false-blocked right after a
+    real merge.
+
+`check_branch_landed` instead asks "is the branch tip a commit-graph
+ancestor of the merge target?" via `git merge-base --is-ancestor`, checked
+against `origin/<merge_target>` first (fetched remote state) and the local
+`<merge_target>` as fallback. It also treats a branch that no longer
+exists locally as landed (not blocked): per this project's convention,
+branches are deleted immediately after merge, so absence is the expected
+post-merge, post-cleanup state — not evidence of an unmerged fix. Squash
+merges land the (squashed) commit on the target directly, so this check
+still confirms them positively once `origin/<merge_target>` is fetched;
+only a genuinely unmerged branch that still exists locally blocks.
+
+Fail-open posture (RAISE-10966): a guard that cannot prove non-merge must
+not block. This gate blocks ONLY on positive evidence — exactly one
+registered worktree whose branch is confirmably unmerged (git successfully
+determined "not an ancestor", not merely "the check failed to run"). Every
+other case (non-terminal transition, no worktree registered, 2+ worktrees
+claiming the same story, an indeterminate merge check, or any lookup/git
+error) allows the transition through — but see `MergeGateResult.advisory`
+(RAISE-15855 C2): fail-open here means "not blocked", not "silent". Any
+path where merge state could not be positively verified carries an
+advisory note instead of vanishing without a trace.
+"""
+
+from __future__ import annotations
+
+import logging
+import os
+import subprocess
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
+
+from raise_cli.adapters.backlog_config import (
+    get_configured_adapters,
+    load_backlog_config,
+)
+from raise_cli.adapters.key_gen import status_category_for
+from raise_cli.pipeline.terminal_status import is_terminal_status
+from raise_cli.storage.worktrees import SqliteWorktreeStore
+
+_log = logging.getLogger(__name__)
+
+_SKIP_ENV = "RAISE_MERGE_GATE_SKIP"
+_BARE_SKIP_VALUES = frozenset({"1", "true", "yes", "on"})
+
+
+def _configured_issue_types(project_root: Path) -> list[str]:
+    """Return workflow issue types across adapters in first-seen order.
+
+    Loading may migrate a legacy ``jira.yaml`` into ``backlog.yaml``. One
+    invalid adapter section is ignored so it cannot hide usable workflow
+    metadata from another configured adapter.
+    """
+    issue_types: list[str] = []
+    for adapter_name in sorted(get_configured_adapters(project_root)):
+        try:
+            config = load_backlog_config(project_root, adapter_name)
+        except Exception:  # noqa: BLE001 — bad section must not hide good sections
+            _log.debug(
+                "merge gate: skipping invalid adapter section %r",
+                adapter_name,
+                exc_info=True,
+            )
+            continue
+        issue_types.extend(
+            issue_type
+            for issue_type in config.workflow
+            if issue_type not in issue_types
+        )
+    return issue_types
+
+
+def _resolve_status_category(project_root: Path, status: str) -> str:
+    """Resolve ``status`` without an issue type; return ``""`` on any failure."""
+    try:
+        for issue_type in _configured_issue_types(project_root):
+            category = status_category_for(project_root, issue_type, status)
+            if category:
+                return category
+    except Exception:  # noqa: BLE001 — unresolved category degrades to tokens
+        _log.debug(
+            "merge gate: category resolution failed for %r", status, exc_info=True
+        )
+    return ""
+
+
+def _documented_skip_reason() -> str | None:
+    """Return the explicit human reason, rejecting bare truthy switches."""
+    reason = os.environ.get(_SKIP_ENV, "").strip()
+    if not reason or reason.casefold() in _BARE_SKIP_VALUES:
+        return None
+    return reason
+
+
+class MergeCheck(Enum):
+    """Outcome of `check_branch_landed` — see that function's docstring."""
+
+    LANDED = "landed"
+    NOT_LANDED = "not_landed"
+    INDETERMINATE = "indeterminate"
+
+
+def _run_git(args: list[str], repo: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _ref_resolves(repo: Path, ref: str) -> bool:
+    """True if `ref` (branch, remote-tracking branch, ...) resolves to a commit."""
+    return _run_git(["rev-parse", "--verify", "--quiet", ref], repo).returncode == 0
+
+
+def _resolve_target_ref(repo: Path, merge_target: str) -> str | None:
+    """Prefer `origin/<merge_target>` (fetched remote state); fall back to local.
+
+    Returns None if neither resolves — e.g. the local checkout never
+    fetched `origin` and no local branch of that name exists either.
+    """
+    origin_ref = f"origin/{merge_target}"
+    if _ref_resolves(repo, origin_ref):
+        return origin_ref
+    if _ref_resolves(repo, merge_target):
+        return merge_target
+    return None
+
+
+def check_branch_landed(
+    repo: Path, branch: str, merge_target: str
+) -> tuple[MergeCheck, str]:
+    """Positive-evidence check: has `branch` landed in `merge_target`'s history?
+
+    Uses `git merge-base --is-ancestor <branch-tip> <target-ref>` — commit
+    reachability, not `git branch --merged` — so squash-merges (which land
+    a new commit on the target rather than replaying the branch's commits)
+    are confirmed correctly once `origin/<merge_target>` carries them.
+
+    Three outcomes, deliberately not collapsed into a bool (that collapse
+    is exactly RAISE-15855 C1's bug):
+      - LANDED: positive evidence the branch is merged, OR the branch no
+        longer exists locally (deleted-after-merge is this project's own
+        convention — treated as landed, not as "can't check so allow").
+      - NOT_LANDED: `git merge-base --is-ancestor` ran successfully and
+        determined the branch tip is NOT an ancestor of the target — a
+        real block signal.
+      - INDETERMINATE: the check itself could not run to a conclusion
+        (neither `origin/<merge_target>` nor `<merge_target>` resolves,
+        the branch tip can't be resolved, or the git command errored for
+        a reason other than "not an ancestor") — no evidence either way.
+    """
+    if not _ref_resolves(repo, f"refs/heads/{branch}"):
+        return (
+            MergeCheck.LANDED,
+            f"branch '{branch}' no longer exists locally — treated as "
+            "merged-and-cleaned-up per project convention (branches are "
+            "deleted immediately after merge)",
+        )
+
+    target_ref = _resolve_target_ref(repo, merge_target)
+    if target_ref is None:
+        return (
+            MergeCheck.INDETERMINATE,
+            f"neither 'origin/{merge_target}' nor '{merge_target}' resolves "
+            "to a commit — cannot verify merge state",
+        )
+
+    branch_sha_result = _run_git(["rev-parse", "--verify", "--quiet", branch], repo)
+    if branch_sha_result.returncode != 0:
+        return (
+            MergeCheck.INDETERMINATE,
+            f"could not resolve '{branch}' to a commit",
+        )
+    branch_sha = branch_sha_result.stdout.strip()
+
+    result = _run_git(["merge-base", "--is-ancestor", branch_sha, target_ref], repo)
+    if result.returncode == 0:
+        return MergeCheck.LANDED, f"'{branch}' is an ancestor of '{target_ref}'"
+    if result.returncode == 1:
+        return (
+            MergeCheck.NOT_LANDED,
+            f"'{branch}' is NOT an ancestor of '{target_ref}'",
+        )
+    # Any other exit code means the command itself failed to run to a
+    # conclusion (bad revision, git internal error, ...) — not evidence.
+    return (
+        MergeCheck.INDETERMINATE,
+        f"'git merge-base --is-ancestor' failed (exit {result.returncode}): "
+        f"{result.stderr.strip()}",
+    )
+
+
+@dataclass(frozen=True)
+class MergeGateResult:
+    """Outcome of a terminal-transition merge check.
+
+    `allowed=False` only when the gate found positive evidence of an
+    unmerged branch for a terminal transition — see module docstring for
+    the fail-open posture on every other path.
+
+    `advisory` is set (non-None) whenever `allowed=True` but merge state
+    could NOT be positively verified — no worktree binding, an ambiguous
+    binding, or an indeterminate git check (RAISE-15855 C2). It is None
+    when the transition is non-terminal (gate inapplicable), when merge
+    state WAS positively confirmed, or when the transition is blocked.
+    Callers surface this in their response so a fail-open outcome is never
+    silent.
+    """
+
+    allowed: bool
+    reason: str
+    advisory: str | None = None
+
+
+def check_merge_gate(issue_key: str, status: str, cwd: str) -> MergeGateResult:
+    """Guard terminal transitions on merge state (RAISE-15769).
+
+    Terminality comes from ``status_category`` when configured and otherwise
+    from the shared whole-token fallback. Non-terminal transitions are always
+    allowed — no gate applies.
+
+    For terminal transitions, resolves the story's registered worktree via
+    `SqliteWorktreeStore.find_by_story` and checks commit-reachability
+    (`check_branch_landed`) against its registered `merge_target`.
+    Fail-open (`allowed=True`) when the story->worktree binding can't be
+    resolved unambiguously, or when any lookup raises or the git check is
+    indeterminate — mirrors the RAISE-10966 invariant that guard errors
+    never block CLI/MCP flows. Every fail-open path carries a non-None
+    `advisory` (RAISE-15855 C2) so the caller can surface it instead of the
+    outcome vanishing silently. Blocks only when exactly one worktree is
+    registered for `issue_key` and `check_branch_landed` positively
+    determines its branch is NOT an ancestor of `merge_target`.
+    Escape hatch: ``RAISE_MERGE_GATE_SKIP=<reason>`` allows a terminal
+    transition while preserving the reason in ``advisory``. Empty values and
+    bare truthy switches such as ``=1`` are not reasons and do not bypass.
+    """
+    project = Path(cwd) if cwd else Path.cwd()
+    category = _resolve_status_category(project, status)
+    if not is_terminal_status(status, status_category=category):
+        return MergeGateResult(
+            allowed=True, reason="non-terminal transition — no merge gate"
+        )
+
+    skip_reason = _documented_skip_reason()
+    if skip_reason is not None:
+        advisory = f"merge gate skipped via {_SKIP_ENV}: {skip_reason}"
+        _log.warning("%s for %s transitioning to %s", advisory, issue_key, status)
+        return MergeGateResult(allowed=True, reason=advisory, advisory=advisory)
+
+    try:
+        store = SqliteWorktreeStore(project)
+        matches = store.find_by_story(issue_key)
+    except Exception as exc:  # noqa: BLE001 — fail-open, guard errors never block (RAISE-10966)
+        _log.debug(
+            "merge gate: worktree lookup failed for %s — fail-open",
+            issue_key,
+            exc_info=True,
+        )
+        reason = f"merge gate unavailable ({exc}) — allowing transition (fail-open)"
+        return MergeGateResult(allowed=True, reason=reason, advisory=reason)
+
+    if not matches:
+        reason = (
+            f"merge state unverified — no worktree binding found for "
+            f"{issue_key}; verify manually before transitioning to '{status}'"
+        )
+        return MergeGateResult(allowed=True, reason=reason, advisory=reason)
+    if len(matches) > 1:
+        reason = (
+            f"merge state unverified — {len(matches)} open worktrees claim "
+            f"{issue_key} (ambiguous); verify manually before transitioning "
+            f"to '{status}'"
+        )
+        return MergeGateResult(allowed=True, reason=reason, advisory=reason)
+
+    try:
+        wt = store.get_by_path(matches[0])
+        outcome, detail = check_branch_landed(project, wt.branch, wt.merge_target)
+    except Exception as exc:  # noqa: BLE001 — fail-open, guard errors never block (RAISE-10966)
+        _log.debug(
+            "merge gate: merge check failed for %s — fail-open",
+            issue_key,
+            exc_info=True,
+        )
+        reason = f"merge check failed ({exc}) — allowing transition (fail-open)"
+        return MergeGateResult(allowed=True, reason=reason, advisory=reason)
+
+    if outcome is MergeCheck.LANDED:
+        return MergeGateResult(
+            allowed=True,
+            reason=f"branch '{wt.branch}' confirmed merged into '{wt.merge_target}' ({detail})",
+        )
+    if outcome is MergeCheck.INDETERMINATE:
+        reason = (
+            f"merge state unverified for '{wt.branch}' -> '{wt.merge_target}' "
+            f"({detail}); verify manually before transitioning to '{status}'"
+        )
+        return MergeGateResult(allowed=True, reason=reason, advisory=reason)
+    return MergeGateResult(
+        allowed=False,
+        reason=(
+            f"branch '{wt.branch}' is NOT merged into '{wt.merge_target}' — "
+            f"{issue_key} cannot transition to '{status}' until the fix is "
+            f"merged ({detail}) (RAISE-15769)"
+        ),
+    )
