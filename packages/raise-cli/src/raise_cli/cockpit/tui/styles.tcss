@@ -1,0 +1,306 @@
+/* Cockpit TUI — Textual CSS (E1 Foundation) */
+
+Screen {
+    layout: horizontal;
+    background: $background;
+}
+
+/* --- TopBar --- */
+TopBar {
+    dock: top;
+    height: 1;
+    background: $surface_warm;
+    color: $foreground;
+}
+
+/* --- Section border pattern (RAISE-16861, epic D5, Frogmouth research) --- */
+/* Full box per panel: each .section is a discrete bordered region with a
+   border title. height: 1fr because Static defaults to auto — without it
+   the border hugs the text instead of framing the panel (D-S4.3). */
+.section {
+    height: 1fr;
+    border: solid $overlay1;
+    border-title-align: left;
+    border-title-color: $foreground;
+}
+
+.section:focus {
+    border: solid $accent;
+    border-title-color: $accent;
+}
+
+/* --- Session Rail --- */
+SessionRail {
+    width: 2fr;
+    min-width: 20;
+    padding: 1 2;
+}
+
+/* --- Detail column (DetailPanel + RecoveryMenu, RAISE-16713 D-S3.4) --- */
+#detail-column {
+    width: 3fr;
+    min-width: 30;
+}
+
+/* --- Responsive tiers via classes --- */
+
+/* Compact: 80-119 cols */
+Screen.compact SessionRail {
+    width: 1fr;
+}
+
+Screen.compact #detail-column {
+    width: 1fr;
+}
+
+/* Rail-only: 50-79 cols */
+Screen.rail-only #detail-column {
+    display: none;
+}
+
+Screen.rail-only SessionRail {
+    width: 1fr;
+}
+
+/* Floor: <50 cols */
+Screen.floor #detail-column {
+    display: none;
+}
+
+Screen.floor SessionRail {
+    width: 1fr;
+}
+
+/* --- Density toggle (RAISE-16860, D-S3.2) --- */
+/* Screen.dense stacks with responsive tiers (compact/rail-only/floor set
+   width/display only — zero property overlap). NOT Screen.compact: taken
+   by the 80-119 col tier (epic adversarial F1). */
+Screen.dense SessionRail {
+    padding: 0 1;
+}
+
+/* --- Expanded detail view (RAISE-16714) — must follow tier rules --- */
+Screen.expanded SessionRail {
+    display: none;
+}
+
+Screen.expanded RecoveryMenu {
+    display: none;
+}
+
+Screen.expanded #detail-column {
+    display: block;
+    width: 1fr;
+}
+
+/* --- New Session wizard modal (RAISE-16707) --- */
+NewSessionScreen {
+    align: center middle;
+}
+
+NewSessionScreen > #dialog {
+    width: 70;
+    height: auto;
+    max-height: 80%;
+    padding: 1 2;
+    background: $panel;
+    border: round $surface;
+}
+
+NewSessionScreen #wizard-title {
+    height: 1;
+    color: $accent;
+    text-style: bold;
+}
+
+NewSessionScreen #name-error {
+    color: $error;
+}
+
+NewSessionScreen #branch-status {
+    color: $warning;
+}
+
+NewSessionScreen #provision-body {
+    height: auto;
+}
+
+/* --- Close confirmation modal (RAISE-16709) --- */
+CloseConfirmScreen {
+    align: center middle;
+}
+
+CloseConfirmScreen > #dialog {
+    width: 70;
+    height: auto;
+    max-height: 80%;
+    padding: 1 2;
+    background: $panel;
+    border: round $surface;
+}
+
+CloseConfirmScreen #close-title {
+    height: 1;
+    color: $accent;
+    text-style: bold;
+}
+
+CloseConfirmScreen #close-safety {
+    color: $warning;
+}
+
+CloseConfirmScreen #close-menu {
+    height: auto;
+}
+
+CloseConfirmScreen #close-name-error {
+    color: $error;
+}
+
+/* --- Degraded banner (RAISE-16713) --- */
+DegradedBanner {
+    dock: top;
+    height: 1;
+    display: none;
+    background: $panel;
+    color: $warning;
+    padding: 0 1;
+}
+
+DegradedBanner.visible {
+    display: block;
+}
+
+/* --- Filter bar (RAISE-16739) --- */
+FilterBar {
+    dock: top;
+    height: 1;
+    background: $surface_warm;
+}
+
+FilterBar > Input {
+    width: 1fr;
+    height: 1;
+    border: none;
+    padding: 0 1;
+    background: $surface_warm;
+}
+
+FilterBar > #filter-count {
+    width: auto;
+    padding: 0 1;
+    color: $overlay1;
+}
+
+/* --- Session logs modal (RAISE-16739) --- */
+SessionLogsScreen {
+    align: center middle;
+}
+
+SessionLogsScreen > #dialog {
+    width: 90;
+    height: auto;
+    max-height: 80%;
+    padding: 1 2;
+    background: $panel;
+    border: round $surface;
+}
+
+SessionLogsScreen #logs-title {
+    height: 1;
+    color: $accent;
+    text-style: bold;
+}
+
+SessionLogsScreen #logs-body {
+    height: auto;
+    color: $foreground;
+}
+
+/* --- Help overlay (RAISE-16712) --- */
+HelpScreen {
+    align: center middle;
+}
+
+HelpScreen > #dialog {
+    width: 60;
+    height: auto;
+    max-height: 80%;
+    padding: 1 2;
+    background: $panel;
+    border: round $surface;
+}
+
+HelpScreen #help-title {
+    height: 1;
+    color: $accent;
+    text-style: bold;
+}
+
+HelpScreen .group-title {
+    color: $accent;
+    text-style: bold;
+}
+
+HelpScreen .group-title.active-context {
+    text-style: bold reverse;
+}
+
+HelpScreen .group-body {
+    height: auto;
+    color: $foreground;
+    padding: 0 0 1 2;
+}
+
+HelpScreen #help-modal-keys {
+    height: auto;
+    color: $overlay1;
+}
+
+/* --- Recovery menu (RAISE-16713) --- */
+RecoveryMenu {
+    display: none;
+    height: auto;
+    margin: 1 2;
+    padding: 1 2;
+    border: round $error;
+    color: $foreground;
+}
+
+RecoveryMenu.visible {
+    display: block;
+}
+
+RecoveryMenu:focus {
+    border: round $accent;
+}
+
+/* --- Command palette (RAISE-16712) --- */
+CommandPaletteScreen {
+    align: center middle;
+}
+
+CommandPaletteScreen > #dialog {
+    width: 60;
+    height: auto;
+    max-height: 80%;
+    padding: 1 2;
+    background: $panel;
+    border: round $surface;
+}
+
+CommandPaletteScreen #command-title {
+    height: 1;
+    color: $accent;
+    text-style: bold;
+}
+
+CommandPaletteScreen > #dialog > Input {
+    border: none;
+    background: $panel;
+}
+
+CommandPaletteScreen #command-matches {
+    height: auto;
+    color: $foreground;
+}

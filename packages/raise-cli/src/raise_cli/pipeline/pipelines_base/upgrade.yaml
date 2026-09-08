@@ -1,0 +1,92 @@
+name: upgrade
+description: >
+  Upgrade a RaiSE project from an older version (e.g. v2.4, pre-SQLite) to the
+  current version, then build its knowledge graph from what already exists.
+  Phases: structural (scaffold v3.x + migrate data) → discover (codebase →
+  symbols → graph) → curate-corpus (classify docs by governance relevance) →
+  governance cartridge (curated docs → queryable knowledge, including the
+  one-time relationship pass) → verify. Replaces the monolithic
+  rai-project-upgrade skill (SP-project-upgrade: "this is a pipeline, not a
+  skill"). First version — phase↔skill alignment refines as skills decompose.
+issue_types:
+  - story
+  - task
+model: claude-sonnet-4-6
+
+defaults:
+  # full = structural + discover + cartridge; structural-only skips knowledge build
+  upgrade_kind: full
+
+phases:
+  # ── Phase 1: structural — detect version, scaffold v3.x, migrate data ──
+  - id: structural
+    type: llm
+    skill: rai-project-upgrade
+    validates:
+      - pattern: ".raise/manifest.yaml"
+        description: "v3.x manifest present after scaffold"
+      - pattern: ".raise/config.toml"
+        description: "v3.x config present"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: high          # touches project structure + migrates personal data
+
+  # ── Phase 2: discover — codebase scan → symbols → knowledge graph ──
+  - id: discover
+    type: llm
+    skill: rai-discover
+    when: "upgrade_kind == 'full'"
+    validates:
+      - pattern: ".raise/rai/memory/index.json"
+        description: "Knowledge graph built from discovered code"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  # ── Phase 3: curate-corpus — classify docs by governance relevance ──
+  # Discovery alone over-includes raw material (transcripts, logs) and misses
+  # docs in odd places. The agent reads + classifies each candidate and the
+  # developer confirms the corpus BEFORE any extraction spend. Cartridge quality
+  # is bounded by what enters the corpus — this matters most on a one-time upgrade.
+  - id: curate-corpus
+    type: llm
+    skill: rai-corpus-curate
+    when: "upgrade_kind == 'full'"
+    validates:
+      - pattern: "work/upgrade/corpus-curation.yaml"
+        description: "Curated governance corpus (kept vs excluded docs)"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: high          # corpus selection gates extraction quality + spend
+
+  # ── Phase 4: governance cartridge — curated docs → queryable knowledge ──
+  # Agent-native (no API key): the local agent proposes the schema and fills the
+  # extract + relate work orders. rai-kc-build (OpenRouter) is the opt-in
+  # batch variant, not the v1 default. Consumes the cartridge scaffolded by the
+  # curate phase. Includes the one-time relationship pass — for a migration
+  # (single event), graph quality outweighs the cost (RAISE-11566 decision).
+  - id: cartridge-governance
+    type: llm
+    skill: rai-cartridge-agent
+    when: "upgrade_kind == 'full'"
+    validates:
+      - pattern: ".raise/cartridges/*/instances/*.json"
+        description: "Governance cartridge extracted from existing documents"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: high          # agent/LLM extraction — quality gate worth a human look
+
+  # ── Phase 5: verify — rebuild graph and list cartridges to confirm wiring ──
+  - id: verify
+    type: deterministic
+    commands:
+      - "rai graph build"
+      - "rai cartridge list"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
