@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.Build.Sql/0.1.13-preview">
+  <PropertyGroup>
+    <Name>SmartGrid.Database</Name>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
+  </PropertyGroup>
+  <ItemGroup>
+    <Build Include="Tables\MeterMeasurement.sql" />
+    <Build Include="Tables\MeterMeasurementHistory.sql" />
+    <Build Include="Types\udtMeterMeasurement.sql" />
+    <Build Include="Procedures\InsertMeterMeasurement.sql" />
+    <Build Include="Procedures\InsertMeterMeasurementHistory.sql" />
+    <Build Include="Views\vwMeterMeasurement.sql" />
+    <Build Include="Functions\fnLatestMeasurement.sql" />
+    <Build Include="Triggers\trMeterMeasurementArchive.sql" />
+  </ItemGroup>
+</Project>

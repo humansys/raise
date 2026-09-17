@@ -1,0 +1,34 @@
+name: epic-flat
+description: "Flat epic — 3 fases sin PDCV sub-pipeline (opt-in para refactors, docs-only)"
+
+execution:
+  worktree_isolation: false
+
+# Flat: start → implement → close (3 fases, sin sub-pipelines ni PDCV)
+# Use default 'epic' for PDCV-gated design.
+# This pipeline is for quick epics where the domain is already well-known
+# and a full gemba walk would be overhead (e.g. pure refactor, docs-only).
+phases:
+  - id: start
+    type: llm
+    skill: rai-epic-start
+    # transition: epic initialized; work is active in current cycle
+    target_status: committed
+
+  - id: implement
+    type: llm
+    skill: rai-epic-design
+    # transition: epic design+implementation running (flat: no PDCV sub-pipeline)
+    target_status: implement
+    validates:
+      - pattern: "work/epics/**/design.md"
+      - pattern: "work/epics/**/scope.md"
+
+  - id: close
+    type: llm
+    skill: rai-epic-close
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/epics/**/scope.md"

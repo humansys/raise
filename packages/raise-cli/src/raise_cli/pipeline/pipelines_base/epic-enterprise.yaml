@@ -1,0 +1,74 @@
+name: epic-enterprise
+description: "7-phase epic lifecycle pipeline"
+issue_types:
+  - epic
+
+execution:
+  worktree_isolation: false
+  branch_pattern: "epic/{issue_id}/pipeline"
+
+phases:
+  - id: start
+    type: llm
+    skill: rai-epic-start
+    # transition: epic initialized; work is active in current cycle
+    target_status: committed
+
+  - id: design
+    type: llm
+    skill: rai-epic-design
+    # transition: epic design complete; tracker signals active design phase
+    target_status: design
+    validates:
+      - pattern: "work/epics/**/design.md"
+        description: "Epic design document"
+      - pattern: "work/epics/**/scope.md"
+        description: "Epic scope document"
+    gate:
+      type: hitl
+      level: REVIEW
+
+  - id: plan
+    type: llm
+    skill: rai-epic-plan
+    # transition: story planning is design-phase work; tracker stays in design state
+    target_status: design
+    validates:
+      - pattern: "work/epics/**/scope.md"
+        description: "Epic scope document (plan appended)"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: story-iteration
+    type: deterministic
+    # transition: HITL approval signals story execution beginning; epic moves to implement state
+    target_status: implement
+    gate:
+      type: hitl
+      level: REVIEW
+      mandatory: true
+
+  - id: docs
+    type: llm
+    skill: rai-epic-docs
+    # transition: documentation creation is implementation output; tracker stays in implement state
+    target_status: implement
+
+  - id: journal
+    type: llm
+    skill: rai-epic-journal
+    # transition: epic journal is pre-close reflection; tracker signals review/retrospective state
+    target_status: review
+
+  - id: close
+    type: llm
+    skill: rai-epic-close
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - store: sqlite
+        type: retro
+        description: "Epic retrospective artifact recorded (own output)"

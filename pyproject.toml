@@ -1,0 +1,465 @@
+# raise-commons — uv workspace root
+# This file defines the workspace and shared tool configuration.
+# It is NOT a package itself. Each package lives in packages/.
+
+[tool.uv]
+# Security constraints for transitive dependencies
+# CVE-2026-48526: pyjwt <2.13.0 accepts public JWK as HMAC secret, forged HS256 tokens (HIGH)
+# CVE-2026-4539: pygments <2.20.0 ReDoS via inefficient GUID regex (LOW)
+# CVE-2026-45409: idna <3.15 DoS via crafted unicode in idna.encode() (MEDIUM)
+# GHSA-4xgf-cpjx-pc3j: pydantic-settings <2.14.2 follows secrets_dir symlinks (MEDIUM)
+constraint-dependencies = [
+    "pyjwt>=2.13.0",
+    "pygments>=2.20.0",
+    "idna>=3.15",
+    "pydantic-settings>=2.14.2",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.workspace]
+# Keep workspace members explicit: broad globs let arbitrary local directories
+# under packages/ break `uv run` hook bootstrap before hook code executes.
+members = [
+    "packages/raise-cli",
+    "packages/raise-core",
+]
+
+[tool.uv.sources]
+raise-core = { workspace = true }
+raise-cli = { workspace = true }
+torch = { index = "pytorch-cpu" }
+
+[dependency-groups]
+dev = [
+    "raise-cli[gdrive,observability,inference]",
+    "openai>=2.0",
+    "raise-core",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.25.2",
+    "pytest-cov>=4.1.0",
+    "pytest-xdist>=3.6.0",
+    "ruff>=0.4.0",
+    "pyright>=1.1.350",
+    "bandit>=1.7.8",
+    "pyinstaller>=6.21.0",
+    "httpx>=0.27.0",
+    "mcp>=1.26,<2",
+    "import-linter>=2.11",
+    "readme-renderer[md]>=44.0",
+    "pymdown-extensions>=11.0.1",
+    "mkdocs-material>=9.7.6",
+    "mkdocs-static-i18n>=1.3.1",
+    "numpy>=2.4.4",
+    "textual>=0.86,<1.0",
+    "tree-sitter-go>=0.25.0",
+    "tree-sitter-java>=0.23.5",
+    "paramiko>=5.0.0",
+    "cairosvg>=2.9.0",
+    "pillow>=12.2.0",
+    "httpx2>=2.12.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["packages/raise-cli/src", "packages/raise-core/src", "packages/rai-agent/src"]
+exclude = ["dev/experiments"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "S",   # flake8-bandit (security)
+    "C90", # McCabe complexity
+    "PL",  # Pylint subset
+    "PERF",# Perflint
+    "FURB",# refurb
+    "RET", # flake8-return
+    "ARG", # flake8-unused-arguments
+    "ERA", # eradicate
+    "PT",  # flake8-pytest-style
+    "TC",  # flake8-type-checking
+    "A",   # flake8-builtins
+    "ANN", # flake8-annotations (D3.1)
+    "D",   # pydocstyle (D5.1)
+    "BLE", # flake8-blind-except (broad except detection, RAISE-15490)
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "S603",   # subprocess calls are expected in a CLI tool that runs gates/tools
+    "S607",   # partial executable paths are intentional (uv, git, etc.)
+    "PLC0415",# inline imports are a project pattern (lazy loading, conditional imports)
+    "PLR2004",# magic value comparisons are pervasive in tests and parsers
+    "PLR0913",# many-argument functions are common in CLI commands and Pydantic models
+    "PLR0912",# too-many-branches covered by C901 complexity check
+    "PLR0915",# too-many-statements covered by C901 complexity check
+    "PLR0911",# too-many-return-statements covered by C901 complexity check
+    "PLW2901",# loop variable reassignment is a common pattern (line stripping, normalization)
+    "PLW1510",# subprocess.run without check is intentional -- we inspect returncode
+    "PLC0414",# explicit re-exports (X as X) are intentional for backward compatibility
+    "PERF401",# manual list comprehension: many cases have complex loop bodies where comprehension reduces readability
+    "RET504", # unnecessary assignment before return: named returns improve readability
+    "ARG002", # unused method argument: many are protocol/interface conformance
+    "ERA001", # commented-out code: high false positive rate (API docs, section headers, code examples)
+    "PT012", # pytest.raises with multiple statements: often intentional for testing specific line
+    "PT018", # composite assertion: splitting weakens test readability
+    "PT011", # pytest.raises too broad: adding match= to existing tests changes semantics
+    "PT019", # fixture without value: false positives on @patch mock parameters
+    "TC001", # typing-only first-party import: risky with Pydantic/isinstance runtime usage
+    "TC002", # typing-only third-party import: risky with Pydantic/isinstance runtime usage
+    "TC003", # typing-only stdlib import: risky with Pydantic/isinstance runtime usage
+    "TC004", # runtime-import-in-type-checking: intentional lazy imports for optional deps
+    "A002",  # builtin argument shadowing: `format`, `id`, `type` are common domain names
+    "D100",  # module docstring: not required for every module, especially small utilities
+    "D104",  # package docstring: __init__.py files rarely need docstrings
+    "D107",  # __init__ docstring: class docstring suffices
+    "D203",  # one-blank-line-before-class: conflicts with D211 (no-blank-line-before-class)
+    "D213",  # multi-line-summary-second-line: conflicts with D212 (summary-first-line)
+    "ANN401",# Any type: pyright strict enforces real type safety; Any is legitimate for entry points, **kwargs, dynamic dispatch
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Protocol stubs, sync wrappers, and adapter implementations of protocol methods
+"packages/raise-cli/src/raise_cli/adapters/protocols.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/adapters/sync.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/adapters/declarative/adapter.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/doctor/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/gates/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/hooks/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/hook_bus/protocol.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/session/protocols.py" = ["D102"]
+"packages/raise-cli/src/raise_cli/cockpit/tui/services.py" = ["D102"]
+# Textual framework overrides (compose, action_*, on_*) don't need docstrings
+"packages/raise-cli/src/raise_cli/hud/**/*.py" = ["D102"]
+"work/epics/**/campaign/**/__main__.py" = ["D103"]  # CLI cmd handlers documented via argparse help
+# token_daily.py DDL constant contains DEFAULT 'stats-cache' — ruff S105 false positive
+"packages/raise-cli/src/raise_cli/telemetry/token_daily.py" = ["S105"]
+# E2E dogfood harness: hardcoded-constant SQL (no user input) + intentional scratchpad log path
+"packages/raise-server/scripts/dogfood_*.py" = ["S608", "S108", "D103"]
+# devtools conformance cube: f-string SQL uses only hardcoded column-name literals (no user input)
+"packages/raise-devtools/src/raise_devtools/conformance_store.py" = ["S608"]
+# H0 analysis script: exploratory, f-string SQL column names come only from RULE_DENOM dict
+"dev/tools/h0_denominator_analysis.py" = ["S608"]
+"**/tests/**/*.py" = [
+    "S101", "S104", "S108", "S105", "S106", "S107", "S310",  # security rules relaxed in tests
+    "ARG001", "ARG002", "ARG005",             # unused args (fixtures, mocks)
+    "ANN001", "ANN002", "ANN003",             # parameter annotations optional in tests
+    "ANN201", "ANN202",                       # return annotations optional in tests
+    "D100", "D101", "D102", "D103", "D105",  # docstrings optional in tests
+    "F821",                                   # undefined names: test fixtures via conftest injection
+    "SIM117",                                 # nested with: intentional for mock.patch layering
+    "BLE001",                                 # broad except common in test harnesses/fixtures
+]
+# BLE001 sweep deferred to Tier 2+ follow-up (RAISE-15488); RAISE-15490 sweeps only raise-cli/src
+"packages/raise-server/src/**/*.py" = ["BLE001"]
+"packages/raise-core/src/**/*.py" = ["BLE001"]
+"packages/raise-devtools/src/**/*.py" = ["BLE001"]
+"infra/**/*.py" = ["BLE001"]
+"work/**/*.py" = ["BLE001"]
+"scripts/**/*.py" = ["BLE001"]
+"tools/**/*.py" = ["BLE001"]
+"dev/**/*.py" = ["BLE001"]
+".claude/**/*.py" = ["BLE001"]
+"scratchpad/**/*.py" = ["BLE001"]
+"packages/rai-agent/commitment-server/**/*.py" = ["BLE001"]
+# alembic auto-generated migration files — suppress doc/style rules
+"packages/raise-server/alembic/versions/*.py" = ["D415", "D103", "D100"]
+# hermes-raise imported integration code — suppress until cleanup story
+"packages/hermes-raise/src/**/*.py" = ["SIM105", "BLE001"]
+# rai-agent: imported code with pre-existing style — suppress until cleanup story
+"packages/rai-agent/src/**/*.py" = [
+    "C901",    # complexity (11 functions > 10)
+    "D102",    # missing docstrings in protocol methods
+    "D105",    # missing docstrings in magic methods
+    "D301",    # raw docstrings
+    "D417",    # missing arg descriptions
+    "S101",    # assert in non-test code (registry guards)
+    "S110",    # bare except-pass
+    "BLE001",  # broad except (imported code; Tier 2+ sweep deferred RAISE-15488)
+    "S310",    # URL audit
+    "PLW0603", # global statement
+    "PLW1641", # missing __hash__
+    "PLR1714", # mergeable comparisons
+    "SIM105",  # contextlib.suppress
+    "UP047",   # generic type parameters
+    "PERF102", # dict values()
+    "ARG001",  # unused function arg
+    "ARG004",  # unused static method arg
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+include = [
+    "packages/raise-core/src",
+    "packages/raise-cli/src",
+    "packages/raise-server/src",
+]
+exclude = [
+    "**/__pycache__",
+    "**/node_modules",
+    ".venv",
+    "packages/*/tests",
+]
+venvPath = "."
+venv = ".venv"
+reportMissingTypeStubs = false
+reportUnknownArgumentType = false
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+
+[tool.pytest.ini_options]
+pythonpath = ["packages/rai-agent", "work/epics/e2161-drift-detection-infra", "tools", "scripts"]
+testpaths = [
+    "packages/raise-core/tests",
+    "packages/raise-cli/tests",
+    "work/epics/e2161-drift-detection-infra/campaign/pass2/tests",
+    "work/epics/e2161-drift-detection-infra/campaign/pass3/tests",
+    "tests",
+    "tools/token_analyzer/tests",
+]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--import-mode=importlib",
+    "-n", "4",
+    "--dist", "loadscope",
+    "-m", "not integration and not slow and not ml and not e2e and not perf",
+    "--strict-markers",
+    "--strict-config",
+]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::pydantic_settings.exceptions.IncompleteFieldDefinitionWarning",
+]
+markers = [
+    "integration: Manual integration tests requiring external services (run with -m integration)",
+    "slow: Tests that take >10s. Excluded from CI fast path on MRs.",
+    "ml: Tests requiring ML runtimes, embedding models, or model downloads. Excluded from CI fast path on MRs.",
+    "e2e: End-to-end tests requiring real services. Excluded from CI fast path on MRs.",
+    "deployed: E2E tests against a live deployed environment — requires RAISE_DEV_URL (ADR-138)",
+    "unit: Fast isolated unit tests.",
+    "contract: API/schema/adapter contract tests that should stay in MR fast path.",
+    "perf: Performance-sensitive tests (timing assertions; bounds generous for CI).",
+    "real_pm_resolution: Opt out of the autouse _isolate_pm_adapter guard (RAISE-14069) to exercise the real resolve_pm_adapter() against stubbed discovery.",
+    "serial: Test mutates process-global state (sys.meta_path, module-level singletons). Must not run concurrently with other tests in the same xdist worker process (RAISE-14875).",
+    "no_xdist: Test is incompatible with any xdist parallelism; requires exclusive process-level ownership or ordering dependencies. Run with -n 0 (RAISE-14875).",
+]
+
+[tool.coverage.run]
+parallel = true
+source = [
+    "packages/raise-cli/src/raise_cli",
+    "packages/raise-core/src/raise_core",
+    "packages/raise-server/src/raise_server",
+    "packages/rai-agent/src/rai_agent",
+]
+omit = [
+    "*/tests/*",
+    "*/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.importlinter]
+root_packages = ["raise_cli", "raise_core"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "ADR-001 Foundation Independence"
+type = "independence"
+modules = [
+    "raise_cli.core",
+    "raise_cli.schemas",
+    "raise_cli.rai_base",
+    "raise_cli.skills_base",
+]
+
+[[tool.importlinter.contracts]]
+name = "ADR-001 No Upward CLI Dependency"
+type = "forbidden"
+source_modules = [
+    "raise_cli.discovery",
+    "raise_cli.graph",
+    "raise_cli.engines",
+    "raise_cli.core",
+    "raise_cli.schemas",
+    "raise_cli.rai_base",
+    "raise_cli.skills_base",
+]
+forbidden_modules = [
+    "raise_cli.cli",
+    "raise_cli.output",
+    "raise_cli.viz",
+]
+
+[[tool.importlinter.contracts]]
+# E14263 AG1 intent (RAISE-14696): adapters must not import from session layer.
+# AG1 detected auth-related symbols fanning out across module boundaries without
+# an aggregator. This contract enforces that adapter implementations (filesystem,
+# jira, etc.) remain caller-independent — they must not depend on session state,
+# which enforces the aggregator boundary AG1 was designed to protect
+# (decision_ref: RAISE-14263, ADR-130).
+name = "E14263 AG1 — adapters session independence"
+type = "forbidden"
+source_modules = ["raise_cli.adapters"]
+forbidden_modules = ["raise_cli.session"]
+
+[[tool.importlinter.contracts]]
+# E14263 CAND-17 intent (RAISE-14696): gate models must not import from application layers.
+# CAND-17 detected excessive import fan-in at module init (__init__.py importing ≥7 packages).
+# This contract enforces that gate primitive models stay lightweight — they must not import
+# from adapters or session, which prevents the fan-in coupling CAND-17 was designed to detect
+# (decision_ref: RAISE-14263, ADR-130).
+name = "E14263 CAND-17 — gate models layer independence"
+type = "forbidden"
+source_modules = ["raise_cli.gates.models"]
+forbidden_modules = ["raise_cli.adapters", "raise_cli.session", "raise_cli.cli"]
+
+[[tool.importlinter.contracts]]
+# ADR-139 C2 — onnxruntime is a raise-server-only dependency. raise_core must
+# never import it so the cartridge-side embedding protocol stays torch-free and
+# raise-core remains lightweight for raise-cli usage (RAISE-15125, S15109.4).
+name = "ADR-139 C2 — raise_core must not import onnxruntime"
+type = "forbidden"
+source_modules = ["raise_core"]
+forbidden_modules = ["onnxruntime"]
+
+[[tool.importlinter.contracts]]
+# RAISE-16340 (Epic RAISE-16334, O7) — the raise_cli 5-layer model.
+#
+# Allowed import direction, outermost first:
+#     cli  ->  services  ->  domain  ->  adapters  ->  core
+#
+# Modules on the same line are joined with `:` (non-independent siblings):
+# intra-layer imports are ALLOWED. This contract polices the *direction of
+# travel between layers*, not coupling inside one. Intra-layer independence
+# where it actually matters is already enforced by the ADR-001 Foundation
+# Independence and E14263 contracts above.
+#
+# The map is PARTIAL by design. Top-level subpackages not listed here are not
+# checked; they get added as they are classified (see the "still being
+# classified" list in packages/raise-cli/ARCHITECTURE.md). A partial map that
+# enforces what we know beats a complete one that is never turned on.
+#
+# TWO PLACEMENTS DIVERGE FROM THE EPIC SKETCH, on gemba evidence:
+#   * `adapters` sits BELOW domain, not above services. It has a fan-in of 17
+#     top-level packages because it holds the ports (`adapters.protocols`,
+#     `adapters.models`) alongside the implementations. Everything that speaks
+#     to an external system depends on those ports. Placing it at the edge
+#     would need 41 extra waivers to describe imports that are not actually
+#     wrong. Splitting ports from implementations is RAISE-16339, and this
+#     placement is revisited then.
+#   * `mcp` is in the core tier, not a peer of `cli`. `raise_cli.mcp` is the
+#     bridge/registry/schema infrastructure (fan-in 6: cli, adapters, pipeline,
+#     session, worktree; fan-out 1). The MCP *server* entry point lives in
+#     `raise_cli.pipeline.mcp_server`, not here. This confirms the premise of
+#     governance/adrs/v1/adr-042-mcp-infrastructure-layer.md.
+#
+# Rationale for import-linter over tach (the epic sketched tach): import-linter
+# was already a dev dependency carrying four contracts and its `layers` type
+# expresses this model directly. Two enforcement tools for one concern is waste.
+# See governance/adrs/adr-2026-08-19-cli-layer-model-enforcement.md.
+#
+# Enforced by: `uv run lint-imports` locally, `guard:import-contracts`
+# (.gitlab-ci.yml) and the `arch` job (.github/workflows/ci-raise-cli.yml) in CI.
+# Specified by: packages/raise-cli/tests/pkg_meta/test_layer_contract.py
+name = "RAISE-16340 raise_cli 5-layer model"
+type = "layers"
+layers = [
+    "cli",
+    "pipeline : worktree : backlog : docs : reliability : skills : release_preflight : release_version : calibration : compliance : quality : self_update : hooks : output : fleet : onboarding : work_item",
+    "gates : session : memory : distillation : governance : work_events : cartridges : doctor",
+    "adapters",
+    "config : storage : schemas : compat : exceptions : cwd_binding : telemetry : graph : mcp : _agent_session : discovery : core : portfolio : dev : developer_profile : project_config : hook_bus : embeddings",
+]
+containers = ["raise_cli"]
+# WAIVER REGISTRY — the frozen stock of layer violations as of RAISE-16340.
+#
+# This list may only SHRINK except via enrollment waivers (ADR-2026-08-21).
+# Enrollment: a package first classified into the contract may carry pre-existing
+# violations as enrollment waivers — raise MAX_WAIVERS in the SAME commit,
+# tag the entry with the enrolled package name, and cite a remediation story.
+# Regression waivers (new code violating a boundary) are always forbidden.
+#
+# The ceiling is asserted by test_waivers_are_a_shrinking_ratchet in
+# packages/raise-cli/tests/pkg_meta/test_layer_contract.py — lower MAX_WAIVERS
+# there when you delete an entry here.
+ignore_imports = [
+    # --- Back-imports into `cli`. Owned by RAISE-16337 (cli/ dependency
+    # inversion). Pinned per-import, not wildcarded, so no NEW module may reach
+    # up into cli even while these six survive.
+    "raise_cli.session.bundle_data -> raise_cli.cli.main",
+    "raise_cli.gates.governance.skill_cli_refint_gate -> raise_cli.cli.main",
+    "raise_cli.pipeline.mcp_tools_docs -> raise_cli.cli.commands._resolve",
+    "raise_cli.pipeline.mcp_tools_backlog -> raise_cli.cli.commands._resolve",
+    "raise_cli.pipeline.mcp_server -> raise_cli.cli.commands.connect",
+    "raise_cli.pipeline.mcp_tools_story -> raise_cli.cli.commands.session",
+    # --- Boundary-level debt discovered by this story. One entry per violated
+    # boundary; each is removed wholesale when that boundary is repaired.
+    # core -> domain: telemetry emits work events instead of the reverse.
+    "raise_cli.telemetry.** -> raise_cli.work_events.**",
+    # core -> domain/adapters: storage reaches up into memory and adapters.
+    "raise_cli.storage.** -> raise_cli.memory.**",
+    "raise_cli.storage.** -> raise_cli.adapters.**",
+    # domain -> services: gates orchestrate service-tier modules.
+    "raise_cli.gates.** -> raise_cli.docs.**",
+    "raise_cli.gates.** -> raise_cli.pipeline.**",
+    "raise_cli.gates.** -> raise_cli.release_preflight",
+    "raise_cli.gates.** -> raise_cli.release_version",
+    "raise_cli.session.** -> raise_cli.worktree.**",
+    # --- doctor enrollment — RAISE-16981: pipeline_coverage_gate imports doctor,
+    # which imports pipeline.loader for coverage checks and worktree.provision
+    # for workspace readiness checks.
+    "raise_cli.doctor.** -> raise_cli.pipeline.**",
+    "raise_cli.doctor.** -> raise_cli.worktree.**",
+    # --- S3 enrollments (ADR-2026-08-21 enrollment waivers, pre-existing debt).
+    # graph→cartridges remediated by RAISE-16457; hooks×3 remediated by RAISE-16455.
+    # --- RAISE-16509 removals: W11/W8/W9 remediated — distillation→pipeline,
+    # session→self_update, developer_profile→adapters removed.
+]
+
+[tool.rai]
+# RaiSE CLI configuration for this project
+output_format = "human"
+color = true
+verbosity = 0
+# Worktree drift-block threshold (commits behind merge target before
+# pipeline_start rejects). Committed config, not env — changing it requires
+# a reviewable MR commit (RAISE-14278: RAISE_DRIFT_BLOCK_THRESHOLD env var
+# was an agent-controlled escape hatch, removed).
+drift_block_threshold = 50
+
+[tool.logfire]
+ignore_no_config = true

@@ -1,0 +1,9 @@
+name: Codex CLI
+agent_type: codex
+instructions_file: AGENTS.md
+skills_dir: .agent/skills
+plugin: raise_cli.agents.codex_plugin
+context_window: 192000
+detection_markers:
+  - AGENTS.md
+  - .codex
