@@ -1,0 +1,59 @@
+name: "CI: raise-cli"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/raise-cli/**"
+      - "packages/raise-core/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/raise-cli/**"
+      - "packages/raise-core/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "conftest.py"
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci-package.yml
+    with:
+      package: raise-cli
+      test-path: packages/raise-cli/tests/public/
+      src-path: packages/raise-cli/src/
+
+  # RAISE-16340 — architecture gate for the raise_cli layer model.
+  #
+  # The shared ci-package.yml workflow runs tests/lint/types only; it has no
+  # architecture step and adding one there would push a raise-cli-specific
+  # concern onto every package. So this lives here as a sibling job.
+  #
+  # `lint-imports` reads every [[tool.importlinter.contracts]] entry in the root
+  # pyproject.toml: the ADR-001 foundation contracts, the E14263 point
+  # contracts, and the RAISE-16340 5-layer model. Do not narrow it with
+  # `--contract` — new contracts must be picked up without touching CI.
+  #
+  # On failure the output names the offending import chain. Fix the import; do
+  # not add a waiver. The waiver registry in pyproject.toml is a ratchet that
+  # only shrinks (see packages/raise-cli/tests/pkg_meta/test_layer_contract.py).
+  #
+  # Deliberately has no `needs:` — a red test suite must not suppress the
+  # architecture verdict.
+  arch:
+    name: Layer contract (import-linter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Install dependencies
+        run: uv sync
+      - name: Check raise_cli layer contract
+        run: uv run lint-imports --config pyproject.toml
+      - name: Edge inventory (RAISE-16419 S1)
+        working-directory: packages/raise-cli
+        run: uv run --no-sync python -m tests.pkg_meta.edge_inventory

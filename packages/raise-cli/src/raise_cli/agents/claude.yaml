@@ -1,0 +1,9 @@
+name: Claude Code
+agent_type: claude
+instructions_file: CLAUDE.md
+skills_dir: .claude/skills
+plugin: raise_cli.agents.claude_plugin
+detection_markers:
+  - CLAUDE.md
+  - .claude
+  - ~/.claude
