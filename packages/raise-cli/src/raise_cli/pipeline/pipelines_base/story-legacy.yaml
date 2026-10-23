@@ -1,0 +1,52 @@
+name: story-legacy
+description: "Legacy story — 4 fases, sin design phase (legacy — 4-phase, no design. Use story for the 5-phase canonical default) via Agent() dispatch, contexto fresco por fase (ADR-134 v2)"
+issue_types:
+  - story
+  - task
+
+execution:
+  worktree_isolation: false  # Agent() provee aislamiento de contexto
+
+# Legacy edition (pre-ADR-143 C1): start → implement → verify → close (4 fases)
+# Promoted to canonical default by ADR-143 C1: story-lean (5-phase) is now story.
+# Keep this file as rollback option — remove after one release cycle if no issues.
+# Enterprise eliminadas: design, plan, architecture-review, pir, review (6+)
+# Skills: default residues de rai-story-{start,close} + enterprise rai-{story-implement,quality-review} (Opción A)
+# Referencia: work/epics/e14770-lean-methodology/skill-audit.md + ADR-134 v2
+phases:
+  - id: start
+    type: llm
+    skill: rai-story-start
+    # Default residue de rai-story-start: fetch+merge + raise_story_open (5 pasos vs 14)
+    # transition: story branch and scope committed — work is active in current cycle
+    target_status: committed
+
+  - id: implement
+    type: llm
+    skill: rai-story-implement
+    # Opción A (30% ceremonia — texto pasivo): el orquestador inyecta prompt directivo
+    # "ejecuta TDD sin HITL per-task; calidad garantizada por gates y raise_task_complete"
+    # transition: TDD implementation running; tracker signals active implementation phase
+    target_status: implement
+    validates:
+      - pattern: "packages/**/tests/**/*.py"
+        description: "Al menos un test file presente (TDD requirement)"
+
+  - id: verify
+    type: llm
+    skill: rai-quality-review
+    # Opción A (32% ceremonia — texto pasivo): el orquestador inyecta prompt directivo
+    # "emite solo verdict + findings críticos, omite output format verbose"
+    # transition: quality audit complete; issue enters review state before close
+    target_status: review
+
+  - id: close
+    type: llm
+    skill: rai-story-close
+    # Default residue de rai-story-close: sin Pipeline Context Check HITL (7 pasos vs 19)
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/epics/**/stories/s*.md"
+        description: "Story scope artifact (producido por start)"

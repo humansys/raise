@@ -1,0 +1,8 @@
+name: GitHub Copilot
+agent_type: copilot
+instructions_file: .github/copilot-instructions.md
+skills_dir: .github/agents
+workflows_dir: .github/prompts
+detection_markers:
+  - .github/copilot-instructions.md
+plugin: raise_cli.agents.copilot_plugin

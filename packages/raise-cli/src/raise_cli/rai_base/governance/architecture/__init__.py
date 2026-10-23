@@ -1,0 +1,1 @@
+"""Bundled architecture document templates."""

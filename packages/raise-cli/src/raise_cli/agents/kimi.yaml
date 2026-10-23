@@ -1,0 +1,7 @@
+name: Kimi Code CLI
+agent_type: kimi
+instructions_file: AGENTS.md
+skills_dir: .agents/skills
+detection_markers:
+  - .kimi-code
+plugin: raise_cli.agents.kimi_plugin

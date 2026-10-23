@@ -1,0 +1,19 @@
+name: raise-dev-workflow
+display_name: RaiSE Development Workflow — Execution Discipline
+version: 1.0.0
+author: Humansys
+license: Apache-2.0
+tier: community
+description: 'Layer 2 of the RaiSE three-layer cartridge model (ADR-108): execution
+  discipline. Teaches how software is built in RaiSE — pipelines and lifecycles, skills,
+  sessions, missions and worktrees, gates and testing, TDD, branch model and MRs,
+  adversarial reviews, HITL and autonomy, and fleet dispatch. Identity and philosophy
+  live in raise-methodology; work taxonomy lives in management-ontology.
+
+  '
+source:
+  type: derived
+  authority: local
+  refresh: manual
+requires:
+  llm: any

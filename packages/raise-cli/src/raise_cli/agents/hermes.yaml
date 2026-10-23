@@ -1,0 +1,8 @@
+name: Hermes Agent
+agent_type: hermes
+instructions_file: AGENTS.md
+skills_dir: .hermes/skills
+context_window: 128000
+detection_markers:
+  - AGENTS.md
+  - .hermes

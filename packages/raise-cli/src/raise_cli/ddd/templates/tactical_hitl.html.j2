@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DDD Tactical Escalation Review — HITL</title>
+  <style>
+    :root {
+      --bg: #1a1412;
+      --copper: #b87333;
+      --patina: #5f9ea0;
+      --snow: #f2ede8;
+      --copper-dim: #8b5e27;
+      --surface: #231c1a;
+      --border: #3a2e2b;
+      --text-muted: #8a7d78;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--snow);
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 1.5rem;
+    }
+
+    header {
+      border-bottom: 1px solid var(--copper-dim);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    header h1 {
+      color: var(--copper);
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+    }
+
+    header p {
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
+    }
+
+    .symbol-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .symbol-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .symbol-id {
+      color: var(--copper);
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .bc-badge {
+      background: var(--copper-dim);
+      color: var(--snow);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 0.78rem;
+    }
+
+    .tactical-badge {
+      background: var(--patina);
+      color: var(--bg);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 0.78rem;
+      font-weight: bold;
+    }
+
+    .agreement {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
+    .confidence-bar-container {
+      margin: 0.6rem 0;
+      background: var(--border);
+      border-radius: 3px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .confidence-bar {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--copper) 0%, var(--patina) 100%);
+    }
+
+    .confidence-label {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      margin-bottom: 0.4rem;
+    }
+
+    details {
+      margin-top: 0.6rem;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--patina);
+      font-size: 0.82rem;
+      padding: 0.2rem 0;
+      user-select: none;
+    }
+
+    summary:hover { color: var(--snow); }
+
+    .model-detail {
+      margin: 0.4rem 0 0 1rem;
+      padding: 0.6rem;
+      background: var(--bg);
+      border-left: 2px solid var(--copper-dim);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .model-name {
+      color: var(--copper);
+      font-size: 0.8rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .model-rationale {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .override-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-top: 0.8rem;
+    }
+
+    .override-label {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    select.override-select {
+      background: var(--bg);
+      color: var(--snow);
+      border: 1px solid var(--copper-dim);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    select.override-select:focus {
+      outline: 1px solid var(--copper);
+    }
+
+    .export-section {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+
+    .export-section h2 {
+      color: var(--copper);
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    button#exportBtn {
+      background: var(--copper);
+      color: var(--bg);
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1.2rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+    }
+
+    button#exportBtn:hover { background: var(--patina); }
+
+    textarea#yamlOutput {
+      display: none;
+      margin-top: 1rem;
+      width: 100%;
+      min-height: 200px;
+      background: var(--bg);
+      color: var(--snow);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.8rem;
+      font-family: inherit;
+      font-size: 0.82rem;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DDD Tactical Escalation — HITL Review</h1>
+    <p>
+      {{ verdicts | length }} symbol(s) escalated for human review.
+      Adjust overrides as needed, then click <strong>Export YAML</strong>.
+    </p>
+  </header>
+
+  {% for verdict in verdicts %}
+  <div class="symbol-card" data-symbol-id="{{ verdict.symbol_id | e }}">
+    <div class="symbol-header">
+      <span class="symbol-id">{{ verdict.symbol_id | e }}</span>
+      <span class="bc-badge">{{ bc_map.get(verdict.symbol_id, "unknown") | e }}</span>
+      <span class="tactical-badge">{{ verdict.tactical_type | e }}</span>
+      <span class="agreement">{{ verdict.agreement }}/{{ verdict.vote_count }} agree</span>
+    </div>
+
+    <div class="confidence-label">Confidence: {{ "%.0f" | format(verdict.confidence * 100) }}%</div>
+    <div class="confidence-bar-container">
+      <div class="confidence-bar" style="width: {{ "%.1f" | format(verdict.confidence * 100) }}%;"></div>
+    </div>
+
+    {% if verdict.per_model %}
+    <details>
+      <summary>Per-model rationale ({{ verdict.per_model | length }} model(s))</summary>
+      {% for model_id, cls in verdict.per_model.items() %}
+      <div class="model-detail">
+        <div class="model-name">{{ model_id | e }} → <strong>{{ cls.tactical_type | e }}</strong> ({{ "%.0f" | format(cls.confidence * 100) }}%)</div>
+        <div class="model-rationale">{{ cls.rationale | e }}</div>
+      </div>
+      {% endfor %}
+    </details>
+    {% endif %}
+
+    <div class="override-row">
+      <span class="override-label">Override:</span>
+      <select class="override-select"
+              data-symbol="{{ verdict.symbol_id | e }}"
+              data-panel-type="{{ verdict.tactical_type | e }}">
+        <option value="no_override">— no override —</option>
+        <option value="entity" {% if verdict.tactical_type == "entity" %}selected{% endif %}>entity</option>
+        <option value="value_object" {% if verdict.tactical_type == "value_object" %}selected{% endif %}>value_object</option>
+        <option value="domain_service" {% if verdict.tactical_type == "domain_service" %}selected{% endif %}>domain_service</option>
+        <option value="domain_event" {% if verdict.tactical_type == "domain_event" %}selected{% endif %}>domain_event</option>
+        <option value="aggregate_root" {% if verdict.tactical_type == "aggregate_root" %}selected{% endif %}>aggregate_root</option>
+        <option value="factory" {% if verdict.tactical_type == "factory" %}selected{% endif %}>factory</option>
+        <option value="repository_interface" {% if verdict.tactical_type == "repository_interface" %}selected{% endif %}>repository_interface</option>
+      </select>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="export-section">
+    <h2>Export YAML</h2>
+    <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.8rem;">
+      Only entries with an explicit override will be included.
+      Copy the YAML into your <code>domain-model.yaml</code> under <code>ddd.ratified[]</code>.
+    </p>
+    <button id="exportBtn">Export YAML</button>
+    <textarea id="yamlOutput" readonly></textarea>
+  </div>
+
+  <script>
+    document.getElementById('exportBtn').addEventListener('click', function () {
+      var today = new Date().toISOString().slice(0, 10);
+      var lines = ['---'];
+      var selects = document.querySelectorAll('select.override-select');
+      var count = 0;
+      selects.forEach(function (sel) {
+        var val = sel.value;
+        if (val === 'no_override') return;
+        var sym = sel.getAttribute('data-symbol');
+        lines.push('- symbol: ' + sym);
+        lines.push('  layer: D');
+        lines.push('  tactical_type: ' + val);
+        lines.push('  ratified_by: architect');
+        lines.push('  ratified_at: ' + today);
+        count++;
+      });
+      if (count === 0) {
+        lines = ['# No overrides selected.'];
+      }
+      var textarea = document.getElementById('yamlOutput');
+      textarea.value = lines.join('\n');
+      textarea.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

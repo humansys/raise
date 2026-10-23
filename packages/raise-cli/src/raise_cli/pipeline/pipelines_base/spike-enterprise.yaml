@@ -1,0 +1,67 @@
+name: spike-enterprise
+description: "4-phase spike lifecycle — time-boxed research or prototype, with team journal"
+# Widened for RAISE-13639 F1 (QR): Task legitimately routes through the spike
+# pipeline in real Jira usage. Ratified by user decision, not an oversight.
+issue_types:
+  - spike
+  - story
+  - task
+
+defaults:
+  spike_type: research
+
+phases:
+  - id: scope
+    type: llm
+    skill: rai-spike-start
+    # transition: spike scope defined; work is active in current cycle
+    target_status: committed
+    validates:
+      - pattern: "work/spikes/**/scope.md"
+        description: "Spike scope artifact"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: research
+    type: llm
+    skill: rai-research
+    when: "spike_type == 'research'"
+    # transition: research is the core work of a spike; tracker signals implementation phase
+    target_status: implement
+    validates:
+      - pattern: "work/research/**/*-report.md"
+        description: "Research report"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: close
+    type: llm
+    skill: rai-spike-close
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/spikes/**/scope.md"
+        description: "Spike scope with decision filled"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: journal
+    type: llm
+    skill: rai-spike-journal
+    # no target_status: this phase executes AFTER close (which already transitioned to done).
+    # Declaring target_status here would attempt a backward move from done — the workflow
+    # machine may reject this as illegal. Post-done documentation phase only.
+    validates:
+      - pattern: "work/spikes/**/*-journal.md"
+        description: "Spike journal narrative (also published to Confluence)"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low

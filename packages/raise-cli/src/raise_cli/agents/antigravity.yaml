@@ -1,0 +1,8 @@
+name: Antigravity
+agent_type: antigravity
+instructions_file: .agent/rules/raise.md
+skills_dir: .agent/skills
+workflows_dir: .agent/workflows
+detection_markers:
+  - .agent/rules
+  - .agent

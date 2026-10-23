@@ -1,0 +1,67 @@
+name: bugfix-lean
+description: "Lean bugfix — 5 fases via Agent() dispatch, contexto fresco por fase (ADR-134 v2)"
+issue_types:
+  - bug
+  - bugfix
+
+execution:
+  worktree_isolation: false  # Agent() provee aislamiento de contexto
+
+# Lean edition: diagnose → fix → verify → review → pir → close (6 fases)
+# Enterprise eliminadas: triage, analyse, plan, architecture-review (4)
+# Skills: lean residues de rai-bugfix-{start,fix,close} + enterprise rai-quality-review (Opción A)
+# Referencia: work/epics/e14770-lean-methodology/skill-audit.md + ADR-134 v2
+phases:
+  - id: diagnose
+    type: llm
+    skill: rai-bugfix-start-lean
+    target_status: committed
+    # Lean residue de rai-bugfix-start: tree check + branch + reproduce + scope + commit (11 pasos vs 25)
+
+  - id: fix
+    type: llm
+    skill: rai-bugfix-fix-lean
+    target_status: implement
+    # Lean residue de rai-bugfix-fix: TDD loop + gates + quality-review (11 pasos vs 19, sin HITL per-task)
+    validates:
+      - pattern: "packages/**/tests/**/*.py"
+        description: "Al menos un test file presente (regression test)"
+
+  - id: verify
+    type: llm
+    skill: rai-quality-review
+    target_status: review
+    # Opción A (32% ceremonia — texto pasivo): el orquestador inyecta prompt directivo
+    # "emite solo verdict + findings críticos, omite output format verbose"
+
+  - id: review
+    type: llm
+    skill: rai-bugfix-review
+    target_status: review
+    validates:
+      - pattern: "work/bugs/{issue_id}/retro.md"
+        description: "Bug retrospective (produced by review)"
+    # Mandatory AR attestation after the independent quality review.
+
+  - id: pir
+    type: llm
+    skill: rai-bugfix-pir
+    target_status: review
+    when: "size != 'XS'"
+    validates:
+      - pattern: "work/bugs/{issue_id}/pir.md"
+        description: "PIR learning narrative"
+
+  - id: close
+    type: llm
+    skill: rai-bugfix-close-lean
+    # Lean residue de rai-bugfix-close: sin Pipeline Context Check HITL, acepta run_id (12 pasos vs 26)
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    workflow_point: "before:bug:close"
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - pattern: "work/bugs/{issue_id}/scope.md"
+        description: "Scope artifact (producido por diagnose)"
+      - pattern: "work/bugs/{issue_id}/retro.md"
+        description: "Bug retrospective (produced by review)"

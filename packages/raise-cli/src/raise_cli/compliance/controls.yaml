@@ -1,0 +1,113 @@
+version: "1.0"
+standard: "ISO 27001:2022"
+controls:
+  - id: "A.8.4"
+    name: "Access to source code"
+    description: >-
+      Access to source code, development tools and software libraries
+      shall be appropriately managed.
+    evidence_sources:
+      - type: git
+        extractor: permissions
+        description: "Repository access controls and permission settings"
+
+  - id: "A.8.9"
+    name: "Configuration management"
+    description: >-
+      Configurations, including security configurations, of hardware,
+      software, services and networks shall be established, documented,
+      implemented, monitored and reviewed.
+    evidence_sources:
+      - type: git
+        extractor: commits
+        description: "Commit history showing configuration changes"
+      - type: git
+        extractor: branches
+        description: "Branch protection rules and branch model"
+      - type: git
+        extractor: tags
+        description: "Release tags documenting versioned configurations"
+
+  - id: "A.8.15"
+    name: "Logging"
+    description: >-
+      Logs that record activities, exceptions, faults and other relevant
+      events shall be produced, stored, protected and analysed.
+    evidence_sources:
+      - type: session
+        extractor: journals
+        description: "Session journal entries tracking development activities"
+      - type: session
+        extractor: audit_trail
+        description: "Audit trail of decisions, changes, and reviews"
+
+  - id: "A.8.25"
+    name: "Secure development lifecycle"
+    description: >-
+      Rules for the secure development of software and systems shall be
+      established and applied.
+    evidence_sources:
+      - type: gate
+        extractor: tests
+        description: "Automated test execution results"
+      - type: gate
+        extractor: type_check
+        description: "Static type checking results (Pyright)"
+      - type: gate
+        extractor: lint
+        description: "Linting and code quality gate results"
+
+  - id: "A.8.26"
+    name: "Application security requirements"
+    description: >-
+      Information security requirements shall be identified, specified
+      and approved when developing or acquiring applications.
+    evidence_sources:
+      - type: session
+        extractor: story_designs
+        description: "Story design documents with security considerations"
+      - type: session
+        extractor: adrs
+        description: "Architecture decision records capturing security decisions"
+
+  - id: "A.8.27"
+    name: "Secure system architecture"
+    description: >-
+      Principles for engineering secure systems shall be established,
+      documented, maintained and applied to any system development.
+    evidence_sources:
+      - type: session
+        extractor: design_docs
+        description: "System design documents and architecture specifications"
+      - type: session
+        extractor: architecture_reviews
+        description: "Architecture review records and approval evidence"
+
+  - id: "A.8.32"
+    name: "Change management"
+    description: >-
+      Changes to information processing facilities and information
+      systems shall be subject to change management procedures.
+    evidence_sources:
+      - type: git
+        extractor: commits
+        description: "Commit history with messages, authors, timestamps"
+      - type: git
+        extractor: pull_requests
+        description: "Pull request reviews and approvals"
+      - type: git
+        extractor: approvals
+        description: "Code review approvals and merge authorization"
+
+  - id: "A.8.33"
+    name: "Test information"
+    description: >-
+      Test information shall be appropriately selected, protected
+      and managed.
+    evidence_sources:
+      - type: gate
+        extractor: test_results
+        description: "Test execution results with pass/fail details"
+      - type: gate
+        extractor: coverage
+        description: "Code coverage metrics and reports"

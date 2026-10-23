@@ -1,0 +1,8 @@
+name: Bob (IBM)
+agent_type: bob
+instructions_file: AGENTS.md
+skills_dir: .bob/skills
+plugin: raise_cli.agents.bob_plugin
+detection_markers:
+  - .bob/custom_modes.yaml
+  - .bob
