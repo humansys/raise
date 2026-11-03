@@ -1,0 +1,7 @@
+name: Cursor
+agent_type: cursor
+instructions_file: .cursor/rules/raise.mdc
+skills_dir: .cursor/skills
+detection_markers:
+  - .cursor/rules
+  - .cursor

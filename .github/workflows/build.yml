@@ -1,0 +1,448 @@
+name: Build binaries
+
+# Builds the standalone rai + rai-mcp-pipeline binaries (RAISE-15629 specs)
+# for linux-x86_64, darwin-arm64 and windows-x86_64, and publishes them as
+# assets on the GitHub Release for the pushed tag (RAISE-15664 — replaces
+# the GitLab-only build:binary:*/publish:binary:*/release:binaries jobs and
+# the Cloudflare R2 facade from S9).
+#
+# Apple Silicon only: GitHub Actions' macos-latest already resolves to
+# arm64 (macos-14) — Intel/darwin-x86_64 is explicitly out of scope
+# (decision 2026-07-30), so there is no separate macos-13 job here.
+#
+# Reuses the platform scripts as-is (scripts/build-binary-local.sh/.ps1,
+# scripts/package-binary-archive.sh, scripts/build-version-manifest.py) —
+# none of them are GitLab-specific.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      skip_acceptance:
+        description: 'Skip windows-acceptance job (binary build check only)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  channel-guard:
+    runs-on: ubuntu-latest
+    outputs:
+      prerelease: ${{ steps.guard.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify tag provenance and channel
+        id: guard
+        run: bash scripts/check-tag-provenance.sh
+
+  build-linux:
+    needs: channel-guard
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Cache HuggingFace model weights
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-multilingual-e5-base-onnx-v1
+      - name: Provision ONNX embedding model (RAISE-15800)
+        run: |
+          uv venv /tmp/onnx-export --python 3.13
+          VIRTUAL_ENV=/tmp/onnx-export uv pip install huggingface-hub "transformers>=4.41,<6" "tokenizers<0.22"
+          /tmp/onnx-export/bin/python scripts/provision_onnx_model.py --dest packages/raise-cli/models/multilingual-e5-base
+          mv packages/raise-cli/models/multilingual-e5-base/model.onnx packages/raise-cli/models/multilingual-e5-base/model_quant.onnx
+      - name: Build binaries
+        run: |
+          uv pip install pyinstaller
+          bash scripts/build-binary-local.sh
+      - name: Package rai
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai packages/raise-cli/dist/rai-linux-x86_64 linux
+      - name: Package rai-mcp-pipeline
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai-mcp-pipeline packages/raise-cli/dist/rai-mcp-pipeline-linux-x86_64 linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-binaries
+          path: |
+            packages/raise-cli/dist/rai-linux-x86_64.tar.gz
+            packages/raise-cli/dist/rai-linux-x86_64.tar.gz.sha256
+            packages/raise-cli/dist/rai-mcp-pipeline-linux-x86_64.tar.gz
+            packages/raise-cli/dist/rai-mcp-pipeline-linux-x86_64.tar.gz.sha256
+
+  build-macos-arm64:
+    needs: channel-guard
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Cache HuggingFace model weights
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/huggingface
+          key: hf-multilingual-e5-base-onnx-v1
+      - name: Provision ONNX embedding model (RAISE-15800)
+        run: |
+          uv venv /tmp/onnx-export --python 3.13
+          VIRTUAL_ENV=/tmp/onnx-export uv pip install huggingface-hub "transformers>=4.41,<6" "tokenizers<0.22"
+          /tmp/onnx-export/bin/python scripts/provision_onnx_model.py --dest packages/raise-cli/models/multilingual-e5-base
+          mv packages/raise-cli/models/multilingual-e5-base/model.onnx packages/raise-cli/models/multilingual-e5-base/model_quant.onnx
+      - name: Build binaries
+        run: |
+          uv pip install pyinstaller
+          bash scripts/build-binary-local.sh
+      - name: Package rai
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai packages/raise-cli/dist/rai-darwin-arm64 darwin
+      - name: Package rai-mcp-pipeline
+        run: bash scripts/package-binary-archive.sh packages/raise-cli/dist/rai-mcp-pipeline packages/raise-cli/dist/rai-mcp-pipeline-darwin-arm64 darwin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64-binaries
+          path: |
+            packages/raise-cli/dist/rai-darwin-arm64.tar.gz
+            packages/raise-cli/dist/rai-darwin-arm64.tar.gz.sha256
+            packages/raise-cli/dist/rai-mcp-pipeline-darwin-arm64.tar.gz
+            packages/raise-cli/dist/rai-mcp-pipeline-darwin-arm64.tar.gz.sha256
+
+  build-windows:
+    needs: channel-guard
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Cache HuggingFace model weights
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\huggingface
+          key: hf-multilingual-e5-base-onnx-v1
+      - name: Provision ONNX embedding model (RAISE-15800)
+        shell: pwsh
+        run: |
+          uv venv "$env:TEMP\onnx-export" --python 3.13
+          $env:VIRTUAL_ENV = "$env:TEMP\onnx-export"
+          uv pip install huggingface-hub "transformers>=4.41,<6" "tokenizers<0.22"
+          & "$env:TEMP\onnx-export\Scripts\python.exe" scripts/provision_onnx_model.py --dest packages/raise-cli/models/multilingual-e5-base
+          Move-Item packages/raise-cli/models/multilingual-e5-base/model.onnx packages/raise-cli/models/multilingual-e5-base/model_quant.onnx
+          $env:VIRTUAL_ENV = "$PWD\.venv"
+      - name: Build binaries
+        run: |
+          uv pip install pyinstaller
+          pwsh -File scripts/build-binary-local.ps1
+      # Windows packaging is inline pwsh (not package-binary-archive.sh, which
+      # only covers linux/darwin tar.gz) — mirrors .gitlab-ci.yml's
+      # build:binary:windows-x86_64 job (RAISE-15631).
+      - name: Package binaries
+        shell: pwsh
+        run: |
+          Compress-Archive -Path packages/raise-cli/dist/rai/* -DestinationPath packages/raise-cli/dist/rai-windows-x86_64.zip
+          Compress-Archive -Path packages/raise-cli/dist/rai-mcp-pipeline/* -DestinationPath packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip
+          "$((Get-FileHash packages/raise-cli/dist/rai-windows-x86_64.zip -Algorithm SHA256).Hash.ToLower())  rai-windows-x86_64.zip" | Out-File -Encoding ascii packages/raise-cli/dist/rai-windows-x86_64.zip.sha256
+          "$((Get-FileHash packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip -Algorithm SHA256).Hash.ToLower())  rai-mcp-pipeline-windows-x86_64.zip" | Out-File -Encoding ascii packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip.sha256
+      # Compiles scripts/rai-installer.iss (RAISE-15631) against the onedir
+      # builds already produced above. AppVersion is the real preprocessor
+      # symbol defined in rai-installer.iss (not MyAppVersion) — /O redirects
+      # ISCC's output next to the .zip artifacts already uploaded below.
+      - name: Build installer (Inno Setup)
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          $sourceDir = (Resolve-Path "packages\raise-cli\dist").Path
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DSourceDir="$sourceDir" `
+            /DAppVersion=$version `
+            /O"packages\raise-cli\dist" `
+            scripts\rai-installer.iss
+          $hash = (Get-FileHash packages/raise-cli/dist/rai-installer-windows-x86_64.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  rai-installer-windows-x86_64.exe" | Out-File -Encoding ascii packages/raise-cli/dist/rai-installer-windows-x86_64.exe.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-binaries
+          path: |
+            packages/raise-cli/dist/rai-windows-x86_64.zip
+            packages/raise-cli/dist/rai-windows-x86_64.zip.sha256
+            packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip
+            packages/raise-cli/dist/rai-mcp-pipeline-windows-x86_64.zip.sha256
+            packages/raise-cli/dist/rai-installer-windows-x86_64.exe
+            packages/raise-cli/dist/rai-installer-windows-x86_64.exe.sha256
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [channel-guard, build-linux, build-macos-arm64, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "*-binaries"
+          path: dist
+          merge-multiple: true
+      - name: Generate version.json
+        run: >
+          python3 scripts/build-version-manifest.py
+          --version ${{ github.ref_name }}
+          --base-url https://releases.raiseframework.ai/${{ github.ref_name }}
+          --dist-dir dist
+          --output dist/version.json
+          --changelog-path CHANGELOG.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ needs.channel-guard.outputs.prerelease == 'true' }}
+          files: |
+            dist/*.tar.gz
+            dist/*.tar.gz.sha256
+            dist/*.zip
+            dist/*.zip.sha256
+            dist/*.exe
+            dist/*.exe.sha256
+            dist/version.json
+            scripts/install.sh
+            scripts/install.ps1
+
+  windows-acceptance:
+    # Dispatch-only: installs the run's own Windows binaries on a real
+    # windows-latest runner to verify the full first-run journey (RAISE-16347).
+    # skip_acceptance=true means only binary build is requested (RAISE-16961).
+    needs: build-windows
+    if: github.event_name == 'workflow_dispatch' && !inputs.skip_acceptance
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-binaries
+          path: serve-tmp
+      - name: Flatten artifact files for HTTP serving
+        shell: pwsh
+        run: |
+          # download-artifact@v4 preserves the workspace-relative path, so binaries land
+          # nested under packages/raise-cli/dist/. Flatten them to serve/acceptance/
+          # so install.ps1 can reach http://127.0.0.1:8765/acceptance/{archive} (D4).
+          New-Item -ItemType Directory -Path 'serve/acceptance' -Force | Out-Null
+          Get-ChildItem -Path 'serve-tmp' -Recurse -File | Copy-Item -Destination 'serve/acceptance'
+      - name: Pester unit tests (install.ps1)
+        shell: pwsh
+        run: |
+          Import-Module Pester -ErrorAction SilentlyContinue
+          Invoke-Pester scripts/install.Tests.ps1 -Output Detailed -CI
+      - name: Install under spaces prefix + verify (AC2/AC4)
+        shell: pwsh
+        run: |
+          # Serve artifacts over local HTTP — pwsh Invoke-WebRequest has no file:// support (D4)
+          $server = Start-Process python -ArgumentList '-m','http.server','8765','--bind','127.0.0.1' `
+                                         -WorkingDirectory serve -PassThru
+          # Wait until the HTTP server is accepting connections (avoid download race condition)
+          $ready = $false
+          for ($i = 0; $i -lt 20; $i++) {
+            Start-Sleep -Milliseconds 500
+            try {
+              $null = Invoke-WebRequest -Uri 'http://127.0.0.1:8765/' -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
+              $ready = $true; break
+            } catch { }
+          }
+          if (-not $ready) { throw "HTTP server did not start within 10 seconds" }
+          try {
+            $prefix = 'C:\rai acceptance\prefix with spaces'
+            $installOut = & scripts/install.ps1 -Version acceptance -BaseUrl 'http://127.0.0.1:8765' -Prefix $prefix 2>&1 | Out-String
+            Write-Host $installOut
+            # install.ps1 uses $ErrorActionPreference = 'Stop'; any failure propagates as exception.
+            # $LASTEXITCODE is not set by pwsh-only scripts (only by native executables), so no -ne 0 check here.
+            if ($installOut -notmatch 'SmartScreen') { throw "install.ps1 output missing SmartScreen guidance line (RAISE-17099 D5)" }
+            $raiDir = Join-Path $prefix 'rai'
+            $cmd = Get-Command rai -ErrorAction Stop
+            if ($cmd.Source -notlike "$raiDir*") { throw "rai resolves to $($cmd.Source), expected under $raiDir" }
+            # Version from pyproject.toml — not the git ref (D5)
+            $expected = (Select-String -Path packages/raise-cli/pyproject.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
+            $v = rai --version | Out-String
+            if ($v -notmatch [regex]::Escape("raise-cli version $expected")) { throw "version mismatch: $v" }
+            # First two segments of session PATH must be the managed dirs (D6)
+            $head = ($env:Path -split ';')[0..1]
+            if ($head -notcontains $raiDir) { throw "rai dir not at front of session PATH: $($head -join ';')" }
+            # Expose managed dirs to subsequent steps via GITHUB_PATH
+            Add-Content $env:GITHUB_PATH $raiDir
+            Add-Content $env:GITHUB_PATH (Join-Path $prefix 'rai-mcp-pipeline')
+          } finally {
+            Stop-Process $server -Force -ErrorAction SilentlyContinue
+          }
+      - name: Brownfield rai onboard smoke (AC5)
+        shell: pwsh
+        run: |
+          git config --global user.email "ci@github.actions"
+          git config --global user.name "CI"
+
+          # Repo 1 — diagnostic only: confirm rai init --detect --yes works standalone.
+          # Must be a separate repo so its git history never contaminates Repo 2.
+          $diagRepo = 'C:\rai acceptance\diag repo'
+          New-Item -ItemType Directory -Path $diagRepo -Force | Out-Null
+          git init $diagRepo
+          Set-Content (Join-Path $diagRepo 'app.py') 'print("hello")'
+          Push-Location $diagRepo
+          try {
+            Write-Host "=== rai init --detect --yes (standalone) ==="
+            $initOut = rai init --detect --yes 2>&1 | Out-String
+            $initCode = $LASTEXITCODE
+            Write-Host $initOut
+            Write-Host "=== init exit: $initCode ==="
+          } finally {
+            Pop-Location
+          }
+          if ($initCode -ne 0) { throw "rai init --detect --yes failed (exit $initCode)" }
+
+          # Repo 2 — completely fresh repo for rai onboard, seeded with the
+          # mixed C#+SQL IoT Smart Grid corpus (RAISE-17099 D1/D6). The
+          # checkout is the mirror snapshot's own tree, so the fixture path
+          # exists without any allowlist change (G2).
+          # No prior rai init, no .raise/ in git history — clean brownfield baseline.
+          $repo = 'C:\rai acceptance\brown field repo'
+          New-Item -ItemType Directory -Path $repo -Force | Out-Null
+          git init $repo
+          Copy-Item -Recurse -Path 'packages\raise-core\tests\public\fixtures\iot-smartgrid-corpus\*' -Destination $repo
+          Push-Location $repo
+          try {
+            $out = rai onboard 2>&1 | Out-String
+            $code = $LASTEXITCODE
+          } finally {
+            Pop-Location
+          }
+          Write-Host $out
+          if ($code -ne 0) { throw "rai onboard exited $code" }
+          if (-not (Test-Path (Join-Path $repo '.raise\manifest.yaml'))) { throw "no manifest.yaml after rai onboard" }
+          foreach ($label in 'Detected:','Action:','Next:') {
+            $n = ([regex]::Matches($out, "(?m)^$label")).Count
+            if ($n -ne 1) { throw "$label appears $n times in transcript, expected exactly 1" }
+          }
+          if ($out -notmatch '(?i)brownfield') { throw "transcript does not mention brownfield: $out" }
+
+          # --- Mixed corpus scan assertions (RAISE-17099 T2, D6) ---
+          # NO_COLOR + wide COLUMNS force rich to emit plain JSON under pwsh
+          # capture (same trick as ci-package.yml).
+          $env:NO_COLOR = '1'
+          $env:COLUMNS = '400'
+          $expected = Get-Content (Join-Path $repo 'expected.json') -Raw | ConvertFrom-Json
+          $scanOut = rai discover scan $repo --output json 2>&1 | Out-String
+          if ($LASTEXITCODE -ne 0) { throw "rai discover scan exited $LASTEXITCODE`n$scanOut" }
+          if ($scanOut -match 'Traceback') { throw "rai discover scan raised a traceback:`n$scanOut" }
+          $scan = $scanOut | ConvertFrom-Json
+
+          if (-not ($scan.PSObject.Properties.Name -contains 'files_found')) {
+            throw "scan JSON missing files_found — binary predates RAISE-17096"
+          }
+          if ($scan.files_found -lt $scan.files_scanned) {
+            throw "files_found ($($scan.files_found)) < files_scanned ($($scan.files_scanned)) — epic contract 2 violated"
+          }
+          # files_found counts every non-excluded file the walk reaches
+          # (README.md, expected.json, .gitattributes, .csproj included, not
+          # just cs+sql+sqlproj) — derived from the copied tree, not hardcoded.
+          $expectedTotalFiles = (Get-ChildItem -Path $repo -Recurse -File).Count
+          if ($scan.files_found -ne $expectedTotalFiles) {
+            throw "files_found ($($scan.files_found)) != files on disk ($expectedTotalFiles)"
+          }
+
+          $csFiles = @($scan.symbols | Where-Object { $_.file -like '*.cs' } | Select-Object -ExpandProperty file -Unique)
+          if ($csFiles.Count -lt $expected.files.cs) {
+            throw "distinct .cs files with symbols ($($csFiles.Count)) < expected ($($expected.files.cs))"
+          }
+          $sqlFiles = @($scan.symbols | Where-Object { $_.file -like '*.sql' } | Select-Object -ExpandProperty file -Unique)
+          if ($sqlFiles.Count -lt $expected.files.sql) {
+            throw "distinct .sql files with symbols ($($sqlFiles.Count)) < expected ($($expected.files.sql))"
+          }
+
+          $minSymbols = $expected.sql_objects.Count + $expected.csharp_symbols.Count
+          if ($scan.symbols.Count -lt $minSymbols) {
+            throw "symbols.Count ($($scan.symbols.Count)) < derived minimum ($minSymbols)"
+          }
+
+          if (@($scan.symbols | Where-Object { $_.file -like '*.sqlproj' }).Count -gt 0) {
+            throw ".sqlproj produced symbols — should be counted, zero extracted"
+          }
+
+          if ($scan.errors.Count -ne 0) {
+            throw "scan produced errors on a clean corpus: $($scan.errors -join '; ')"
+          }
+
+          # --- Long-path sub-step (RAISE-17099 T5 verification) ---
+          $deepBase = $repo
+          for ($i = 1; $i -le 9; $i++) {
+            $deepBase = Join-Path $deepBase ("LongPathSegment_" + ("x" * 24) + "_$i")
+          }
+          New-Item -ItemType Directory -Path $deepBase -Force | Out-Null
+          Copy-Item -Path (Join-Path $repo 'Database\Views\vwMeterMeasurement.sql') -Destination (Join-Path $deepBase 'DeepView.sql')
+
+          $deepScanOut = rai discover scan $repo --output json 2>&1 | Out-String
+          if ($deepScanOut -match 'Traceback') { throw "long-path scan raised a traceback:`n$deepScanOut" }
+          $deepScan = $deepScanOut | ConvertFrom-Json
+          $scannedDeep = @($deepScan.symbols | Where-Object { $_.file -like '*DeepView.sql' })
+          $diagnosedDeep = @($deepScan.errors | Where-Object { $_ -match 'MAX_PATH|LongPathsEnabled|path length' })
+          if ($scannedDeep.Count -eq 0 -and $diagnosedDeep.Count -eq 0) {
+            throw "DeepView.sql neither scanned nor diagnosed — silent long-path omission"
+          }
+
+          # Non-fatal diagnostic: which long-path regime this runner is under.
+          $raiCmd = Get-Command rai -ErrorAction SilentlyContinue
+          if ($raiCmd) {
+            $longPathAware = Select-String -Path $raiCmd.Source -Pattern 'longPathAware' -Quiet -ErrorAction SilentlyContinue
+            Write-Host "longPathAware manifest marker present in rai.exe: $longPathAware"
+          }
+
+          # rai init --detect must not crash (Traceback) on a repo containing
+          # a pre-existing deep directory (D4-3, detection._count_extensions).
+          $deepInitRepo = 'C:\rai acceptance\deep init repo'
+          New-Item -ItemType Directory -Path $deepInitRepo -Force | Out-Null
+          git init $deepInitRepo
+          Set-Content (Join-Path $deepInitRepo 'app.py') 'print("hello")'
+          $deepInitBase = $deepInitRepo
+          for ($i = 1; $i -le 9; $i++) {
+            $deepInitBase = Join-Path $deepInitBase ("LongPathSegment_" + ("x" * 24) + "_$i")
+          }
+          New-Item -ItemType Directory -Path $deepInitBase -Force | Out-Null
+          Set-Content (Join-Path $deepInitBase 'deep.py') 'x = 1'
+          Push-Location $deepInitRepo
+          try {
+            $deepInitOut = rai init --detect --yes 2>&1 | Out-String
+            $deepInitCode = $LASTEXITCODE
+          } finally {
+            Pop-Location
+          }
+          Write-Host $deepInitOut
+          if ($deepInitCode -ne 0) { throw "rai init --detect --yes failed on deep-path repo (exit $deepInitCode)" }
+          if ($deepInitOut -match 'Traceback') { throw "rai init --detect --yes raised a traceback on deep-path repo:`n$deepInitOut" }
+      - uses: astral-sh/setup-uv@v5
+      - name: SQLite WAL + lock tests (AC6)
+        shell: pwsh
+        run: |
+          uv sync
+          uv run pytest `
+            packages/raise-cli/tests/storage/test_connection.py `
+            packages/raise-cli/tests/storage/test_transaction_safety.py `
+            packages/raise-cli/tests/storage/test_maintenance_lock.py `
+            packages/raise-cli/tests/storage/test_consolidate_lock.py `
+            -o "addopts=" -p no:asyncio -p no:anyio -p no:cov -p no:xdist `
+            -W "ignore::pytest.PytestConfigWarning" -ra --tb=short
+
+  verify-published:
+    # RAISE-17080: fail the run if any of the 17 expected release assets is
+    # absent or unfinished (softprops ignores unmatched globs by default).
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify release assets for ${{ github.ref_name }}
+        run: bash scripts/verify-published.sh release-assets "${{ github.ref_name }}"

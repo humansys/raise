@@ -1,0 +1,66 @@
+name: research
+description: "Adaptive research pipeline — depth route (quick/standard/deep) controls which phases run"
+issue_types:
+  - research
+  - study
+
+execution:
+  worktree_isolation: false
+
+phases:
+  - id: frame
+    type: llm
+    skill: rai-research-frame
+    model: sonnet
+    # Outputs route: quick|standard|deep in phase_result
+
+  - id: scope
+    type: llm
+    skill: rai-research-scope
+    model: sonnet
+    depends_on: [frame]
+    when: "route != 'quick'"
+    # Decomposes question into 3-5 divergent search angles
+
+  - id: search
+    type: llm
+    skill: rai-research-search
+    model: sonnet
+    depends_on: [frame]
+    # Runs for all depths; scales internally (1 pass for quick, fan-out for standard/deep)
+
+  - id: evidence
+    type: llm
+    skill: rai-research-evidence
+    model: sonnet
+    depends_on: [search]
+    when: "route != 'quick'"
+    # Merge + dedup + evidence catalog
+
+  - id: verify
+    type: llm
+    skill: rai-research-verify
+    model: opus
+    depends_on: [evidence]
+    when: "route == 'deep'"
+    # Adversarial verification — forks try to refute each major claim
+
+  - id: critic
+    type: llm
+    skill: rai-research-critic
+    model: opus
+    depends_on: [verify]
+    when: "route == 'deep'"
+    # Completeness critic — identifies gaps, triggers re-search if needed
+
+  - id: synthesize
+    type: llm
+    skill: rai-research-synthesize
+    model: fable
+    depends_on: [search]
+    # Runs for all depths; reads whatever artifacts prior phases produced
+    validates:
+      - pattern: "work/research/**/*-report.md"
+    gate:
+      type: hitl
+      level: REVIEW

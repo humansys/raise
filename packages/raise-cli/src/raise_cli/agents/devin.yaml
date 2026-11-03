@@ -1,0 +1,7 @@
+name: Devin
+agent_type: devin
+instructions_file: AGENTS.md
+skills_dir: .agents/skills
+detection_markers:
+  - .devin
+plugin: raise_cli.agents.devin_plugin

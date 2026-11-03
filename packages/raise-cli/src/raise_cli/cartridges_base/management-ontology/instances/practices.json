@@ -1,0 +1,726 @@
+[
+  {
+    "id": "kc-management-ontology-delivery-vs-management",
+    "type": "knowledge",
+    "content": "# Delivery vs Management Work in RaiSE\n\nRaiSE draws a sharp distinction between two categories of work: delivery work and management work. This distinction matters because the two categories have different workflows, different success criteria, and different accountability models.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/delivery-vs-management.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "delivery-vs-management"
+    }
+  },
+  {
+    "id": "kc-management-ontology-delivery-work-value-work",
+    "type": "knowledge",
+    "content": "Delivery work produces observable value for end users. It is the reason the team exists. Delivery work follows TDD, has acceptance criteria, and produces something a user can interact with, measure, or depend on.\n\n**Examples of delivery work:**\n- Stories implementing a new feature\n- Bugfixes that correct user-facing defects\n- Epics that deliver a new capability\n- Performance improvements with measurable user impact\n\n**Properties of delivery work:**\n- Follows the canonical lifecycle (start → design → plan → implement → review → close)\n- Requires TDD (tests first, always)\n- Has formal acceptance criteria (Gherkin scenarios)\n- Produces a retrospective with extracted patterns\n- Tracked in the delivery project in Jira (Story/Bug issue types)",
+    "source_file": ".raise/cartridges/management-ontology/corpus/delivery-vs-management.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Delivery Work (Value Work)"
+    }
+  },
+  {
+    "id": "kc-management-ontology-management-work-operational-work",
+    "type": "knowledge",
+    "content": "Management work is necessary for delivery to happen, but it does not directly produce user-facing value. It is overhead — necessary overhead, but overhead nonetheless. RaiSE tracks management work to make its cost visible, not to treat it as value.\n\n**Examples of management work:**\n- Compliance documentation (GDPR, SOC 2, audit reports)\n- Infrastructure maintenance (not tied to a feature)\n- Team coordination meetings with action items\n- Reporting and dashboards\n- Hiring and onboarding coordination\n- Tool setup and administration\n\n**Properties of management work:**\n- Does not follow TDD (no test-driven requirement)\n- Does not require acceptance criteria (operational outcomes, not user outcomes)\n- Uses Task issue type in Jira\n- May or may not have a retrospective (depends on the task)\n- Tracked in a management project or as management tasks within delivery projects",
+    "source_file": ".raise/cartridges/management-ontology/corpus/delivery-vs-management.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Management Work (Operational Work)"
+    }
+  },
+  {
+    "id": "kc-management-ontology-epics-can-be-either",
+    "type": "knowledge",
+    "content": "An epic can be a delivery epic (a bounded software initiative) or a management epic (a bounded administrative initiative). The type determines which sub-workflows apply.\n\nA compliance audit epic is a management epic. A new authentication system epic is a delivery epic. The distinction is not always obvious — the test is: \"Does this directly produce something a user interacts with?\"",
+    "source_file": ".raise/cartridges/management-ontology/corpus/delivery-vs-management.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Epics Can Be Either"
+    }
+  },
+  {
+    "id": "kc-management-ontology-why-the-distinction-matters",
+    "type": "knowledge",
+    "content": "**For velocity:** Mixing delivery and management work in the same backlog without distinction inflates apparent velocity (points moved) while masking real delivery throughput.\n\n**For accountability:** Delivery work has observable outcomes (working software). Management work has operational outcomes (document written, meeting held). The accountability models differ.\n\n**For process:** Applying TDD and acceptance criteria to compliance documentation creates unnecessary friction. Omitting TDD from a feature story creates quality debt. The right process for each type of work is different.\n\n**For AI agents:** Autonomous agents should focus on delivery work. Management work often requires human judgment and authority that agents should not assume. RaiSE's pipeline engine is optimized for delivery work.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/delivery-vs-management.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Why the Distinction Matters"
+    }
+  },
+  {
+    "id": "kc-management-ontology-the-hybrid-case",
+    "type": "knowledge",
+    "content": "Some work is hybrid — it has both delivery and management dimensions. For example, a monitoring dashboard is delivery work (users interact with it) but its primary purpose is management (tracking team health). In these cases, classify by the primary value driver.\n\nWhen in doubt: ask \"Who is the user?\" If the user is an end customer, it is delivery. If the user is the team itself, it is management.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/delivery-vs-management.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "The Hybrid Case"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as",
+    "type": "knowledge",
+    "content": "value work vs overhead, delivery vs admin, productive vs operational, feature work vs process work, direct value vs supporting value",
+    "source_file": ".raise/cartridges/management-ontology/corpus/delivery-vs-management.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As"
+    }
+  },
+  {
+    "id": "kc-management-ontology-dependencies",
+    "type": "knowledge",
+    "content": "# Dependency Management in RaiSE\n\nDependencies in RaiSE come in two forms: work dependencies (one story depends on another) and technical dependencies (one component depends on another). Managing both well is critical for delivery predictability.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/dependencies.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "dependencies"
+    }
+  },
+  {
+    "id": "kc-management-ontology-work-dependencies",
+    "type": "knowledge",
+    "content": "### Upstream Dependencies\n\nAn upstream dependency is work that must be completed before the current work can start or complete. In RaiSE, upstream dependencies are documented in the story scope and tracked via Jira issue links (\"is blocked by\").\n\n**Types of upstream dependencies:**\n- **Hard (blocking):** The current story cannot start without the upstream being done. Example: a story implementing a feature that requires a database schema migration from another story.\n- **Soft (parallel):** The current story can start but cannot complete without the upstream. Example: a UI story that can be built against a mock but needs the real API to be validated.\n\n**Management:** Hard upstream dependencies must be resolved before the story enters the Implement phase. Soft dependencies must be resolved before the story enters the Review phase.\n\n### Downstream Dependencies\n\nA downstream dependency is work that depends on the current work. The current story \"unblocks\" the downstream. RaiSE tracks these with \"blocks\" Jira links.\n\nDownstream dependencies create delivery pressure: a story with many downstream dependents should be prioritized because blocking them costs more than just the story's own delay.\n\n### Cross-Epic Dependencies\n\nWhen a story in one epic depends on a story from another epic, this is a cross-epic dependency. These are the most dangerous because they cross team boundaries (in larger organizations) and planning horizons.\n\nCross-epic dependencies should be minimized by: decomposing epics around vertical slices (each slice is independently shippable), using interface-first design (define the contract before implementing either side), and explicit coordination via the mission planning level.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/dependencies.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Work Dependencies"
+    }
+  },
+  {
+    "id": "kc-management-ontology-technical-dependencies",
+    "type": "knowledge",
+    "content": "### Package Dependencies\n\nExternal packages (Python packages via uv, npm packages, etc.) are technical dependencies. RaiSE's supply chain gate requires evaluating new external dependencies before introducing them: version history, download count, maintenance status, bus factor, yank history.\n\nWell-known packages (pydantic, fastapi, pytest, typer) are pre-approved. Novel packages require evaluation.\n\n### Internal Module Dependencies\n\nInternal dependencies (one module importing from another) create coupling. The direction of coupling matters: stable modules (core abstractions, graph models) should not import from volatile modules (new features, experimental code). Coupling in the wrong direction creates fragility.\n\nRaiSE's architecture review checks coupling direction as part of the systemic audit.\n\n### Service Dependencies\n\nExternal services (databases, APIs, message queues) are runtime dependencies. Stories that introduce new service dependencies should document: the service's SLA, the fallback behavior when the service is unavailable, and the health check strategy.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/dependencies.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Technical Dependencies"
+    }
+  },
+  {
+    "id": "kc-management-ontology-dependency-patterns",
+    "type": "knowledge",
+    "content": "### Dependency Inversion\n\nDepend on abstractions, not concretions. Define an interface first, implement it second. This allows parallel development (one team implements the interface, another consumes it) and easier testing (mock the interface, not the implementation).\n\n### Walking Skeleton\n\nWhen a story has upstream dependencies that are not yet complete, build the walking skeleton against mocks. The walking skeleton demonstrates the end-to-end flow without requiring all components to be production-ready.\n\n### Feature Flags\n\nWhen two stories have a soft dependency, use a feature flag to allow the upstream to merge first (with the flag off) and the downstream to integrate later (with the flag on). This avoids long-lived branches.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/dependencies.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Dependency Patterns"
+    }
+  },
+  {
+    "id": "kc-management-ontology-documenting-dependencies-in-raise",
+    "type": "knowledge",
+    "content": "**In scope.md:** List upstream dependencies (what this story depends on) and downstream dependencies (what this story unblocks).\n\n**In design.md:** The `dependencies` field lists what the story depends on and whether it is a blocker.\n\n**In Jira:** Use \"is blocked by\" and \"blocks\" link types to make dependencies visible in the board view.\n\n**In epic scope.md:** Cross-story dependencies are documented in the Implementation Plan section with the sequencing rationale.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/dependencies.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Documenting Dependencies in RaiSE"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--dependencies",
+    "type": "knowledge",
+    "content": "prerequisites, blockers, upstream/downstream, coupling, prerequisites, service dependencies, external dependencies",
+    "source_file": ".raise/cartridges/management-ontology/corpus/dependencies.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-lifecycle",
+    "type": "knowledge",
+    "content": "# Canonical Lifecycle in RaiSE\n\nThe canonical lifecycle is the standard progression for delivery work in RaiSE. It applies to stories, bugfixes, and epics (with phase-specific variations). The lifecycle is not optional — skipping phases is not a shortcut, it is a process defect.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/lifecycle.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "lifecycle"
+    }
+  },
+  {
+    "id": "kc-management-ontology-the-six-phases",
+    "type": "knowledge",
+    "content": "### 1. Start\n\nThe start phase initializes the work unit: creates the branch, writes the scope document, transitions the backlog item to in-progress, and binds the work to the session. The scope commit is a hard gate — no implementation work happens on an unbranched story.\n\nFor stories: `/rai-story-start` creates `story/s{N}.{M}/{slug}` from the development branch, writes `scope.md` and `story.md`, transitions Jira to the design status.\n\nFor epics: `/rai-epic-start` initializes `work/epics/e{N}-{name}/`, creates `scope.md`, transitions the epic ticket.\n\n### 2. Design\n\nDesign is the gemba walk — going to the actual code before deciding what to build. Design without reading the code is guessing. The design document captures: problem, value, approach, affected components, decisions, examples, and acceptance criteria.\n\nDesign is never optional. A story that skips design is likely to build the wrong thing or duplicate existing functionality. The design HITL gate requires human approval before proceeding to plan.\n\nOutput: `design.md` (structured artifact + Markdown view + Confluence page)\n\n### 3. Plan\n\nThe plan decomposes the story into atomic, individually verifiable tasks. Each task has: description, files affected, TDD cycle (RED → GREEN → REFACTOR), acceptance criteria reference, verification commands with explicit scope, and size estimate.\n\nThe plan determines execution order (risk-first), identifies dependencies (sequential vs parallel), and includes the Gate Policy (how to run tests — always via `rai gate check`, never directly via pytest or npm test).\n\nOutput: `plan.md`\n\n### 4. Implement\n\nImplementation follows the plan task by task. Each task completes its full TDD cycle before moving to the next. No task is considered done until gates pass: tests, lint, format, types. Each completed task gets its own commit.\n\nThe implement phase is the longest in wall-clock time but the shortest in decision-making: the design and plan have already made the decisions. Implementation is execution.\n\n### 5. Review\n\nThe review phase is an adversarial retrospective. It includes: architecture review (proportionality, YAGNI, Beck's four rules), quality review (semantic bugs, type honesty, test quality), and pattern extraction (what was learned that should propagate to future stories).\n\nThe architecture review asks: \"Could we achieve the same outcome with less?\" The quality review asks: \"What did the automated gates miss?\" Both are required before close.\n\n### 6. Close\n\nClose merges the story branch to the development branch, updates the epic progress tracking, transitions the Jira issue to Done, and emits the lifecycle signal. The retrospective document is committed before merge.\n\nFor epics: close includes the epic retrospective, architecture doc update, and merge of the epic accumulation branch.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/lifecycle.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "The Six Phases"
+    }
+  },
+  {
+    "id": "kc-management-ontology-gates-between-phases",
+    "type": "knowledge",
+    "content": "Each phase transition has a gate that must pass before proceeding:\n\n| Transition | Gate |\n|------------|------|\n| Start → Design | Scope commit on story branch |\n| Design → Plan | HITL design approval |\n| Plan → Implement | HITL plan approval (adversarial AR + QR in pipeline) |\n| Implement → Review | All gates pass (tests, lint, format, types) |\n| Review → Close | Retrospective document complete |\n\nGates are not bureaucracy — they are quality checkpoints. \"Move fast\" by passing gates, not by skipping them.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/lifecycle.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Gates Between Phases"
+    }
+  },
+  {
+    "id": "kc-management-ontology-lifecycle-variants",
+    "type": "knowledge",
+    "content": "**Epic lifecycle:** start → design → plan → [stories iterate] → close. Stories execute their full 6-phase lifecycle within the epic container.\n\n**Bugfix lifecycle:** start → triage → analyse → plan → fix → review → close → PIR. The PIR (post-incident review) is an additional phase that extracts systemic lessons.\n\n**Hotfix:** Compressed bugfix lifecycle for production incidents. Same phases, accelerated timeline. RCA is required but may be done after the fix is deployed (with a commitment to complete it).",
+    "source_file": ".raise/cartridges/management-ontology/corpus/lifecycle.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Lifecycle Variants"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--lifecycle",
+    "type": "knowledge",
+    "content": "workflow, pipeline, development lifecycle, SDLC, process, delivery cycle, sprint workflow",
+    "source_file": ".raise/cartridges/management-ontology/corpus/lifecycle.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-metrics",
+    "type": "knowledge",
+    "content": "# Metrics in RaiSE\n\nMetrics in RaiSE measure the health of the delivery process, not just its output. A team that ships fast but accumulates technical debt, skips retrospectives, or burns out engineers is not healthy. RaiSE tracks metrics that capture the full picture.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/metrics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "metrics"
+    }
+  },
+  {
+    "id": "kc-management-ontology-delivery-metrics",
+    "type": "knowledge",
+    "content": "### Velocity\n\n**Definition:** Story points completed per sprint (typically 2 weeks).\n\n**Measurement:** Sum of points on stories transitioned to Done during the sprint period.\n\n**Caution:** Velocity is a planning tool, not a performance metric. Comparing velocity across teams is a misuse. Velocity only makes sense within the context of a stable team using consistent estimation practices. Inflation via oversized estimates is a process smell.\n\n### Cycle Time\n\n**Definition:** Time from \"work started\" (scope commit) to \"work done\" (branch merged) for a single story.\n\n**Measurement:** `done_at - started_at` for each story. Tracked per story, aggregated per sprint.\n\n**Use:** Cycle time reveals process bottlenecks. High cycle time indicates: large stories (split them), frequent blocking, gate failures requiring rework, or design skipping.\n\n### Lead Time\n\n**Definition:** Time from \"story created in backlog\" to \"story done.\" Includes queue time.\n\n**Measurement:** `done_at - created_at`. Longer than cycle time because it includes the waiting period.\n\n**Use:** Lead time tells stakeholders how long it takes from request to delivery. High lead time with low cycle time indicates queuing problems (backlog too large, prioritization unclear).\n\n### Defect Escape Rate\n\n**Definition:** Percentage of bugs that were not caught during implementation and reached review or production.\n\n**Measurement:** `bugs_caught_in_review / total_bugs` and `bugs_in_production / total_bugs`.\n\n**Use:** High defect escape rate indicates: test coverage gaps, skipped gates, or design problems. RaiSE's gate policy (tests + lint + types before review) is designed to minimize escape rate.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/metrics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Delivery Metrics"
+    }
+  },
+  {
+    "id": "kc-management-ontology-process-quality-metrics",
+    "type": "knowledge",
+    "content": "### Retrospective Pattern Rate\n\n**Definition:** Average number of new patterns extracted per story retrospective.\n\n**Measurement:** Count of patterns registered (PAT-E-*) per story, averaged over the sprint.\n\n**Use:** A team that learns from every story improves compoundingly. A team that skips retrospectives or writes empty ones stagnates. Low pattern rate is a signal to improve retrospective quality.\n\n### Gate Pass Rate\n\n**Definition:** Percentage of gate check runs that pass on first attempt.\n\n**Measurement:** `gate_passes_first_try / total_gate_checks`.\n\n**Use:** Low gate pass rate indicates: TDD not being followed (writing code before tests), rushed implementation, or gate infrastructure problems. Target: >80% first-try pass rate.\n\n### Design Compliance Rate\n\n**Definition:** Percentage of stories that complete a design document before implementation.\n\n**Measurement:** Stories with design.md committed before the first implementation commit.\n\n**Use:** Design compliance is a leading indicator of rework rates. Stories without design have 2-3x higher rework rates based on empirical observation.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/metrics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Process Quality Metrics"
+    }
+  },
+  {
+    "id": "kc-management-ontology-agent-metrics-autonomous-work",
+    "type": "knowledge",
+    "content": "When AI agents execute stories autonomously, additional metrics apply:\n\n### Attempt Count\n\n**Definition:** Number of implementation attempts before a story passes review.\n\n**Target:** ≤2 attempts. More than 2 suggests the design or planning phase has issues.\n\n### HITL Decision Time\n\n**Definition:** Time between an HITL gate being presented and a human approving or rejecting it.\n\n**Target:** ≤5 minutes per decision. Longer indicates gates are not being monitored or decisions are unclear.\n\n### Autonomous Completion Rate\n\n**Definition:** Percentage of stories completed without escalation beyond HITL gates.\n\n**Use:** Measures the reliability of autonomous execution. High escalation rate suggests the agent is encountering novel situations not covered by patterns.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/metrics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Agent Metrics (Autonomous Work)"
+    }
+  },
+  {
+    "id": "kc-management-ontology-using-metrics-responsibly",
+    "type": "knowledge",
+    "content": "Metrics are sensors, not targets. Goodhart's Law applies: when a measure becomes a target, it ceases to be a good measure. Track metrics to understand the system, not to optimize the metric.\n\nRaiSE emits telemetry signals at lifecycle transitions (start, design-complete, implement-complete, etc.) that feed dashboards. The signals are observational — they do not gate the process.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/metrics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Using Metrics Responsibly"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--metrics",
+    "type": "knowledge",
+    "content": "KPIs, indicators, measurements, telemetry, signals, analytics, health metrics, DORA metrics",
+    "source_file": ".raise/cartridges/management-ontology/corpus/metrics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-query-vocabulary",
+    "type": "knowledge",
+    "content": "# Query Vocabulary in RaiSE\n\nRaiSE uses natural language queries to retrieve relevant knowledge from its graph and cartridges. Because the same concept can be expressed in many ways across teams and organizations, RaiSE maintains synonym mappings to ensure retrieval is robust to terminology variation.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/query-vocabulary.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "query-vocabulary"
+    }
+  },
+  {
+    "id": "kc-management-ontology-core-synonym-groups",
+    "type": "knowledge",
+    "content": "### Retrospective\n\n`retro` = `retrospective` = `review session` = `post-mortem` = `after-action review` = `lessons learned` = `sprint review` = `story close review`\n\nAll of these terms refer to the structured reflection at the end of a work unit that extracts learnings and patterns. In RaiSE, retrospectives produce: pattern candidates, improvement actions, and a committed `retrospective.md` document.\n\n### Architectural Decision\n\n`decision` = `ADR` = `architecture decision record` = `design decision` = `trade-off` = `architectural choice` = `tech decision`\n\nDecisions are captured in `governance/adrs/` as numbered ADR documents. They follow the format: context, decision, rationale, consequences. ADRs are binding — a decision recorded in an ADR is not relitigated without a new ADR superseding it.\n\n### Blockage\n\n`blocked` = `impediment` = `blocker` = `stuck` = `waiting` = `dependency` = `bottleneck` = `constraint`\n\nA blocked item cannot proceed. Blocked status requires a documented reason and resolution path. In Jira, blocked items should have a link to the blocking issue and a comment explaining what needs to happen.\n\n### Epic\n\n`epic` = `initiative` = `feature set` = `capability` = `program increment` = `large story` = `theme`\n\nAn epic is a multi-story work container. Not to be confused with a Jira Epic (which is a specific issue type) — in RaiSE, the concept maps to Jira Epics but the semantics are richer.\n\n### Story\n\n`story` = `user story` = `feature` = `requirement` = `deliverable` = `ticket` = `issue` = `card`\n\nA story is the unit of delivery. In Jira, stories are Story-type issues. In conversation, \"feature\" and \"requirement\" often mean the same thing. \"Ticket\" is a colloquialism that maps to story in delivery contexts.\n\n### Plan\n\n`plan` = `decomposition` = `task breakdown` = `sprint plan` = `implementation plan` = `execution plan`\n\nA plan decomposes a story into atomic tasks. In RaiSE, the plan document contains ordered tasks with TDD guidance and gate policy.\n\n### Scope\n\n`scope` = `boundaries` = `in-scope/out-of-scope` = `done-when` = `acceptance criteria` = `definition of done`\n\nScope defines what is and isn't part of a work unit. The scope document (scope.md) contains three sections: In Scope, Out of Scope, Done When. Done-when is functionally equivalent to \"definition of done\" in Scrum terminology.\n\n### Workflow\n\n`workflow` = `process` = `lifecycle` = `pipeline` = `SDLC` = `delivery process`\n\nThe canonical lifecycle (start → design → plan → implement → review → close) is the workflow. \"Pipeline\" refers both to the lifecycle and to the automation pipeline (MCP pipeline engine) that orchestrates skill invocations.\n\n### Pattern\n\n`pattern` = `practice` = `convention` = `best practice` = `established approach` = `known solution`\n\nPatterns are extractable, reusable solutions to recurring problems. They are stored in the pattern system (PAT-E-*) and propagated via retrospectives. A pattern is not a rule — it is a documented solution that worked in a specific context.\n\n### Metric\n\n`metric` = `measurement` = `KPI` = `indicator` = `signal` = `telemetry`\n\nMetrics measure the health of the delivery process. Key metrics in RaiSE: story points per sprint (velocity), cycle time (start to done), defect escape rate (bugs that reach review/prod), retrospective pattern rate (patterns extracted per story).",
+    "source_file": ".raise/cartridges/management-ontology/corpus/query-vocabulary.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Core Synonym Groups"
+    }
+  },
+  {
+    "id": "kc-management-ontology-query-examples",
+    "type": "knowledge",
+    "content": "When querying the knowledge graph, RaiSE normalizes these synonyms:\n\n| User query | Canonical concept |\n|------------|-------------------|\n| \"how do I write a retro?\" | retrospective |\n| \"what is a blocker?\" | blockage / blocked status |\n| \"how to make an ADR?\" | architectural decision record |\n| \"what goes in scope?\" | scope / done-when |\n| \"how do I split a large feature?\" | epic / story decomposition |\n| \"what patterns exist for auth?\" | pattern system |",
+    "source_file": ".raise/cartridges/management-ontology/corpus/query-vocabulary.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Query Examples"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--query-vocabulary",
+    "type": "knowledge",
+    "content": "glossary, terminology map, synonyms, vocabulary, ontology terms, domain vocabulary",
+    "source_file": ".raise/cartridges/management-ontology/corpus/query-vocabulary.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-risks",
+    "type": "knowledge",
+    "content": "# Risk Management in RaiSE\n\nRisk management in RaiSE is practical and embedded in the delivery process — not a separate discipline that produces documents nobody reads. Risks are captured at the epic and story level, assessed by probability and impact, and mitigated through specific technical decisions.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/risks.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "risks"
+    }
+  },
+  {
+    "id": "kc-management-ontology-risk-classification",
+    "type": "knowledge",
+    "content": "### By Probability\n\n- **High:** Likely to occur based on past experience, known technical constraints, or environmental factors.\n- **Medium:** Could occur; some evidence or precedent exists.\n- **Low:** Unlikely but worth noting; would be a surprise if it occurred.\n\n### By Impact\n\n- **High:** Blocks delivery, requires significant rework, or affects production users.\n- **Medium:** Causes delays or requires moderate rework but doesn't block.\n- **Low:** Minor friction; easily mitigated or absorbed.\n\n### By Type\n\n**Technical Risk:** The technology may not work as expected, may not scale, or may introduce hidden complexity.\nExamples: LLM non-determinism, third-party API instability, database migration conflicts, performance degradation under load.\n\n**Process Risk:** The team process may fail to catch defects, produce the wrong thing, or create dependencies that block.\nExamples: Design skipped (leading to rework), testing gaps (defects reach production), unclear acceptance criteria (story reopened after Done).\n\n**External Risk:** Factors outside the team's control.\nExamples: Third-party service outages, API key expiration, infrastructure changes by a platform team, regulatory changes.\n\n**Knowledge Risk:** The team lacks the information needed to make good decisions.\nExamples: Novel technology being used for the first time, unclear business requirements, architectural constraints not yet understood.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/risks.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Risk Classification"
+    }
+  },
+  {
+    "id": "kc-management-ontology-risk-registration-in-raise",
+    "type": "knowledge",
+    "content": "Risks are registered in three places:\n\n**Epic scope (`scope.md`):** A \"Riesgos\" section with the top 3 risks for the epic, their probability/impact/mitigation.\n\n**Story design (`design.md`):** The `drift_risks` section captures risks specific to the technical approach — particularly AG4 (context-window planning) and AG2 (clone amplification).\n\n**Architecture review:** The AR identifies systemic risks (orphaned abstractions, coupling direction, shotgun surgery).",
+    "source_file": ".raise/cartridges/management-ontology/corpus/risks.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Risk Registration in RaiSE"
+    }
+  },
+  {
+    "id": "kc-management-ontology-risk-mitigation-patterns",
+    "type": "knowledge",
+    "content": "### Walking Skeleton First\n\nFor high-technical-risk stories, implement the riskiest component first as a minimal proof-of-concept before building the full feature. This surfaces blockers early when rework is cheap.\n\n### Scope Slicing\n\nLarge epics with high scope risk should be sliced into smaller stories that can be delivered and validated independently. A story that delivers partial value is better than a large story that delivers no value until it's complete.\n\n### External Dependency Isolation\n\nIsolate external dependencies (APIs, services, databases) behind interfaces so that mock implementations can be used during development and testing. This prevents external instability from blocking the team.\n\n### Frozen Fixtures\n\nFor non-deterministic components (LLM extraction, ML models), commit extracted artifacts as frozen fixtures. This prevents re-extraction surprises and ensures tests are deterministic.\n\n### Gate Escalation\n\nWhen a risk materializes during implementation (a gate fails unexpectedly, an assumption proves wrong), escalate to the HITL gate pattern: stop, document the finding, propose options, wait for human decision. Do not push forward blindly.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/risks.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Risk Mitigation Patterns"
+    }
+  },
+  {
+    "id": "kc-management-ontology-risk-tracking",
+    "type": "knowledge",
+    "content": "RaiSE does not maintain a separate risk register. Risks are tracked where the work is tracked — in the epic scope, story design, and retrospective. The retrospective is where risks that materialized become process improvement actions.\n\nA risk that materializes and was not in the risk register is a signal to improve the risk identification process. It should be captured as a pattern: \"In the context of X, we missed risk Y. In future, look for Y when doing X.\"",
+    "source_file": ".raise/cartridges/management-ontology/corpus/risks.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Risk Tracking"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--risks",
+    "type": "knowledge",
+    "content": "risk register, risk assessment, threat model, uncertainty, assumptions, mitigation plan, contingency",
+    "source_file": ".raise/cartridges/management-ontology/corpus/risks.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-roadmap",
+    "type": "knowledge",
+    "content": "# Roadmap and Planning in RaiSE\n\nA roadmap in RaiSE is not a Gantt chart or a commitment to dates. It is a sequenced set of intentions — what the team plans to build, in what order, and why — with enough granularity to coordinate across teams but not so much detail that it becomes outdated as soon as it is written.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/roadmap.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "roadmap"
+    }
+  },
+  {
+    "id": "kc-management-ontology-planning-levels",
+    "type": "knowledge",
+    "content": "### Mission Level (Strategic)\n\nA mission is a teleological container — it defines a bounded initiative with explicit objectives and success criteria. Missions span multiple epics and potentially multiple quarters. They are the highest planning level in RaiSE.\n\nA mission has: a name, a set of objectives (each with observable completion criteria), a set of linked epics, and a timeline horizon. Missions are not detailed — they define destination, not route.\n\n**Example:** \"Mission: Retrieval híbrido neuro-simbólico — Objectives: (1) federated retrieval across 3 cartridges, (2) hybrid ranking with symbolic + neural scores, (3) quota tier enforcement.\"\n\n### Epic Level (Tactical)\n\nAn epic translates a mission objective into a bounded deliverable. An epic has: a scope document, a design document, a plan with story sequence, and a retrospective at close. Epics are the primary planning unit for quarterly planning.\n\nAn epic is sized by the sum of its stories (roughly 8–40+ points). A well-planned epic can be delivered in 1–4 sprints. An epic that spans more than 2 quarters is probably too large and should be split.\n\n**Planning artifacts:** `work/epics/e{N}-{name}/scope.md`, `design.md`, `scope.md` (updated with progress tracking).\n\n### Story Level (Operational)\n\nStories are the unit of planning within a sprint. Sprint planning selects stories from the ready queue (stories with design completed and estimated), orders them by priority and dependency, and assigns them to the sprint.\n\nStory-level planning is done in Jira (sprint board) and in the session (daily focus). The session journal captures intra-day decisions that don't warrant a Jira comment.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/roadmap.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Planning Levels"
+    }
+  },
+  {
+    "id": "kc-management-ontology-release-planning",
+    "type": "knowledge",
+    "content": "### Release Branches\n\nRaiSE uses explicit release branches: `release/{major}.{minor}.{patch}`. All story work branches from and merges to the active release branch. When a release is ready, the release branch merges to `main`.\n\nThis model provides: clear scope isolation (only merged stories are in the release), easy rollback (the release branch can be abandoned if a blocker emerges), and explicit release decision points.\n\n### Milestones\n\nEpic milestones are defined at epic-plan time. A milestone is a meaningful intermediate state — the point at which a subset of stories is complete and a demo or validation can be done.\n\nGood milestones enable: early feedback (show a working vertical slice before the epic is complete), risk management (know early if the approach is wrong), and stakeholder communication (concrete \"done\" moments to celebrate).\n\n### Freezes\n\nA merge freeze stops non-critical merges for a period before a release cut. RaiSE uses merge freezes when: preparing for a public release, before a customer demo, or when the release branch is in a sensitive state (post-incident, critical fixes being applied).\n\nMerge freezes are communicated with a date and scope: \"Freeze begins 2026-06-20 for release/3.1.0 cut. Only P1 bugfixes merge after this date.\"",
+    "source_file": ".raise/cartridges/management-ontology/corpus/roadmap.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Release Planning"
+    }
+  },
+  {
+    "id": "kc-management-ontology-roadmap-communication",
+    "type": "knowledge",
+    "content": "A roadmap is a communication tool. Its audience determines its format:\n\n**For the delivery team:** The Jira backlog ordered by priority, with epic dependencies visible in the board view. Granular enough to plan the next sprint.\n\n**For technical stakeholders:** The epic sequence with rationale (why this order, what unblocks what). Shows the dependency graph and the delivery horizon.\n\n**For non-technical stakeholders:** The mission objective progress (what objectives have been met, what remains). No Jira tickets — just observable outcomes.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/roadmap.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Roadmap Communication"
+    }
+  },
+  {
+    "id": "kc-management-ontology-adaptation-vs-commitment",
+    "type": "knowledge",
+    "content": "A roadmap is a set of intentions, not a commitment. Reality changes: requirements shift, technical constraints emerge, priorities change. A roadmap that cannot change is a liability, not an asset.\n\nRaiSE separates roadmap change from delivery commitment: a sprint commitment (the stories selected for the current sprint) is a short-term commitment. A quarterly roadmap is a medium-term intention. A mission is a long-term direction.\n\nWhen the roadmap needs to change: document why (ADR or mission update), adjust the epic/story sequence, communicate the change to stakeholders. Do not pretend the original roadmap was never created.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/roadmap.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Adaptation vs. Commitment"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--roadmap",
+    "type": "knowledge",
+    "content": "planning, roadmap, release plan, sprint plan, backlog, product plan, delivery schedule, milestones",
+    "source_file": ".raise/cartridges/management-ontology/corpus/roadmap.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-stakeholders",
+    "type": "knowledge",
+    "content": "# Stakeholders in RaiSE\n\nA stakeholder is anyone who has a stake in the outcome of a work item — they either influence what gets built, depend on what gets built, or are accountable for its quality. RaiSE recognizes several categories of stakeholders, each with different roles in the delivery process.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "stakeholders"
+    }
+  },
+  {
+    "id": "kc-management-ontology-developer-primary-user-of-raise",
+    "type": "knowledge",
+    "content": "The developer is the primary user of RaiSE. They work directly with the CLI, invoke skills, run gates, and produce the delivery artifacts. Developers are the agents of the canonical lifecycle — they start stories, design them, implement them, and close them.\n\nIn the RaiSE model, developers operate at different mastery levels (ShuHaRi): Shu (learning, needs guidance), Ha (competent, adapts patterns), Ri (expert, creates patterns). The coaching model adjusts verbosity and explanation depth based on mastery level.\n\n**Responsibilities:** Execute the delivery lifecycle, follow TDD, write retrospectives, extract patterns.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Developer (Primary User of RaiSE)"
+    }
+  },
+  {
+    "id": "kc-management-ontology-tech-lead-staff-engineer",
+    "type": "knowledge",
+    "content": "The tech lead provides architectural oversight and reviews. They approve HITL gates for complex design decisions, review merge requests, and ensure architectural coherence across stories and epics. In RaiSE, they are the primary audience for architecture reviews.\n\n**Responsibilities:** Design approval (HITL gates), MR review, architectural decision-making (ADRs), epic scope validation.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Tech Lead / Staff Engineer"
+    }
+  },
+  {
+    "id": "kc-management-ontology-product-owner-product-manager",
+    "type": "knowledge",
+    "content": "The product owner defines what gets built and why. They create epics and stories in the backlog, prioritize the work queue, and accept stories as Done based on observable outcomes. In RaiSE, they define the acceptance criteria that stories must satisfy.\n\n**Responsibilities:** Backlog prioritization, acceptance criteria definition, story acceptance (Done approval), scope negotiation.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Product Owner / Product Manager"
+    }
+  },
+  {
+    "id": "kc-management-ontology-ai-agent-rai-raise",
+    "type": "knowledge",
+    "content": "In RaiSE's model, the AI agent is a first-class stakeholder — a collaborator with specific responsibilities and limits. The agent executes skills, writes code, runs gates, and produces artifacts. It operates within governance boundaries and stops at HITL gates where human judgment is required.\n\n**Responsibilities:** Skill execution, code writing, gate checking, pattern application, context loading.\n**Limits:** Cannot approve its own HITL gates, cannot make scope decisions without human confirmation, cannot take destructive actions without explicit authorization.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "AI Agent (Rai / RaiSE)"
+    }
+  },
+  {
+    "id": "kc-management-ontology-qa-engineer",
+    "type": "knowledge",
+    "content": "The QA engineer validates that delivered software meets its acceptance criteria and does not introduce regressions. In RaiSE, automated gates (tests, lint, types) handle much of the mechanical QA. The QA engineer focuses on edge cases, integration scenarios, and exploratory testing.\n\n**Responsibilities:** Test coverage validation, exploratory testing, regression detection, acceptance testing.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "QA Engineer"
+    }
+  },
+  {
+    "id": "kc-management-ontology-operations-platform-engineer",
+    "type": "knowledge",
+    "content": "The platform engineer maintains the infrastructure on which delivered software runs. They are affected by architectural decisions (scalability, deployment model, monitoring) and are consulted when stories touch infrastructure concerns.\n\n**Responsibilities:** Infrastructure provisioning, deployment pipeline maintenance, monitoring and alerting, capacity planning.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Operations / Platform Engineer"
+    }
+  },
+  {
+    "id": "kc-management-ontology-end-user-customer",
+    "type": "knowledge",
+    "content": "The end user is the ultimate beneficiary of delivery work. Their needs define what value means. In RaiSE, end users are represented by acceptance criteria — the formal expression of what observable behavior they expect.\n\n**Responsibilities (as stakeholder):** Provide requirements, validate delivered value, report bugs.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "End User / Customer"
+    }
+  },
+  {
+    "id": "kc-management-ontology-mission-owner",
+    "type": "knowledge",
+    "content": "The mission owner is the human who defines the teleological container (mission) within which epics and stories are executed. They set the objectives and success criteria at the mission level, and they are the final authority on whether the mission is complete.\n\n**Responsibilities:** Mission definition, objective setting, mission close decision.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Mission Owner"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--stakeholders",
+    "type": "knowledge",
+    "content": "roles, participants, actors, users, principals, team members, contributors",
+    "source_file": ".raise/cartridges/management-ontology/corpus/stakeholders.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-status-semantics",
+    "type": "knowledge",
+    "content": "# Status Semantics in RaiSE\n\nEvery work item in RaiSE has a status that communicates its current state in the lifecycle. Status is not cosmetic — it drives automation, reporting, and process gates. Using a status incorrectly misleads the team and breaks audit trails.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/status-semantics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "status-semantics"
+    }
+  },
+  {
+    "id": "kc-management-ontology-the-core-statuses",
+    "type": "knowledge",
+    "content": "### To Do (Backlog)\n\nWork is scoped and committed to but not yet started. A \"To Do\" item has a backlog entry, possibly a story document, but no branch and no code. It is in the queue waiting to be picked up in a session.\n\n**Invariants:**\n- No branch exists for this work\n- No code has been written\n- The item may or may not have been estimated\n- Moving from To Do → Implement requires a scope commit on a story branch\n\n### In Progress (Implement / Design / Plan)\n\nThe item is actively being worked on. In RaiSE's Jira workflow, \"In Progress\" is expressed as phase-specific statuses: Design, Plan, Implement. The sub-statuses communicate which phase of the lifecycle is active.\n\n- **Design:** The design document is being written. The code has been read (gemba walk). No implementation has started.\n- **Plan:** The task decomposition is in progress. Design is complete and approved.\n- **Implement:** Code is being written. The plan exists. TDD cycle is active.\n\n**Invariants:**\n- A branch exists (since scope commit at start)\n- At least one commit exists on the story branch\n- Moving from Implement → Review requires all gates to pass\n\n### Blocked\n\nThe item cannot proceed due to an external dependency, missing information, or an unresolved decision. Blocked is not a vague catch-all — it requires a documented blocker reason and a resolution path.\n\nA blocked item must answer: \"What is blocking it?\" and \"What needs to happen to unblock it?\" Without these, \"blocked\" is meaningless noise.\n\n**Invariants:**\n- A blocker reason is documented (in Jira comment or story journal)\n- A resolution path is identified (even if \"waiting for X\")\n- Moving from Blocked → previous status requires the blocker to be documented as resolved\n\n### Review\n\nThe implementation is complete (all gates pass) and the work is being reviewed. This includes architecture review, quality review, and human review of the pull/merge request. No new feature code should be written during review — only fixes to review findings.\n\n**Invariants:**\n- All automated gates pass (tests, lint, format, types)\n- A merge request exists\n- Moving from Review → Done requires: retrospective document, MR approved\n\n### Done\n\nAll acceptance criteria are met. Tests pass. Retrospective is complete. The story is merged. The Jira issue is in Done.\n\nDone means observable value was delivered and the team has extracted learnings. A story that is \"technically done\" but without a retrospective is not Done in RaiSE — it is incomplete.\n\n**Invariants:**\n- Branch is merged to development branch\n- Retrospective document exists and is committed\n- Branch is deleted (no accumulation of stale branches)\n\n### Cancelled\n\nThe work was decided not to pursue. This is a terminal state with a different meaning than Done — it signals that the value was not delivered, and the reason should be documented. Cancelled items contribute to \"waste\" metrics and should inform future planning.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/status-semantics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "The Core Statuses"
+    }
+  },
+  {
+    "id": "kc-management-ontology-status-anti-patterns",
+    "type": "knowledge",
+    "content": "| Anti-Pattern | Problem |\n|-------------|---------|\n| Using \"In Progress\" for months without movement | Masks stale work; use Blocked if truly stuck |\n| Marking Done without retrospective | Loses learnings; breaks the pattern system |\n| Using Backlog as \"won't do\" | Backlog is a queue, not an archive; use Cancelled |\n| Reopening Done items | Create a new story or bugfix instead |",
+    "source_file": ".raise/cartridges/management-ontology/corpus/status-semantics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Status Anti-Patterns"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--status-semantics",
+    "type": "knowledge",
+    "content": "state, workflow state, issue status, ticket status, kanban column, work state",
+    "source_file": ".raise/cartridges/management-ontology/corpus/status-semantics.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-transition-rules",
+    "type": "knowledge",
+    "content": "# Transition Rules in RaiSE\n\nStatus transitions are not free-form. Each transition has preconditions that must be satisfied. These rules exist because a transition communicates a commitment — moving to \"Review\" means gates pass, moving to \"Done\" means retrospective exists. Violating the rules creates false signals that mislead the team and corrupt reporting.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/transition-rules.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "transition-rules"
+    }
+  },
+  {
+    "id": "kc-management-ontology-forward-transitions-happy-path",
+    "type": "knowledge",
+    "content": "### To Do → Design / Implement (Start)\n\n**Precondition:** Scope commit exists on the story branch.\n\nThe scope commit is the evidence of start. Without it, \"in progress\" is a lie — no artifact exists. The scope commit contains `scope.md` (in-scope, out-of-scope, done-when) and `story.md` (user story + Gherkin AC).\n\n**How:** `/rai-story-start` creates the branch and scope commit atomically.\n\n### Design → Plan\n\n**Precondition:** Design document approved by human (HITL gate).\n\nA design that hasn't been reviewed is a draft, not a decision. The HITL gate ensures a human has read the design and confirmed it matches the intent. Auto-approval is blocked here — the human must act.\n\n**How:** Pipeline advances after human approves the design HITL gate.\n\n### Plan → Implement\n\n**Precondition:** Plan document exists with task decomposition and gate policy.\n\nA plan without gate policy is incomplete. Gate policy specifies exact `rai gate check` commands with `--scope` for each task. Without it, implementation drifts into unscoped test runs.\n\n**How:** Pipeline advances after human approves the plan HITL gate (in adversarial mode, AR + QR also run pre-implement).\n\n### Implement → Review\n\n**Precondition:** All gates pass — tests (scoped), lint, format, types.\n\n\"All gates pass\" means: `rai gate check gate-tests --scope <pkg>`, `gate-lint`, `gate-format`, `gate-types` all exit 0. A commit that breaks any gate is not implementation-complete. The MR is created only after gates pass.\n\n**How:** `/rai-mr-create` runs the full gate suite before creating the MR.\n\n### Review → Done\n\n**Preconditions:**\n1. Retrospective document committed (`s{N}.{M}-retrospective.md`)\n2. MR approved by reviewer\n3. Branch merged to development branch\n4. Branch deleted\n\nThe retrospective is not optional at close. If you skip it, learnings are lost and patterns don't propagate. The pattern system depends on retrospectives.\n\n**How:** `/rai-story-close` performs the merge, writes retrospective, transitions Jira, deletes branch.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/transition-rules.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Forward Transitions (Happy Path)"
+    }
+  },
+  {
+    "id": "kc-management-ontology-backward-transitions",
+    "type": "knowledge",
+    "content": "### Any → Blocked\n\n**Precondition:** Blocker reason documented and resolution path identified.\n\nMoving backward (from Implement back to Design, etc.) is generally not allowed. The correct pattern when implementation reveals a design flaw is: document the finding, update the design doc, continue from where you are (implementation may need partial rollback). Creating a new story to fix the issue found is acceptable.\n\n**How:** Document in Jira comment: \"Blocked: [reason]. Resolution: [path]. ETA: [estimate].\"\n\n### Blocked → Previous\n\n**Precondition:** Blocker is resolved and documented as such.\n\nThe resolution must be documented, not just the unblocking action. \"Fixed the dependency\" is not documentation. \"Dependency X resolved by upgrading to version Y on 2026-06-14\" is documentation.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/transition-rules.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Backward Transitions"
+    }
+  },
+  {
+    "id": "kc-management-ontology-transition-anti-patterns",
+    "type": "knowledge",
+    "content": "| Anti-Pattern | Rule Violated | Consequence |\n|-------------|---------------|-------------|\n| Moving to Done without merging | Review → Done gate | Branch becomes stale; work appears complete but isn't integrated |\n| Moving to Implement without scope commit | To Do → Start gate | No artifact evidence; team can't verify what's being built |\n| Moving to Review with failing tests | Implement → Review gate | False signal that gates pass; reviewer wastes time on broken code |\n| Skipping Design for \"simple\" stories | Design is never optional | Simple stories become complex because design wasn't done |\n| Reopening Done with code changes | Terminal state violation | Use a new bugfix or story instead |",
+    "source_file": ".raise/cartridges/management-ontology/corpus/transition-rules.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Transition Anti-Patterns"
+    }
+  },
+  {
+    "id": "kc-management-ontology-also-known-as--transition-rules",
+    "type": "knowledge",
+    "content": "workflow rules, state machine, transition constraints, status machine, process gates, lifecycle gates",
+    "source_file": ".raise/cartridges/management-ontology/corpus/transition-rules.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Also Known As",
+      "hygiene_original_id": "kc-management-ontology-also-known-as"
+    }
+  },
+  {
+    "id": "kc-management-ontology-work-types",
+    "type": "knowledge",
+    "content": "# Work Types in RaiSE\n\nRaiSE classifies all work into five distinct work types, each with its own lifecycle, gates, and purpose. Understanding which type applies determines which pipeline to use, which skills to invoke, and what the expected deliverables are.",
+    "source_file": ".raise/cartridges/management-ontology/corpus/work-types.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "work-types"
+    }
+  },
+  {
+    "id": "kc-management-ontology-epic",
+    "type": "knowledge",
+    "content": "An epic is a multi-story work container that spans a bounded initiative — typically 3 to 10 features, or a coherent architectural change. Epics are logical containers: they have a directory (`work/epics/e{N}-{name}/`) and a tracker entry, but they do not correspond to a branch. Multiple stories branch independently from the development branch, deliver their work, and merge back. The epic accumulates their combined outcome.\n\nEpics can be delivery (software features, integrations, new capabilities) or management (administrative initiatives, compliance work, team coordination that spans multiple cycles). An epic is initialized with `/rai-epic-start`, designed with `/rai-epic-design`, and planned with `/rai-epic-plan`. It closes with `/rai-epic-close` after all its stories are complete and a retrospective is written.\n\nAlso known as: initiative, feature set, capability, program increment item.\n\n**Key properties:**\n- Fibonacci estimation: 8–40+ points (sum of stories)\n- Duration: typically 1–4 sprints\n- Contains: 3–10 stories\n- Deliverable: working software + retrospective + updated architecture docs",
+    "source_file": ".raise/cartridges/management-ontology/corpus/work-types.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Epic"
+    }
+  },
+  {
+    "id": "kc-management-ontology-story",
+    "type": "knowledge",
+    "content": "A story is the unit of delivery value in RaiSE. Every story produces an observable outcome for a real user. Stories have formal acceptance criteria (Gherkin), follow TDD (red–green–refactor without exception), branch from the development branch, and merge back on close.\n\nStories are sized in Fibonacci points (1, 2, 3, 5, 8). A story sized above 8 is a signal to split. Stories follow the full pipeline: start → design → plan → implement → review → close. Design is never optional — it is the gemba walk that prevents building the wrong thing. The retrospective is never skipped — it is how patterns propagate.\n\nAlso known as: user story, feature, requirement, deliverable, ticket.\n\n**Key properties:**\n- Fibonacci sizing: 1–8 points\n- Must have: acceptance criteria, TDD cycle, scope commit, retrospective\n- Must not: exceed 8 SP (split instead), skip design, skip retrospective",
+    "source_file": ".raise/cartridges/management-ontology/corpus/work-types.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Story"
+    }
+  },
+  {
+    "id": "kc-management-ontology-bugfix",
+    "type": "knowledge",
+    "content": "A bugfix is a defect correction workflow with mandatory root cause analysis. Bugs are not just problems to fix — they are process sensors. A bug that reaches production means something in the development process failed to catch it. That failure is as important as the fix itself.\n\nBugfixes are classified in four ODC-inspired dimensions: trigger (what caused it to appear), impact (what was affected), qualifier (how severe), and activity (which phase missed it). This classification feeds the Post-Incident Review (PIR) and the pattern system.\n\nThe bugfix pipeline: start → triage → analyse → plan → fix → review → close → PIR. Root cause analysis (5 Whys, Ishikawa, Gemba) is mandatory before planning a fix. A fix without RCA is a patch, not a fix.\n\nAlso known as: bug, defect, incident, issue, regression, hotfix (for production).\n\n**Key properties:**\n- Requires: root cause analysis before fix planning\n- Requires: PIR (post-incident review) after close\n- Classification: 4 ODC dimensions (trigger, impact, qualifier, activity)\n- Must not: apply a fix before understanding the root cause",
+    "source_file": ".raise/cartridges/management-ontology/corpus/work-types.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Bugfix"
+    }
+  },
+  {
+    "id": "kc-management-ontology-task",
+    "type": "knowledge",
+    "content": "A task is management work that is not delivery — administrative, operational, or cross-project coordination. Tasks do not follow TDD. They do not have acceptance criteria in the delivery sense. They are necessary for delivery but do not produce observable value for end users directly.\n\nTasks exist for work like: compliance document preparation, infrastructure setup that is not a feature, team coordination meetings with action items, reporting, and operational maintenance. Tasks can have subtasks. They live in a dedicated management project in Jira or as management tasks within delivery projects.\n\nAlso known as: chore, admin task, operational item, management item, maintenance.\n\n**Key properties:**\n- No TDD (not delivery)\n- No acceptance criteria (operational outcomes, not user outcomes)\n- Can have subtasks\n- Examples: writing compliance docs, infrastructure maintenance, team coordination",
+    "source_file": ".raise/cartridges/management-ontology/corpus/work-types.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Task"
+    }
+  },
+  {
+    "id": "kc-management-ontology-session",
+    "type": "knowledge",
+    "content": "A session is a bounded working period with explicit start and close. Sessions are the atomic unit of human–AI collaboration in RaiSE. Every session loads context (governance, coaching, mission, current story), proposes a focus, and closes with a structured summary that persists learnings and decisions.\n\nSession types: kata (practice), feature (delivery work), research (investigation), ideation (exploration), maintenance (operations). Sessions track decisions via the session journal, which survives context compaction. Sessions bind to a mission (the teleological container) and optionally to a story (the tactical unit).\n\nAlso known as: working session, sprint session, focus block, pair session.\n\n**Key properties:**\n- Has: explicit start, explicit close, type declaration, focus statement\n- Produces: session journal entries, pattern candidates, session summary\n- Binds to: mission (required), story (optional)\n- Types: kata, feature, research, ideation, maintenance",
+    "source_file": ".raise/cartridges/management-ontology/corpus/work-types.md",
+    "created": "2026-06-15T11:30:06.244704+00:00",
+    "metadata": {
+      "cartridge": "management-ontology",
+      "heading": "Session"
+    }
+  }
+]

@@ -1,0 +1,157 @@
+name: story-enterprise
+description: "8-phase story lifecycle pipeline"
+# Widened for RAISE-13639 F1 (QR): Task/Sub-task legitimately route through the
+# story pipeline in real Jira usage — [story] alone rejected them once a live
+# adapter was configured. Ratified by user decision, not an oversight.
+issue_types:
+  - story
+  - task
+  - sub-task
+
+defaults:
+  story_type: code
+
+execution:
+  worktree_isolation: true
+  branch_pattern: "story/{issue_id}/pipeline"
+
+phases:
+  - id: start
+    type: llm
+    skill: rai-story-start
+    # transition: story branch and scope committed — work is active in current cycle
+    target_status: committed
+    context:
+      graph:
+        - types: [principle]
+          limit: 5
+
+  - id: design
+    type: llm
+    skill: rai-story-design
+    # transition: design artifact produced; tracker signals active design phase
+    target_status: design
+    context:
+      graph:
+        - types: [pattern]
+          limit: 3
+        - types: [module]
+          limit: 2
+        - types: [decision]
+          limit: 2
+    validates:
+      - pattern: "**/*-design.md"
+        description: "Story design document"
+    gate:
+      type: hitl
+      level: REVIEW
+
+  - id: plan
+    type: llm
+    skill: rai-story-plan
+    # transition: task plan is design-phase work; tracker stays in design state
+    target_status: design
+    context:
+      graph:
+        - types: [guardrail]
+          limit: 2
+        - types: [pattern]
+          limit: 3
+    validates:
+      - pattern: "**/*-plan.md"
+        description: "Story plan document"
+
+  - id: implement
+    type: llm
+    skill: rai-story-implement
+    # transition: TDD implementation running; tracker signals active implementation phase
+    target_status: implement
+    context:
+      graph:
+        - types: [pattern]
+          limit: 5
+        - types: [module]
+          limit: 2
+    validates:
+      - store: sqlite
+        type: implement
+        description: "Implement artifact (files_changed/tests_added) recorded"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: architecture-review
+    type: llm
+    skill: rai-architecture-review
+    when: "story_type == 'code'"
+    # transition: architecture review is a review activity; tracker signals review state
+    target_status: review
+    review_mode: adversarial
+    review_template: adversarial-ar
+    context:
+      graph:
+        - types: [pattern]
+          limit: 5
+        - types: [module]
+          limit: 2
+        - types: [decision]
+          limit: 2
+    validates:
+      - pattern: "**/*-ar.md"
+        description: "Architecture review document"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: quality-review
+    type: llm
+    skill: rai-quality-review
+    when: "story_type == 'code'"
+    # transition: quality review is a review activity; noop if AR already set review state
+    target_status: review
+    review_mode: adversarial
+    review_template: adversarial-qr
+    context:
+      graph:
+        - types: [pattern]
+          limit: 5
+        - types: [guardrail]
+          limit: 3
+    validates:
+      - pattern: "**/*-qr.md"
+        description: "Quality review document"
+    gate:
+      type: hitl
+      level: REVIEW
+      impact: low
+
+  - id: review
+    type: llm
+    skill: rai-story-review
+    # transition: story retrospective is review activity; noop if QR already set review state
+    target_status: review
+    context:
+      graph:
+        - types: [pattern]
+          limit: 3
+        - types: [guardrail]
+          limit: 2
+
+  - id: close
+    type: llm
+    skill: rai-story-close
+    # S14263.6 (RAISE-14712): advisory gate enforcement at story close.
+    # GateBridgeHook -> run_gates_for_point("before:story:close") runs
+    # capability-overlap and other before:story:close gates here.
+    # Engine treats this point as advisory — never aborts close on failure
+    # (mirrors CI allow_failure:true, ADR-130 D2).
+    # S10 (RAISE-15037): blocking — failed transition halts the pipeline run.
+    workflow_point: "before:story:close"
+    target_status: done
+    transition_mode: blocking
+    validates:
+      - store: sqlite
+        type: retro
+        description: "Story retrospective artifact recorded (proves review ran)"

@@ -1,0 +1,19 @@
+# Enterprise skillset manifest
+# Full-ceremony, compliance-grade skills for workflows requiring human review gates,
+# ADR documentation, or governance audit trails.
+#
+# Reference: docs/lean-pipeline-guide.md — "Switching to Enterprise Skillset"
+
+name: enterprise
+description: >
+  Full-ceremony skills for human-review gates, compliance audit trails, and
+  governance-hardened workflows. Replaces the 8 corresponding default skills.
+skills:
+  - rai-bugfix-start-enterprise
+  - rai-bugfix-fix-enterprise
+  - rai-bugfix-close-enterprise
+  - rai-story-start-enterprise
+  - rai-story-close-enterprise
+  - rai-epic-start-enterprise
+  - rai-epic-design-enterprise
+  - rai-epic-close-enterprise

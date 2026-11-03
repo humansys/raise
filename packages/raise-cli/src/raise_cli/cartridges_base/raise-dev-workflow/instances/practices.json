@@ -1,0 +1,686 @@
+[
+  {
+    "id": "kc-raise-dev-workflow-branch-and-mr",
+    "type": "knowledge",
+    "content": "# Branch Model and Merge Requests\n\nThe branch model defines how work flows from a developer's hands into stable software. RaiSE uses an explicit release-branch model: `main` holds stable, released code; a release branch (e.g. `release/3.1.0`) is the active development integration target; story branches are cut from and merged back to the release branch. Main receives only tested, released code — stories never branch from or merge to main directly.\n\nAlso known as: branch strategy, release branch model, integration flow.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "branch-and-mr"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-development-branch-as-integration-target",
+    "type": "knowledge",
+    "content": "The development branch (the current release branch) is the single integration target for all story work. Every story branches from it and merges back to it. Keeping one integration target avoids the divergence that multiple long-lived branches create.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Development Branch as Integration Target"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-branch-naming",
+    "type": "knowledge",
+    "content": "Story branches follow `story/s{N}.{M}/{slug}`: `s{N}.{M}` identifies the story within its epic, and the slug is a short human-readable description. Example: `story/s8.3/gate-policy-enforcement`. Consistent naming makes the branch's purpose and parentage legible at a glance.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Story Branch Naming"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-merge-requests-via-rai-mr-create",
+    "type": "knowledge",
+    "content": "Stories merge back through a Merge Request, created exclusively via the `/rai-mr-create` skill — never by manual `git push` plus a manual `glab`/`gh` command, not even for \"quick\" chore or docs branches. The skill runs the full gate suite before pushing and catches drift guards and other non-obvious failures that a manual push would skip.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Merge Requests via /rai-mr-create"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-re-run-the-full-gate-after-merging-the-target",
+    "type": "knowledge",
+    "content": "A clean merge of the target branch into your branch does not guarantee test compatibility — the target may carry tests that reference APIs your branch changed. After merging the target in, always re-run the full gate suite before creating or updating the MR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Re-run the Full Gate After Merging the Target"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-delete-branches-after-merge",
+    "type": "knowledge",
+    "content": "Merged branches are deleted immediately. Accumulating stale branches creates confusion about what is active. Cleanup is part of the merge, not a later chore.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Delete Branches After Merge"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-merge-is-not-deploy",
+    "type": "knowledge",
+    "content": "Merging a story to the development branch is not the same as deploying it. Stories that touch deployable components require explicit post-merge verification that the deploy actually happened. Pushing a release branch is likewise not the same as opening a release MR to main — those are separate, explicit actions.\n\n**Key properties:**\n- `main` (stable) ← release branch (dev integration) ← `story/s{N}.{M}/{slug}`\n- MRs created only via `/rai-mr-create` (runs full gate first) — never manual\n- Re-run full gate after merging the target branch in\n- Delete merged branches immediately\n- Merge ≠ deploy; release-branch push ≠ release MR to main",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/branch-and-mr.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Merge Is Not Deploy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-fleet",
+    "type": "knowledge",
+    "content": "# Fleet Dispatch\n\nFleet dispatch is the mechanism for parallelizing RaiSE work across multiple concurrent agents. Where a single session executes one body of work at a time, the fleet dispatches several units of work to run simultaneously, each in its own isolated context, and coordinates their completion. Fleet is how RaiSE scales from one human orchestrating one agent toward a few humans orchestrating many agents.\n\nAlso known as: fleet, agent fleet, parallel dispatch, swarm orchestration.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "fleet"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-dispatch",
+    "type": "knowledge",
+    "content": "Dispatch launches a unit of work to an agent in the fleet. Each dispatched unit runs independently — it does not share the orchestrator's context window — so units do not interfere with one another. The orchestrator decides what to dispatch and to how many agents, then waits for results rather than executing the work itself.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Dispatch"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-status-and-signal",
+    "type": "knowledge",
+    "content": "The fleet exposes status (what each agent is doing, what has completed) and a signalling channel (to coordinate or steer running agents). Status makes the parallel work observable — the orchestrator can see progress across the fleet without reading every agent's full output. Signals let the orchestrator intervene without restarting a unit.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Status and Signal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-approval-in-the-fleet",
+    "type": "knowledge",
+    "content": "Fleet work still respects governance: units that reach a gate requiring human approval surface that approval to the orchestrator rather than self-approving. Parallelism increases throughput; it does not relax the HITL and governance discipline that applies to single-session work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Approval in the Fleet"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-isolation-prevents-interference",
+    "type": "knowledge",
+    "content": "Each fleet unit is isolated (its own context, often its own worktree) so that concurrent work does not collide — no shared mutable state, no context bleed between agents. Isolation is what makes parallelism safe: the cost of an isolated worktree is paid precisely when concurrent agents would otherwise conflict.\n\n**Key properties:**\n- Parallelizes work across concurrent, isolated agents\n- Orchestrator dispatches and waits; it does not execute the dispatched work\n- Exposes status (observability) and signal (coordination) channels\n- Governance and HITL still apply — units surface approvals, never self-approve\n- Isolation (context, worktree) prevents cross-agent interference",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/fleet.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Isolation Prevents Interference"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gates-and-testing",
+    "type": "knowledge",
+    "content": "# Gates and Testing Policy\n\nA gate is an automated quality checkpoint that must pass before work proceeds. Gates cover tests, lint, format, and type checks. They are the quality floor — a commit that breaks any gate is not complete, and work never advances below the floor. Gates make quality a property of the process rather than a matter of individual diligence.\n\nGates are run exclusively through `rai gate check`. Direct test invocation (`uv run pytest`, `npm test`) is prohibited: it floods the agent's context window with raw output and bypasses the gate-tracking that records results in the project database for analytics and for blocking on repeated failures.\n\nAlso known as: quality gate, gate check, the quality floor.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "gates-and-testing"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-rai-gate-check-is-the-exclusive-test-runner",
+    "type": "knowledge",
+    "content": "`rai gate check` is the only sanctioned way to run tests in a RaiSE project. It reads gate configuration from the manifest, scopes output for context efficiency, and records results. Running raw test commands is a process violation even when it \"works,\" because it leaves no tracked result and floods context.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "rai gate check Is the Exclusive Test Runner"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-scoped-testing-per-task",
+    "type": "knowledge",
+    "content": "During a task, run `rai gate check gate-tests --scope <test_path>` scoped to the tests for the module being changed. Scoped runs are fast and keep the context window clean. Every per-task gate run must carry an explicit `--scope`.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Scoped Testing — Per Task"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-scoped-testing-per-story",
+    "type": "knowledge",
+    "content": "At story completion, before review, run the gate scoped to the changed package (`--scope packages/<pkg>/`). This catches cross-module regressions within the package without running the entire suite.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Scoped Testing — Per Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-full-suite-only-at-mr-creation",
+    "type": "knowledge",
+    "content": "The only place an unscoped full-suite gate runs is at MR creation, via `/rai-mr-create`. The full suite is the final quality gate before merging to the development branch. A clean merge does not by itself guarantee compatibility — the target branch may have changed APIs your branch references — so the full gate is always re-run after merging the target branch in.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Full Suite — Only at MR Creation"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-gates-before-every-commit",
+    "type": "knowledge",
+    "content": "Tests, type checks, and linting must all pass before any commit. This is enforced as a non-negotiable rule: there is no \"commit now, fix the gate later.\" A red gate is a stop signal (Jidoka), not a warning to be deferred.\n\n**Key properties:**\n- Gates: tests, lint, format, types — the quality floor\n- `rai gate check` is the exclusive runner; raw pytest/npm is prohibited\n- Scope per task (module), per story (package); full suite only at MR creation\n- All gates pass before every commit — no deferral",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/gates-and-testing.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Gates Before Every Commit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-and-autonomy",
+    "type": "knowledge",
+    "content": "# HITL Gates and Autonomy\n\nA Human-In-The-Loop (HITL) gate is a pipeline pause that requires human approval before the work advances. HITL gates sit on the phases where a human decision has the most leverage — notably design and implement. The gate is how human judgment enters an otherwise automated flow at the moments that matter. This file covers how HITL is *applied* in the development flow; the underlying ShuHaRi philosophy lives in the methodology layer.\n\nAlso known as: HITL gate, approval gate, human checkpoint.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "hitl-and-autonomy"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-agents-do-not-self-approve",
+    "type": "knowledge",
+    "content": "At the foundational level, an AI agent must not self-approve a HITL gate. The human approves explicitly. This is the bright line that keeps the human accountable for the decisions a gate guards. Self-approval would convert a checkpoint into a formality and break the chain of human accountability.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Agents Do Not Self-Approve"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-pause-cadence-follows-the-developers-level",
+    "type": "knowledge",
+    "content": "HITL gating is not flat across the team — it follows each developer's ShuHaRi level. Shu pauses at each gate for review. Ha advances autonomously through routine gates and pauses only on new or non-obvious decisions. Ri runs fully autonomous and pauses only on high-impact design decisions or on errors that persist after several resolution attempts. A team policy defers to the per-developer level so mastery is respected without forcing newcomers to move too fast.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Pause Cadence Follows the Developer's Level"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-what-still-triggers-a-pause-at-ri",
+    "type": "knowledge",
+    "content": "Even at full autonomy, certain situations always warrant a human pause: high-impact or architectural decisions, ADR-level choices, scope changes, irreversible or outward-facing actions, and errors unresolved after repeated attempts. Autonomy is about not pausing on *routine* gates — not about removing human judgment from genuinely consequential decisions.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "What Still Triggers a Pause at Ri"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-autonomy-never-skips-governance",
+    "type": "knowledge",
+    "content": "Running without HITL pauses is not the same as skipping skills or governance artifacts. Autonomous execution still produces the full pipeline and the complete artifact trail — story, scope, design, plan, and retrospective — at every level, even for extra-small work. The principle is explicit: no code without a governance trail. Autonomy changes *when a human is asked to approve*, never *what record is left behind*. This is required for traceability at regulatory (EU AI Act) standards.\n\n**Key properties:**\n- HITL gates pause for human approval (design, implement phases)\n- Agents never self-approve at the foundational level\n- Pause cadence follows the developer's ShuHaRi level (Shu/Ha/Ri)\n- Ri still pauses on high-impact/irreversible decisions and persistent errors\n- Autonomy never skips governance artifacts — no code without a trail",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/hitl-and-autonomy.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Autonomy Never Skips Governance"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-missions-and-worktrees",
+    "type": "knowledge",
+    "content": "# Missions and Worktrees (Execution Discipline)\n\nThis file covers *how missions and worktrees are used in the development flow* — the execution discipline. The conceptual definitions of what they are live in the project documentation; here the concern is operational: how to bind, isolate, and integrate work through them.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "missions-and-worktrees"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-mission-as-execution-anchor",
+    "type": "knowledge",
+    "content": "A mission is the teleological container for a body of work — a sustained objective that may span multiple epics and stories. In the development flow, the mission is what a session binds to so that every piece of work traces back to a purpose. Mission resolution (which mission is active) is resolved at session start and must be consistent across every caller in the session flow; divergence between resolvers is a known defect class and must be fixed across all callers in the same change.\n\nOne worktree is bound to one mission, persistently, and reused across the epics and stories of that mission until its objectives are met.\n\nAlso known as: mission binding, the active mission, mission-scoped work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Mission as Execution Anchor"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-worktree-as-isolation-unit",
+    "type": "knowledge",
+    "content": "A worktree is an isolated git checkout (under `.worktree/`) that lets parallel bodies of work proceed without colliding. Each worktree has its own branch and its own merge target. The discipline: enter the worktree before creating the story branch, not after — this avoids checkout juggling and prevents commits landing on the wrong branch.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Worktree as Isolation Unit"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-one-worktree-per-mission",
+    "type": "knowledge",
+    "content": "The operating pattern is one worktree per mission, reused across all the work of that mission. Worktrees are not created per-story and discarded; they persist. This keeps the environment (env files, venv, MCP config) propagated once and stable for the duration of the mission.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "One Worktree per Mission"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-branch-discipline-in-worktrees",
+    "type": "knowledge",
+    "content": "Working in a secondary worktree carries a risk: commands run from the wrong directory commit to the wrong branch. The discipline is to assert the expected branch in the same command as the commit, and to use absolute paths rather than `cd` when a CWD-binding hook is active. Stashes are unreliable for transferring work between worktrees — they can be silently dropped by hooks — so they are not used for cross-worktree transfer.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Branch Discipline in Worktrees"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic-branch-inside-a-worktree",
+    "type": "knowledge",
+    "content": "When an epic is developed in a dedicated worktree, an intermediate epic branch (`worktree-{epic-slug}`) is created from the development branch. Stories merge to this epic branch (not directly to the development branch). Only epic close merges the epic branch to the development branch via an MR.\n\n**Key properties:**\n- Mission = purpose anchor; session binds to it; resolution must be consistent across callers\n- Worktree = isolated checkout; one per mission, persistent and reused\n- Enter the worktree before creating the story branch\n- Assert branch in the same command as commit in secondary worktrees\n- Stories merge to the epic branch; only epic close merges to the development branch",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/missions-and-worktrees.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Epic Branch Inside a Worktree"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-pipelines-and-lifecycles",
+    "type": "knowledge",
+    "content": "# Pipelines and Lifecycles\n\nThe pipeline engine is the execution backbone of RaiSE. It orchestrates work through an ordered sequence of phases, each phase bound to a skill and optionally to a Human-In-The-Loop (HITL) gate. The pipeline is the process; the process is the quality system. Phases are never skipped — even for small work — because the structure is what makes the outcome reliable and the governance trail complete.\n\nThe pipeline engine is the exclusive way to start orchestrated work. Story, bugfix, epic, and hotfix lifecycles are launched through it, not by invoking skills directly. Each run is tracked in the project database with phase status, gate approvals, and artifacts, so progress survives context compaction and is auditable after the fact.\n\nAlso known as: the pipeline, the engine, lifecycle orchestration, the phase machine.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "pipelines-and-lifecycles"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-epic-lifecycle",
+    "type": "knowledge",
+    "content": "An epic is a logical container for a bounded initiative (3–10 stories). Its lifecycle: start → design → plan → story-iteration → docs → journal → close. `start` initializes the epic directory and tracker entry; `design` produces scope, design, and ADRs; `plan` decomposes into stories; `story-iteration` runs each child story through its own pipeline; `close` requires an epic retrospective before completion. Epics are directories and tracker entries, not branches.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Epic Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-story-lifecycle",
+    "type": "knowledge",
+    "content": "A story is the unit of delivery value. Its lifecycle: start → design → plan → implement → architecture-review → quality-review → review → close. Design is never optional — it is the gemba walk that prevents building the wrong thing. The two adversarial reviews (architecture and quality) precede the final review. Close requires a retrospective. Stories branch from the development branch and merge back on close.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Story Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-bugfix-lifecycle",
+    "type": "knowledge",
+    "content": "A bugfix corrects a defect with mandatory root cause analysis. Its lifecycle: start → triage → analyse → plan → fix → review → close → PIR. Root cause analysis (5 Whys, Ishikawa, Gemba) is mandatory before planning a fix — a fix without RCA is a patch, not a fix. The Post-Incident Review (PIR) after close feeds the pattern system so the same defect class is caught earlier next time.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Bugfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hotfix-lifecycle",
+    "type": "knowledge",
+    "content": "A hotfix is an expedited production correction. It compresses the bugfix lifecycle for urgency but never drops the governance trail: the fix is still traced to an artifact and a retrospective still follows. Speed changes the cadence, not the requirement to leave a record.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Hotfix Lifecycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-hitl-gates-on-phases",
+    "type": "knowledge",
+    "content": "Certain phases carry a HITL gate (notably design and implement). The gate pauses the pipeline for human review. An AI agent must not self-approve a HITL gate at the Shu level; at higher mastery levels the pause cadence relaxes per the developer's level, but the gate's existence and the artifact it guards do not disappear.\n\n**Key properties:**\n- Exclusive entry point for orchestrated work (story/bugfix/epic/hotfix)\n- Phases are ordered, skill-bound, and never skipped\n- Each run is tracked in the project DB (survives compaction, auditable)\n- Design and retrospective are mandatory in every story lifecycle",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/pipelines-and-lifecycles.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "HITL Gates on Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-reviews",
+    "type": "knowledge",
+    "content": "# Adversarial Reviews\n\nAll code is reviewed before merge. Review is not optional, even for small changes. Every story passes through at minimum an architecture review and a quality review. Both are deliberately adversarial: the reviewer's job is to challenge the implementation and try to find what is wrong, not to validate it or rubber-stamp it. The goal is to surface problems before they reach production, when they are cheap to fix.\n\nAlso known as: code review, adversarial review, AR/QR.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "reviews"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-architecture-review",
+    "type": "knowledge",
+    "content": "Architecture review examines structural decisions: module boundaries, dependency direction, abstraction levels, and whether the implementation actually matches the design that was approved. It asks \"is this built the right way?\" and challenges the approach itself. A correct implementation of a wrong structure fails architecture review.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Architecture Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-quality-review",
+    "type": "knowledge",
+    "content": "Quality review validates the implementation's correctness and craft: test coverage, edge-case handling, type-annotation completeness, and code clarity. It asks \"is this correct, not just working for the happy path?\" Quality review assumes the structure is sound (architecture review's domain) and probes whether the details hold up.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Quality Review"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-why-adversarial",
+    "type": "knowledge",
+    "content": "Reviews are adversarial by design because a review that seeks to confirm finds little. A reviewer prompted to refute, to look for the failure mode, to default to skepticism, catches problems that a confirming review misses. The adversarial stance is the same Jidoka instinct applied to code: actively hunt the defect rather than wait for it to announce itself.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Why Adversarial"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-reviews-are-distinct-phases",
+    "type": "knowledge",
+    "content": "Architecture review and quality review are separate pipeline phases with separate templates, not a single combined pass. Separating them keeps each lens focused: structure first, then correctness. Collapsing them lets a reviewer satisfied on one axis wave through problems on the other.\n\n**Key properties:**\n- Mandatory for every story — architecture review AND quality review\n- Architecture review: structure, boundaries, design-match (\"built right?\")\n- Quality review: coverage, edge cases, types, clarity (\"correct?\")\n- Adversarial stance — reviewers refute, they do not confirm\n- Distinct phases with distinct templates",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/reviews.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Reviews Are Distinct Phases"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-sessions",
+    "type": "knowledge",
+    "content": "# Sessions\n\nA session is a bounded working period with an explicit start and an explicit close. Sessions are the atomic unit of human–AI collaboration in RaiSE. Every session loads context (governance, coaching, mission, current story), proposes a focus, does the work, and closes with a structured summary that persists decisions and learnings. The discipline of opening and closing sessions is what makes work resumable and what feeds the continuity system across days and across context compactions.\n\nSessions must be opened and closed through the session skills (`/rai-session-start`, `/rai-session-close`), not raw CLI, so the full context bundle and the structured close are produced consistently.\n\nAlso known as: working session, focus block, pair session, work session.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "sessions"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-start",
+    "type": "knowledge",
+    "content": "Session start runs a deterministic sequence in one composite call: working-tree hygiene, base-branch drift check, database health, mission resolution, context bundle assembly, and MCP health. The skill interprets the signals and presents context, focus, and any warnings. Mission selection is always surfaced to the developer unless the worktree is already bound to a mission — never silently auto-selected.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Session Start"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-close",
+    "type": "knowledge",
+    "content": "Session close produces a structured summary: what was done, decisions made, patterns discovered, and a next-session prompt. This summary is the bridge between sessions — the next session start consumes it. Closing is not optional bookkeeping; an unclosed session loses its learnings.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Session Close"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-journal",
+    "type": "knowledge",
+    "content": "The session journal records decisions, insights, and tasks as they happen. It survives context compaction: after a compaction, the journal is re-read to restore working state. This is why decisions are logged to the journal rather than held only in the conversation — the conversation is volatile, the journal is durable.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Session Journal"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-session-types",
+    "type": "knowledge",
+    "content": "Sessions declare a type at start: kata (deliberate practice), feature (delivery work), research (investigation), ideation (exploration), or maintenance (operations). The type sets expectations for the kind of output and the cadence of the work.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Session Types"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-binding-to-mission-and-story",
+    "type": "knowledge",
+    "content": "A session binds to a mission (the teleological container — required) and optionally to a story (the tactical unit). The mission binding anchors the session in a larger objective; the story binding ties it to a specific deliverable. Mission resolution must be consistent across all callers in the session flow, or bindings diverge.\n\n**Key properties:**\n- Explicit start and close, both via session skills\n- Loads context bundle at start; produces structured summary at close\n- Journal survives compaction — durable decision record\n- Types: kata, feature, research, ideation, maintenance\n- Binds to mission (required) and story (optional)",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/sessions.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Binding to Mission and Story"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skills",
+    "type": "knowledge",
+    "content": "# Skills and the Skill Cycle\n\nA skill is a packaged, reusable unit of execution capability in RaiSE — a documented procedure that an agent follows to accomplish a specific kind of work (start a story, design an epic, review code, create an MR). Skills encode the methodology as executable structure: they carry the steps, the verification points, and the references needed to do a task the RaiSE way. The pipeline engine binds each phase to a skill; running the phase means executing the skill.\n\nSkills are invoked by name (e.g. `/rai-story-design`, `/rai-mr-create`). They are not free-form prompts — each has a defined purpose, inputs, steps, and outputs, and most include a quality checklist. Using a skill even for small work is a deliberate discipline: the structure helps, and the overhead is minimal compared to the cost of an inconsistent process.\n\nAlso known as: workflow skill, slash command, procedure, executable playbook.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "skills"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-the-full-skill-cycle",
+    "type": "knowledge",
+    "content": "RaiSE mandates the full skill cycle even for small stories. Skipping skills to \"save time\" trades a small, predictable cost for an unpredictable risk: a missing design step, an absent retrospective, a gap in the governance trail. The cycle exists because consistency at small scale is what makes consistency at large scale possible.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "The Full Skill Cycle"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-prime-protocol",
+    "type": "knowledge",
+    "content": "Many skills begin with a PRIME step: chain-read the prior phase's output, query the knowledge graph for relevant patterns, surface them as context, and emit a lifecycle signal for observability. PRIME ensures each skill execution starts grounded in what already exists rather than reinventing it. Zero query results is a valid outcome, not a failure.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "PRIME Protocol"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skills-are-distributed-and-synced",
+    "type": "knowledge",
+    "content": "Skills live under `.claude/skills/` as the canonical source and are synced to the other agent surfaces. Editing a skill requires syncing the copies, or the distribution drift guard fails. The canonical source is always `.claude/skills/` — editing a generated copy gets clobbered on the next sync.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Skills Are Distributed and Synced"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-skills-vs-cartridges",
+    "type": "knowledge",
+    "content": "A skill is *how to do* a task (procedure). A cartridge is *what to know* about a domain (knowledge). They are complementary: a skill may query a cartridge during its PRIME step, but they are different kinds of artifact with different lifecycles.\n\n**Key properties:**\n- Invoked by name; each has defined purpose, steps, outputs, checklist\n- Bound to pipeline phases — running a phase executes its skill\n- Full cycle is mandatory even for small work\n- Canonical source `.claude/skills/`; edits must be synced to other surfaces",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/skills.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Skills vs Cartridges"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tdd",
+    "type": "knowledge",
+    "content": "# Test-Driven Development\n\nTest-Driven Development is mandatory in RaiSE, with no exceptions. The discipline is non-negotiable because tests are the specification of behavior, not a verification afterthought added once code exists. Writing the test first forces the interface and the expected outcome to be decided before implementation details cloud the picture. If behavior is not covered by a test, it is not specified.\n\nAlso known as: TDD, red-green-refactor, test-first development.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "tdd"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-red-write-the-failing-test-first",
+    "type": "knowledge",
+    "content": "Before any production code, write a failing test that defines the expected behavior. The test must fail for the right reason — a missing implementation, not a syntax error or a typo. No production code exists without a failing test that demands it.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "RED — Write the Failing Test First"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-green-write-minimal-code-to-pass",
+    "type": "knowledge",
+    "content": "Once a failing test exists, write the minimal code required to make it pass. No extra logic, no speculative future-proofing, no refactoring yet. The single goal of this phase is a passing test — nothing more.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "GREEN — Write Minimal Code to Pass"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-refactor-clean-up-without-breaking-tests",
+    "type": "knowledge",
+    "content": "With the test green, refactor to improve clarity, remove duplication, and apply clean-code principles. Tests stay green throughout. Refactoring changes structure, never observable behavior. If a refactor breaks a test, the refactor was wrong, not the test.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "REFACTOR — Clean Up Without Breaking Tests"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tests-are-specification",
+    "type": "knowledge",
+    "content": "The test suite is the executable specification of the system. This reframes testing from \"checking that code works\" to \"defining what the code must do.\" It is also why tests are written first: the specification precedes the implementation, not the other way around.",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "Tests Are Specification"
+    }
+  },
+  {
+    "id": "kc-raise-dev-workflow-tdd-applies-to-delivery-work",
+    "type": "knowledge",
+    "content": "TDD governs delivery work — code that produces observable value. Management tasks (administrative, operational) do not follow TDD because they are not delivery and have no behavioral specification to encode. The distinction matters: applying TDD where there is no behavior to specify is ceremony, not discipline.\n\n**Key properties:**\n- Mandatory for all delivery code, no exceptions\n- Cycle: RED (failing test) → GREEN (minimal pass) → REFACTOR (clean, stay green)\n- Tests are the specification, written before implementation\n- Does not apply to non-delivery management tasks",
+    "source_file": ".raise/cartridges/raise-dev-workflow/corpus/tdd.md",
+    "created": "2026-06-18T18:44:38.251932+00:00",
+    "updated_at": null,
+    "metadata": {
+      "cartridge": "raise-dev-workflow",
+      "heading": "TDD Applies to Delivery Work"
+    }
+  }
+]
