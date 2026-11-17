@@ -1,0 +1,143 @@
+# Reference YAML adapter config: GitHub Issues via MCP
+#
+# This file demonstrates how to integrate an MCP server with the
+# declarative adapter framework. Copy and adapt for your own server.
+#
+# Architecture: ADR-041, E337
+
+# --- Adapter identity ---
+# name: Used with --adapter flag (e.g., rai backlog search --adapter github)
+# protocol: "pm" (ProjectManagement) or "docs" (Documentation)
+# description: Human-readable, shown in `rai adapter list`
+adapter:
+  name: github
+  protocol: pm
+  description: "GitHub Issues via mcp-github"
+
+# --- MCP server connection ---
+# command: Executable to launch the MCP server subprocess
+# args: Command-line arguments passed to the server
+# env: Environment variable names to forward to the subprocess
+#      (values read from the current environment at runtime)
+server:
+  command: uvx
+  args: [mcp-github]
+  env: [GITHUB_TOKEN]
+
+# --- Protocol method mappings ---
+# Each key is a protocol method name from AsyncProjectManagementAdapter.
+# Set to null for methods the MCP server doesn't support.
+#
+# Per method:
+#   tool: MCP tool name to call
+#   args: Argument name → expression template
+#         Templates use {{ var }} syntax with dot-access and filters:
+#           {{ issue.summary }}       — dot-access into nested objects
+#           {{ data.number | str }}   — type coercion filter
+#           {{ data.url | default:"" }} — default value filter
+#           {{ data.labels | pluck:"name" }} — extract field from list items
+#   response: How to parse the MCP tool response
+#     fields: Field name → expression template (for single-item responses)
+#     items_path: Dot-path to list in response data (for list responses)
+methods:
+
+  # --- CRUD ---
+
+  create_issue:
+    tool: github_create_issue
+    args:
+      title: "{{ issue.summary }}"
+      body: "{{ issue.description | default:'' }}"
+      repo: "{{ project_key }}"
+      labels: "{{ issue.labels | default:'' }}"
+    response:
+      fields:
+        key: "{{ data.number | str }}"
+        url: "{{ data.html_url }}"
+
+  get_issue:
+    tool: github_get_issue
+    args:
+      issue_number: "{{ key }}"
+    response:
+      fields:
+        key: "{{ data.number | str }}"
+        summary: "{{ data.title }}"
+        status: "{{ data.state }}"
+        issue_type: "{{ data.type | default:'Issue' }}"
+        description: "{{ data.body | default:'' }}"
+
+  update_issue:
+    tool: github_update_issue
+    args:
+      issue_number: "{{ key }}"
+      title: "{{ fields.summary | default:'' }}"
+      body: "{{ fields.description | default:'' }}"
+    response:
+      fields:
+        key: "{{ data.number | str }}"
+        url: "{{ data.html_url }}"
+
+  transition_issue:
+    tool: github_update_issue
+    args:
+      issue_number: "{{ key }}"
+      state: "{{ status }}"
+    response:
+      fields:
+        key: "{{ data.number | str }}"
+        url: "{{ data.html_url }}"
+
+  # --- Batch ---
+  # batch_transition is auto-looped by the adapter (calls transition_issue N times).
+  # No MCP tool needed — set to null.
+  batch_transition: null
+
+  # --- Relationships ---
+  # GitHub doesn't have native issue linking via MCP tools.
+  link_to_parent: null
+  link_issues: null
+
+  # --- Comments ---
+
+  add_comment:
+    tool: github_add_comment
+    args:
+      issue_number: "{{ key }}"
+      body: "{{ body }}"
+    response:
+      fields:
+        id: "{{ data.id | str }}"
+        url: "{{ data.html_url }}"
+
+  get_comments:
+    tool: github_list_comments
+    args:
+      issue_number: "{{ key }}"
+      per_page: "{{ limit }}"
+    response:
+      items_path: data
+      fields:
+        id: "{{ item.id | str }}"
+        author: "{{ item.user.login }}"
+        body: "{{ item.body }}"
+        created: "{{ item.created_at }}"
+
+  # --- Query ---
+
+  search:
+    tool: github_search_issues
+    args:
+      query: "{{ query }}"
+      per_page: "{{ limit }}"
+    response:
+      items_path: data.items
+      fields:
+        key: "{{ item.number | str }}"
+        summary: "{{ item.title }}"
+        status: "{{ item.state }}"
+
+  # --- Lifecycle ---
+  # health is handled by the adapter framework (pings the MCP bridge).
+  # No MCP tool needed — set to null.
+  health: null

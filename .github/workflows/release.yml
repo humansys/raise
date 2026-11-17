@@ -1,0 +1,107 @@
+name: Release to PyPI
+
+# Tag format: {package}-v{version} (e.g. raise-core-v2.4.0, rai-agent-v0.1.0)
+# Prerequisite: each package must have a Trusted Publisher configured on PyPI
+# pointing to this repo, workflow "release.yml", environment "pypi".
+
+on:
+  push:
+    tags:
+      - "*-v*"
+
+permissions:
+  contents: write
+  id-token: write  # Required for Trusted Publishers (OIDC)
+
+jobs:
+  channel-guard:
+    runs-on: ubuntu-latest
+    outputs:
+      prerelease: ${{ steps.guard.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify tag provenance and channel
+        id: guard
+        run: bash scripts/check-tag-provenance.sh
+
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      package: ${{ steps.parse.outputs.package }}
+      version: ${{ steps.parse.outputs.version }}
+      prerelease: ${{ steps.parse.outputs.prerelease }}
+    steps:
+      - name: Parse tag
+        id: parse
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          PACKAGE="${TAG%-v*}"
+          VERSION="${TAG##*-v}"
+          echo "package=$PACKAGE" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          case "$VERSION" in
+            *a*|*b*|*rc*) echo "prerelease=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+          echo "Publishing $PACKAGE v$VERSION"
+
+  build:
+    needs: [resolve, channel-guard]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Build package
+        run: uv build --package ${{ needs.resolve.outputs.package }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/${{ needs.resolve.outputs.package }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ needs.resolve.outputs.prerelease == 'true' }}
+
+  verify-published:
+    # RAISE-17080: a green run means PyPI serves wheel+sdist and the
+    # GitHub Release exists. Consumes resolve outputs (package/version) —
+    # no re-parsing of the tag.
+    needs: [resolve, publish, github-release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify PyPI serves ${{ needs.resolve.outputs.package }}==${{ needs.resolve.outputs.version }}
+        run: bash scripts/verify-published.sh pypi "${{ needs.resolve.outputs.package }}" "${{ needs.resolve.outputs.version }}"
+      - name: Verify GitHub Release exists
+        run: gh release view "${{ needs.resolve.outputs.package }}-v${{ needs.resolve.outputs.version }}" --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName

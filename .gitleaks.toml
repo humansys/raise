@@ -1,0 +1,19 @@
+# Gitleaks configuration for raise-commons
+# Allowlist documentation, SOPs, ADRs, and scripts that contain
+# example/placeholder passwords (not real secrets).
+
+title = "raise-commons gitleaks config"
+
+[allowlist]
+description = "Known false positives — example passwords in docs and scripts"
+paths = [
+    # Documentation — all under dev/ is architecture, ADRs, SOPs
+    '''^dev/architecture/platform/.*\.md$''',
+    '''^dev/decisions/adr.*\.md$''',
+    '''^dev/sops/.*\.md$''',
+    # Story/epic design documents — contain example connection strings
+    '''^work/epics/e1962-rovo-mcp-bridge/smoke/.*\.sh$''',
+    '''^work/epics/e275-shared-memory-backend/stories/.*\.md$''',
+    # Migration scripts — dev-only localhost connections
+    '''^scripts/migrate_hansei_jsonl_to_db\.py$''',
+]

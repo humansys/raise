@@ -1,0 +1,7 @@
+type: architecture_context
+project: "{project_name}"
+status: draft
+tech_stack: {}
+external_dependencies: []
+users: []
+governed_by: []
